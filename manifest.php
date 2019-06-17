@@ -17,12 +17,14 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  */
 
+use oat\taoReview\scripts\update\Updater;
+
 return [
     'name' => 'taoReview',
     'label' => 'Review',
     'description' => 'Extension for reviewing passed tests, with the display of actual and correct answers.',
     'license' => 'GPL-2.0',
-    'version' => '0.2.0',
+    'version' => '0.1.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => [
         'tao' => '*',

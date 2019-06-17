@@ -28,12 +28,12 @@ module.exports = function (grunt) {
     let notify = grunt.config('notify') || {};
     let root = grunt.option('root') + '/taoReview/views/';
 
-    sass.taobosaselor = {
+    sass.taoreview = {
         options : {},
         files : {}
     };
 
-    watch.taobosaselorsass = {
+    watch.taoreviewsass = {
         files : [root + 'scss/**/*.scss'],
         tasks : ['sass:taoreview', 'notify:taoreviewsass'],
         options : {

@@ -25,7 +25,7 @@ module.exports = function(grunt) {
 
     grunt.config.merge({
         bundle : {
-            taobosaselor : {
+            taoreview : {
                 options : {
                     extension : 'taoReview',
                     outputDir : 'loader',

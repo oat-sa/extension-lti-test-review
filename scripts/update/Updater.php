@@ -20,6 +20,12 @@
 namespace oat\taoReview\scripts\update;
 
 use common_ext_ExtensionUpdater;
+use oat\tao\model\accessControl\func\AccessRule;
+use oat\tao\model\accessControl\func\AclProxy;
+use oat\tao\model\user\TaoRoles;
+use oat\taoLti\models\classes\LtiRoles;
+use oat\taoReview\controller\Review;
+use oat\taoReview\controller\ReviewTool;
 
 /**
  * Class Updater for updating the extension
@@ -33,6 +39,15 @@ class Updater extends common_ext_ExtensionUpdater
      */
     public function update($initialVersion)
     {
-        $this->setVersion($initialVersion);
+        if ($this->isVersion('0.1.0')) {
+
+            AclProxy::applyRule(new AccessRule(AccessRule::GRANT, 'http://www.tao.lu/Ontologies/generis.rdf#taoReviewManager', ['ext' => 'taoReview']));
+            AclProxy::applyRule(new AccessRule(AccessRule::GRANT, TaoRoles::ANONYMOUS, ReviewTool::class));
+            AclProxy::applyRule(new AccessRule(AccessRule::GRANT, LtiRoles::CONTEXT_LEARNER, Review::class));
+
+
+            $this->setVersion('0.2.0');
+        }
+
     }
 }

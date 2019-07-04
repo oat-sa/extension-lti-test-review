@@ -17,6 +17,11 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  */
 
+use oat\tao\model\accessControl\func\AccessRule;
+use oat\tao\model\user\TaoRoles;
+use oat\taoLti\models\classes\LtiRoles;
+use oat\taoReview\controller\Review;
+use oat\taoReview\controller\ReviewTool;
 use oat\taoReview\scripts\update\Updater;
 
 return [
@@ -28,6 +33,13 @@ return [
     'author' => 'Open Assessment Technologies SA',
     'requires' => [
         'tao' => '*',
+        'taoLti' => '*'
+    ],
+    'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoReviewManager',
+    'acl' => [
+        [AccessRule::GRANT, 'http://www.tao.lu/Ontologies/generis.rdf#taoReviewManager', ['ext' => 'taoReview']],
+        [AccessRule::GRANT, TaoRoles::ANONYMOUS, ReviewTool::class],
+        [AccessRule::GRANT, LtiRoles::CONTEXT_LEARNER, Review::class],
     ],
     'install' => [
         'php' => []

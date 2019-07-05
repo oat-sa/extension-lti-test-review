@@ -32,8 +32,9 @@ return [
     'version' => '0.2.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => [
-        'tao' => '*',
-        'taoLti' => '*'
+        'tao' => '>=37.8.2',
+        'taoLti' => '>=10.1.0',
+        'ltiDeliveryProvider' => '>=9.2.0',
     ],
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoReviewManager',
     'acl' => [
@@ -42,15 +43,15 @@ return [
         [AccessRule::GRANT, LtiRoles::CONTEXT_LEARNER, Review::class],
     ],
     'install' => [
-        'php' => []
+        'php' => [],
     ],
     'uninstall' => [],
     'update' => Updater::class,
     'routes' => [
-        '/taoReview' => 'oat\\taoReview\\controller'
+        '/taoReview' => 'oat\\taoReview\\controller',
     ],
     'constants' => [
         'DIR_VIEWS' => __DIR__ . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR,
         'BASE_URL' => ROOT_URL . 'taoReview/',
-    ]
+    ],
 ];

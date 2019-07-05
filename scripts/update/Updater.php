@@ -35,13 +35,15 @@ class Updater extends common_ext_ExtensionUpdater
 {
     /**
      * @param $initialVersion
+     *
      * @return string|void
      */
     public function update($initialVersion)
     {
         if ($this->isVersion('0.1.0')) {
 
-            AclProxy::applyRule(new AccessRule(AccessRule::GRANT, 'http://www.tao.lu/Ontologies/generis.rdf#taoReviewManager', ['ext' => 'taoReview']));
+            AclProxy::applyRule(new AccessRule(AccessRule::GRANT,
+                'http://www.tao.lu/Ontologies/generis.rdf#taoReviewManager', ['ext' => 'taoReview']));
             AclProxy::applyRule(new AccessRule(AccessRule::GRANT, TaoRoles::ANONYMOUS, ReviewTool::class));
             AclProxy::applyRule(new AccessRule(AccessRule::GRANT, LtiRoles::CONTEXT_LEARNER, Review::class));
 

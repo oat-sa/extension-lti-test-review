@@ -24,12 +24,11 @@ use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiMessages\LtiErrorMessage;
 
 /**
- * Class ReviewTool
+ * ReviewTool controller for managing LTI calls, used as entry point for LTI call and do redirect to proper application controller
  * @package oat\taoReview\controller
  */
 class ReviewTool extends ToolModule
 {
-
     /**
      * @throws LtiException
      * @throws \InterruptedActionException

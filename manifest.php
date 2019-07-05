@@ -17,6 +17,11 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  */
 
+use oat\tao\model\accessControl\func\AccessRule;
+use oat\tao\model\user\TaoRoles;
+use oat\taoLti\models\classes\LtiRoles;
+use oat\taoReview\controller\Review;
+use oat\taoReview\controller\ReviewTool;
 use oat\taoReview\scripts\update\Updater;
 
 return [
@@ -24,21 +29,29 @@ return [
     'label' => 'Review',
     'description' => 'Extension for reviewing passed tests, with the display of actual and correct answers.',
     'license' => 'GPL-2.0',
-    'version' => '0.1.0',
+    'version' => '0.2.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => [
-        'tao' => '*',
+        'tao' => '>=37.8.2',
+        'taoLti' => '>=10.1.0',
+        'ltiDeliveryProvider' => '>=9.2.0',
+    ],
+    'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoReviewManager',
+    'acl' => [
+        [AccessRule::GRANT, 'http://www.tao.lu/Ontologies/generis.rdf#taoReviewManager', ['ext' => 'taoReview']],
+        [AccessRule::GRANT, TaoRoles::ANONYMOUS, ReviewTool::class],
+        [AccessRule::GRANT, LtiRoles::CONTEXT_LEARNER, Review::class],
     ],
     'install' => [
-        'php' => []
+        'php' => [],
     ],
     'uninstall' => [],
     'update' => Updater::class,
     'routes' => [
-        '/taoReview' => 'oat\\taoReview\\controller'
+        '/taoReview' => 'oat\\taoReview\\controller',
     ],
     'constants' => [
         'DIR_VIEWS' => __DIR__ . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR,
         'BASE_URL' => ROOT_URL . 'taoReview/',
-    ]
+    ],
 ];

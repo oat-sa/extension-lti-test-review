@@ -42,6 +42,8 @@ class Review extends tao_actions_SinglePageModule
      */
     public function index()
     {
+        // TODO: Move logic from controller to service with test coverage
+
         $launchData = LtiService::singleton()->getLtiSession()->getLaunchData();
 
         /** @var LtiLaunchDataService $launchDataService */

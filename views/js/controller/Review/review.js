@@ -19,12 +19,14 @@ define([
     'jquery',
     'lodash',
     'i18n',
-    'module'
+    'module',
+    'taoReview/review/runner'
 ], function (
     $,
     _,
     __,
-    module
+    module,
+    previewerFactory
 ) {
     'use strict';
 
@@ -40,6 +42,17 @@ define([
         start() {
             const pageParams = module.config();
             console.log(pageParams);
+
+            const uri = {
+                resultId: 'http://bosa/bosa3.rdf#i1562597019959151',
+                deliveryUri: 'http://bosa/bosa3.rdf#i15625969425625'
+            };
+
+            previewerFactory(document.querySelector(".content-wrap"), {
+                testUri: uri,
+                readOnly: true,
+                fullPage: true
+            });
         }
     };
 });

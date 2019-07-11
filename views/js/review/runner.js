@@ -43,23 +43,20 @@ define([
      */
     return function previewerFactory(container, config = {}, template = null) {
         const defaultPlugins = [{
-            module: 'taoQtiTest/runner/plugins/navigation/previous',
-            bundle: 'taoQtiTest/loader/testPlugins.min',
-            category: 'navigation'
-        }, {
-            module: 'taoQtiTest/runner/plugins/navigation/next',
-            bundle: 'taoQtiTest/loader/testPlugins.min',
+            module: 'taoReview/review/plugins/next-prev-review/next-prev-review',
+            bundle: 'taoReview/loader/qtiReview.min',
             category: 'navigation'
         }];
 
         const testRunnerConfig = {
             testDefinition: 'test-container',
             serviceCallId: 'previewer',
+            // loadFromBundle: 'true',
             providers: {
                 runner: {
-                    id: 'qtiItemPreviewer',
-                    module: 'taoQtiTestPreviewer/previewer/provider/item/item',
-                    bundle: 'taoQtiTestPreviewer/loader/qtiPreviewer.min',
+                    id: 'qtiItemReview',
+                    module: 'taoReview/review/provider/item/item',
+                    bundle: 'taoReview/loader/qtiReview.min',
                     category: 'runner'
                 },
                 proxy: {

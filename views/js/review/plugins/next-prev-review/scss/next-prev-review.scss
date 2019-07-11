@@ -1,0 +1,19 @@
+
+.next-prev-review {
+  .btn-info {
+    border-radius: 0;
+    margin: 10px;
+
+    &.review-next {
+      width: 120px;
+    }
+
+    a {
+      color: white;
+      &:hover {
+        color: white;
+        text-decoration: none;
+      }
+    }
+  }
+}

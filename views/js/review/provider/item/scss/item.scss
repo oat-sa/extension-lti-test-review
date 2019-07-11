@@ -1,0 +1,12 @@
+.previewer-component {
+  .item-previewer-scope {
+    .action-bar {
+      &.bottom-action-bar {
+        display: none;
+      }
+    }
+    .test-sidebar {
+      height: 100%;
+    }
+  }
+}

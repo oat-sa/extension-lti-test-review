@@ -1,0 +1,9 @@
+{
+	"version": 3,
+	"file": "next-prev-review.css",
+	"sources": [
+		"../scss/next-prev-review.scss"
+	],
+	"names": [],
+	"mappings": "AACA,AACE,iBADe,CACf,SAAS,AAAC,CACR,aAAa,CAAE,CAAC,CAChB,MAAM,CAAE,IAAI,CAab,AAhBH,AAKI,iBALa,CACf,SAAS,AAIN,YAAY,AAAC,CACZ,KAAK,CAAE,KAAK,CACb,AAPL,AASI,iBATa,CACf,SAAS,CAQP,CAAC,AAAC,CACA,KAAK,CAAE,KAAK,CAKb,AAfL,AAWM,iBAXW,CACf,SAAS,CAQP,CAAC,AAEE,MAAM,AAAC,CACN,KAAK,CAAE,KAAK,CACZ,eAAe,CAAE,IAAI,CACtB"
+}

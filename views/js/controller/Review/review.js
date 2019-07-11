@@ -50,8 +50,7 @@ define([
 
             previewerFactory(document.querySelector(".content-wrap"), {
                 testUri: uri,
-                readOnly: true,
-                fullPage: true
+                readOnly: true
             });
         }
     };

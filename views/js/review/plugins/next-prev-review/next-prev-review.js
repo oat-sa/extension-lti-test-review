@@ -27,15 +27,13 @@ define([
     'i18n',
     'ui/hider',
     'taoTests/runner/plugin',
-    'taoQtiTest/runner/plugins/navigation/next/nextWarningHelper',
-    'taoQtiTest/runner/helpers/messages',
     'taoQtiTest/runner/helpers/map',
     'taoQtiTest/runner/helpers/navigation',
     'util/shortcut',
     'util/namespace',
     'tpl!taoReview/review/plugins/next-prev-review/next-prev-review',
     'css!taoReview/review/plugins/next-prev-review/css/next-prev-review'
-], function ($, _, __, hider, pluginFactory, nextWarningHelper, messages, mapHelper, navigationHelper, shortcut, namespaceHelper, buttonTpl){
+], function ($, _, __, hider, pluginFactory, mapHelper, navigationHelper, shortcut, namespaceHelper, buttonTpl){
     'use strict';
 
     /**
@@ -50,7 +48,7 @@ define([
         },
         prev : {
             title   : __('Go to the previous item'),
-            icon    : 'left',
+            icon    : 'left'
         }
     };
 

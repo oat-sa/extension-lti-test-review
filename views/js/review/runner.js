@@ -22,10 +22,11 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 define([
+    'ui/feedback',
     'taoTests/runner/runnerComponent',
     'tpl!taoReview/review/runner',
     'json!taoReview/review/map.json',
-], function (runnerComponentFactory, runnerTpl, testmap) {
+], function (feedback, runnerComponentFactory, runnerTpl, testmap) {
     'use strict';
 
     /**
@@ -51,6 +52,7 @@ define([
         const testRunnerConfig = {
             testDefinition: 'test-container',
             serviceCallId: 'previewer',
+            proxyProvider: 'qtiItemReviewProxy',
             // loadFromBundle: 'true',
             providers: {
                 runner: {
@@ -60,9 +62,9 @@ define([
                     category: 'runner'
                 },
                 proxy: {
-                    id: 'qtiItemPreviewerProxy',
-                    module: 'taoQtiTestPreviewer/previewer/proxy/item',
-                    bundle: 'taoQtiTestPreviewer/loader/qtiPreviewer.min',
+                    id: 'qtiItemReviewProxy',
+                    module: 'taoReview/review/proxy/item',
+                    bundle: 'taoReview/loader/qtiReview.min',
                     category: 'proxy'
                 },
                 communicator: {
@@ -76,17 +78,14 @@ define([
             options: {
                 readOnly: config.readOnly,
                 fullPage: config.fullPage,
-                // plugins: config.pluginsOptions
             }
         };
 
         const items = [{
             itemDefinition: 'item-1',
-            uri: 'http://bosa/bosa3.rdf#i1562594332832614',
             state: null,
         }, {
             itemDefinition: 'item-2',
-            uri: 'http://bosa/bosa3.rdf#i156259433311715',
             state: {
                 RESPONSE: {
                     response: {
@@ -116,7 +115,6 @@ define([
             }
         }, {
             itemDefinition: 'item-3',
-            uri: 'http://bosa/bosa3.rdf#i1562594334560716',
             state: {
                 RESPONSE: {
                     response: {
@@ -191,6 +189,14 @@ define([
                     
                 })
                 runner.on('destroy', () => this.destroy() );
-            });
+                runner.spread(this, 'error');
+            })
+            .on('error', err => {
+                if (!_.isUndefined(err.message)) {
+                    feedback().error(err.message);
+                } else {
+                    logger.error(err);
+                }
+            } );
     };
 });

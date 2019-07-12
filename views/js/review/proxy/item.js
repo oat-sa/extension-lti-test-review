@@ -17,25 +17,21 @@
  */
 
 /**
- * Test runner provider for the QTI item review
+ * Test runner proxy for the QTI item review
  */
 define([
-    'taoQtiTestPreviewer/previewer/provider/item/item',
-    'css!taoReview/review/provider/item/css/item',
-    'css!taoQtiTestPreviewer/previewer/provider/item/css/item',
-], function (
-    qtiItemPreviewer,
-) {
+    'taoQtiTestPreviewer/previewer/proxy/item',
+], function(qtiItemPreviewerProxy) {
     'use strict';
 
-    /**
-     * A Test runner provider to be registered against the runner
-     */
-   const qtiItemReviewer = qtiItemPreviewer;
+    const qtiItemReviewProxy = qtiItemPreviewerProxy;
+    qtiItemReviewProxy.name = 'qtiItemReviewProxy';
 
-   //provider name
-   qtiItemReviewer.name = 'qtiItemReview';
-    
-    return qtiItemReviewer;
+    /**
+     * QTI proxy definition
+     * Related to remote services calls
+     * @type {Object}
+     */
+    return qtiItemReviewProxy;
 
 });

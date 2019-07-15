@@ -71,7 +71,7 @@ define([
         /**
          * Initialize the plugin (called during runner's init)
          */
-        init : function init(){
+        init() {
             const testRunner = this.getTestRunner();
             const testData = testRunner.getTestData();
             const testConfig = testData.config || {};

@@ -129,7 +129,7 @@ define([
     ]).test('plugin API ', (data, assert) =>  {
         const ready = assert.async();
         assert.expect(1);
-        previewerFactory('#fixture-api', runnerConfig)
+        reviewFactory('#fixture-api', runnerConfig)
             .on('ready', function (runner) {
                 const plugin = pluginFactory(runner);
                 assert.equal(typeof plugin[data.title], 'function', `The instances expose a ${data.title} function`);
@@ -144,25 +144,23 @@ define([
         const ready = assert.async();
         assert.expect(11);
 
-        previewerFactory('#fixture-enable', runnerConfig)
+        reviewFactory('#fixture-enable', runnerConfig)
             .on('ready', function (runner) {
                 const areaBroker = runner.getAreaBroker();
-                const plugin = runner.getPlugin('submit');
+                const plugin = runner.getPlugin('next-prev-review');
+                const $navigation = areaBroker.getPanelArea();
+                let $element = $navigation.find('[data-control="next-prev-review"]');
+                let $nextButton = $navigation.find('[data-control="next"]');
+                let $prevButton = $navigation.find('[data-control="prev"]');
                 Promise.resolve()
                     .then(function () {
-                        const $navigation = areaBroker.getNavigationArea();
-                        const $element = $navigation.find('[data-control="next-prev-review"]');
-                        const $nextButton = $navigation.find('[data-control="next"]');
-                        const $prevButton = $navigation.find('[data-control="prev"]');
-                        assert.equal($button.length, 1, 'The element has been inserted');
+                        assert.equal($element.length, 1, 'The element has been inserted');
                         assert.equal($nextButton.length, 1, 'The next button has been inserted');
                         assert.equal($prevButton.length, 1, 'The prev button has been inserted');
                         assert.equal($element.hasClass('disabled'), true, 'The button has been rendered disabled');
                         return plugin.enable();
                     })
                     .then(function () {
-                        const $navigation = areaBroker.getNavigationArea();
-                        const $element = $navigation.find('[data-control="next-prev-review"]');
                         assert.equal($element.hasClass('disabled'), false, 'The element has been enabled');
                         return new Promise(function (resolve) {
                             runner
@@ -171,8 +169,6 @@ define([
                         });
                     })
                     .then(function () {
-                        const $navigation = areaBroker.getNavigationArea();
-                        const $element = $navigation.find('[data-control="next-prev-review"]');
                         assert.equal($element.hasClass('disabled'), true, 'The element has been disabled');
                         return new Promise(function (resolve) {
                             runner
@@ -181,19 +177,14 @@ define([
                         });
                     })
                     .then(function () {
-                        const $navigation = areaBroker.getNavigationArea();
-                        const $element = $navigation.find('[data-control="next-prev-review"]');
                         assert.equal($element.hasClass('disabled'), false, 'The element has been enabled');
                         return plugin.disable();
                     })
                     .then(function () {
-                        const $navigation = areaBroker.getNavigationArea();
-                        const $element = $navigation.find('[data-control="next-prev-review"]');
                         assert.equal($element.hasClass('disabled'), true, 'The element has been disabled');
                         return plugin.destroy();
                     })
                     .then(function () {
-                        const $navigation = areaBroker.getNavigationArea();
                         const $element = $navigation.find('[data-control="next-prev-review"]');
                         const $nextButton = $navigation.find('[data-control="next"]');
                         const $prevButton = $navigation.find('[data-control="prev"]');
@@ -215,7 +206,7 @@ define([
     // QUnit.test('submit', assert =>  {
     //     const ready = assert.async();
     //     assert.expect(14);
-    //     previewerFactory('#fixture-show', runnerConfig)
+    //     reviewFactory('#fixture-show', runnerConfig)
     //         .on('ready', function (runner) {
     //             const areaBroker = runner.getAreaBroker();
     //             const plugin = runner.getPlugin('submit');
@@ -301,7 +292,7 @@ define([
 
         assert.expect(1);
 
-        previewerFactory($container, runnerConfig)
+        reviewFactory($container, runnerConfig)
             .on('error', function(err) {
                 assert.ok(false, 'An error has occurred');
                 assert.pushResult({
@@ -316,7 +307,6 @@ define([
                         assert.ok(true, 'The review has been rendered');
                         ready();
                     })
-                    .loadItem(itemRef);
             });
     });
 

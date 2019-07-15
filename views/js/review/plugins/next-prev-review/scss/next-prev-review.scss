@@ -19,5 +19,18 @@
       height: 25px;
       font-size: 2rem;
     }
+
+    .btn__content {
+      border: transparent 1px dotted;
+    }
+
+    &:focus,
+    .btn__content:focus {
+      outline: none;
+      
+    }
+    &:focus > .btn__content  {
+      border: white 1px dotted;
+    } 
   }
 }

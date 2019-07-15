@@ -1,9 +1,9 @@
 <div data-control="{{control}}" class="next-prev-review">
 	<button data-control="{{prev.control}}" class="small btn-info btn-group action review-prev">
-		<span class="icon icon-{{prev.icon}} no-label"></span>
+		<span class="icon icon-{{prev.icon}} no-label btn__content" tabindex="-1"></span>
 	</button>
 	<button data-control="{{next.control}}" class="small btn-info btn-group action review-next">
-		<div>
+		<div class="btn__content" tabindex="-1">
 			{{next.text}}
 			<span class="icon icon-{{next.icon}}{{#unless prev.text}} no-label{{/unless}}"></span>
 		</div>

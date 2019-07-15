@@ -31,8 +31,8 @@ define([
     'taoQtiTest/runner/helpers/navigation',
     'util/shortcut',
     'util/namespace',
-    'tpl!taoReview/review/plugins/next-prev-review/next-prev-review',
-    'css!taoReview/review/plugins/next-prev-review/css/next-prev-review'
+    'tpl!taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
+    'css!taoReview/review/plugins/navigation/next-prev-review/css/next-prev-review'
 ], function ($, _, __, hider, pluginFactory, mapHelper, navigationHelper, shortcut, namespaceHelper, buttonTpl){
     'use strict';
 
@@ -44,11 +44,13 @@ define([
         next : {
             title   : __('Go to the next item'),
             icon    : 'right',
-            text    : __('Next')
+            text    : __('Next'),
+            control : 'next',
         },
         prev : {
             title   : __('Go to the previous item'),
-            icon    : 'left'
+            icon    : 'left',
+            control : 'prev',
         }
     };
 

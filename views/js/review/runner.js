@@ -43,9 +43,9 @@ define([
      * @param {Function} [template] - An optional template for the component
      * @returns {previewer}
      */
-    return function previewerFactory(container, config = {}, template = null) {
+    return function reviewFactory(container, config = {}, template = null) {
         const defaultPlugins = [{
-            module: 'taoReview/review/plugins/next-prev-review/next-prev-review',
+            module: 'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
             bundle: 'taoReview/loader/qtiReview.min',
             category: 'navigation'
         }];
@@ -177,7 +177,7 @@ define([
                 });
                 const loadItem = () => {
                     const context = runner.getTestContext();
-                    const testUri = { ...config.testUri, uri: items[context.itemPosition].uri, itemDefinition: items[context.itemPosition].itemDefinition};
+                    const testUri = { uri: items[context.itemPosition].uri, itemDefinition: items[context.itemPosition].itemDefinition};
                     Object.assign(testUri, config.testUri);
                     runner.loadItem(testUri);
                 };

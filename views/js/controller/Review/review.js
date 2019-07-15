@@ -17,16 +17,10 @@
  */
 define([
     'jquery',
-    'lodash',
-    'i18n',
-    'module',
     'taoReview/review/runner'
 ], function (
     $,
-    _,
-    __,
-    module,
-    previewerFactory
+    reviewFactory
 ) {
     'use strict';
 
@@ -45,7 +39,7 @@ define([
                 deliveryUri: 'http://bosa/bosa3.rdf#i15625969425625'
             };
 
-            previewerFactory(document.querySelector(".content-wrap"), {
+            reviewFactory($(".content-wrap", document), {
                 testUri: uri,
                 readOnly: true,
                 fullPage: false

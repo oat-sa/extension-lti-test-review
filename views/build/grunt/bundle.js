@@ -29,8 +29,14 @@ module.exports = function(grunt) {
                 options : {
                     extension : 'taoReview',
                     outputDir : 'loader',
-                    dependencies : [],
-                    bundles : []
+                    dependencies : ['taoItems', 'taoQtiItem', 'taoTests', 'taoQtiTest', 'taoQtiTestPreviewer'],
+                    bundles : [{
+                        name : 'qtiReview',
+                        babel : true,
+                        include : [
+                            'taoReview/review/**/*'
+                        ]
+                    }]
                 }
             }
         }

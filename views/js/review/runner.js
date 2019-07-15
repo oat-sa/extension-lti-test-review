@@ -161,7 +161,9 @@ define([
                 });
                 const loadItem = () => {
                     const context = runner.getTestContext();
-                    const testUri = {...config.testUri, uri: items[context.itemPosition].uri, itemDefinition: items[context.itemPosition].itemDefinition};
+                    // const testUri = { ...config.testUri, uri: items[context.itemPosition].uri, itemDefinition: items[context.itemPosition].itemDefinition};
+                    const testUri = {uri: items[context.itemPosition].uri, itemDefinition: items[context.itemPosition].itemDefinition};
+                    Object.assign(testUri, config.testUri);
                     runner.loadItem(testUri);
                 }
                 loadItem();

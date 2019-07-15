@@ -40,9 +40,6 @@ define([
          * Entry point of the page
          */
         start() {
-            const pageParams = module.config();
-            console.log(pageParams);
-
             const uri = {
                 resultId: 'http://bosa/bosa3.rdf#i1562597019959151',
                 deliveryUri: 'http://bosa/bosa3.rdf#i15625969425625'

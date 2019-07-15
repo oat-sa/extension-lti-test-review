@@ -39,7 +39,7 @@ define([
     /**
      * The display of the next button
      */
-    var buttonData = {
+    const buttonData = {
         control : 'next-prev-review',
         next : {
             title   : __('Go to the next item'),
@@ -56,7 +56,7 @@ define([
      * Create the buttons
      * @returns {jQueryElement} the button
      */
-    var createElement = function createElement(){
+    const createElement = function createElement(){
         return $(buttonTpl(buttonData));
     };
 
@@ -70,34 +70,17 @@ define([
          * Initialize the plugin (called during runner's init)
          */
         init : function init(){
-            var self = this;
-            var testRunner = this.getTestRunner();
-            var testData = testRunner.getTestData();
-            var testConfig = testData.config || {};
-            var pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
+            const testRunner = this.getTestRunner();
+            const testData = testRunner.getTestData();
+            const testConfig = testData.config || {};
+            const pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
 
-            //plugin behavior
-            function doNext() {
-                testRunner.trigger('disablenav');
-
-                if (self.getState('enabled') !== false) {
-                    testRunner.next();
-                }
-            }
-            //plugin behavior
-            function doPrevious() {
-                testRunner.trigger('disablenav');
-
-                if(self.getState('enabled') !== false){
-                    testRunner.previous();
-                }
-            }
             /**
              * Check if the "Next" functionality should be available or not
              */
-            var canDoNext = function canDoNext() {
-                var testMap = testRunner.getTestMap();
-                var context = testRunner.getTestContext();
+            const canDoNext = function canDoNext() {
+                const testMap = testRunner.getTestMap();
+                const context = testRunner.getTestContext();
 
                 // check TestMap if empty
                 if( _.isPlainObject(testMap) && _.size(testMap) === 0){
@@ -110,15 +93,15 @@ define([
                 }
 
                 return true;
-            }
+            };
             /**
              * Check if the "Previous" functionality should be available or not
              */
-            var canDoPrevious = function canDoPrevious() {
-                var testMap = testRunner.getTestMap();
-                var context = testRunner.getTestContext();
-                var previousSection;
-                var previousPart;
+            const canDoPrevious = function canDoPrevious() {
+                const testMap = testRunner.getTestMap();
+                const context = testRunner.getTestContext();
+                let previousSection;
+                let previousPart;
 
                 // check TestMap if empty
                 if( _.isPlainObject(testMap) && _.size(testMap) === 0){
@@ -157,33 +140,47 @@ define([
                 }
                 return context.isLinear === false && context.canMoveBackward === true;
             };
+            //plugin behavior
+            const doNext = () => {
+                if (this.getState('enabled') !== false && canDoNext()) {
+                    testRunner.trigger('disablenav');
+                    testRunner.next();
+                }
+            };
+            //plugin behavior
+            const doPrevious = () => {
+                if(this.getState('enabled') !== false && canDoPrevious()){
+                    testRunner.trigger('disablenav');
+                    testRunner.previous();
+                }
+            };
             /**
              * Enable the button
              */
-            var enableButton = function enableButton (button){
+            const enableButton = function enableButton (button){
                 button.removeProp('disabled')
                     .removeClass('disabled');
             };
             /**
              * Disable the button
              */
-            var disableButton = function disableButton (button){
+            const disableButton = function disableButton (button){
                 button.prop('disabled', true)
                     .addClass('disabled');
             };
             /**
-             * Hide the plugin if the Previous functionality shouldn't be available
+             * Disable/enable Next/Prev buttons
              */
-            var toggle = function toggle(){
+            const toggle = () => {
                 if(canDoPrevious()){
-                    enableButton(self.$prev);
+                    enableButton(this.$prev);
                 } else {
-                    disableButton(self.$prev);
+                    disableButton(this.$prev);
                 }
                 if(canDoNext()){
-                    enableButton(self.$next);
+                    enableButton(this.$next);
                 } else {
-                    disableButton(self.$next);
+                    disableButton(this.$next);
                 }
             };
 
@@ -201,17 +198,23 @@ define([
             //attach behavior
             this.$prev.on('click', function(e){
                 e.preventDefault();
-                testRunner.trigger('nav-previous');
+                testRunner.trigger('nav-prev');
             });
 
-            if(testConfig.allowShortcuts && pluginShortcuts.trigger){
-                shortcut.add(namespaceHelper.namespaceAll(pluginShortcuts.trigger, this.getName(), true), function(e) {
-                    if (self.getState('enabled') === true) {
-                        testRunner.trigger('nav-next', true);
-                    }
-                }, {
-                    avoidInput: true,
-                    prevent: true
+            /**
+             * pluginShortcuts: {
+             *  next: 'shortkey',
+             *  prev: 'shortkey'
+             * }
+             */
+            if(testConfig.allowShortcuts){
+                _.forIn(pluginShortcuts, (value, key) => {
+                    shortcut.add(namespaceHelper.namespaceAll(value, this.getName(), true), () => {
+                        testRunner.trigger(`nav-${key}`, true);
+                    }, {
+                        avoidInput: true,
+                        prevent: true
+                    });
                 });
             }
 
@@ -221,30 +224,30 @@ define([
             //change plugin state
             testRunner
                 .on('loaditem', toggle)
-                .on('enablenav', function(){
-                    self.enable();
+                .on('enablenav', () => {
+                    this.enable();
                 })
-                .on('disablenav', function(){
-                    self.disable();
+                .on('disablenav', () => {
+                    this.disable();
                 })
-                .on('hidenav', function(){
-                    self.hide();
+                .on('hidenav', () => {
+                    this.hide();
                 })
-                .on('shownav', function(){
-                    self.show();
+                .on('shownav', () => {
+                    this.show();
                 })
-                .on('nav-next', function() {
+                .on('nav-next', () => {
                     doNext();
                 })
-                .on('nav-previous', function(){
+                .on('nav-prev', () => {
                     doPrevious();
-                });;
+                });
         },
 
         /**
          * Called during the runner's render phase
          */
-        render : function render(){
+        render() {
             //attach the element to the navigation area
             var $container = this.getAreaBroker().getPanelArea();
             $container.append(this.$element);
@@ -253,38 +256,38 @@ define([
         /**
          * Called during the runner's destroy phase
          */
-        destroy : function destroy (){
-            shortcut.remove('.' + this.getName());
+        destroy() {
+            shortcut.remove(`.${this.getName()}`);
             this.$element.remove();
         },
 
         /**
-         * Enable the button
+         * Enable the buttons
          */
-        enable : function enable (){
+        enable() {
             this.$element.removeProp('disabled')
-                         .removeClass('disabled');
+                .removeClass('disabled');
         },
 
         /**
-         * Disable the button
+         * Disable the buttons
          */
-        disable : function disable (){
+        disable(){
             this.$element.prop('disabled', true)
-                         .addClass('disabled');
+                .addClass('disabled');
         },
 
         /**
-         * Show the button
+         * Show the buttons
          */
-        show: function show(){
+        show() {
             hider.show(this.$element);
         },
 
         /**
-         * Hide the button
+         * Hide the buttons
          */
-        hide: function hide(){
+        hide() {
             hider.hide(this.$element);
         }
     });

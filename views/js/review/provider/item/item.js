@@ -31,11 +31,11 @@ define([
     /**
      * A Test runner provider to be registered against the runner
      */
-   const qtiItemReviewer = qtiItemPreviewer;
+    const qtiItemReviewer = qtiItemPreviewer;
 
-   //provider name
-   qtiItemReviewer.name = 'qtiItemReview';
-    
+    //provider name
+    qtiItemReviewer.name = 'qtiItemReview';
+
     return qtiItemReviewer;
 
 });

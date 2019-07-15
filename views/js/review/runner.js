@@ -22,11 +22,12 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 define([
+    'lodash',
     'ui/feedback',
     'taoTests/runner/runnerComponent',
     'tpl!taoReview/review/runner',
     'json!taoReview/review/map.json',
-], function (feedback, runnerComponentFactory, runnerTpl, testmap) {
+], function (_, feedback, runnerComponentFactory, runnerTpl, testmap) {
     'use strict';
 
     /**
@@ -78,6 +79,18 @@ define([
             options: {
                 readOnly: config.readOnly,
                 fullPage: config.fullPage,
+            }
+        };
+
+        const testData = {
+            config: {
+                allowShortcuts: true,
+                shortcuts: {
+                    'next-prev-review': {
+                        next: 'arrowright',
+                        prev: 'arrowleft'
+                    }
+                },
             }
         };
 
@@ -141,17 +154,20 @@ define([
             itemPosition: 0,
             isLinear: false,
             canMoveBackward: true
-        }; 
-        
+        };
+
         return runnerComponentFactory(container, testRunnerConfig, template || runnerTpl)
             .on('render', function() {
                 const {fullPage, readOnly} = this.getConfig().options;
                 this.setState('fullpage', fullPage);
                 this.setState('readonly', readOnly);
-            })
-            .on('ready', function(runner) {
+
+                const runner = this.getRunner();
                 runner.setTestMap(testmap);
                 runner.setTestContext(testContex);
+                runner.setTestData(testData);
+            })
+            .on('ready', function(runner) {
                 runner.on('renderitem', () => {
                     const context = runner.getTestContext();
                     if(items[context.itemPosition].state) {
@@ -161,14 +177,12 @@ define([
                 });
                 const loadItem = () => {
                     const context = runner.getTestContext();
-                    // const testUri = { ...config.testUri, uri: items[context.itemPosition].uri, itemDefinition: items[context.itemPosition].itemDefinition};
-                    const testUri = {uri: items[context.itemPosition].uri, itemDefinition: items[context.itemPosition].itemDefinition};
+                    const testUri = { ...config.testUri, uri: items[context.itemPosition].uri, itemDefinition: items[context.itemPosition].itemDefinition};
                     Object.assign(testUri, config.testUri);
                     runner.loadItem(testUri);
-                }
+                };
                 loadItem();
-                runner.on('move', function(direction, scope, position){
-                    console.log(direction, scope, position);
+                runner.on('move', function(direction){
                     const context = runner.getTestContext();
                     const testMap = runner.getTestMap();
                     let nextItemPosition;
@@ -178,7 +192,7 @@ define([
                     if(direction === 'previous') {
                         nextItemPosition = context.itemPosition - 1;
                     }
-    
+
                     runner.on('unloaditem', () => {
                         runner.off('unloaditem');
                         context.itemPosition = nextItemPosition;
@@ -188,16 +202,14 @@ define([
                     });
 
                     runner.unloadItem(context.itemIdentifier);
-                    
-                })
+
+                });
                 runner.on('destroy', () => this.destroy() );
                 runner.spread(this, 'error');
             })
             .on('error', err => {
                 if (!_.isUndefined(err.message)) {
                     feedback().error(err.message);
-                } else {
-                    logger.error(err);
                 }
             } );
     };

@@ -36,7 +36,7 @@ define([
     //provider name
     qtiItemReviewer.name = 'qtiItemReview';
 
-    qtiItemPreviewer.init() = function {
+    qtiItemPreviewer.init() = function () {
         const dataHolder = this.getDataHolder();
         const areaBroker = this.getAreaBroker();
 

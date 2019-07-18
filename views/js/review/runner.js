@@ -54,6 +54,10 @@ define([
             testDefinition: 'test-container',
             serviceCallId: 'previewer',
             proxyProvider: 'qtiItemReviewProxy',
+            bootstrap : {
+                serviceController : 'Review',
+                serviceExtension : 'taoReview'
+            },
             // loadFromBundle: 'true',
             providers: {
                 runner: {
@@ -162,10 +166,12 @@ define([
                 this.setState('fullpage', fullPage);
                 this.setState('readonly', readOnly);
 
+                // start - temporarily for mock-data
                 const runner = this.getRunner();
                 runner.setTestMap(testmap);
                 runner.setTestContext(testContex);
                 runner.setTestData(testData);
+                // end
             })
             .on('ready', function(runner) {
                 runner.on('renderitem', () => {
@@ -173,15 +179,14 @@ define([
                     if(items[context.itemPosition].state) {
                         runner.itemRunner.setState(items[context.itemPosition].state);
                     }
-                    // runner.trigger('enablenav'); in taoQtiTestPreviewer/views/js/previewer/provider/item/item.js 180line
                 });
                 const loadItem = () => {
                     const context = runner.getTestContext();
-                    const testUri = { uri: items[context.itemPosition].uri, itemDefinition: items[context.itemPosition].itemDefinition};
+                    const testUri = { itemDefinition: items[context.itemPosition].itemDefinition};
                     Object.assign(testUri, config.testUri);
                     runner.loadItem(testUri);
                 };
-                loadItem();
+                loadItem(); // temporarily to load first item, see taoQtiTestPreviewer/views/js/previewer/provider/item/item.js 163
                 runner.on('move', function(direction){
                     const context = runner.getTestContext();
                     const testMap = runner.getTestMap();

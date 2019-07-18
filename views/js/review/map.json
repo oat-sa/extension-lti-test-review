@@ -15,34 +15,10 @@
           "items": {
             "item-1": {
               "id": "item-1",
-              "label": "Example_0_Introduction",
-              "position": 0,
-              "occurrence": 0,
-              "remainingAttempts": 0,
-              "answered": false,
-              "flagged": false,
-              "viewed": true,
-              "categories": [],
-              "informational": true
+              "label": "Example_0_Introduction"
             }
-          },
-          "stats": {
-            "questions": 0,
-            "answered": 0,
-            "flagged": 0,
-            "viewed": 1,
-            "total": 1,
-            "questionsViewed": 0
           }
         }
-      },
-      "stats": {
-        "questions": 0,
-        "answered": 0,
-        "flagged": 0,
-        "viewed": 1,
-        "total": 1,
-        "questionsViewed": 0
       }
     },
     "QTIExamples": {
@@ -59,128 +35,40 @@
           "items": {
             "item-2": {
               "id": "item-2",
-              "label": "example_1_TAO",
-              "position": 1,
-              "occurrence": 0,
-              "remainingAttempts": 1,
-              "answered": false,
-              "flagged": false,
-              "viewed": false,
-              "categories": [],
-              "informational": false
+              "label": "example_1_TAO"
             },
             "item-3": {
               "id": "item-3",
-              "label": "example_2_Math",
-              "position": 2,
-              "occurrence": 0,
-              "remainingAttempts": 1,
-              "answered": false,
-              "flagged": false,
-              "viewed": false,
-              "categories": [],
-              "informational": false
+              "label": "example_2_Math"
             },
             "item-4": {
               "id": "item-4",
-              "label": "Example_3_Baudelaire",
-              "position": 3,
-              "occurrence": 0,
-              "remainingAttempts": 1,
-              "answered": false,
-              "flagged": false,
-              "viewed": false,
-              "categories": [],
-              "informational": false
+              "label": "Example_3_Baudelaire"
             },
             "item-5": {
               "id": "item-5",
-              "label": "Example_4_Appearance",
-              "position": 4,
-              "occurrence": 0,
-              "remainingAttempts": 1,
-              "answered": false,
-              "flagged": false,
-              "viewed": false,
-              "categories": [],
-              "informational": false
+              "label": "Example_4_Appearance"
             },
             "item-6": {
               "id": "item-6",
-              "label": "Example_5_picasso",
-              "position": 5,
-              "occurrence": 0,
-              "remainingAttempts": 1,
-              "answered": false,
-              "flagged": false,
-              "viewed": false,
-              "categories": [],
-              "informational": false
+              "label": "Example_5_picasso"
             },
             "item-7": {
               "id": "item-7",
-              "label": "Example_6_Geography",
-              "position": 6,
-              "occurrence": 0,
-              "remainingAttempts": 1,
-              "answered": false,
-              "flagged": false,
-              "viewed": false,
-              "categories": [],
-              "informational": false
+              "label": "Example_6_Geography"
             },
             "item-8": {
               "id": "item-8",
-              "label": "Example_7_Geo 2",
-              "position": 7,
-              "occurrence": 0,
-              "remainingAttempts": 1,
-              "answered": false,
-              "flagged": false,
-              "viewed": false,
-              "categories": [],
-              "informational": false
+              "label": "Example_7_Geo 2"
             },
             "item-9": {
               "id": "item-9",
-              "label": "Example_8_Geo 3",
-              "position": 8,
-              "occurrence": 0,
-              "remainingAttempts": 1,
-              "answered": false,
-              "flagged": false,
-              "viewed": false,
-              "categories": [],
-              "informational": false
+              "label": "Example_8_Geo 3"
             }
-          },
-          "stats": {
-            "questions": 8,
-            "answered": 0,
-            "flagged": 0,
-            "viewed": 0,
-            "total": 8,
-            "questionsViewed": 0
           }
         }
-      },
-      "stats": {
-        "questions": 8,
-        "answered": 0,
-        "flagged": 0,
-        "viewed": 0,
-        "total": 8,
-        "questionsViewed": 0
       }
     }
-  },
-  "stats": {
-    "questions": 8,
-    "answered": 0,
-    "flagged": 0,
-    "viewed": 1,
-    "total": 9,
-    "questionsViewed": 0
   },
   "jumps": [
     {

@@ -22,9 +22,12 @@
 namespace oat\taoReview\controller;
 
 use common_exception_Error;
+use oat\generis\model\OntologyAwareTrait;
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
 use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
+use oat\taoDelivery\model\execution\OntologyDeliveryExecution;
 use oat\taoLti\models\classes\LtiException;
+use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiService;
 use oat\taoLti\models\classes\LtiVariableMissingException;
 use tao_actions_SinglePageModule;
@@ -35,6 +38,8 @@ use tao_actions_SinglePageModule;
  */
 class Review extends tao_actions_SinglePageModule
 {
+    use OntologyAwareTrait;
+
     /**
      * @throws LtiException
      * @throws LtiVariableMissingException
@@ -52,19 +57,27 @@ class Review extends tao_actions_SinglePageModule
         /** @var LtiResultAliasStorage $ltiResultIdStorage */
         $ltiResultIdStorage = $this->getServiceLocator()->get(LtiResultAliasStorage::SERVICE_ID);
 
-
         $resultIdentifier = $launchData->hasVariable('lis_result_sourcedid')
             ? $launchData->getVariable('lis_result_sourcedid')
             : $launchDataService->findDeliveryExecutionFromLaunchData($launchData);
 
         $deliveryExecutionId = $ltiResultIdStorage->getDeliveryExecutionId($resultIdentifier);
 
-        if ($deliveryExecutionId !== null) {
-            $params['delivery_execution'] = $deliveryExecutionId;
+        if ($deliveryExecutionId === null) {
+            throw new LtiInvalidLaunchDataException('Wrong result ID provided');
         }
 
-        $this->setClientRoute(_url('index', 'Review', 'taoReview', $params ?? []));
-        $this->composeView('delegated-view', null, 'pages/index.tpl', 'tao');
+        $execution = $this->getResource($deliveryExecutionId);
+        $delivery = $execution->getOnePropertyValue($this->getProperty(OntologyDeliveryExecution::PROPERTY_DELIVERY));
+
+        if ($deliveryExecutionId !== null) {
+            $data = [
+                'delivery' => $delivery->getUri(),
+                'execution' => $execution->getUri()
+            ];
+        }
+
+        $this->composeView('delegated-view', $data ?? [], 'pages/index.tpl', 'tao');
     }
 
 }

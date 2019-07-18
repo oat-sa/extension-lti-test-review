@@ -25,7 +25,7 @@ define([
     'use strict';
 
     /**
-     * Controls the taoProctoring delivery page
+     * Controls the taoReview delivery page
      *
      * @type {Object}
      */
@@ -34,13 +34,16 @@ define([
          * Entry point of the page
          */
         start() {
-            const uri = {
-                resultId: 'http://bosa/bosa3.rdf#i1562597019959151',
-                deliveryUri: 'http://bosa/bosa3.rdf#i15625969425625'
-            };
+
+            const $container = $('.container');
+            const execution = $container.data('execution');
+            const delivery = $container.data('delivery');
 
             reviewFactory($(".content-wrap", document), {
-                testUri: uri,
+                testUri: {
+                    resultId: execution,
+                    deliveryUri: delivery
+                },
                 readOnly: true,
                 fullPage: false
             });

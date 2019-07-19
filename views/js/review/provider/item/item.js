@@ -21,10 +21,12 @@
  */
 define([
     'taoQtiTestPreviewer/previewer/provider/item/item',
+    'taoQtiTest/runner/ui/toolbox/toolbox',
     'css!taoReview/review/provider/item/css/item',
     'css!taoQtiTestPreviewer/previewer/provider/item/css/item',
 ], function (
     qtiItemPreviewer,
+    toolboxFactory
 ) {
     'use strict';
 
@@ -36,7 +38,7 @@ define([
     //provider name
     qtiItemReviewer.name = 'qtiItemReview';
 
-    qtiItemPreviewer.init() = function () {
+    qtiItemPreviewer.init = function () {
         const dataHolder = this.getDataHolder();
         const areaBroker = this.getAreaBroker();
 

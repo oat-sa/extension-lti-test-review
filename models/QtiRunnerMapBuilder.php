@@ -24,7 +24,6 @@ namespace oat\taoReview\models;
 use common_Exception;
 use common_exception_Error;
 use core_kernel_classes_Resource;
-use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\taoQtiTest\models\cat\CatService;
 use oat\taoQtiTest\models\ExtendedStateService;
 use oat\taoQtiTest\models\runner\config\QtiRunnerConfig;
@@ -63,8 +62,8 @@ class QtiRunnerMapBuilder
      * @param QtiRunnerServiceContext $context
      *
      * @return array
-     * @throws InvalidServiceManagerException
      * @throws common_Exception
+     * @throws common_exception_Error
      */
     public function build(QtiRunnerServiceContext $context)
     {
@@ -113,6 +112,8 @@ class QtiRunnerMapBuilder
                     'informational'     => $isItemInformational,
                 ];
 
+                $offset++;
+
                 $testPart = $routeItem->getTestPart();
                 $partId = $testPart->getIdentifier();
 
@@ -126,7 +127,6 @@ class QtiRunnerMapBuilder
                 }
                 $sectionId = $section->getIdentifier();
 
-//                $map['parts'][$partId]['sections'][$sectionId]['items'][$itemId] = $itemInfos;
                 $map[$partId]['sections'][$sectionId]['items'][$itemId] = $itemInfos;
             }
         }
@@ -146,6 +146,7 @@ class QtiRunnerMapBuilder
     protected function getOffsetPosition(QtiRunnerServiceContext $context, RouteItem $currentRouteItem)
     {
         $session = $context->getTestSession();
+
         /** @var Route $route */
         $route = $session->getRoute();
         $routeCount = $route->count();
@@ -220,18 +221,8 @@ class QtiRunnerMapBuilder
      */
     private function getItemLabel(QtiRunnerServiceContext $context, $itemUri)
     {
-//        $label = $context->getItemIndexValue($itemUri, 'title');
-//
-//        if (!$label) {
-//            $label = $context->getItemIndexValue($itemUri, 'label');
-//        }
-//
-//        if (!$label) {
         $item = new core_kernel_classes_Resource($itemUri);
-        $label = $item->getLabel();
 
-//        }
-
-        return $label;
+        return $item->getLabel();
     }
 }

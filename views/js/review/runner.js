@@ -54,6 +54,14 @@ define([
                 const {fullPage, readOnly} = this.getConfig().options;
                 this.setState('fullpage', fullPage);
                 this.setState('readonly', readOnly);
+
+                // start - temporarily for mock-data
+                const runner = this.getRunner();
+                // runner.setTestMap(testmap);
+                // runner.setTestContext(testContex);
+                runner.setTestData(testData);
+                // end
+
             })
             .on('ready', function(runner) {
                 // const loadItem = () => {

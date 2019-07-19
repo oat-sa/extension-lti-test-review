@@ -95,7 +95,7 @@ define([
                 dataHolder.set('itemData', data.itemData);
                 dataHolder.set('testMap', data.testMap);
                 dataHolder.set('testContext', data.testContext);
-                dataHolder.set('testData', data.testData);
+                // dataHolder.set('testData', data.testData);
             });
     };
 

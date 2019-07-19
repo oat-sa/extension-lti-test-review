@@ -168,8 +168,8 @@ define([
 
                 // start - temporarily for mock-data
                 const runner = this.getRunner();
-                runner.setTestMap(testmap);
-                runner.setTestContext(testContex);
+                // runner.setTestMap(testmap);
+                // runner.setTestContext(testContex);
                 runner.setTestData(testData);
                 // end
             })

@@ -21,22 +21,20 @@
 
 namespace oat\taoReview\controller;
 
+use common_Exception;
 use common_exception_Error;
 use oat\generis\model\OntologyAwareTrait;
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
 use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
+use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\taoDelivery\model\execution\OntologyDeliveryExecution;
-use oat\taoDeliveryRdf\model\DeliveryContainerService;
 use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiService;
 use oat\taoLti\models\classes\LtiVariableMissingException;
-use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
-use oat\taoQtiTest\models\runner\QtiRunnerService;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
-use oat\taoReview\models\QtiRunnerInitDataBuilder;
-use oat\taoReview\models\QtiRunnerMapBuilderFactory;
+use oat\taoReview\models\QtiRunnerInitDataBuilderFactory;
 use tao_actions_SinglePageModule;
 
 /**
@@ -79,7 +77,7 @@ class Review extends tao_actions_SinglePageModule
 
         if ($deliveryExecutionId !== null) {
             $data = [
-                'delivery' => $delivery->getUri(),
+                'delivery'  => $delivery->getUri(),
                 'execution' => $execution->getUri()
             ];
         }
@@ -166,18 +164,15 @@ class Review extends tao_actions_SinglePageModule
         return empty($lang) ? DEFAULT_LANG : (string)current($lang);
     }
 
+    /**
+     * @throws common_Exception
+     * @throws InvalidServiceManagerException
+     */
     public function init()
     {
-        $mapBuilderFactory = new QtiRunnerMapBuilderFactory();
-        $mapBuilderFactory->setServiceLocator($this->getServiceLocator());
+        $dataBuilder = new QtiRunnerInitDataBuilderFactory();
+        $dataBuilder->setServiceLocator($this->getServiceLocator());
 
-        $dataBuilder = new QtiRunnerInitDataBuilder(
-            $this->getServiceLocator()->get(DeliveryContainerService::SERVICE_ID),
-            $this->getServiceLocator()->get(QtiRunnerService::SERVICE_ID),
-            $mapBuilderFactory->create(),
-            $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID)
-        );
-
-        $this->returnJson($dataBuilder->build('https://taoce.loc/first.rdf#i15633615731648264'));
+        $this->returnJson($dataBuilder->create()->build('https://taoce.loc/first.rdf#i15633615731648264'));
     }
 }

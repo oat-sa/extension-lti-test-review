@@ -40,7 +40,7 @@ class QtiRunnerInitDataBuilderFactory extends ConfigurableService
             $locator->get(QtiRunnerService::SERVICE_ID),
             $locator->get(QtiRunnerMapBuilderFactory::SERVICE_ID)->create(),
             $locator->get(DeliveryExecutionManagerService::SERVICE_ID),
-            $locator->get(ResultServiceWrapper::SERVICE_ID),
+            $locator->get(ResultServiceWrapper::SERVICE_ID)
         );
     }
 }

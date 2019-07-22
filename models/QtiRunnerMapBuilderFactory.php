@@ -28,15 +28,19 @@ use oat\taoQtiTest\models\runner\config\QtiRunnerConfig;
 
 class QtiRunnerMapBuilderFactory extends ConfigurableService
 {
+    const SERVICE_ID = 'taoReview/QtiRunnerMapBuilderFactory';
+
     /**
      * @return QtiRunnerMapBuilder
      */
     public function create()
     {
+        $locator = $this->getServiceLocator();
+
         return new QtiRunnerMapBuilder(
-            $this->getServiceLocator()->get(QtiRunnerConfig::SERVICE_ID),
-            $this->getServiceLocator()->get(ExtendedStateService::SERVICE_ID),
-            $this->getServiceLocator()->get(CatService::SERVICE_ID)
+            $locator->get(QtiRunnerConfig::SERVICE_ID),
+            $locator->get(ExtendedStateService::SERVICE_ID),
+            $locator->get(CatService::SERVICE_ID)
         );
     }
 }

@@ -24,6 +24,9 @@ namespace oat\taoReview\models;
 use common_Exception;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\taoDeliveryRdf\model\DeliveryContainerService;
+use oat\taoOutcomeUi\helper\ResponseVariableFormatter;
+use oat\taoOutcomeUi\model\ResultsService;
+use oat\taoOutcomeUi\model\Wrapper\ResultServiceWrapper;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTest\models\runner\QtiRunnerService;
 use oat\taoQtiTest\models\runner\QtiRunnerServiceContext;
@@ -47,21 +50,27 @@ class QtiRunnerInitDataBuilder
      * @var DeliveryExecutionManagerService
      */
     private $deliveryExecutionService;
+    /**
+     * @var ResultServiceWrapper
+     */
+    private $resultService;
 
     public function __construct(
         DeliveryContainerService $deliveryContainerService,
         QtiRunnerService $qtiRunnerService,
         QtiRunnerMapBuilder $qtiRunnerMapBuilder,
-        DeliveryExecutionManagerService $deliveryExecutionService
+        DeliveryExecutionManagerService $deliveryExecutionService,
+        ResultServiceWrapper $resultService
     ) {
         $this->deliveryContainerService = $deliveryContainerService;
         $this->qtiRunnerService = $qtiRunnerService;
         $this->qtiRunnerMapBuilder = $qtiRunnerMapBuilder;
         $this->deliveryExecutionService = $deliveryExecutionService;
+        $this->resultService = $resultService;
     }
 
     /**
-     * @param $deliveryExecutionId
+     * @param string $deliveryExecutionId
      *
      * @return array
      * @throws common_Exception
@@ -69,24 +78,12 @@ class QtiRunnerInitDataBuilder
      */
     public function build($deliveryExecutionId)
     {
-        $deliveryExecution = $this->deliveryExecutionService->getDeliveryExecutionById($deliveryExecutionId);
-
-        $compilation = $this->deliveryContainerService->getTestCompilation($deliveryExecution);
-        $testId = $this->deliveryContainerService->getTestDefinition($deliveryExecution);
-
-        $serviceContext = $this->qtiRunnerService->getServiceContext($testId, $compilation, $deliveryExecutionId);
-        $jumps = $this->getJumps($serviceContext);
-
-        $parts = $this->qtiRunnerMapBuilder->build($serviceContext);
+        $serviceContext = $this->getServiceContext($deliveryExecutionId);
 
         $init = [
             'itemIdentifier' => null,
             'itemData'       => null,
-            'testMap'        => [
-                'scope' => 'test',
-                'parts' => $parts,
-                'jumps' => $jumps
-            ],
+            'testMap'        => $this->getTestMap($serviceContext),
             'testContext'    => $this->qtiRunnerService->getTestContext($serviceContext),
             'success'        => true
         ];
@@ -94,7 +91,92 @@ class QtiRunnerInitDataBuilder
         return $init;
     }
 
-    private function getJumps(QtiRunnerServiceContext $serviceContext)
+    /**
+     * @param string $deliveryExecutionId
+     *
+     * @return QtiRunnerServiceContext
+     *
+     * @throws common_Exception
+     */
+    private function getServiceContext($deliveryExecutionId)
+    {
+        $deliveryExecution = $this->deliveryExecutionService->getDeliveryExecutionById($deliveryExecutionId);
+
+        $compilation = $this->deliveryContainerService->getTestCompilation($deliveryExecution);
+        $testId = $this->deliveryContainerService->getTestDefinition($deliveryExecution);
+
+        return $this->qtiRunnerService->getServiceContext($testId, $compilation, $deliveryExecutionId);
+    }
+
+    /**
+     * @param $serviceContext
+     *
+     * @return array
+     * @throws InvalidServiceManagerException
+     * @throws common_Exception
+     */
+    private function getTestMap(QtiRunnerServiceContext $serviceContext)
+    {
+        $parts = $this->qtiRunnerMapBuilder->build($serviceContext);
+
+        return [
+            'scope' => 'test',
+            'parts' => $parts,
+            //            'jumps' => $this->getJumps($serviceContext)
+            'jumps' => $this->getJumps3($parts),
+            $variables = $this->getResultVariables(),
+        ];
+    }
+
+    private function getJumps3(array $parts)
+    {
+        $jumps = [];
+        foreach ($parts as $partName => $part) {
+            foreach ($part['sections'] as $sectionName => $section) {
+                foreach ($section['items'] as $item) {
+                    $jumps[] = [
+                        'identifier' => $item['id'],
+                        'position'   => $item['position'],
+                        'section'    => $sectionName,
+                        'part'       => $partName
+                    ];
+                }
+            }
+        }
+
+        return $jumps;
+    }
+
+    /**
+     * @param       $resultId
+     * @param       $filterSubmission
+     * @param array $filterTypes
+     *
+     * @return mixed
+     * @throws common_Exception
+     */
+    protected function getResultVariables($resultId, $filterSubmission = ResultsService::VARIABLES_FILTER_LAST_SUBMITTED, $filterTypes = array())
+    {
+        $variables = $this->resultService->getStructuredVariables($resultId, $filterSubmission, array_merge($filterTypes, [\taoResultServer_models_classes_ResponseVariable::class]));
+        $displayedVariables = $this->resultService->filterStructuredVariables($variables, $filterTypes);
+        $responses = ResponseVariableFormatter::formatStructuredVariablesToItemState($variables);
+        $excludedVariables = array_flip(['numAttempts', 'duration']);
+
+        foreach ($displayedVariables as &$item) {
+            if (!isset($item['uri'])) {
+                continue;
+            }
+            $itemUri = $item['uri'];
+            $item['state'] = isset($responses[$itemUri][$item['attempt']])
+                ? json_encode(array_diff_key($responses[$itemUri][$item['attempt']], $excludedVariables))
+                : null;
+        }
+
+        return $displayedVariables;
+    }
+
+
+    private function getJumps1(QtiRunnerServiceContext $serviceContext)
     {
         return taoQtiTest_helpers_TestRunnerUtils::buildPossibleJumps($serviceContext->getTestSession());
     }

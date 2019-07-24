@@ -26,9 +26,13 @@ define([
     'ui/hider',
     'taoReview/review/runner',
     'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
-    'json!taoQtiItem/test/samples/json/space-shuttle.json',
+    'json!taoReview/test/mocks/item-1.json',
+    'json!taoReview/test/mocks/testData.json',
+    'json!taoReview/test/mocks/testContext.json',
+    'json!taoReview/test/mocks/testMap.json',
+    'json!taoReview/test/mocks/testResponses.json',
     'lib/jquery.mockjax/jquery.mockjax',
-    'css!taoQtiTestPreviewer/previewer/provider/item/css/item'
+    'css!taoReview/review/provider/test/css/test'
 ], function (
     $,
     _,
@@ -36,7 +40,11 @@ define([
     hider,
     reviewFactory,
     pluginFactory,
-    itemData
+    itemData,
+    testData,
+    testContext,
+    testMap,
+    testResponses
 ) {
     'use strict';
 
@@ -44,14 +52,14 @@ define([
         serviceCallId : 'foo',
         providers : {
             runner: {
-                id: 'qtiItemReview',
-                module: 'taoReview/review/provider/item/item',
+                id: 'qtiTestReviewProvider',
+                module: 'taoReview/review/provider/test/qtiTestReviewProvider',
                 bundle: 'taoReview/loader/qtiReview.min',
                 category: 'runner'
             },
             proxy: {
-                id: 'qtiItemReviewProxy',
-                module: 'taoReview/review/proxy/item',
+                id: 'qtiTestReviewProxy',
+                module: 'taoReview/review/proxy/qtiTestReviewProxy',
                 bundle: 'taoReview/loader/qtiReview.min',
                 category: 'proxy'
             },
@@ -67,7 +75,10 @@ define([
                 category: 'navigation'
             }]
         },
-        options : {}
+        options : {
+            fullPage: false,
+            readOnly: true
+        }
     };
 
     // Prevent the AJAX mocks to pollute the logs
@@ -78,7 +89,12 @@ define([
     $.mockjax({
         url: '/init*',
         responseText: {
-            success: true
+            success: true,
+            itemIdentifier: 'item-1',
+            testData: testData,
+            testContext: testContext,
+            testMap: testMap,
+            testResponses: testResponses
         }
     });
     $.mockjax({

@@ -54,14 +54,6 @@ define([
                 const {fullPage, readOnly} = this.getConfig().options;
                 this.setState('fullpage', fullPage);
                 this.setState('readonly', readOnly);
-
-                // start - temporarily for mock-data
-                const runner = this.getRunner();
-                // runner.setTestMap(testmap);
-                // runner.setTestContext(testContex);
-                runner.setTestData(testData);
-                // end
-
             })
             .on('ready', function(runner) {
                 // const loadItem = () => {
@@ -93,12 +85,15 @@ define([
                 //     runner.unloadItem(context.itemIdentifier);
 
                 // });
-                runner.on('destroy', () => this.destroy() );
-                runner.spread(this, 'error');
+                // runner.spread(this, 'destroy');
+                // runner.spread(this, 'error');
+                runner.on('destroy', () => {
+                    this.destroy();
+                 });
             })
             .on('error', err => {
                 console.error(err);
-                if (!_.isUndefined(err.message)) {
+                if (err && err.message) {
                     feedback().error(err.message);
                 }
             } );

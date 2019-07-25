@@ -71,13 +71,16 @@ class Review extends tao_actions_SinglePageModule
         $this->composeView('delegated-view', $data, 'pages/index.tpl', 'tao');
     }
 
+    public function getItems()
+    {
+        
+    }
+
     /**
      * Provides the definition data and the state for a particular item
      */
     public function getItem()
     {
-        $code = 200;
-
         try {
             $this->validateCsrf();
 
@@ -125,7 +128,7 @@ class Review extends tao_actions_SinglePageModule
             $code = $this->getErrorCode($e);
         }
 
-        $this->returnJson($response, $code);
+        $this->returnJson($response, $code ?? 200);
     }
 
     /**

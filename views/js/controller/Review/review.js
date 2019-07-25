@@ -17,7 +17,7 @@
  */
 define([
     'jquery',
-    'taoReview/review/runner'
+    'taoReview/review/component/qtiTestReviewComponent'
 ], function (
     $,
     reviewFactory
@@ -45,7 +45,12 @@ define([
                     deliveryUri: delivery
                 },
                 readOnly: true,
-                fullPage: false
+                fullPage: false,
+                plugins: [{
+                    module: 'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
+                    bundle: 'taoReview/loader/qtiReview.min',
+                    category: 'navigation'
+                }]
             });
         }
     };

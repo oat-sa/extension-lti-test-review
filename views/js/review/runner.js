@@ -43,12 +43,6 @@ define([
      * @returns {previewer}
      */
     return function reviewFactory(container, config = {}, template = null) {
-        const defaultPlugins = [{
-            module: 'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
-            bundle: 'taoReview/loader/qtiReview.min',
-            category: 'navigation'
-        }];
-
         return runnerComponentFactory(container, config, template || runnerTpl)
             .on('render', function() {
                 const {fullPage, readOnly} = this.getConfig().options;
@@ -56,37 +50,6 @@ define([
                 this.setState('readonly', readOnly);
             })
             .on('ready', function(runner) {
-                // const loadItem = () => {
-                //     const context = runner.getTestContext();
-                //     const testUri = { itemDefinition: items[context.itemPosition].itemDefinition};
-                //     Object.assign(testUri, config.testUri);
-                //     runner.loadItem(testUri);
-                // };
-                // loadItem(); // temporarily to load first item, see taoQtiTestPreviewer/views/js/previewer/provider/item/item.js 163
-                // runner.on('move', function(direction){
-                //     const context = runner.getTestContext();
-                //     const testMap = runner.getTestMap();
-                //     let nextItemPosition;
-                //     if(direction === 'next') {
-                //         nextItemPosition = context.itemPosition + 1;
-                //     }
-                //     if(direction === 'previous') {
-                //         nextItemPosition = context.itemPosition - 1;
-                //     }
-
-                //     runner.on('unloaditem', () => {
-                //         runner.off('unloaditem');
-                //         context.itemPosition = nextItemPosition;
-                //         context.itemIdentifier = testMap.jumps[nextItemPosition].identifier;
-                //         runner.setTestContext(context);
-                //         loadItem();
-                //     });
-
-                //     runner.unloadItem(context.itemIdentifier);
-
-                // });
-                // runner.spread(this, 'destroy');
-                // runner.spread(this, 'error');
                 runner.on('destroy', () => {
                     this.destroy();
                  });

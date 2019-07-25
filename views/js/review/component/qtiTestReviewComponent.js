@@ -40,7 +40,7 @@ define([
 
         const testRunnerConfig = {
             testDefinition: config.testDefinition || 'test-container',
-            serviceCallId: config.serviceCallId || 'review',
+            serviceCallId: config.testUri.resultId,
             providers: {
                 runner: {
                     id: 'qtiTestReviewProvider',

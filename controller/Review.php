@@ -157,12 +157,18 @@ class Review extends tao_actions_SinglePageModule
      * @throws common_Exception
      * @throws InvalidServiceManagerException
      */
-    public function init()
+    public function init(): void
     {
-        $dataBuilder = new QtiRunnerInitDataBuilderFactory();
-        $dataBuilder->setServiceLocator($this->getServiceLocator());
+        /** @var QtiRunnerInitDataBuilderFactory $dataBuilder */
+        $dataBuilder = $this->getServiceLocator()->get(QtiRunnerInitDataBuilderFactory::SERVICE_ID);
 
-        $this->returnJson($dataBuilder->create()->build('https://taoce.loc/first.rdf#i15633615731648264'));
+        $params = $this->getPsrRequest()->getQueryParams();
+
+        if (isset($params['serviceCallId'])) {
+            $data = $dataBuilder->create()->build($params['serviceCallId']);
+        }
+
+        $this->returnJson($data ?? []);
     }
 
 }

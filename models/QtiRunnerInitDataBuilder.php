@@ -20,7 +20,6 @@
 
 namespace oat\taoReview\models;
 
-
 use common_Exception;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\taoDeliveryRdf\model\DeliveryContainerService;
@@ -34,25 +33,19 @@ use taoQtiTest_helpers_TestRunnerUtils;
 
 class QtiRunnerInitDataBuilder
 {
-    /**
-     * @var DeliveryContainerService
-     */
+    /** @var DeliveryContainerService */
     private $deliveryContainerService;
-    /**
-     * @var QtiRunnerService
-     */
+
+    /** @var QtiRunnerService */
     private $qtiRunnerService;
-    /**
-     * @var QtiRunnerMapBuilder
-     */
+
+    /** @var QtiRunnerMapBuilder */
     private $qtiRunnerMapBuilder;
-    /**
-     * @var DeliveryExecutionManagerService
-     */
+
+    /** @var DeliveryExecutionManagerService */
     private $deliveryExecutionService;
-    /**
-     * @var ResultServiceWrapper
-     */
+
+    /** @var ResultServiceWrapper */
     private $resultService;
 
     public function __construct(
@@ -74,9 +67,8 @@ class QtiRunnerInitDataBuilder
      *
      * @return array
      * @throws common_Exception
-     * @throws InvalidServiceManagerException
      */
-    public function build($deliveryExecutionId)
+    public function build($deliveryExecutionId): array
     {
         $serviceContext = $this->getServiceContext($deliveryExecutionId);
 
@@ -98,8 +90,9 @@ class QtiRunnerInitDataBuilder
      *
      * @throws common_Exception
      */
-    private function getServiceContext($deliveryExecutionId)
+    private function getServiceContext($deliveryExecutionId): QtiRunnerServiceContext
     {
+        // need to use ontology service probably here
         $deliveryExecution = $this->deliveryExecutionService->getDeliveryExecutionById($deliveryExecutionId);
 
         $compilation = $this->deliveryContainerService->getTestCompilation($deliveryExecution);
@@ -112,7 +105,6 @@ class QtiRunnerInitDataBuilder
      * @param $serviceContext
      *
      * @return array
-     * @throws InvalidServiceManagerException
      * @throws common_Exception
      */
     private function getTestMap(QtiRunnerServiceContext $serviceContext)
@@ -122,9 +114,8 @@ class QtiRunnerInitDataBuilder
         return [
             'scope' => 'test',
             'parts' => $parts,
-            //            'jumps' => $this->getJumps($serviceContext)
+//            'jumps' => $this->getJumps($serviceContext)
             'jumps' => $this->getJumps3($parts),
-            $variables = $this->getResultVariables(),
         ];
     }
 

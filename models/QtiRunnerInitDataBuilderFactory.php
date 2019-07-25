@@ -29,9 +29,9 @@ use oat\taoQtiTest\models\runner\QtiRunnerService;
 
 class QtiRunnerInitDataBuilderFactory extends ConfigurableService
 {
-    const SERVICE_ID = 'taoReview/QtiRunnerInitDataBuilderFactory';
+    public const SERVICE_ID = 'taoReview/QtiRunnerInitDataBuilderFactory';
 
-    public function create()
+    public function create(): QtiRunnerInitDataBuilder
     {
         $locator = $this->getServiceLocator();
 

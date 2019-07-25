@@ -28,6 +28,8 @@ use oat\taoLti\models\classes\LtiRoles;
 use oat\taoReview\controller\Review;
 use oat\taoReview\controller\ReviewTool;
 use oat\taoReview\models\DeliveryExecutionFinderService;
+use oat\taoReview\models\QtiRunnerInitDataBuilderFactory;
+use oat\taoReview\models\QtiRunnerMapBuilderFactory;
 
 /**
  * Class Updater for updating the extension
@@ -56,7 +58,11 @@ class Updater extends common_ext_ExtensionUpdater
 
         if ($this->isVersion('0.2.0')) {
 
-            $this->getServiceManager()->register(DeliveryExecutionFinderService::SERVICE_ID, new DeliveryExecutionFinderService());
+            $serviceManager = $this->getServiceManager();
+
+            $serviceManager->register(DeliveryExecutionFinderService::SERVICE_ID, new DeliveryExecutionFinderService());
+            $serviceManager->register(QtiRunnerInitDataBuilderFactory::SERVICE_ID, new QtiRunnerInitDataBuilderFactory());
+            $serviceManager->register(QtiRunnerMapBuilderFactory::SERVICE_ID, new QtiRunnerMapBuilderFactory());
 
             $this->setVersion('0.3.0');
         }

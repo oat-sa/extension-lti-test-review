@@ -20,7 +20,6 @@
 
 namespace oat\taoReview\models;
 
-
 use oat\oatbox\service\ConfigurableService;
 use oat\taoQtiTest\models\cat\CatService;
 use oat\taoQtiTest\models\ExtendedStateService;
@@ -28,12 +27,12 @@ use oat\taoQtiTest\models\runner\config\QtiRunnerConfig;
 
 class QtiRunnerMapBuilderFactory extends ConfigurableService
 {
-    const SERVICE_ID = 'taoReview/QtiRunnerMapBuilderFactory';
+    public const SERVICE_ID = 'taoReview/QtiRunnerMapBuilderFactory';
 
     /**
      * @return QtiRunnerMapBuilder
      */
-    public function create()
+    public function create(): QtiRunnerMapBuilder
     {
         $locator = $this->getServiceLocator();
 

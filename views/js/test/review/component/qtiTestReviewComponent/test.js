@@ -17,7 +17,7 @@
  */
 
 /**
- * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
+ * @author Hanna Dzmitryieva <hanna@taotesting.com>
  */
 define([
     'jquery',

@@ -3,6 +3,8 @@
 namespace oat\taoReview\models;
 
 
+use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
+use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
 use oat\oatbox\service\ConfigurableService;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\taoDelivery\model\execution\DeliveryExecution;

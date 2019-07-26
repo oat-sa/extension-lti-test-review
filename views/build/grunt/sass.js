@@ -30,7 +30,13 @@ module.exports = function (grunt) {
 
     sass.taoreview = {
         options : {},
-        files : {}
+        files : [{
+            expand: true,
+            src: root + 'js/**/scss/*.scss',
+            rename : function rename(dest, src){
+                return src.replace(/scss/g, 'css');
+            }
+        }]
     };
 
     watch.taoreviewsass = {

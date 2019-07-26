@@ -53,12 +53,6 @@ define([
                 runner.on('destroy', () => {
                     this.destroy();
                  });
-            })
-            .on('error', err => {
-                console.error(err);
-                if (err && err.message) {
-                    feedback().error(err.message);
-                }
-            } );
+            });
     };
 });

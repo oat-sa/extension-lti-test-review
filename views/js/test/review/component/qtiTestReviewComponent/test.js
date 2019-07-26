@@ -24,12 +24,25 @@ define([
     'lodash',
     'taoReview/review/component/qtiTestReviewComponent',
     'json!taoReview/test/mocks/item-1.json',
+    'json!taoReview/test/mocks/item-2.json',
+    'json!taoReview/test/mocks/item-3.json',
     'json!taoReview/test/mocks/testData.json',
     'json!taoReview/test/mocks/testContext.json',
     'json!taoReview/test/mocks/testMap.json',
     'json!taoReview/test/mocks/testResponses.json',
     'lib/jquery.mockjax/jquery.mockjax'
-], function($, _, qtiTestReviewFactory, itemData, testData, testContext, testMap, testResponses) {
+], function(
+    $, 
+    _,
+    qtiTestReviewFactory,
+    itemData1,
+    itemData2,
+    itemData3,
+    testData,
+    testContext,
+    testMap,
+    testResponses
+) {
     'use strict';
 
     QUnit.module('API');
@@ -37,11 +50,6 @@ define([
     // Prevent the AJAX mocks to pollute the logs
     $.mockjaxSettings.logger = null;
     $.mockjaxSettings.responseTime = 1;
-
-    // Restore AJAX method after each test
-    QUnit.testDone(function() {
-        $.mockjax.clear();
-    });
 
     QUnit.test('module', assert =>  {
         const ready = assert.async();
@@ -51,7 +59,7 @@ define([
         const review2 = qtiTestReviewFactory('#fixture-api', config);
 
         assert.expect(4);
-        $.mockjax({
+        const idMock = $.mockjax({
             url: '/*',
             responseText: {
                 success: true
@@ -76,7 +84,12 @@ define([
             review1.destroy()
             review2.destroy()
         })
-        .then( ready );
+        .then( ()=> {
+            // Restore AJAX method
+            $.mockjax.clear(idMock);
+            ready();
+        });
+
     });
 
     QUnit.cases.init([{
@@ -89,7 +102,7 @@ define([
                 itemData: {
                     content: {
                         type: 'qti',
-                        data: itemData
+                        data: itemData1
                     },
                     baseUrl: '',
                     state: {}
@@ -110,7 +123,7 @@ define([
                 success: true,
                 content: {
                     type: 'qti',
-                    data: itemData
+                    data: itemData1
                 },
                 baseUrl: '',
                 state: {}
@@ -125,7 +138,7 @@ define([
 
         assert.expect(1);
 
-        $.mockjax(data.mock);
+        const idMock = $.mockjax(data.mock);
 
         qtiTestReviewFactory($container, config)
             .on('error', function(err) {
@@ -143,9 +156,11 @@ define([
                 });
             })
             .after('destroy', function() {
+                // Restore AJAX method
+                $.mockjax.clear(idMock); 
                 ready();
             });
-                   
+                  
     });
 
     QUnit.test('destroy', assert =>  {
@@ -155,7 +170,7 @@ define([
 
         assert.expect(2);
 
-        $.mockjax({
+        const idMock = $.mockjax({
             url: '/init*',
             responseText: {
                 success: true
@@ -177,6 +192,8 @@ define([
             })
             .after('destroy', function() {
                 assert.equal($container.children().length, 0, 'The review has been destroyed');
+                // Restore AJAX method
+                $.mockjax.clear(idMock); 
                 ready();
             });
     });
@@ -211,17 +228,41 @@ define([
             }
         });
         $.mockjax({
-            url: '/getItem*',
+            url: '/getItem*item-1',
             responseText: {
                 success: true,
                 content: {
                     type: 'qti',
-                    data: itemData
+                    data: itemData1
                 },
                 baseUrl: '',
                 state: {}
             }
         });
+        $.mockjax({
+            url: '/getItem*item-2',
+            responseText: {
+                success: true,
+                content: {
+                    type: 'qti',
+                    data: itemData2
+                },
+                baseUrl: '',
+                state: {}
+            }
+        });
+        $.mockjax({
+            url: '/getItem*item-3',
+            responseText: {
+                success: true,
+                content: {
+                    type: 'qti',
+                    data: itemData3
+                },
+                baseUrl: '',
+                state: {}
+            }
+        });    
 
         qtiTestReviewFactory($container, config)
             .on('error', function(err) {

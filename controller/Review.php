@@ -73,7 +73,7 @@ class Review extends tao_actions_SinglePageModule
 
     public function getItems()
     {
-        
+        // TBD
     }
 
     /**

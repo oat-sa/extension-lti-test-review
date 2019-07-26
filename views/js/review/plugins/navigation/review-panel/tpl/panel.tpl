@@ -9,16 +9,12 @@
 {{/if}}
     <ul class="review-panel-filters plain">
     {{#each filters}}
-        <li class="review-panel-filter{{#if active}} active{{/if}}" data-control="{{id}}">
+        <li class="review-panel-filter" data-control="{{id}}">
             <span class="review-panel-label" title="{{title}}">{{label}}</span>
         </li>
     {{/each}}
     </ul>
-    <nav class="review-panel-content">
-    {{#with list}}
-        {{> tao-review-panel-list }}
-    {{/with}}
-    </nav>
+    <nav class="review-panel-content"></nav>
 {{#if footer}}
     <footer class="review-panel-footer">
     {{#with footer}}

@@ -164,11 +164,10 @@ define([
                     
                 })
                 .on('move', function(direction){
-                    var testNavigator;
-                    var newTestContext;
-                    var testData = this.getDataHolder().get('testData');
-                    var testContext = this.getDataHolder().get('testContext');
-                    var testMap = this.getDataHolder().get('testMap');
+                    let newTestContext;
+                    const testData = this.getTestData();
+                    const testContext = this.getTestContext();
+                    const testMap = this.getTestMap();
 
                     //we just block those actions and the end of the test
                     if (direction === 'next' && navigationHelper.isLast(testMap, testContext.itemIdentifier))
@@ -176,7 +175,7 @@ define([
                         throw offlineErrorHelper.buildErrorFromContext(offlineErrorHelper.getOfflineExitError());
                     }
 
-                    testNavigator = testNavigatorFactory(testData, testContext, testMap);
+                    const testNavigator = testNavigatorFactory(testData, testContext, testMap);
                     // try the navigation if the actionParams context meaningful data
                     if(direction === 'next') {
                         newTestContext = testNavigator.nextItem();
@@ -184,20 +183,12 @@ define([
                     if(direction === 'previous') {
                         newTestContext = testNavigator.previousItem();
                     }
-                    this.unloadItem(testContext.itemIdentifier)
-                        // .then(() => {
-                        //     this.setTestContext(newTestContext);
-                        //     loadItem();
-                        // })
+                    this.unloadItem(testContext.itemIdentifier);
+                    this.setTestContext(newTestContext);
                 })
                 .on('unloaditem', () => {
-                    // context.itemPosition = nextItemPosition;
-                    // context.itemIdentifier = testMap.jumps[nextItemPosition].identifier;
-                    // runner.setTestContext(context);
-                    // const context = runner.getTestContext();
-                    // const testUri = { itemDefinition: items[context.itemPosition].itemDefinition};
-                    // Object.assign(testUri, config.testUri);
-                    // loadItem(testUri);
+                    const testContext = this.getTestContext();
+                    this.loadItem(testContext.itemIdentifier);
                 })
                 .on('resumeitem', () => {
                     this.trigger('enableitem enablenav');

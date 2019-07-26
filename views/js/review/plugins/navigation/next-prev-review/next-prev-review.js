@@ -74,7 +74,7 @@ define([
         init() {
             const testRunner = this.getTestRunner();
             const testData = testRunner.getTestData();
-            const testConfig = testData.config || {};
+            const testConfig = testData && testData.config || {};
             const pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
 
             /**

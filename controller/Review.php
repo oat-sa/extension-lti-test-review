@@ -23,17 +23,17 @@ namespace oat\taoReview\controller;
 
 use common_Exception;
 use common_exception_Error;
+use common_exception_NotFound;
+use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
-use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
-use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
-use oat\taoDelivery\model\execution\OntologyDeliveryExecution;
 use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiService;
 use oat\taoLti\models\classes\LtiVariableMissingException;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
+use oat\taoReview\models\DeliveryExecutionFinderService;
 use oat\taoReview\models\QtiRunnerInitDataBuilderFactory;
 use tao_actions_SinglePageModule;
 
@@ -46,43 +46,34 @@ class Review extends tao_actions_SinglePageModule
     use OntologyAwareTrait;
 
     /**
+     * @throws InvalidServiceManagerException
      * @throws LtiException
+     * @throws LtiInvalidLaunchDataException
      * @throws LtiVariableMissingException
      * @throws common_exception_Error
+     * @throws common_exception_NotFound
      */
     public function index()
     {
-        // TODO: Move logic from controller to service with test coverage
-
         $launchData = LtiService::singleton()->getLtiSession()->getLaunchData();
 
-        /** @var LtiLaunchDataService $launchDataService */
-        $launchDataService = $this->getServiceLocator()->get(LtiLaunchDataService::SERVICE_ID);
+        /** @var DeliveryExecutionFinderService $finder */
+        $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
 
-        /** @var LtiResultAliasStorage $ltiResultIdStorage */
-        $ltiResultIdStorage = $this->getServiceLocator()->get(LtiResultAliasStorage::SERVICE_ID);
+        $execution = $finder->findDeliveryExecution($launchData);
+        $delivery = $execution->getDelivery();
 
-        $resultIdentifier = !$launchData->hasVariable('lis_result_sourcedid')
-            ? $launchData->getVariable('lis_result_sourcedid')
-            : $launchDataService->findDeliveryExecutionFromLaunchData($launchData);
+        $data = [
+            'execution' => $execution->getUri(),
+            'delivery'  => $delivery->getUri(),
+        ];
 
-        $deliveryExecutionId = $ltiResultIdStorage->getDeliveryExecutionId($resultIdentifier);
+        $this->composeView('delegated-view', $data, 'pages/index.tpl', 'tao');
+    }
 
-        if ($deliveryExecutionId === null) {
-            throw new LtiInvalidLaunchDataException('Wrong result ID provided');
-        }
-
-        $execution = $this->getResource($deliveryExecutionId);
-        $delivery = $execution->getOnePropertyValue($this->getProperty(OntologyDeliveryExecution::PROPERTY_DELIVERY));
-
-        if ($deliveryExecutionId !== null) {
-            $data = [
-                'delivery'  => $delivery->getUri(),
-                'execution' => $execution->getUri()
-            ];
-        }
-
-        $this->composeView('delegated-view', $data ?? [], 'pages/index.tpl', 'tao');
+    public function getItems()
+    {
+        // TBD
     }
 
     /**
@@ -90,8 +81,6 @@ class Review extends tao_actions_SinglePageModule
      */
     public function getItem()
     {
-        $code = 200;
-
         try {
             $this->validateCsrf();
 
@@ -139,7 +128,7 @@ class Review extends tao_actions_SinglePageModule
             $code = $this->getErrorCode($e);
         }
 
-        $this->returnJson($response, $code);
+        $this->returnJson($response, $code ?? 200);
     }
 
     /**
@@ -159,7 +148,7 @@ class Review extends tao_actions_SinglePageModule
         $testTaker = new \core_kernel_users_GenerisUser(
             new \core_kernel_classes_Resource($implementation->getTestTaker($resultId))
         );
-        $lang = $testTaker->getPropertyValues(\oat\generis\model\GenerisRdf::PROPERTY_USER_DEFLG);
+        $lang = $testTaker->getPropertyValues(GenerisRdf::PROPERTY_USER_DEFLG);
 
         return empty($lang) ? DEFAULT_LANG : (string)current($lang);
     }
@@ -168,11 +157,18 @@ class Review extends tao_actions_SinglePageModule
      * @throws common_Exception
      * @throws InvalidServiceManagerException
      */
-    public function init()
+    public function init(): void
     {
-        $dataBuilder = new QtiRunnerInitDataBuilderFactory();
-        $dataBuilder->setServiceLocator($this->getServiceLocator());
+        /** @var QtiRunnerInitDataBuilderFactory $dataBuilder */
+        $dataBuilder = $this->getServiceLocator()->get(QtiRunnerInitDataBuilderFactory::SERVICE_ID);
 
-        $this->returnJson($dataBuilder->create()->build('https://taoce.loc/first.rdf#i15633615731648264'));
+        $params = $this->getPsrRequest()->getQueryParams();
+
+        if (isset($params['serviceCallId'])) {
+            $data = $dataBuilder->create()->build($params['serviceCallId']);
+        }
+
+        $this->returnJson($data ?? []);
     }
+
 }

@@ -124,7 +124,8 @@ define([
      * @param {reviewPanelData|null} data
      * @returns {component}
      * @fires ready - When the component is ready to work
-     * @fires filterchange - When the active filter is changed
+     * @fires filterchange When the active filter has changed
+     * @fires datachange When the panel data has changed
      */
     function reviewPanelFactory(container, config = {}, data = null) {
         let controls = null;
@@ -132,6 +133,7 @@ define([
         let activeItem = null;
         let percentScore = '0%';
         let overallScore = '0/0';
+        let filteredData = null;
 
         /**
          * Selects the active filter
@@ -145,10 +147,95 @@ define([
         };
 
         /**
+         *
+         * @param {reviewPanelItem} item
+         * @returns {String}
+         */
+        const getItemIconCls = item => {
+            if (item.maxScore) {
+                if (item.score === item.maxScore) {
+                    return 'item-correct';
+                } else {
+                    return 'item-incorrect';
+                }
+            }
+            return 'item-info';
+        };
+
+        /**
+         * Refine the data to display the panel with respect to the current filter
+         */
+        const filterData = () => {
+            let score = 0;
+            let maxScore = 0;
+            filteredData = {
+                parts: (data && data.parts || []).reduce((parts, part) => {
+                    part = Object.assign({}, part);
+                    part.sections = (part.sections || []).reduce((sections, section) => {
+                        section = Object.assign({}, section);
+                        section.items = (section.items || []).reduce((items, item) => {
+                            item = Object.assign({}, item);
+                            item.cls = getItemIconCls(item);
+
+                            score += item.score || 0;
+                            maxScore += item.maxScore || 0;
+
+                            if (!activeFilter || !activeFilter.filter || activeFilter.filter(item, section, part)) {
+                                items.push(item);
+                            }
+
+                            return items;
+                        }, []);
+
+                        if (section.items.length) {
+                            sections.push(section);
+                        }
+
+                        return sections;
+                    }, []);
+
+                    if (part.sections.length) {
+                        parts.push(part);
+                    }
+
+                    return parts;
+                }, [])
+            };
+            percentScore = `${Math.floor(100 * score/maxScore) || 0}%`;
+            overallScore = `${score}/${maxScore}`;
+        };
+
+        /**
          * Defines the reviewPanel API
          * @type {reviewPanel}
          */
         const api = {
+            /**
+             * Gets the panel data
+             * @returns {reviewPanelData}
+             */
+            getData() {
+                return data;
+            },
+
+            /**
+             * Sets the panel data
+             * @param {reviewPanelData} newData
+             * @returns {reviewPanel}
+             * @fires datachange
+             */
+            setData(newData) {
+                data = newData;
+
+                /**
+                 * @event datachange
+                 * @param {reviewPanelData} data
+                 */
+                this.trigger('datachange', data);
+
+                return this;
+            },
+
             /**
              * Gets the active filter
              * @returns {reviewPanelFilter|null}
@@ -229,9 +316,14 @@ define([
              * @returns {reviewPanel}
              */
             update() {
+                filterData();
+
                 if (this.is('rendered')) {
-                    // ...
+                    controls.$content.html(listTpl(filteredData));
+                    controls.$headerScore.text(percentScore);
+                    controls.$footerScore.text(overallScore);
                 }
+
                 return this;
             }
         };
@@ -244,7 +336,7 @@ define([
             .setTemplate(panelTpl)
 
             // auto render on init
-            .on('init', function onMyComponentInit() {
+            .on('init', function onReviewPanelInit() {
                 const initConfig = this.getConfig();
                 const {headerLabel, footerLabel, filters} = initConfig;
 
@@ -274,7 +366,7 @@ define([
             })
 
             // renders the component
-            .on('render', function onMyComponentRender() {
+            .on('render', function onReviewPanelRender() {
                 controls = {
                     $headerScore: this.getElement().find('.review-panel-header .review-panel-score'),
                     $footerScore: this.getElement().find('.review-panel-footer .review-panel-score'),
@@ -307,8 +399,13 @@ define([
                     .trigger('ready');
             })
 
+            // data update
+            .on('datachange', function onReviewPanelDataChange() {
+                this.update();
+            })
+
             // free resources on dispose
-            .on('destroy', function onMyComponentDestroy() {
+            .on('destroy', function onReviewPanelDestroy() {
                 controls = null;
             });
 

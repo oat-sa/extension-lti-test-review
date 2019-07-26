@@ -1,6 +1,6 @@
 @import "inc/bootstrap";
 
-$minPanelWidth: 200px;
+$minPanelWidth: 300px;
 $maxPanelWidth: 300px;
 $scoreWidth: 30px;
 $iconWidth: 30px;
@@ -23,7 +23,7 @@ $partBackgroundHover: mix($textHighlight, $websiteBorder, 50%);
 $partBackgroundActive: mix($textHighlight, $websiteBorder, 45%);
 
 $sectionBorderColor: $textHighlight;
-$sectionBackground: $canvas;
+$sectionBackground: mix($textHighlight, $grey, 80%);
 $sectionBackgroundHover: mix($textHighlight, $grey, 75%);
 $sectionBackgroundActive: mix($textHighlight, $grey, 60%);
 
@@ -237,17 +237,17 @@ $incorrectColor: $error;
             padding-right: $space;
             line-height: inherit;
         }
-        &.info {
+        &.item-info {
             .review-panel-label:before {
                 @include icon-info;
             }
         }
-        &.correct {
+        &.item-correct {
             .review-panel-label:before {
                 @include icon-result-ok;
             }
         }
-        &.incorrect {
+        &.item-incorrect {
             .review-panel-label:before {
                 @include icon-result-nok;
                 color: $incorrectColor;

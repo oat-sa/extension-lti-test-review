@@ -1,5 +1,6 @@
+{{#if parts}}
 <ul class="review-panel-list plain">
-{{#each parts}}
+    {{#each parts}}
     <li class="review-panel-part{{#if active}} active{{/if}}{{#if expanded}} expanded{{/if}}" data-control="{{id}}">
         <span class="review-panel-label" title="{{label}}">{{label}}</span>
         <ul class="review-panel-block plain">
@@ -18,5 +19,6 @@
             {{/each}}
         </ul>
     </li>
-{{/each}}
+    {{/each}}
 </ul>
+{{/if}}

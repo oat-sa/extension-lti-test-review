@@ -131,10 +131,6 @@ define([
         let controls = null;
         let activeFilter = null;
         let activeItem = null;
-        let percentScore = '0%';
-        let overallScore = '0/0';
-        let filteredData = null;
-
         /**
          * Selects the active filter
          * @param {String} filterId
@@ -147,7 +143,7 @@ define([
         };
 
         /**
-         *
+         * Gets the icon class for a particular item
          * @param {reviewPanelItem} item
          * @returns {String}
          */
@@ -163,12 +159,13 @@ define([
         };
 
         /**
-         * Refine the data to display the panel with respect to the current filter
+         * Refines the data to display the panel with respect to the current filter
+         * @returns {Object}
          */
         const filterData = () => {
             let score = 0;
             let maxScore = 0;
-            filteredData = {
+            const testMap = {
                 parts: (data && data.parts || []).reduce((parts, part) => {
                     part = Object.assign({}, part);
                     part.sections = (part.sections || []).reduce((sections, section) => {
@@ -201,8 +198,11 @@ define([
                     return parts;
                 }, [])
             };
-            percentScore = `${Math.floor(100 * score/maxScore) || 0}%`;
-            overallScore = `${score}/${maxScore}`;
+            return {
+                testMap,
+                percentScore: `${Math.floor(100 * score / maxScore) || 0}%`,
+                overallScore: `${score}/${maxScore}`
+            };
         };
 
         /**
@@ -316,12 +316,11 @@ define([
              * @returns {reviewPanel}
              */
             update() {
-                filterData();
-
                 if (this.is('rendered')) {
-                    controls.$content.html(listTpl(filteredData));
-                    controls.$headerScore.text(percentScore);
-                    controls.$footerScore.text(overallScore);
+                    const filteredData = filterData();
+                    controls.$content.html(listTpl(filteredData.testMap));
+                    controls.$headerScore.text(filteredData.percentScore);
+                    controls.$footerScore.text(filteredData.overallScore);
                 }
 
                 return this;
@@ -344,7 +343,7 @@ define([
                 if (headerLabel) {
                     initConfig.header = {
                         label: headerLabel,
-                        score: percentScore
+                        score: '0%'
                     };
                 }
 
@@ -352,7 +351,7 @@ define([
                 if (footerLabel) {
                     initConfig.footer = {
                         label: footerLabel,
-                        score: overallScore
+                        score: '0/0'
                     };
                 }
 

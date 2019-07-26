@@ -30,6 +30,8 @@ define([
     'taoQtiTest/runner/ui/toolbox/toolbox',
     'taoQtiItem/runner/qtiItemRunner',
     'taoQtiTest/runner/config/assetManager',
+    'taoQtiTest/runner/navigator/navigator',
+    'taoQtiTest/runner/helpers/navigation',
     'tpl!taoReview/review/provider/test/tpl/test'
 ], function (
     $,
@@ -40,6 +42,8 @@ define([
     toolboxFactory,
     qtiItemRunner,
     assetManagerFactory,
+    testNavigatorFactory,
+    navigationHelper,
     layoutTpl
 ) {
     'use strict';
@@ -160,18 +164,31 @@ define([
                     
                 })
                 .on('move', function(direction){
-                    // const context = runner.getTestContext();
-                    // const testMap = runner.getTestMap();
-                    // let nextItemPosition;
-                    // if(direction === 'next') {
-                    //     nextItemPosition = context.itemPosition + 1;
-                    // }
-                    // if(direction === 'previous') {
-                    //     nextItemPosition = context.itemPosition - 1;
-                    // }
+                    var testNavigator;
+                    var newTestContext;
+                    var testData = this.getDataHolder().get('testData');
+                    var testContext = this.getDataHolder().get('testContext');
+                    var testMap = this.getDataHolder().get('testMap');
 
-                    // this.unloadItem(context.itemIdentifier);
+                    //we just block those actions and the end of the test
+                    if (direction === 'next' && navigationHelper.isLast(testMap, testContext.itemIdentifier))
+                    {
+                        throw offlineErrorHelper.buildErrorFromContext(offlineErrorHelper.getOfflineExitError());
+                    }
 
+                    testNavigator = testNavigatorFactory(testData, testContext, testMap);
+                    // try the navigation if the actionParams context meaningful data
+                    if(direction === 'next') {
+                        newTestContext = testNavigator.nextItem();
+                    }
+                    if(direction === 'previous') {
+                        newTestContext = testNavigator.previousItem();
+                    }
+                    this.unloadItem(testContext.itemIdentifier)
+                        // .then(() => {
+                        //     this.setTestContext(newTestContext);
+                        //     loadItem();
+                        // })
                 })
                 .on('unloaditem', () => {
                     // context.itemPosition = nextItemPosition;

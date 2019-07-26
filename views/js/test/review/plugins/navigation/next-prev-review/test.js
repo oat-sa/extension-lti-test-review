@@ -27,6 +27,8 @@ define([
     'taoReview/review/runner',
     'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
     'json!taoReview/test/mocks/item-1.json',
+    'json!taoReview/test/mocks/item-2.json',
+    'json!taoReview/test/mocks/item-3.json',
     'json!taoReview/test/mocks/testData.json',
     'json!taoReview/test/mocks/testContext.json',
     'json!taoReview/test/mocks/testMap.json',
@@ -40,7 +42,9 @@ define([
     hider,
     reviewFactory,
     pluginFactory,
-    itemData,
+    itemData1,
+    itemData2,
+    itemData3,
     testData,
     testContext,
     testMap,
@@ -98,12 +102,36 @@ define([
         }
     });
     $.mockjax({
-        url: '/getItem*',
+        url: '/getItem*item-1',
         responseText: {
             success: true,
             content: {
                 type: 'qti',
-                data: itemData
+                data: itemData1
+            },
+            baseUrl: '',
+            state: {}
+        }
+    });
+    $.mockjax({
+        url: '/getItem*item-2',
+        responseText: {
+            success: true,
+            content: {
+                type: 'qti',
+                data: itemData2
+            },
+            baseUrl: '',
+            state: {}
+        }
+    });
+    $.mockjax({
+        url: '/getItem*item-3',
+        responseText: {
+            success: true,
+            content: {
+                type: 'qti',
+                data: itemData3
             },
             baseUrl: '',
             state: {}

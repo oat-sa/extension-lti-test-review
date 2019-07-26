@@ -51,7 +51,13 @@ define([
                     bundle: 'taoReview/loader/qtiReview.min',
                     category: 'navigation'
                 }]
-            });
+            })
+            .on('error', err => {
+                console.error(err);
+                if (err && err.message) {
+                    feedback().error(err.message);
+                }
+            } );
         }
     };
 });

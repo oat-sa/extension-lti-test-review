@@ -30,6 +30,8 @@ define([
     'taoQtiTest/runner/ui/toolbox/toolbox',
     'taoQtiItem/runner/qtiItemRunner',
     'taoQtiTest/runner/config/assetManager',
+    'taoQtiTest/runner/navigator/navigator',
+    'taoQtiTest/runner/helpers/navigation',
     'tpl!taoReview/review/provider/test/tpl/test'
 ], function (
     $,
@@ -40,6 +42,8 @@ define([
     toolboxFactory,
     qtiItemRunner,
     assetManagerFactory,
+    testNavigatorFactory,
+    navigationHelper,
     layoutTpl
 ) {
     'use strict';
@@ -160,27 +164,33 @@ define([
                     
                 })
                 .on('move', function(direction){
-                    // const context = runner.getTestContext();
-                    // const testMap = runner.getTestMap();
-                    // let nextItemPosition;
-                    // if(direction === 'next') {
-                    //     nextItemPosition = context.itemPosition + 1;
-                    // }
-                    // if(direction === 'previous') {
-                    //     nextItemPosition = context.itemPosition - 1;
-                    // }
+                    let newTestContext;
+                    const testData = this.getTestData();
+                    const testContext = this.getTestContext();
+                    const testMap = this.getTestMap();
 
-                    // this.unloadItem(context.itemIdentifier);
+                    //we just block those actions and the end of the test
+                    if (direction === 'next' && navigationHelper.isLast(testMap, testContext.itemIdentifier))
+                    {
+                        throw offlineErrorHelper.buildErrorFromContext(offlineErrorHelper.getOfflineExitError());
+                    }
 
+                    const testNavigator = testNavigatorFactory(testData, testContext, testMap);
+                    // try the navigation if the actionParams context meaningful data
+                    if(direction === 'next') {
+                        newTestContext = testNavigator.nextItem();
+                    }
+                    if(direction === 'previous') {
+                        newTestContext = testNavigator.previousItem();
+                    }
+                    this.unloadItem(testContext.itemIdentifier);
+                    this.setTestContext(newTestContext);
                 })
                 .on('unloaditem', () => {
-                    // context.itemPosition = nextItemPosition;
-                    // context.itemIdentifier = testMap.jumps[nextItemPosition].identifier;
-                    // runner.setTestContext(context);
-                    // const context = runner.getTestContext();
-                    // const testUri = { itemDefinition: items[context.itemPosition].itemDefinition};
-                    // Object.assign(testUri, config.testUri);
-                    // loadItem(testUri);
+                    const testContext = this.getTestContext();
+                    if(testContext && testContext.itemIdentifier) {
+                        this.loadItem(testContext.itemIdentifier);
+                    }
                 })
                 .on('resumeitem', () => {
                     this.trigger('enableitem enablenav');

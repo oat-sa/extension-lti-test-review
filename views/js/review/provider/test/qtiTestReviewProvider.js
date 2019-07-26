@@ -188,7 +188,9 @@ define([
                 })
                 .on('unloaditem', () => {
                     const testContext = this.getTestContext();
-                    this.loadItem(testContext.itemIdentifier);
+                    if(testContext && testContext.itemIdentifier) {
+                        this.loadItem(testContext.itemIdentifier);
+                    }
                 })
                 .on('resumeitem', () => {
                     this.trigger('enableitem enablenav');

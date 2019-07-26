@@ -5,7 +5,7 @@
       "id": "testPart-1",
       "label": "testPart-1",
       "position": 0,
-      "isLinear": true,
+      "isLinear": false,
       "sections": {
         "assessmentSection-1": {
           "id": "assessmentSection-1",

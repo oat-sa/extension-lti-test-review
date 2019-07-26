@@ -1,7 +1,7 @@
 @import "inc/bootstrap";
 
-$minPanelWidth: 300px;
-$maxPanelWidth: 300px;
+$minPanelWidth: 250px;
+$maxPanelWidth: 250px;
 $scoreWidth: 30px;
 $iconWidth: 30px;
 $lineHeight: 3rem;
@@ -103,8 +103,12 @@ $incorrectColor: $error;
     display: flex;
     flex-direction: column;
     cursor: default;
-    min-width: $minPanelWidth;
-    max-width: $maxPanelWidth;
+    @if $minPanelWidth == $maxPanelWidth {
+        width: $minPanelWidth;
+    } @else {
+        min-width: $minPanelWidth;
+        max-width: $maxPanelWidth;
+    }
     height: 100%;
     padding: $panelMargin;
 

@@ -64,6 +64,78 @@ define([
      * @property {Function<item, section, part>} [filter] - A callback function applied to filter the data
      */
 
+    /**
+     * Gets the icon class for a particular item
+     * @param {reviewPanelItem} item
+     * @returns {String}
+     */
+    const getItemIconCls = item => {
+        if (item.maxScore) {
+            if (item.score === item.maxScore) {
+                return 'item-correct';
+            } else {
+                return 'item-incorrect';
+            }
+        }
+        return 'item-info';
+    };
+
+    /**
+     * Reduces an array to another array
+     * @param {Array} array
+     * @param {Function} callback
+     * @returns {Array}
+     */
+    const reduceArray = (array, callback) => (array || []).reduce(callback, []);
+
+    /**
+     * Refines the data to display the panel with respect to the current filter
+     * @param {reviewPanelData} data
+     * @param {Function} [filter] - A callback function applied to filter the data
+     * @returns {Object}
+     */
+    const filterData = (data, filter) => {
+        let score = 0;
+        let maxScore = 0;
+        if (!_.isFunction(filter)) {
+            filter = () => true;
+        }
+        return {
+            testMap: {
+                parts: reduceArray(data && data.parts, (testParts, testPart) => {
+                    const sections = reduceArray(testPart.sections, (partSections, partSection) => {
+                        const items = reduceArray(partSection.items, (sectionItems, sectionItem) => {
+                            sectionItem = Object.assign({}, sectionItem);
+                            sectionItem.cls = getItemIconCls(sectionItem);
+
+                            score += sectionItem.score || 0;
+                            maxScore += sectionItem.maxScore || 0;
+
+                            if (filter(sectionItem, partSection, testPart)) {
+                                sectionItems.push(sectionItem);
+                            }
+
+                            return sectionItems;
+                        });
+
+                        if (items.length) {
+                            partSections.push(Object.assign({}, partSection, {items}));
+                        }
+
+                        return partSections;
+                    });
+
+                    if (sections.length) {
+                        testParts.push(Object.assign({}, testPart, {sections}));
+                    }
+
+                    return testParts;
+                })
+            },
+            percentScore: `${Math.floor(100 * score / maxScore) || 0}%`,
+            overallScore: `${score}/${maxScore}`
+        };
+    };
 
     /**
      * Some default config
@@ -141,69 +213,6 @@ define([
                 .removeClass('active')
                 .filter(`[data-control="${filterId}"]`)
                 .addClass('active');
-        };
-
-        /**
-         * Gets the icon class for a particular item
-         * @param {reviewPanelItem} item
-         * @returns {String}
-         */
-        const getItemIconCls = item => {
-            if (item.maxScore) {
-                if (item.score === item.maxScore) {
-                    return 'item-correct';
-                } else {
-                    return 'item-incorrect';
-                }
-            }
-            return 'item-info';
-        };
-
-        /**
-         * Refines the data to display the panel with respect to the current filter
-         * @returns {Object}
-         */
-        const filterData = () => {
-            let score = 0;
-            let maxScore = 0;
-            const testMap = {
-                parts: (data && data.parts || []).reduce((parts, part) => {
-                    part = Object.assign({}, part);
-                    part.sections = (part.sections || []).reduce((sections, section) => {
-                        section = Object.assign({}, section);
-                        section.items = (section.items || []).reduce((items, item) => {
-                            item = Object.assign({}, item);
-                            item.cls = getItemIconCls(item);
-
-                            score += item.score || 0;
-                            maxScore += item.maxScore || 0;
-
-                            if (!activeFilter || !activeFilter.filter || activeFilter.filter(item, section, part)) {
-                                items.push(item);
-                            }
-
-                            return items;
-                        }, []);
-
-                        if (section.items.length) {
-                            sections.push(section);
-                        }
-
-                        return sections;
-                    }, []);
-
-                    if (part.sections.length) {
-                        parts.push(part);
-                    }
-
-                    return parts;
-                }, [])
-            };
-            return {
-                testMap,
-                percentScore: `${Math.floor(100 * score / maxScore) || 0}%`,
-                overallScore: `${score}/${maxScore}`
-            };
         };
 
         /**
@@ -319,7 +328,7 @@ define([
              */
             update() {
                 if (this.is('rendered')) {
-                    const filteredData = filterData();
+                    const filteredData = filterData(data, activeFilter && activeFilter.filter);
                     controls.$content.html(listTpl(filteredData.testMap));
                     controls.$headerScore.text(filteredData.percentScore);
                     controls.$footerScore.text(filteredData.overallScore);

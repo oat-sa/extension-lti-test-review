@@ -24,13 +24,17 @@ define([
     'lodash',
     'i18n',
     'taoReview/review/plugins/navigation/review-panel/panel',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel/list.json'
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data.json',
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data-filtered-all.json',
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data-filtered-incorrect.json'
 ], function (
     $,
     _,
     __,
     reviewPanelFactory,
-    panelData
+    panelData,
+    panelDataFilteredAll,
+    panelDataFilteredIncorrect
 ) {
     'use strict';
 
@@ -316,7 +320,7 @@ define([
             }]
         };
 
-        assert.expect(71);
+        assert.expect(73);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -349,17 +353,26 @@ define([
 
                 Promise
                     .resolve()
-                    .then(() => new Promise(resolve => {
-                        instance
-                            .off('.test')
-                            .on('datachange.test', newData => {
-                                assert.equal(newData, panelData, 'The datachange event is triggered with the expected parameter');
-                                resolve();
-                            });
-
+                    .then(() => {
+                        instance.off('.test');
+                        const promises = [
+                            new Promise(resolve => {
+                                instance.on('datachange.test', newData => {
+                                    assert.equal(newData, panelData, 'The datachange event is triggered with the expected parameter');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('update.test', filteredData => {
+                                    assert.deepEqual(filteredData, panelDataFilteredAll, 'The update event is triggered with the expected parameter');
+                                    resolve();
+                                });
+                            }),
+                        ];
                         assert.equal(instance.setData(panelData), instance, 'setData is fluent');
                         assert.equal(instance.getData(), panelData, 'The updated data is set');
-                    }))
+                        return Promise.all(promises);
+                    })
                     .then(() => {
                         assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
                         assert.equal($container.find('.review-panel-part:nth(0) > .review-panel-label').text().trim(), panelData.parts[0].label, 'The first test part got the expected label');
@@ -398,19 +411,28 @@ define([
                         assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is active');
                         assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active');
                     })
-                    .then(() => new Promise(resolve => {
-                        instance
-                            .off('.test')
-                            .on('filterchange.test', filterId => {
-                                assert.equal(filterId, defaultFilters[1].id, 'The filterchange event is triggered with the expected parameter');
-                                resolve();
-                            });
-
+                    .then(() => {
+                        instance.off('.test');
+                        const promises = [
+                            new Promise(resolve => {
+                                instance.on('filterchange.test', filterId => {
+                                    assert.equal(filterId, defaultFilters[1].id, 'The filterchange event is triggered with the expected parameter');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('update.test', filteredData => {
+                                    assert.deepEqual(filteredData, panelDataFilteredIncorrect, 'The update event is triggered with the expected parameter');
+                                    resolve();
+                                });
+                            }),
+                        ];
                         instance.setActiveFilter(defaultFilters[1].id);
 
                         assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), false, 'The first filter is not active anymore');
                         assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), true, 'The second filter is now active');
-                    }))
+                        return Promise.all(promises);
+                    })
                     .then(() => {
                         assert.equal($container.find('.review-panel-part').length, 1, 'The test parts are rendered');
                         assert.equal($container.find('.review-panel-part:nth(0) > .review-panel-label').text().trim(), panelData.parts[1].label, 'The first test part got the expected label');

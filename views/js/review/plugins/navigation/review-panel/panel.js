@@ -126,6 +126,7 @@ define([
      * @fires ready - When the component is ready to work
      * @fires filterchange When the active filter has changed
      * @fires datachange When the panel data has changed
+     * @fires update When the navigation panel has been updated
      */
     function reviewPanelFactory(container, config = {}, data = null) {
         let controls = null;
@@ -314,6 +315,7 @@ define([
             /**
              * Update the displayed list
              * @returns {reviewPanel}
+             * @fires update once the display has been updated
              */
             update() {
                 if (this.is('rendered')) {
@@ -321,6 +323,12 @@ define([
                     controls.$content.html(listTpl(filteredData.testMap));
                     controls.$headerScore.text(filteredData.percentScore);
                     controls.$footerScore.text(filteredData.overallScore);
+
+                    /**
+                     * @event update
+                     * @param {reviewPanelData} filteredData
+                     */
+                    this.trigger('update', filteredData);
                 }
 
                 return this;

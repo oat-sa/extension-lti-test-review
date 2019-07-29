@@ -60,7 +60,13 @@
                 "position": 4,
                 "score": 2,
                 "maxScore": 2
-              },
+              }
+            ]
+          },
+          {
+            "id": "assessmentSection-3",
+            "label": "Section 2",
+            "items": [
               {
                 "id": "item-6",
                 "label": "Example_5_picasso",
@@ -99,6 +105,6 @@
       }
     ]
   },
-  "percentScore": "94%",
-  "overallScore": "16/17"
+  "score": 16,
+  "maxScore": 17
 }

@@ -38,7 +38,7 @@
               "id": "item-3",
               "label": "example_2_Math",
               "position": 2,
-              "score": 2,
+              "score": 3,
               "maxScore": 3
             },
             {
@@ -54,7 +54,13 @@
               "position": 4,
               "score": 2,
               "maxScore": 2
-            },
+            }
+          ]
+        },
+        {
+          "id": "assessmentSection-3",
+          "label": "Section 2",
+          "items": [
             {
               "id": "item-6",
               "label": "Example_5_picasso",

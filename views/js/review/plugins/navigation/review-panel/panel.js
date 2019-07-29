@@ -22,12 +22,12 @@ define([
     'jquery',
     'lodash',
     'i18n',
-    'handlebars',
+    'ui/hider',
     'ui/component',
     'tpl!taoReview/review/plugins/navigation/review-panel/tpl/panel',
     'tpl!taoReview/review/plugins/navigation/review-panel/tpl/list',
     'css!taoReview/review/plugins/navigation/review-panel/css/panel.css'
-], function ($, _, __, Handlebars, componentFactory, panelTpl, listTpl) {
+], function ($, _, __, hider, componentFactory, panelTpl, listTpl) {
     'use strict';
 
     /**
@@ -54,8 +54,15 @@ define([
      */
 
     /**
-     * @typedef {Object} reviewPanelData
+     * @typedef {Object} reviewPanelMap
      * @property {reviewPanelPart[]} parts - The list of test parts to display
+     */
+
+    /**
+     * @typedef {Object} reviewPanelData
+     * @property {reviewPanelMap} testMap - The test map
+     * @property {Number} score - The test taker's score for the test
+     * @property {Number} maxScore - The max possible score for the test
      */
 
     /**
@@ -63,6 +70,64 @@ define([
      * @property {String} title - The tooltip displayed on mouse over
      * @property {Function<item, section, part>} [filter] - A callback function applied to filter the data
      */
+
+    /**
+     * Some default config
+     * @type {Object}
+     */
+    const defaults = {
+        headerLabel: __('TEST SCORE:'),
+        footerLabel: __('TOTAL'),
+        filters: [{
+            id: 'all',
+            label: __('All'),
+            title: __('Show all items')
+        }, {
+            id: 'incorrect',
+            label: __('Incorrect'),
+            title: __('Show incorrect items only'),
+            filter(item) {
+                return item.score !== item.maxScore;
+            }
+        }]
+    };
+
+    /**
+     * CSS classes involved in the review panel
+     * @type {Object}
+     */
+    const cssClasses = {
+        collapsible: 'collapsible',
+        expanded: 'expanded',
+        active: 'active'
+    };
+
+    /**
+     * CSS selectors that match some particular elements
+     * @type {Object}
+     */
+    const cssSelectors = {
+        collapsible: `.${cssClasses.collapsible}`,
+        collapsibleLabel: `.${cssClasses.collapsible} > .review-panel-label`,
+        expanded: `.${cssClasses.expanded}`,
+        active: `.${cssClasses.active}`,
+        item: '.review-panel-item'
+    };
+
+    /**
+     * Finds an element by its control identifier
+     * @param {jQuery} $container
+     * @param {String} id
+     * @returns {jQuery}
+     */
+    const findControl = ($container, id) => $container.find(`[data-control="${id}"]`);
+
+    /**
+     * Finds every expanded collapsible element within the provided target
+     * @param {jQuery} $target
+     * @returns {jQuery}
+     */
+    const findExpanded = $target => $target.find(cssSelectors.collapsible + cssSelectors.expanded);
 
     /**
      * Gets the icon class for a particular item
@@ -90,11 +155,11 @@ define([
 
     /**
      * Refines the data to display the panel with respect to the current filter
-     * @param {reviewPanelData} data
+     * @param {reviewPanelMap} map
      * @param {Function} [filter] - A callback function applied to filter the data
-     * @returns {Object}
+     * @returns {reviewPanelData}
      */
-    const filterData = (data, filter) => {
+    const filterData = (map, filter) => {
         let score = 0;
         let maxScore = 0;
         if (!_.isFunction(filter)) {
@@ -102,7 +167,7 @@ define([
         }
         return {
             testMap: {
-                parts: reduceArray(data && data.parts, (testParts, testPart) => {
+                parts: reduceArray(map && map.parts, (testParts, testPart) => {
                     const sections = reduceArray(testPart.sections, (partSections, partSection) => {
                         const items = reduceArray(partSection.items, (sectionItems, sectionItem) => {
                             sectionItem = Object.assign({}, sectionItem);
@@ -132,30 +197,9 @@ define([
                     return testParts;
                 })
             },
-            percentScore: `${Math.floor(100 * score / maxScore) || 0}%`,
-            overallScore: `${score}/${maxScore}`
+            score,
+            maxScore
         };
-    };
-
-    /**
-     * Some default config
-     * @type {Object}
-     */
-    const defaults = {
-        headerLabel: __('TEST SCORE:'),
-        footerLabel: __('TOTAL'),
-        filters: [{
-            id: 'all',
-            label: __('All'),
-            title: __('Show all items')
-        }, {
-            id: 'incorrect',
-            label: __('Incorrect'),
-            title: __('Show incorrect items only'),
-            filter(item) {
-                return item.score !== item.maxScore;
-            }
-        }]
     };
 
     /**
@@ -193,26 +237,28 @@ define([
      * @param {String} [config.headerLabel] - Header label
      * @param {String} [config.footerLabel] - Footer label
      * @param {reviewPanelFilter[]} [config.filters] - The list of available filters
-     * @param {reviewPanelData|null} data
+     * @param {reviewPanelMap|null} map
      * @returns {component}
      * @fires ready - When the component is ready to work
      * @fires filterchange When the active filter has changed
      * @fires datachange When the panel data has changed
      * @fires update When the navigation panel has been updated
      */
-    function reviewPanelFactory(container, config = {}, data = null) {
+    function reviewPanelFactory(container, config = {}, map = null) {
         let controls = null;
         let activeFilter = null;
         let activeItem = null;
+        let data = filterData(map);
+
         /**
          * Selects the active filter
          * @param {String} filterId
          */
         const selectFilter = filterId => {
             controls.$filters
-                .removeClass('active')
+                .removeClass(cssClasses.active)
                 .filter(`[data-control="${filterId}"]`)
-                .addClass('active');
+                .addClass(cssClasses.active);
         };
 
         /**
@@ -230,12 +276,13 @@ define([
 
             /**
              * Sets the panel data
-             * @param {reviewPanelData} newData
+             * @param {reviewPanelMap} newMap
              * @returns {reviewPanel}
              * @fires datachange
              */
-            setData(newData) {
-                data = newData;
+            setData(newMap) {
+                map = newMap;
+                data = filterData(newMap);
 
                 /**
                  * @event datachange
@@ -299,25 +346,100 @@ define([
             },
 
             /**
-             * Expands all the blocks from the given id and upper
+             * Expands all the blocks from the given identifier and above
              * @param {String} id
              * @returns {reviewPanel}
+             * @fires expand for each expanded block
              */
             expand(id) {
                 if (this.is('rendered')) {
-                    // ...
+                    const $target = findControl(controls.$content, id);
+
+                    if ($target.length) {
+                        // first, collapse all expanded blocks
+                        this.collapse();
+
+                        // then expand the target and its parents
+                        // also expand first child blocks
+                        let $collapsed = $target.parentsUntil(controls.$content, cssSelectors.collapsible)
+                            .add($target.find(cssSelectors.collapsible).filter(':first-child'));
+
+                        if ($target.is(cssSelectors.collapsible)) {
+                            $collapsed = $collapsed.add($target);
+                        }
+
+                        $collapsed.each((index, el) => {
+                            el.classList.add(cssClasses.expanded);
+
+                            /**
+                             * @event expand
+                             * @param {String} id - the identifier of the expanded element
+                             */
+                            this.trigger('expand', el.dataset.control);
+                        });
+                    }
                 }
+
                 return this;
             },
 
             /**
-             * Collapse all the blocks
+             * Collapse all the blocks from the given identifier and below
+             * @param {String|null} [id] - The identifier og the block to collapse. If none, all blocks will be targeted.
              * @returns {reviewPanel}
+             * @fires collapse for each collapsed block
              */
-            collapse() {
+            collapse(id = null) {
                 if (this.is('rendered')) {
-                    // ...
+                    let $expanded = null;
+
+                    // select the elements to collapse
+                    if (id) {
+                        // only the expanded elements that belong to the provided identifier
+                        const $target = findControl(controls.$content, id);
+                        $expanded = findExpanded($target);
+                        if ($target.is(cssSelectors.expanded)) {
+                            $expanded = $expanded.add($target);
+                        }
+                    } else {
+                        // all expanded elements
+                        $expanded = findExpanded(controls.$content);
+                    }
+
+                    // apply the collapse
+                    $expanded.each((index, el) => {
+                        el.classList.remove(cssClasses.expanded);
+
+                        /**
+                         * @event collapse
+                         * @param {String} id - the identifier of the collapsed element
+                         */
+                        this.trigger('collapse', el.dataset.control);
+                    });
                 }
+
+                return this;
+            },
+
+            /**
+             * Expands or collapse the blocks related to the given identifier
+             * @param {String} id
+             * @returns {reviewPanel}
+             * @fires expand for each expanded block
+             * @fires collapse for each collapsed block
+             */
+            toggle(id) {
+                if (this.is('rendered')) {
+                    const $target = findControl(controls.$content, id);
+                    if ($target.length) {
+                        if ($target.is(cssSelectors.expanded)) {
+                            this.collapse(id);
+                        } else {
+                            this.expand(id);
+                        }
+                    }
+                }
+
                 return this;
             },
 
@@ -328,10 +450,17 @@ define([
              */
             update() {
                 if (this.is('rendered')) {
-                    const filteredData = filterData(data, activeFilter && activeFilter.filter);
+                    let filteredData;
+                    if (data.score !== data.maxScore) {
+                        filteredData = filterData(map, activeFilter && activeFilter.filter);
+                    } else {
+                        filteredData = data;
+                    }
+
                     controls.$content.html(listTpl(filteredData.testMap));
-                    controls.$headerScore.text(filteredData.percentScore);
-                    controls.$footerScore.text(filteredData.overallScore);
+                    controls.$headerScore.text(`${Math.floor(100 * filteredData.score / filteredData.maxScore) || 0}%`);
+                    controls.$footerScore.text(`${filteredData.score}/${filteredData.maxScore}`);
+                    hider.toggle(controls.$filters, filteredData.score !== filteredData.maxScore);
 
                     /**
                      * @event update
@@ -396,10 +525,15 @@ define([
                     this.setActiveFilter(e.currentTarget.dataset.control);
                 });
 
-                controls.$content.on('click', '.review-panel-label', e => {
-                    controls.$content.find('.active').removeClass('active');
-                    e.currentTarget.parentElement.classList.toggle('expanded');
-                    $(e.currentTarget).parentsUntil('.review-panel-list').addClass('active');
+                // expand/collapse blocks on click
+                controls.$content.on('click', cssSelectors.collapsibleLabel, e => {
+                    this.toggle(e.currentTarget.parentElement.dataset.control);
+                });
+
+                // select item
+                controls.$content.on('click', cssSelectors.item, e => {
+                    controls.$content.find(cssSelectors.active).removeClass(cssClasses.active);
+                    $(e.currentTarget).parentsUntil(controls.$content).add(e.currentTarget).addClass(cssClasses.active);
                 });
 
                 if (activeFilter) {

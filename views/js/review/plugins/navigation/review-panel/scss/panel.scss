@@ -1,3 +1,20 @@
+/**
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * Copyright (c) 2019 Open Assessment Technologies SA ;
+ */
 @import "inc/bootstrap";
 
 $minPanelWidth: 250px;
@@ -56,45 +73,6 @@ $incorrectColor: $error;
     }
 }
 
-@mixin review-panel-collapsible() {
-    // label of collapsible elements must display a dropdown icon
-    > .review-panel-label {
-        cursor: pointer;
-        width: 100%;
-        line-height: $lineHeight;
-        padding: 0 $sidePadding;
-        font-size: 1.5rem;
-        &::after {
-            @include tao-icon-setup;
-            @include icon-down;
-            line-height: inherit;
-            float: right;
-        }
-    }
-    // by default every block is collapsed
-    > .review-panel-block {
-        display: none;
-    }
-    // child block must be displayed in an expanded element
-    &.expanded {
-        > .review-panel-label::after {
-            @include icon-up;
-        }
-        > .review-panel-block {
-            display: block;
-        }
-    }
-    // prevent unique child to be collapsible
-    &:first-child:last-child {
-        > .review-panel-label::after {
-            content: none;
-        }
-        > .review-panel-block {
-            display: block;
-        }
-    }
-}
-
 .review-panel {
     @include disableSelect();
     background-color: $panelBackground;
@@ -120,6 +98,35 @@ $incorrectColor: $error;
     .review-panel-score {
         display: block;
         white-space: nowrap;
+    }
+    .collapsible {
+        // label of collapsible elements must display a dropdown icon
+        > .review-panel-label {
+            cursor: pointer;
+            width: 100%;
+            line-height: $lineHeight;
+            padding: 0 $sidePadding;
+            font-size: 1.5rem;
+            &::after {
+                @include tao-icon-setup;
+                @include icon-down;
+                line-height: inherit;
+                float: right;
+            }
+        }
+        // by default every block is collapsed
+        > .review-panel-block {
+            display: none;
+        }
+        // child block must be displayed in an expanded element
+        &.expanded {
+            > .review-panel-label::after {
+                @include icon-up;
+            }
+            > .review-panel-block {
+                display: block;
+            }
+        }
     }
 
     .review-panel-header {
@@ -179,7 +186,6 @@ $incorrectColor: $error;
     }
 
     .review-panel-part {
-        @include review-panel-collapsible();
         margin-top: $borderWidth;
         > .review-panel-label {
             background-color: $partBackground;
@@ -195,7 +201,6 @@ $incorrectColor: $error;
     }
 
     .review-panel-section {
-        @include review-panel-collapsible();
         > .review-panel-label {
             background-color: $sectionBackground;
             border-bottom: $borderWidth solid $sectionBorderColor;

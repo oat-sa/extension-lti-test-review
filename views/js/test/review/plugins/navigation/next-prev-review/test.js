@@ -247,83 +247,122 @@ define([
 
     QUnit.module('behavior');
 
-    // QUnit.test('submit', assert =>  {
-    //     const ready = assert.async();
-    //     assert.expect(14);
-    //     reviewFactory('#fixture-show', runnerConfig)
-    //         .on('ready', function (runner) {
-    //             const areaBroker = runner.getAreaBroker();
-    //             const plugin = runner.getPlugin('submit');
-    //             Promise.resolve()
-    //                 .then(function () {
-    //                     return new Promise(function (resolve) {
-    //                         runner
-    //                             .after('renderitem', resolve)
-    //                             .loadItem('item-1');
-    //                     });
-    //                 })
-    //                 .then(function () {
-    //                     const $container = areaBroker.getContainer();
-    //                     const $navigation = areaBroker.getNavigationArea();
-    //                     const $button = $navigation.find('[data-control="submit"]');
-    //                     const $closer = $navigation.find('.preview-console-closer');
-    //                     const $console = $container.find('.preview-console');
-    //                     assert.equal($closer.length, 1, 'The console closer has been inserted');
-    //                     assert.equal($console.length, 1, 'The console has been inserted');
-    //                     assert.equal($button.length, 1, 'The button has been inserted');
-    //                     assert.equal($button.hasClass('disabled'), false, 'The button has been enabled');
-    //                 })
-    //                 .then(function () {
-    //                     return new Promise(function (resolve) {
-    //                         const $navigation = areaBroker.getNavigationArea();
-    //                         const $button = $navigation.find('[data-control="submit"]');
-    //                         runner.after('scoreitem', function() {
-    //                             assert.ok('The score is submitted');
-    //                             resolve();
-    //                         });
-    //                         $button.click();
-    //                     });
-    //                 })
-    //                 .then(function () {
-    //                     const $container = areaBroker.getContainer();
-    //                     const $navigation = areaBroker.getNavigationArea();
-    //                     const $button = $navigation.find('[data-control="submit"]');
-    //                     const $closer = $navigation.find('.preview-console-closer');
-    //                     const $console = $container.find('.preview-console');
-    //                     assert.ok(!hider.isHidden($button), 'The button is visible');
-    //                     assert.ok(!hider.isHidden($closer), 'The console closer is visible');
-    //                     assert.ok(!hider.isHidden($console), 'The console is visible');
-    //                     $closer.click();
-    //                 })
-    //                 .then(function () {
-    //                     const $container = areaBroker.getContainer();
-    //                     const $navigation = areaBroker.getNavigationArea();
-    //                     const $button = $navigation.find('[data-control="submit"]');
-    //                     const $closer = $navigation.find('.preview-console-closer');
-    //                     const $console = $container.find('.preview-console');
-    //                     assert.ok(!hider.isHidden($button), 'The button is visible');
-    //                     assert.ok(hider.isHidden($closer), 'The console closer is hidden');
-    //                     assert.ok(hider.isHidden($console), 'The console is hidden');
-    //                     return plugin.destroy();
-    //                 })
-    //                 .then(function () {
-    //                     const $container = areaBroker.getContainer();
-    //                     const $navigation = areaBroker.getNavigationArea();
-    //                     const $button = $navigation.find('[data-control="submit"]');
-    //                     const $closer = $navigation.find('.preview-console-closer');
-    //                     const $console = $container.find('.preview-console');
-    //                     assert.equal($button.length, 0, 'The trigger button has been removed');
-    //                     assert.equal($closer.length, 0, 'The console closer has been removed');
-    //                     assert.equal($console.length, 0, 'The console has been removed');
-    //                     runner.destroy();
-    //                 })
-    //                 .catch(function (err) {
-    //                     assert.ok(false, `Error in init method: ${err.message}`);
-    //                     runner.destroy();
-    //                 });
-    //         })
-    //         .on('destroy', ready);
-    // });
+    QUnit.test('next-prev-review', assert =>  {
+        const ready = assert.async();
+        assert.expect(17);
+        reviewFactory('#fixture-show', runnerConfig)
+            .on('ready', function (runner) {
+                const areaBroker = runner.getAreaBroker();
+                const $navigation = areaBroker.getPanelArea();
+                let $element = $navigation.find('[data-control="next-prev-review"]');
+                let $nextButton = $navigation.find('[data-control="next"]');
+                let $prevButton = $navigation.find('[data-control="prev"]');
+                Promise.resolve()
+                    .then(function () {
+                        return new Promise(function (resolve) {
+                            runner
+                                .after('renderitem', resolve)
+                        });
+                    })
+                    .then(function () {
+                        assert.equal($element.length, 1, 'The element has been inserted');
+                        assert.equal($nextButton.length, 1, 'The next button has been inserted');
+                        assert.equal($prevButton.length, 1, 'The prev button has been inserted');
+                        assert.equal($prevButton.hasClass('disabled'), true, 'The prevButton has been rendered disabled');
+                    })
+                    .then(function () {
+                        return new Promise(function (resolve) {
+                            runner.after('move.test', function(direction) {
+                                assert.equal(direction, 'next', 'The move with direction === next is submitted');
+                                resolve();
+                            });
+                            $nextButton.click();
+                        });
+                    })
+                    .then(function () {
+                        return new Promise(function (resolve) {
+                            runner
+                                .off('.test')
+                                .after('renderitem.test', function(itemRef) {
+                                    assert.equal(itemRef, 'item-2', 'Item "item-2" is rendered');
+                                    assert.equal($prevButton.hasClass('disabled'), false, 'The prevButton has been enabled');
+                                    resolve();
+                                });
+                        });
+                    })
+                    .then(function () {
+                        return new Promise(function (resolve) {
+                            runner
+                                .off('.test')
+                                .after('move.test', function(direction) {
+                                    assert.equal(direction, 'next', 'The move with direction === next is submitted');
+                                    resolve();
+                                });
+                            $nextButton.click();
+                        });
+                    })
+                    .then(function () {
+                        return new Promise(function (resolve) {
+                            runner
+                                .off('.test')
+                                .after('renderitem.test', function(itemRef) {
+                                    assert.equal(itemRef, 'item-3', 'Item "item-3" is rendered');
+                                    assert.equal($nextButton.hasClass('disabled'), true, 'The nextButton has been disabled');
+                                    resolve();
+                                });
+                        });
+                    })
+                    .then(function () {
+                        runner
+                            .off('.test')
+                            .after('move.test', function(direction) {
+                                assert.equal(direction, 'previous', 'The move with direction === previous is submitted');
+                                resolve();
+                            });
+                        $prevButton.click();
+                    })
+                    .then(function () {
+                        return new Promise(function (resolve) {
+                            runner
+                                .off('.test')
+                                .after('renderitem.test', function(itemRef) {
+                                    assert.equal(itemRef, 'item-2', 'Item "item-2" is rendered');
+                                    assert.equal($nextButton.hasClass('disabled'), false, 'The nextButton has been enabled');
+                                    assert.equal($prevButton.hasClass('disabled'), false, 'The prevButton has been enabled');
+                                    resolve();
+                                });
+                        });
+                    })
+                    .then(function () {
+                        runner
+                            .off('.test')
+                            .after('move.test', function(direction) {
+                                assert.equal(direction, 'previous', 'The move with direction === previous is submitted');
+                                resolve();
+                            });
+                        $prevButton.click();
+                    })
+                    .then(function () {
+                        return new Promise(function (resolve) {
+                            runner
+                                .off('.test')
+                                .after('renderitem.test', function(itemRef) {
+                                    assert.equal(itemRef, 'item-1', 'Item "item-1" is rendered');
+                                    resolve();
+                                });
+                        });
+                    })
+                    .then(function () {
+                        assert.ok(!hider.isHidden($element), 'The element is visible');
+                        return runner.destroy();
+                    })
+                    .catch(function (err) {
+                        assert.ok(false, `Error in init method: ${err.message}`);
+                        runner.destroy();
+                    });
+            })
+            .on('destroy', ready);
+    });
 
 
 

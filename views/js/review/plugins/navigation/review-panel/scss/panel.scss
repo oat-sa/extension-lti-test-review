@@ -154,7 +154,7 @@ $incorrectColor: $error;
 
     .review-panel-filters {
         @include review-panel-line-layout(space-evenly);
-        margin: 3rem 0 1rem 0;
+        padding: 3rem 0 1rem 0;
 
         .review-panel-filter {
             display: block;
@@ -170,6 +170,11 @@ $incorrectColor: $error;
                 font-weight: bold;
             }
         }
+    }
+
+    .review-panel-content {
+        flex: 1 1 auto;
+        overflow-y: auto;
     }
 
     .review-panel-part {

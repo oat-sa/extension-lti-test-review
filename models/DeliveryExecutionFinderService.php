@@ -19,11 +19,9 @@
 
 namespace oat\taoReview\models;
 
-
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
 use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
 use oat\oatbox\service\ConfigurableService;
-use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\OntologyService;
 use oat\taoDelivery\model\execution\ServiceProxy;
@@ -45,17 +43,13 @@ class DeliveryExecutionFinderService extends ConfigurableService
      * @param LtiLaunchData $data
      *
      * @return DeliveryExecution
-     * @throws InvalidServiceManagerException
      * @throws LtiInvalidLaunchDataException
      * @throws LtiVariableMissingException
      */
     public function findDeliveryExecution(LtiLaunchData $data): DeliveryExecution
     {
-        /** @var LtiLaunchDataService $launchDataService */
-        $launchDataService = $this->getServiceLocator()->get(LtiLaunchDataService::SERVICE_ID);
-
-        /** @var LtiResultAliasStorage $ltiResultIdStorage */
-        $ltiResultIdStorage = $this->getServiceLocator()->get(LtiResultAliasStorage::SERVICE_ID);
+        $launchDataService = $this->getLaunchDataService();
+        $ltiResultIdStorage = $this->getLtiResultIdStorage();
 
         $resultIdentifier = $data->hasVariable(self::LTI_SOURCE_ID)
             ? $data->getVariable(self::LTI_SOURCE_ID)
@@ -67,15 +61,21 @@ class DeliveryExecutionFinderService extends ConfigurableService
             throw new LtiInvalidLaunchDataException('Wrong result ID provided');
         }
 
-        return $this->getOntologyService()->getDeliveryExecution($deliveryExecutionId);
+        return $this->getOntologyService()->getDeliveryExecution($deliveryExecutionId); // и этого
     }
 
-    /**
-     * @return OntologyService
-     * @throws InvalidServiceManagerException
-     */
+    protected function getLtiResultIdStorage(): LtiResultAliasStorage
+    {
+        return $this->getServiceLocator()->get(LtiResultAliasStorage::SERVICE_ID);
+    }
+
+    protected function getLaunchDataService(): LtiLaunchDataService
+    {
+        return $this->getServiceLocator()->get(LtiLaunchDataService::SERVICE_ID);
+    }
+
     protected function getOntologyService(): OntologyService
     {
-        return $this->getServiceManager()->get(ServiceProxy::SERVICE_ID);
+        return $this->getServiceLocator()->get(ServiceProxy::SERVICE_ID);
     }
 }

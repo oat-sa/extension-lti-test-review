@@ -1467,13 +1467,23 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-item');
 
-        assert.expect(44);
+        assert.expect(46);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
         const instance = reviewPanelFactory($container, {}, reviewDataIncorrect)
             .on('init', function () {
                 assert.equal(this, instance, 'The instance has been initialized');
+                const shouldExpand = new Map([['QTIExamples', true], ['assessmentSection-3', true]]);
+                instance
+                    .off('.test')
+                    .on('expand.test', id => {
+                        assert.ok(shouldExpand.has(id), `The expand event is triggered for ${id}`);
+                    })
+                    .on('active.test', id => {
+                        assert.equal(id, 'item-8', `The active event is triggered for ${id}`);
+                    })
+                    .setActiveItem('item-8');
             })
             .on('ready', () => {
                 assert.ok(instance.is('ready'), 'The component is ready');
@@ -1490,26 +1500,25 @@ define([
                     .resolve()
                     .then(() => {
                         assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
-                        assert.equal($container.find('.review-panel-part.active').length, 0, 'No test part is active yet');
+                        assert.equal($container.find('.review-panel-part.active').length, 1, 'A test part is already active');
+                        assert.equal($container.find('.review-panel-part.active').is('[data-control="QTIExamples"]'), true, 'The expected test part is now active');
 
                         assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
-                        assert.equal($container.find('.review-panel-section.active').length, 0, 'No test section is active yet');
+                        assert.equal($container.find('.review-panel-section.active').length, 1, 'A test section is already active');
+                        assert.equal($container.find('.review-panel-section.active').is('[data-control="assessmentSection-3"]'), true, 'The expected test section is now active');
 
                         assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
-                        assert.equal($container.find('.review-panel-item.active').length, 0, 'No test item is active yet');
+                        assert.equal($container.find('.review-panel-item.active').length, 1, 'A test item is already active');
+                        assert.equal($container.find('.review-panel-item.active').is('[data-control="item-8"]'), true, 'The expected test item is now active');
 
-                        assert.equal($container.find('.review-panel-content .active').length, 0, 'No element is active yet');
+                        assert.equal($container.find('.review-panel-content .active').length, 3, '3 elements are now active');
                     })
                     .then(() => new Promise(resolve => {
-                        const shouldActivate = new Map([['QTIExamples', true], ['assessmentSection-2', true], ['item-3', true]]);
                         instance
                             .off('.test')
                             .on('active.test', id => {
-                                assert.ok(shouldActivate.has(id), `The active event is triggered for ${id}`);
-                                shouldActivate.delete(id);
-                                if (!shouldActivate.size) {
-                                    resolve();
-                                }
+                                assert.equal(id, 'item-3', `The active event is triggered for ${id}`);
+                                resolve();
                             })
                             .setActiveItem('item-3');
                     }))
@@ -1538,15 +1547,11 @@ define([
                         window.setTimeout(resolve, 300);
                     }))
                     .then(() => new Promise(resolve => {
-                        const shouldActivate = new Map([['Introduction', true], ['assessmentSection-1', true], ['item-1', true]]);
                         instance
                             .off('.test')
                             .on('active.test', id => {
-                                assert.ok(shouldActivate.has(id), `The active event is triggered for ${id}`);
-                                shouldActivate.delete(id);
-                                if (!shouldActivate.size) {
-                                    resolve();
-                                }
+                                assert.equal(id, 'item-1', `The active event is triggered for ${id}`);
+                                resolve();
                             })
                             .setActiveItem('item-1');
                     }))
@@ -1601,7 +1606,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-item-click');
 
-        assert.expect(44);
+        assert.expect(40);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -1635,15 +1640,11 @@ define([
                         assert.equal($container.find('.review-panel-content .active').length, 0, 'No element is active yet');
                     })
                     .then(() => new Promise(resolve => {
-                        const shouldActivate = new Map([['QTIExamples', true], ['assessmentSection-2', true], ['item-3', true]]);
                         instance
                             .off('.test')
                             .on('active.test', id => {
-                                assert.ok(shouldActivate.has(id), `The active event is triggered for ${id}`);
-                                shouldActivate.delete(id);
-                                if (!shouldActivate.size) {
-                                    resolve();
-                                }
+                                assert.equal(id, 'item-3', `The active event is triggered for ${id}`);
+                                resolve();
                             });
                         $container.find('[data-control="item-3"]').click();
                     }))
@@ -1672,15 +1673,11 @@ define([
                         window.setTimeout(resolve, 300);
                     }))
                     .then(() => new Promise(resolve => {
-                        const shouldActivate = new Map([['Introduction', true], ['assessmentSection-1', true], ['item-1', true]]);
                         instance
                             .off('.test')
                             .on('active.test', id => {
-                                assert.ok(shouldActivate.has(id), `The active event is triggered for ${id}`);
-                                shouldActivate.delete(id);
-                                if (!shouldActivate.size) {
-                                    resolve();
-                                }
+                                assert.equal(id, 'item-1', `The active event is triggered for ${id}`);
+                                resolve();
                             });
                         $container.find('[data-control="item-1"]').click();
                     }))

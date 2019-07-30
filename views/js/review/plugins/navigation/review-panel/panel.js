@@ -23,11 +23,12 @@ define([
     'lodash',
     'i18n',
     'ui/hider',
+    'ui/autoscroll',
     'ui/component',
     'tpl!taoReview/review/plugins/navigation/review-panel/tpl/panel',
     'tpl!taoReview/review/plugins/navigation/review-panel/tpl/list',
     'css!taoReview/review/plugins/navigation/review-panel/css/panel.css'
-], function ($, _, __, hider, componentFactory, panelTpl, listTpl) {
+], function ($, _, __, hider, autoscroll, componentFactory, panelTpl, listTpl) {
     'use strict';
 
     /**
@@ -277,6 +278,27 @@ define([
         };
 
         /**
+         * Selects the active item
+         * @param {String} itemId
+         */
+        const selectItem = itemId => {
+            // first deactivate already active elements
+            controls.$content
+                .find(cssSelectors.active)
+                .removeClass(cssClasses.active);
+
+            // then find the chain of elements to activate
+            const $target = findControl(controls.$content, itemId);
+            const $parents = $target.parentsUntil(controls.$content, cssSelectors.control);
+            $target
+                .add($parents)
+                .addClass(cssClasses.active);
+
+            // finally make sure the item is visible
+            autoscroll($target, controls.$content);
+        };
+
+        /**
          * Defines the reviewPanel API
          * @type {reviewPanel}
          */
@@ -368,20 +390,15 @@ define([
                 if (data && data.itemsMap.has(itemId) && (!activeItem || activeItem.id !== itemId)) {
                     activeItem = data.itemsMap.get(itemId);
 
-                    // first deactivate already active item
-                    controls.$content.find(cssSelectors.active).removeClass(cssClasses.active);
+                    if (this.is('rendered')) {
+                        selectItem(itemId);
+                    }
 
-                    // then find the chain of elements to activate
-                    const $target = findControl(controls.$content, itemId);
-                    $target.add($target.parentsUntil(controls.$content, cssSelectors.control)).each((index, el) => {
-                        el.classList.add(cssClasses.active);
-
-                        /**
-                         * @event active
-                         * @param {String} id - the identifier of the expanded element
-                         */
-                        this.trigger('active', el.dataset.control);
-                    });
+                    /**
+                     * @event active
+                     * @param {String} itemId
+                     */
+                    this.trigger('active', itemId);
                 }
                 return this;
             },
@@ -576,11 +593,16 @@ define([
                     this.setActiveItem(e.currentTarget.dataset.control);
                 });
 
+                this.update();
+
                 if (activeFilter) {
                     selectFilter(activeFilter.id);
                 }
 
-                this.update();
+                if (activeItem) {
+                    selectItem(activeItem.id);
+                    this.expand(activeItem.id);
+                }
 
                 /**
                  * @event ready

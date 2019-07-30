@@ -117,6 +117,7 @@ define([
         {title: 'getActiveFilter'},
         {title: 'setActiveFilter'},
         {title: 'getActiveItem'},
+        {title: 'getActiveItemPosition'},
         {title: 'setActiveItem'},
         {title: 'expand'},
         {title: 'collapse'},
@@ -382,19 +383,20 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-filter');
 
-        assert.expect(20);
+        assert.expect(22);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
         const instance = reviewPanelFactory($container, {filters: defaultFilters})
             .on('init', function () {
                 assert.equal(this, instance, 'The instance has been initialized');
+                assert.equal(instance.getActiveFilter(), 'all', 'The "All" filter is activated by default');
             })
             .on('ready', () => {
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
 
-                assert.equal(instance.getActiveFilter(), defaultFilters[0], 'The first filter is activated by default');
+                assert.equal(instance.getActiveFilter(), 'all', 'The "All" filter is activated by default');
 
                 assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
                 assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
@@ -407,12 +409,12 @@ define([
                         instance
                             .off('.test')
                             .on('filterchange.test', filterId => {
-                                assert.equal(filterId, defaultFilters[1].id, 'The filterchange event is triggered with the expected parameter');
+                                assert.equal(filterId, 'incorrect', 'The filterchange event is triggered with the expected parameter');
                                 resolve();
                             });
 
-                        assert.equal(instance.setActiveFilter(defaultFilters[1].id), instance, 'setActiveFilter is fluent');
-                        assert.equal(instance.getActiveFilter(), defaultFilters[1], 'The second filter is now activated');
+                        assert.equal(instance.setActiveFilter('incorrect'), instance, 'setActiveFilter is fluent');
+                        assert.equal(instance.getActiveFilter(), 'incorrect', 'The "Incorrect" filter is now activated');
 
                         assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), false, 'The first filter is not active anymore');
                         assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), true, 'The second filter is now active');
@@ -423,20 +425,20 @@ define([
                             .on('filterchange.test', () => {
                                 assert.ok(false, 'The filterchange event should not be triggered');
                             });
-                        instance.setActiveFilter(defaultFilters[1].id);
+                        instance.setActiveFilter('incorrect');
                         window.setTimeout(resolve, 300);
                     }))
                     .then(() => new Promise(resolve => {
                         instance
                             .off('.test')
                             .on('filterchange.test', filterId => {
-                                assert.equal(filterId, defaultFilters[0].id, 'The filterchange event is triggered with the expected parameter');
+                                assert.equal(filterId, 'all', 'The filterchange event is triggered with the expected parameter');
                                 resolve();
                             });
 
                         $container.find('.review-panel-filter:nth(0)').click();
 
-                        assert.equal(instance.getActiveFilter(), defaultFilters[0], 'The filter filter is now activated');
+                        assert.equal(instance.getActiveFilter(), 'all', 'The "All" filter is now activated');
                         assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is now active');
                         assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active anymore');
                     }))
@@ -470,6 +472,7 @@ define([
                 });
                 ready();
             });
+        assert.equal(instance.getActiveFilter(), null, 'No filter is activated yet');
     });
 
     QUnit.test('data with correct responses', assert => {
@@ -515,7 +518,7 @@ define([
             maxScore: 1
         };
 
-        assert.expect(60);
+        assert.expect(63);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -527,7 +530,10 @@ define([
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
 
-                assert.deepEqual(instance.getData(), initialDataAll, 'The initial data is set');
+                assert.deepEqual(instance.getData().testMap, initialDataAll.testMap, 'The initial data is set: testMap');
+                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
+                assert.deepEqual(instance.getData().score, initialDataAll.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, initialDataAll.maxScore, 'The initial data is set: maxScore');
 
                 assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
                 assert.equal($container.find('.review-panel-part').length, 1, 'A test part is rendered');
@@ -550,19 +556,19 @@ define([
                         const promises = [
                             new Promise(resolve => {
                                 instance.on('datachange.test', newData => {
-                                    assert.deepEqual(newData, reviewDataCorrectAll, 'The datachange event is triggered with the expected parameter');
+                                    assert.deepEqual(newData.testMap, reviewDataCorrectAll.testMap, 'The datachange event is triggered with the expected parameter');
                                     resolve();
                                 });
                             }),
                             new Promise(resolve => {
                                 instance.on('update.test', filteredData => {
-                                    assert.deepEqual(filteredData, reviewDataCorrectAll, 'The update event is triggered with the expected parameter');
+                                    assert.deepEqual(filteredData.testMap, reviewDataCorrectAll.testMap, 'The update event is triggered with the expected parameter');
                                     resolve();
                                 });
                             }),
                         ];
                         assert.equal(instance.setData(reviewDataCorrect), instance, 'setData is fluent');
-                        assert.deepEqual(instance.getData(), reviewDataCorrectAll, 'The updated data is set');
+                        assert.deepEqual(instance.getData().testMap, reviewDataCorrectAll.testMap, 'The updated data is set');
                         return Promise.all(promises);
                     })
                     .then(() => {
@@ -603,18 +609,18 @@ define([
                         const promises = [
                             new Promise(resolve => {
                                 instance.on('filterchange.test', filterId => {
-                                    assert.equal(filterId, defaultFilters[1].id, 'The filterchange event is triggered with the expected parameter');
+                                    assert.equal(filterId, 'incorrect', 'The filterchange event is triggered with the expected parameter');
                                     resolve();
                                 });
                             }),
                             new Promise(resolve => {
                                 instance.on('update.test', filteredData => {
-                                    assert.deepEqual(filteredData, reviewDataCorrectAll, 'The update event is triggered with the expected parameter');
+                                    assert.deepEqual(filteredData.testMap, reviewDataCorrectAll.testMap, 'The update event is triggered with the expected parameter');
                                     resolve();
                                 });
                             }),
                         ];
-                        instance.setActiveFilter(defaultFilters[1].id);
+                        instance.setActiveFilter('incorrect');
 
                         assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), false, 'The first filter is not active anymore');
                         assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), true, 'The second filter is now active');
@@ -698,7 +704,7 @@ define([
             maxScore: 1
         };
 
-        assert.expect(67);
+        assert.expect(70);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -710,7 +716,10 @@ define([
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
 
-                assert.deepEqual(instance.getData(), initialDataAll, 'The initial data is set');
+                assert.deepEqual(instance.getData().testMap, initialDataAll.testMap, 'The initial data is set: testMap');
+                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
+                assert.deepEqual(instance.getData().score, initialDataAll.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, initialDataAll.maxScore, 'The initial data is set: maxScore');
 
                 assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
                 assert.equal($container.find('.review-panel-part').length, 1, 'A test part is rendered');
@@ -733,19 +742,19 @@ define([
                         const promises = [
                             new Promise(resolve => {
                                 instance.on('datachange.test', newData => {
-                                    assert.deepEqual(newData, reviewDataIncorrectAll, 'The datachange event is triggered with the expected parameter');
+                                    assert.deepEqual(newData.testMap, reviewDataIncorrectAll.testMap, 'The datachange event is triggered with the expected parameter');
                                     resolve();
                                 });
                             }),
                             new Promise(resolve => {
                                 instance.on('update.test', filteredData => {
-                                    assert.deepEqual(filteredData, reviewDataIncorrectAll, 'The update event is triggered with the expected parameter');
+                                    assert.deepEqual(filteredData.testMap, reviewDataIncorrectAll.testMap, 'The update event is triggered with the expected parameter');
                                     resolve();
                                 });
                             }),
                         ];
                         assert.equal(instance.setData(reviewDataIncorrect), instance, 'setData is fluent');
-                        assert.deepEqual(instance.getData(), reviewDataIncorrectAll, 'The updated data is set');
+                        assert.deepEqual(instance.getData().testMap, reviewDataIncorrectAll.testMap, 'The updated data is set');
                         return Promise.all(promises);
                     })
                     .then(() => {
@@ -787,18 +796,18 @@ define([
                         const promises = [
                             new Promise(resolve => {
                                 instance.on('filterchange.test', filterId => {
-                                    assert.equal(filterId, defaultFilters[1].id, 'The filterchange event is triggered with the expected parameter');
+                                    assert.equal(filterId, 'incorrect', 'The filterchange event is triggered with the expected parameter');
                                     resolve();
                                 });
                             }),
                             new Promise(resolve => {
                                 instance.on('update.test', filteredData => {
-                                    assert.deepEqual(filteredData, reviewDataIncorrectFiltered, 'The update event is triggered with the expected parameter');
+                                    assert.deepEqual(filteredData.testMap, reviewDataIncorrectFiltered.testMap, 'The update event is triggered with the expected parameter');
                                     resolve();
                                 });
                             }),
                         ];
-                        instance.setActiveFilter(defaultFilters[1].id);
+                        instance.setActiveFilter('incorrect');
 
                         assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), false, 'The first filter is not active anymore');
                         assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), true, 'The second filter is now active');
@@ -851,7 +860,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-expand');
 
-        assert.expect(84);
+        assert.expect(87);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -863,7 +872,10 @@ define([
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
 
-                assert.deepEqual(instance.getData(), reviewDataIncorrectAll, 'The initial data is set');
+                assert.deepEqual(instance.getData().testMap, reviewDataIncorrectAll.testMap, 'The initial data is set: testMap');
+                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
+                assert.deepEqual(instance.getData().score, reviewDataIncorrectAll.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrectAll.maxScore, 'The initial data is set: maxScore');
 
                 assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
 
@@ -1079,7 +1091,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-toggle');
 
-        assert.expect(73);
+        assert.expect(76);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -1091,7 +1103,10 @@ define([
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
 
-                assert.deepEqual(instance.getData(), reviewDataIncorrectAll, 'The initial data is set');
+                assert.deepEqual(instance.getData().testMap, reviewDataIncorrectAll.testMap, 'The initial data is set: testMap');
+                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
+                assert.deepEqual(instance.getData().score, reviewDataIncorrectAll.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrectAll.maxScore, 'The initial data is set: maxScore');
 
                 assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
 
@@ -1279,7 +1294,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-panel-click');
 
-        assert.expect(60);
+        assert.expect(63);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -1291,7 +1306,10 @@ define([
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
 
-                assert.deepEqual(instance.getData(), reviewDataIncorrectAll, 'The initial data is set');
+                assert.deepEqual(instance.getData().testMap, reviewDataIncorrectAll.testMap, 'The initial data is set: testMap');
+                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
+                assert.deepEqual(instance.getData().score, reviewDataIncorrectAll.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrectAll.maxScore, 'The initial data is set: maxScore');
 
                 assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
 
@@ -1445,11 +1463,280 @@ define([
             });
     });
 
+    QUnit.test('active item', assert => {
+        const ready = assert.async();
+        const $container = $('#fixture-item');
+
+        assert.expect(44);
+
+        assert.equal($container.children().length, 0, 'The container is empty');
+
+        const instance = reviewPanelFactory($container, {}, reviewDataIncorrect)
+            .on('init', function () {
+                assert.equal(this, instance, 'The instance has been initialized');
+            })
+            .on('ready', () => {
+                assert.ok(instance.is('ready'), 'The component is ready');
+                assert.equal($container.children().length, 1, 'The container contains an element');
+
+                assert.deepEqual(instance.getData().testMap, reviewDataIncorrectAll.testMap, 'The initial data is set: testMap');
+                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
+                assert.deepEqual(instance.getData().score, reviewDataIncorrectAll.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrectAll.maxScore, 'The initial data is set: maxScore');
+
+                assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
+
+                Promise
+                    .resolve()
+                    .then(() => {
+                        assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
+                        assert.equal($container.find('.review-panel-part.active').length, 0, 'No test part is active yet');
+
+                        assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
+                        assert.equal($container.find('.review-panel-section.active').length, 0, 'No test section is active yet');
+
+                        assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
+                        assert.equal($container.find('.review-panel-item.active').length, 0, 'No test item is active yet');
+
+                        assert.equal($container.find('.review-panel-content .active').length, 0, 'No element is active yet');
+                    })
+                    .then(() => new Promise(resolve => {
+                        const shouldActivate = new Map([['QTIExamples', true], ['assessmentSection-2', true], ['item-3', true]]);
+                        instance
+                            .off('.test')
+                            .on('active.test', id => {
+                                assert.ok(shouldActivate.has(id), `The active event is triggered for ${id}`);
+                                shouldActivate.delete(id);
+                                if (!shouldActivate.size) {
+                                    resolve();
+                                }
+                            })
+                            .setActiveItem('item-3');
+                    }))
+                    .then(() => {
+                        assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
+                        assert.equal($container.find('.review-panel-part.active').length, 1, 'A test part is now active');
+                        assert.equal($container.find('.review-panel-part.active').is('[data-control="QTIExamples"]'), true, 'The expected test part is now active');
+
+                        assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
+                        assert.equal($container.find('.review-panel-section.active').length, 1, 'A test section is now active');
+                        assert.equal($container.find('.review-panel-section.active').is('[data-control="assessmentSection-2"]'), true, 'The expected test section is now active');
+
+                        assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
+                        assert.equal($container.find('.review-panel-item.active').length, 1, 'A test item is now active');
+                        assert.equal($container.find('.review-panel-item.active').is('[data-control="item-3"]'), true, 'The expected test item is now active');
+
+                        assert.equal($container.find('.review-panel-content .active').length, 3, '3 elements are now active');
+                    })
+                    .then(() => new Promise(resolve => {
+                        instance
+                            .off('.test')
+                            .on('active.test', () => {
+                                assert.ok(false, 'The active event should not be triggered');
+                            })
+                            .setActiveItem('item-3');
+                        window.setTimeout(resolve, 300);
+                    }))
+                    .then(() => new Promise(resolve => {
+                        const shouldActivate = new Map([['Introduction', true], ['assessmentSection-1', true], ['item-1', true]]);
+                        instance
+                            .off('.test')
+                            .on('active.test', id => {
+                                assert.ok(shouldActivate.has(id), `The active event is triggered for ${id}`);
+                                shouldActivate.delete(id);
+                                if (!shouldActivate.size) {
+                                    resolve();
+                                }
+                            })
+                            .setActiveItem('item-1');
+                    }))
+                    .then(() => {
+                        assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
+                        assert.equal($container.find('.review-panel-part.active').length, 1, 'A test part is now active');
+                        assert.equal($container.find('.review-panel-part.active').is('[data-control="Introduction"]'), true, 'The expected test part is now active');
+
+                        assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
+                        assert.equal($container.find('.review-panel-section.active').length, 1, 'A test section is now active');
+                        assert.equal($container.find('.review-panel-section.active').is('[data-control="assessmentSection-1"]'), true, 'The expected test section is now active');
+
+                        assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
+                        assert.equal($container.find('.review-panel-item.active').length, 1, 'A test item is now active');
+                        assert.equal($container.find('.review-panel-item.active').is('[data-control="item-1"]'), true, 'The expected test item is now active');
+
+                        assert.equal($container.find('.review-panel-content .active').length, 3, '3 elements are now active');
+                    })
+                    .then(() => new Promise(resolve => {
+                        instance
+                            .off('.test')
+                            .on('active.test', () => {
+                                assert.ok(false, 'The active event should not be triggered');
+                            })
+                            .setActiveItem('item-1');
+                        window.setTimeout(resolve, 300);
+                    }))
+                    .catch(err => {
+                        assert.pushResult({
+                            result: false,
+                            message: err
+                        });
+                    })
+                    .then(() => instance.destroy());
+            })
+            .after('destroy', () => {
+                assert.equal($container.children().length, 0, 'The container is now empty');
+                assert.ok(!instance.is('ready'), 'The component is not ready anymore');
+                ready();
+            })
+            .on('error', err => {
+                assert.ok(false, 'The operation should not fail!');
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+                ready();
+            });
+    });
+
+    QUnit.test('active item click', assert => {
+        const ready = assert.async();
+        const $container = $('#fixture-item-click');
+
+        assert.expect(44);
+
+        assert.equal($container.children().length, 0, 'The container is empty');
+
+        const instance = reviewPanelFactory($container, {}, reviewDataIncorrect)
+            .on('init', function () {
+                assert.equal(this, instance, 'The instance has been initialized');
+            })
+            .on('ready', () => {
+                assert.ok(instance.is('ready'), 'The component is ready');
+                assert.equal($container.children().length, 1, 'The container contains an element');
+
+                assert.deepEqual(instance.getData().testMap, reviewDataIncorrectAll.testMap, 'The initial data is set: testMap');
+                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
+                assert.deepEqual(instance.getData().score, reviewDataIncorrectAll.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrectAll.maxScore, 'The initial data is set: maxScore');
+
+                assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
+
+                Promise
+                    .resolve()
+                    .then(() => {
+                        assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
+                        assert.equal($container.find('.review-panel-part.active').length, 0, 'No test part is active yet');
+
+                        assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
+                        assert.equal($container.find('.review-panel-section.active').length, 0, 'No test section is active yet');
+
+                        assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
+                        assert.equal($container.find('.review-panel-item.active').length, 0, 'No test item is active yet');
+
+                        assert.equal($container.find('.review-panel-content .active').length, 0, 'No element is active yet');
+                    })
+                    .then(() => new Promise(resolve => {
+                        const shouldActivate = new Map([['QTIExamples', true], ['assessmentSection-2', true], ['item-3', true]]);
+                        instance
+                            .off('.test')
+                            .on('active.test', id => {
+                                assert.ok(shouldActivate.has(id), `The active event is triggered for ${id}`);
+                                shouldActivate.delete(id);
+                                if (!shouldActivate.size) {
+                                    resolve();
+                                }
+                            });
+                        $container.find('[data-control="item-3"]').click();
+                    }))
+                    .then(() => {
+                        assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
+                        assert.equal($container.find('.review-panel-part.active').length, 1, 'A test part is now active');
+                        assert.equal($container.find('.review-panel-part.active').is('[data-control="QTIExamples"]'), true, 'The expected test part is now active');
+
+                        assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
+                        assert.equal($container.find('.review-panel-section.active').length, 1, 'A test section is now active');
+                        assert.equal($container.find('.review-panel-section.active').is('[data-control="assessmentSection-2"]'), true, 'The expected test section is now active');
+
+                        assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
+                        assert.equal($container.find('.review-panel-item.active').length, 1, 'A test item is now active');
+                        assert.equal($container.find('.review-panel-item.active').is('[data-control="item-3"]'), true, 'The expected test item is now active');
+
+                        assert.equal($container.find('.review-panel-content .active').length, 3, '3 elements are now active');
+                    })
+                    .then(() => new Promise(resolve => {
+                        instance
+                            .off('.test')
+                            .on('active.test', () => {
+                                assert.ok(false, 'The active event should not be triggered');
+                            });
+                        $container.find('[data-control="item-3"]').click();
+                        window.setTimeout(resolve, 300);
+                    }))
+                    .then(() => new Promise(resolve => {
+                        const shouldActivate = new Map([['Introduction', true], ['assessmentSection-1', true], ['item-1', true]]);
+                        instance
+                            .off('.test')
+                            .on('active.test', id => {
+                                assert.ok(shouldActivate.has(id), `The active event is triggered for ${id}`);
+                                shouldActivate.delete(id);
+                                if (!shouldActivate.size) {
+                                    resolve();
+                                }
+                            });
+                        $container.find('[data-control="item-1"]').click();
+                    }))
+                    .then(() => {
+                        assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
+                        assert.equal($container.find('.review-panel-part.active').length, 1, 'A test part is now active');
+                        assert.equal($container.find('.review-panel-part.active').is('[data-control="Introduction"]'), true, 'The expected test part is now active');
+
+                        assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
+                        assert.equal($container.find('.review-panel-section.active').length, 1, 'A test section is now active');
+                        assert.equal($container.find('.review-panel-section.active').is('[data-control="assessmentSection-1"]'), true, 'The expected test section is now active');
+
+                        assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
+                        assert.equal($container.find('.review-panel-item.active').length, 1, 'A test item is now active');
+                        assert.equal($container.find('.review-panel-item.active').is('[data-control="item-1"]'), true, 'The expected test item is now active');
+
+                        assert.equal($container.find('.review-panel-content .active').length, 3, '3 elements are now active');
+                    })
+                    .then(() => new Promise(resolve => {
+                        instance
+                            .off('.test')
+                            .on('active.test', () => {
+                                assert.ok(false, 'The active event should not be triggered');
+                            });
+                        $container.find('[data-control="item-1"]').click();
+                        window.setTimeout(resolve, 300);
+                    }))
+                    .catch(err => {
+                        assert.pushResult({
+                            result: false,
+                            message: err
+                        });
+                    })
+                    .then(() => instance.destroy());
+            })
+            .after('destroy', () => {
+                assert.equal($container.children().length, 0, 'The container is now empty');
+                assert.ok(!instance.is('ready'), 'The component is not ready anymore');
+                ready();
+            })
+            .on('error', err => {
+                assert.ok(false, 'The operation should not fail!');
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+                ready();
+            });
+    });
+
     QUnit.module('Visual');
 
     QUnit.test('Visual test', assert => {
         const ready = assert.async();
         const $container = $('#visual-test .panel');
+        const $item = $('#visual-test .item');
         const instance = reviewPanelFactory($container, {}, reviewDataIncorrect);
 
         assert.expect(3);
@@ -1463,6 +1750,10 @@ define([
             .on('ready', () => {
                 assert.equal($container.children().length, 1, 'The container contains an element');
                 ready();
+            })
+            .on('itemchange', (id, position) => {
+                const item = instance.getData().itemsMap.get(id);
+                $item.innerHTML = `<h1>${item.label}</h1><p>${id} at #${position}</p>`;
             })
             .on('error', err => {
                 assert.ok(false, 'The operation should not fail!');

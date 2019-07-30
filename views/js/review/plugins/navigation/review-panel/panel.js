@@ -61,6 +61,7 @@ define([
     /**
      * @typedef {Object} reviewPanelData
      * @property {reviewPanelMap} testMap - The test map
+     * @property {Map} itemsMap - The list of items, indexed by identifier
      * @property {Number} score - The test taker's score for the test
      * @property {Number} maxScore - The max possible score for the test
      */
@@ -111,7 +112,14 @@ define([
         collapsibleLabel: `.${cssClasses.collapsible} > .review-panel-label`,
         expanded: `.${cssClasses.expanded}`,
         active: `.${cssClasses.active}`,
-        item: '.review-panel-item'
+        control: '[data-control]',
+        content: '.review-panel-content',
+        filtersContainer: '.review-panel-filters',
+        filter: '.review-panel-filter',
+        item: '.review-panel-item',
+        header: '.review-panel-header',
+        footer: '.review-panel-footer',
+        score: '.review-panel-score'
     };
 
     /**
@@ -162,6 +170,7 @@ define([
     const filterData = (map, filter) => {
         let score = 0;
         let maxScore = 0;
+        const itemsMap = new Map();
         if (!_.isFunction(filter)) {
             filter = () => true;
         }
@@ -178,6 +187,7 @@ define([
 
                             if (filter(sectionItem, partSection, testPart)) {
                                 sectionItems.push(sectionItem);
+                                itemsMap.set(sectionItem.id, sectionItem);
                             }
 
                             return sectionItems;
@@ -197,6 +207,7 @@ define([
                     return testParts;
                 })
             },
+            itemsMap,
             score,
             maxScore
         };
@@ -240,9 +251,13 @@ define([
      * @param {reviewPanelMap|null} map
      * @returns {component}
      * @fires ready - When the component is ready to work
+     * @fires update When the navigation panel has been updated
+     * @fires collapse When a block element is collapsed
+     * @fires expand When a block element is expanded
+     * @fires active When an element is activated
      * @fires filterchange When the active filter has changed
      * @fires datachange When the panel data has changed
-     * @fires update When the navigation panel has been updated
+     * @fires itemchange When an item is selected by the user (either a click on item or a filter)
      */
     function reviewPanelFactory(container, config = {}, map = null) {
         let controls = null;
@@ -294,11 +309,11 @@ define([
             },
 
             /**
-             * Gets the active filter
-             * @returns {reviewPanelFilter|null}
+             * Gets the identifier of the active filter
+             * @returns {String|null}
              */
             getActiveFilter() {
-                return activeFilter;
+                return activeFilter && activeFilter.id;
             },
 
             /**
@@ -309,7 +324,7 @@ define([
             setActiveFilter(filterId) {
                 const {filters} = this.getConfig();
                 const foundFilter = filters.find(filter => filter.id === filterId);
-                if (foundFilter && activeFilter !== foundFilter) {
+                if (foundFilter && (!activeFilter || activeFilter.id !== filterId)) {
                     activeFilter = foundFilter;
 
                     if (this.is('rendered')) {
@@ -328,20 +343,46 @@ define([
             },
 
             /**
-             * Gets the active item
-             * @returns {reviewPanelItem|null}
+             * Gets the identifier of the active item
+             * @returns {String|null}
              */
             getActiveItem() {
-                return activeItem;
+                return activeItem && activeItem.id;
+            },
+
+            /**
+             * Gets the position of the active item
+             * @returns {Number|null}
+             */
+            getActiveItemPosition() {
+                return activeItem && activeItem.position;
             },
 
             /**
              * Sets the active item
              * @param {String} itemId
              * @returns {reviewPanel}
+             * @fires expand for each activated element
              */
             setActiveItem(itemId) {
-                // ...
+                if (data && data.itemsMap.has(itemId) && (!activeItem || activeItem.id !== itemId)) {
+                    activeItem = data.itemsMap.get(itemId);
+
+                    // first deactivate already active item
+                    controls.$content.find(cssSelectors.active).removeClass(cssClasses.active);
+
+                    // then find the chain of elements to activate
+                    const $target = findControl(controls.$content, itemId);
+                    $target.add($target.parentsUntil(controls.$content, cssSelectors.control)).each((index, el) => {
+                        el.classList.add(cssClasses.active);
+
+                        /**
+                         * @event active
+                         * @param {String} id - the identifier of the expanded element
+                         */
+                        this.trigger('active', el.dataset.control);
+                    });
+                }
                 return this;
             },
 
@@ -513,15 +554,15 @@ define([
             // renders the component
             .on('render', function onReviewPanelRender() {
                 controls = {
-                    $headerScore: this.getElement().find('.review-panel-header .review-panel-score'),
-                    $footerScore: this.getElement().find('.review-panel-footer .review-panel-score'),
-                    $filtersContainer: this.getElement().find('.review-panel-filters'),
-                    $filters: this.getElement().find('.review-panel-filter'),
-                    $content: this.getElement().find('.review-panel-content'),
+                    $headerScore: this.getElement().find(`${cssSelectors.header} ${cssSelectors.score}`),
+                    $footerScore: this.getElement().find(`${cssSelectors.footer} ${cssSelectors.score}`),
+                    $filtersContainer: this.getElement().find(cssSelectors.filtersContainer),
+                    $filters: this.getElement().find(cssSelectors.filter),
+                    $content: this.getElement().find(cssSelectors.content),
                 };
 
                 // change filter on click
-                controls.$filtersContainer.on('click', '.review-panel-filter', e => {
+                controls.$filtersContainer.on('click', cssSelectors.filter, e => {
                     this.setActiveFilter(e.currentTarget.dataset.control);
                 });
 
@@ -532,8 +573,7 @@ define([
 
                 // select item
                 controls.$content.on('click', cssSelectors.item, e => {
-                    controls.$content.find(cssSelectors.active).removeClass(cssClasses.active);
-                    $(e.currentTarget).parentsUntil(controls.$content).add(e.currentTarget).addClass(cssClasses.active);
+                    this.setActiveItem(e.currentTarget.dataset.control);
                 });
 
                 if (activeFilter) {

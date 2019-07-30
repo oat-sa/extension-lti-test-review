@@ -225,15 +225,14 @@ define([
             });
     });
 
-    QUnit.test('render', assert => {
+    QUnit.test('render default', assert => {
         const ready = assert.async();
         const $container = $('#fixture-render');
-        const config = {};
 
         assert.expect(16);
         assert.equal($container.children().length, 0, 'The container is empty');
 
-        const instance = reviewPanelFactory($container, config)
+        const instance = reviewPanelFactory($container)
             .on('init', function () {
                 assert.equal(this, instance, 'The instance has been initialized');
             })
@@ -269,21 +268,96 @@ define([
             });
     });
 
-    QUnit.test('destroy', assert => {
+    QUnit.test('render with data', assert => {
         const ready = assert.async();
-        const $container = $('#fixture-destroy');
+        const $container = $('#fixture-render-data');
+        const config = {
+            headerLabel: 'HEADER',
+            footerLabel: 'FOOTER'
+        };
 
-        assert.expect(6);
-
+        assert.expect(36);
         assert.equal($container.children().length, 0, 'The container is empty');
 
-        const instance = reviewPanelFactory($container)
+        const instance = reviewPanelFactory($container, config, reviewDataIncorrect)
             .on('init', function () {
                 assert.equal(this, instance, 'The instance has been initialized');
             })
             .on('ready', () => {
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
+                assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
+                assert.equal($container.find('.review-panel-content').children().length, 1, 'The content area is not empty');
+
+                assert.equal($container.find('.review-panel-header .review-panel-label').text().trim(), config.headerLabel, 'The header label is rendered');
+                assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '94%', 'The header score is rendered');
+
+                assert.equal($container.find('.review-panel-footer .review-panel-label').text().trim(), config.footerLabel, 'The header label is rendered');
+                assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '16/17', 'The header score is rendered');
+
+                assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
+                assert.equal($container.find('.review-panel-part:nth(0) > .review-panel-label').text().trim(), reviewDataIncorrect.parts[0].label, 'The first test part got the expected label');
+                assert.equal($container.find('.review-panel-part:nth(1) > .review-panel-label').text().trim(), reviewDataIncorrect.parts[1].label, 'The second test part got the expected label');
+
+                assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
+                assert.equal($container.find('.review-panel-section:nth(0) > .review-panel-label').text().trim(), reviewDataIncorrect.parts[0].sections[0].label, 'The 1st rendered test section got the expected label');
+                assert.equal($container.find('.review-panel-section:nth(1) > .review-panel-label').text().trim(), reviewDataIncorrect.parts[1].sections[0].label, 'The 2nd rendered test section got the expected label');
+                assert.equal($container.find('.review-panel-section:nth(2) > .review-panel-label').text().trim(), reviewDataIncorrect.parts[1].sections[1].label, 'The 2nd rendered test section got the expected label');
+
+                assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
+                assert.equal($container.find('.review-panel-item:nth(0) > .review-panel-label').text().trim(), reviewDataIncorrect.parts[0].sections[0].items[0].label, 'The 1st rendered test item got the expected label');
+                assert.equal($container.find('.review-panel-item:nth(1) > .review-panel-label').text().trim(), reviewDataIncorrect.parts[1].sections[0].items[0].label, 'The 2nd rendered test item got the expected label');
+                assert.equal($container.find('.review-panel-item:nth(2) > .review-panel-label').text().trim(), reviewDataIncorrect.parts[1].sections[0].items[1].label, 'The 3rd rendered test item got the expected label');
+                assert.equal($container.find('.review-panel-item:nth(3) > .review-panel-label').text().trim(), reviewDataIncorrect.parts[1].sections[0].items[2].label, 'The 4th rendered test item got the expected label');
+                assert.equal($container.find('.review-panel-item:nth(4) > .review-panel-label').text().trim(), reviewDataIncorrect.parts[1].sections[0].items[3].label, 'The 5th rendered test item got the expected label');
+                assert.equal($container.find('.review-panel-item:nth(5) > .review-panel-label').text().trim(), reviewDataIncorrect.parts[1].sections[1].items[0].label, 'The 6th rendered test item got the expected label');
+                assert.equal($container.find('.review-panel-item:nth(6) > .review-panel-label').text().trim(), reviewDataIncorrect.parts[1].sections[1].items[1].label, 'The 7th rendered test item got the expected label');
+                assert.equal($container.find('.review-panel-item:nth(7) > .review-panel-label').text().trim(), reviewDataIncorrect.parts[1].sections[1].items[2].label, 'The 8th rendered test item got the expected label');
+                assert.equal($container.find('.review-panel-item:nth(8) > .review-panel-label').text().trim(), reviewDataIncorrect.parts[1].sections[1].items[3].label, 'The 9th rendered test item got the expected label');
+
+                assert.equal($container.find('.review-panel-item:nth(0)').is('.item-info'), true, 'The 1st item got the expected icon');
+                assert.equal($container.find('.review-panel-item:nth(2)').is('.item-incorrect'), true, 'The 3rd item got the expected icon');
+                assert.equal($container.find('.review-panel-item.item-correct').length, 7, 'The other items got the expected icon');
+
+                assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
+                assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
+                assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is active');
+                assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active');
+                assert.equal($container.find('.review-panel-filter:nth(0)').text().trim(), defaultFilters[0].label, 'The first filter is rendered');
+                assert.equal($container.find('.review-panel-filter:nth(1)').text().trim(), defaultFilters[1].label, 'The second filter is rendered');
+
+                instance.destroy();
+            })
+            .on('destroy', () => ready())
+            .on('error', err => {
+                assert.ok(false, 'The operation should not fail!');
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+                ready();
+            });
+    });
+
+    QUnit.test('destroy', assert => {
+        const ready = assert.async();
+        const $container = $('#fixture-destroy');
+
+        assert.expect(10);
+
+        assert.equal($container.children().length, 0, 'The container is empty');
+
+        const instance = reviewPanelFactory($container, {}, reviewDataCorrect)
+            .on('init', function () {
+                assert.equal(this, instance, 'The instance has been initialized');
+            })
+            .on('ready', () => {
+                assert.ok(instance.is('ready'), 'The component is ready');
+                assert.equal($container.children().length, 1, 'The container contains an element');
+                assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
+                assert.equal($container.find('.review-panel-content').children().length, 1, 'The content area is not empty');
+                assert.equal($container.find('.review-panel-header').length, 1, 'The header area is rendered');
+                assert.equal($container.find('.review-panel-footer').length, 1, 'The footer area is rendered');
 
                 instance.destroy();
             })
@@ -346,6 +420,15 @@ define([
                     .then(() => new Promise(resolve => {
                         instance
                             .off('.test')
+                            .on('filterchange.test', () => {
+                                assert.ok(false, 'The filterchange event should not be triggered');
+                            });
+                        instance.setActiveFilter(defaultFilters[1].id);
+                        window.setTimeout(resolve, 300);
+                    }))
+                    .then(() => new Promise(resolve => {
+                        instance
+                            .off('.test')
                             .on('filterchange.test', filterId => {
                                 assert.equal(filterId, defaultFilters[0].id, 'The filterchange event is triggered with the expected parameter');
                                 resolve();
@@ -356,6 +439,15 @@ define([
                         assert.equal(instance.getActiveFilter(), defaultFilters[0], 'The filter filter is now activated');
                         assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is now active');
                         assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active anymore');
+                    }))
+                    .then(() => new Promise(resolve => {
+                        instance
+                            .off('.test')
+                            .on('filterchange.test', () => {
+                                assert.ok(false, 'The filterchange event should not be triggered');
+                            });
+                        $container.find('.review-panel-filter:nth(0)').click();
+                        window.setTimeout(resolve, 300);
                     }))
                     .catch(err => {
                         assert.pushResult({
@@ -423,7 +515,7 @@ define([
             maxScore: 1
         };
 
-        assert.expect(96);
+        assert.expect(60);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -439,12 +531,8 @@ define([
 
                 assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
                 assert.equal($container.find('.review-panel-part').length, 1, 'A test part is rendered');
-                assert.equal($container.find('.review-panel-part > .review-panel-label').text().trim(), initialData.parts[0].label, 'The rendered test part got the expected label');
                 assert.equal($container.find('.review-panel-section').length, 1, 'A test section is rendered');
-                assert.equal($container.find('.review-panel-section > .review-panel-label').text().trim(), initialData.parts[0].sections[0].label, 'The rendered test section got the expected label');
                 assert.equal($container.find('.review-panel-item').length, 1, 'A test item is rendered');
-                assert.equal($container.find('.review-panel-item').is('.item-incorrect'), true, 'The item got the expected icon');
-                assert.equal($container.find('.review-panel-item > .review-panel-label').text().trim(), initialData.parts[0].sections[0].items[0].label, 'The rendered test item got the expected label');
 
                 assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
                 assert.equal($container.find('.review-panel-filter:visible').length, 2, 'The filters are displayed');
@@ -499,14 +587,7 @@ define([
                         assert.equal($container.find('.review-panel-item:nth(8) > .review-panel-label').text().trim(), reviewDataCorrect.parts[1].sections[1].items[3].label, 'The 9th rendered test item got the expected label');
 
                         assert.equal($container.find('.review-panel-item:nth(0)').is('.item-info'), true, 'The 1st item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(1)').is('.item-correct'), true, 'The 2nd item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(2)').is('.item-correct'), true, 'The 3rd item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(3)').is('.item-correct'), true, 'The 4th item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(4)').is('.item-correct'), true, 'The 5th item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(5)').is('.item-correct'), true, 'The 6th item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(6)').is('.item-correct'), true, 'The 7th item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(7)').is('.item-correct'), true, 'The 8th item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(8)').is('.item-correct'), true, 'The 9th item got the expected icon');
+                        assert.equal($container.find('.review-panel-item.item-correct').length, 8, 'The other items got the expected icon');
 
                         assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '100%', 'The header score is rendered');
                         assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '17/17', 'The header score is rendered');
@@ -541,37 +622,8 @@ define([
                     })
                     .then(() => {
                         assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
-                        assert.equal($container.find('.review-panel-part:nth(0) > .review-panel-label').text().trim(), reviewDataCorrect.parts[0].label, 'The first test part got the expected label');
-                        assert.equal($container.find('.review-panel-part:nth(1) > .review-panel-label').text().trim(), reviewDataCorrect.parts[1].label, 'The second test part got the expected label');
-
                         assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
-                        assert.equal($container.find('.review-panel-section:nth(0) > .review-panel-label').text().trim(), reviewDataCorrect.parts[0].sections[0].label, 'The 1st rendered test section got the expected label');
-                        assert.equal($container.find('.review-panel-section:nth(1) > .review-panel-label').text().trim(), reviewDataCorrect.parts[1].sections[0].label, 'The 2nd rendered test section got the expected label');
-                        assert.equal($container.find('.review-panel-section:nth(2) > .review-panel-label').text().trim(), reviewDataCorrect.parts[1].sections[1].label, 'The 2nd rendered test section got the expected label');
-
                         assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
-                        assert.equal($container.find('.review-panel-item:nth(0) > .review-panel-label').text().trim(), reviewDataCorrect.parts[0].sections[0].items[0].label, 'The 1st rendered test item got the expected label');
-                        assert.equal($container.find('.review-panel-item:nth(1) > .review-panel-label').text().trim(), reviewDataCorrect.parts[1].sections[0].items[0].label, 'The 2nd rendered test item got the expected label');
-                        assert.equal($container.find('.review-panel-item:nth(2) > .review-panel-label').text().trim(), reviewDataCorrect.parts[1].sections[0].items[1].label, 'The 3rd rendered test item got the expected label');
-                        assert.equal($container.find('.review-panel-item:nth(3) > .review-panel-label').text().trim(), reviewDataCorrect.parts[1].sections[0].items[2].label, 'The 4th rendered test item got the expected label');
-                        assert.equal($container.find('.review-panel-item:nth(4) > .review-panel-label').text().trim(), reviewDataCorrect.parts[1].sections[0].items[3].label, 'The 5th rendered test item got the expected label');
-                        assert.equal($container.find('.review-panel-item:nth(5) > .review-panel-label').text().trim(), reviewDataCorrect.parts[1].sections[1].items[0].label, 'The 6th rendered test item got the expected label');
-                        assert.equal($container.find('.review-panel-item:nth(6) > .review-panel-label').text().trim(), reviewDataCorrect.parts[1].sections[1].items[1].label, 'The 7th rendered test item got the expected label');
-                        assert.equal($container.find('.review-panel-item:nth(7) > .review-panel-label').text().trim(), reviewDataCorrect.parts[1].sections[1].items[2].label, 'The 8th rendered test item got the expected label');
-                        assert.equal($container.find('.review-panel-item:nth(8) > .review-panel-label').text().trim(), reviewDataCorrect.parts[1].sections[1].items[3].label, 'The 9th rendered test item got the expected label');
-
-                        assert.equal($container.find('.review-panel-item:nth(0)').is('.item-info'), true, 'The 1st item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(1)').is('.item-correct'), true, 'The 2nd item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(2)').is('.item-correct'), true, 'The 3rd item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(3)').is('.item-correct'), true, 'The 4th item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(4)').is('.item-correct'), true, 'The 5th item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(5)').is('.item-correct'), true, 'The 6th item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(6)').is('.item-correct'), true, 'The 7th item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(7)').is('.item-correct'), true, 'The 8th item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(8)').is('.item-correct'), true, 'The 9th item got the expected icon');
-
-                        assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '100%', 'The header score is rendered');
-                        assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '17/17', 'The header score is rendered');
 
                         assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
                         assert.equal($container.find('.review-panel-filter:visible').length, 0, 'The filters are not displayed');
@@ -646,7 +698,7 @@ define([
             maxScore: 1
         };
 
-        assert.expect(77);
+        assert.expect(67);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -662,12 +714,8 @@ define([
 
                 assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
                 assert.equal($container.find('.review-panel-part').length, 1, 'A test part is rendered');
-                assert.equal($container.find('.review-panel-part > .review-panel-label').text().trim(), initialData.parts[0].label, 'The rendered test part got the expected label');
                 assert.equal($container.find('.review-panel-section').length, 1, 'A test section is rendered');
-                assert.equal($container.find('.review-panel-section > .review-panel-label').text().trim(), initialData.parts[0].sections[0].label, 'The rendered test section got the expected label');
                 assert.equal($container.find('.review-panel-item').length, 1, 'A test item is rendered');
-                assert.equal($container.find('.review-panel-item').is('.item-correct'), true, 'The item got the expected icon');
-                assert.equal($container.find('.review-panel-item > .review-panel-label').text().trim(), initialData.parts[0].sections[0].items[0].label, 'The rendered test item got the expected label');
 
                 assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
                 assert.equal($container.find('.review-panel-filter:visible').length, 0, 'The filters are not displayed');
@@ -722,14 +770,8 @@ define([
                         assert.equal($container.find('.review-panel-item:nth(8) > .review-panel-label').text().trim(), reviewDataIncorrect.parts[1].sections[1].items[3].label, 'The 9th rendered test item got the expected label');
 
                         assert.equal($container.find('.review-panel-item:nth(0)').is('.item-info'), true, 'The 1st item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(1)').is('.item-correct'), true, 'The 2nd item got the expected icon');
                         assert.equal($container.find('.review-panel-item:nth(2)').is('.item-incorrect'), true, 'The 3rd item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(3)').is('.item-correct'), true, 'The 4th item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(4)').is('.item-correct'), true, 'The 5th item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(5)').is('.item-correct'), true, 'The 6th item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(6)').is('.item-correct'), true, 'The 7th item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(7)').is('.item-correct'), true, 'The 8th item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(8)').is('.item-correct'), true, 'The 9th item got the expected icon');
+                        assert.equal($container.find('.review-panel-item.item-correct').length, 7, 'The other items got the expected icon');
 
                         assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '94%', 'The header score is rendered');
                         assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '16/17', 'The header score is rendered');

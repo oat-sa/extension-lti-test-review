@@ -309,7 +309,7 @@ define([
             setActiveFilter(filterId) {
                 const {filters} = this.getConfig();
                 const foundFilter = filters.find(filter => filter.id === filterId);
-                if (foundFilter) {
+                if (foundFilter && activeFilter !== foundFilter) {
                     activeFilter = foundFilter;
 
                     if (this.is('rendered')) {

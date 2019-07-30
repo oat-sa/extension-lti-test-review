@@ -1467,7 +1467,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-item');
 
-        assert.expect(46);
+        assert.expect(52);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -1502,10 +1502,12 @@ define([
                         assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
                         assert.equal($container.find('.review-panel-part.active').length, 1, 'A test part is already active');
                         assert.equal($container.find('.review-panel-part.active').is('[data-control="QTIExamples"]'), true, 'The expected test part is now active');
+                        assert.equal($container.find('.review-panel-part.active.expanded').length, 1, 'The test part is expanded');
 
                         assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
                         assert.equal($container.find('.review-panel-section.active').length, 1, 'A test section is already active');
                         assert.equal($container.find('.review-panel-section.active').is('[data-control="assessmentSection-3"]'), true, 'The expected test section is now active');
+                        assert.equal($container.find('.review-panel-section.active.expanded').length, 1, 'The test section is expanded');
 
                         assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
                         assert.equal($container.find('.review-panel-item.active').length, 1, 'A test item is already active');
@@ -1520,16 +1522,21 @@ define([
                                 assert.equal(id, 'item-3', `The active event is triggered for ${id}`);
                                 resolve();
                             })
+                            .on('itemchange.test', () => {
+                                assert.ok(false, 'The itemchange event should not be triggered');
+                            })
                             .setActiveItem('item-3');
                     }))
                     .then(() => {
                         assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
                         assert.equal($container.find('.review-panel-part.active').length, 1, 'A test part is now active');
                         assert.equal($container.find('.review-panel-part.active').is('[data-control="QTIExamples"]'), true, 'The expected test part is now active');
+                        assert.equal($container.find('.review-panel-part.active.expanded').length, 1, 'The test part is expanded');
 
                         assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
                         assert.equal($container.find('.review-panel-section.active').length, 1, 'A test section is now active');
                         assert.equal($container.find('.review-panel-section.active').is('[data-control="assessmentSection-2"]'), true, 'The expected test section is now active');
+                        assert.equal($container.find('.review-panel-section.active.expanded').length, 1, 'The test section is expanded');
 
                         assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
                         assert.equal($container.find('.review-panel-item.active').length, 1, 'A test item is now active');
@@ -1543,6 +1550,9 @@ define([
                             .on('active.test', () => {
                                 assert.ok(false, 'The active event should not be triggered');
                             })
+                            .on('itemchange.test', () => {
+                                assert.ok(false, 'The itemchange event should not be triggered');
+                            })
                             .setActiveItem('item-3');
                         window.setTimeout(resolve, 300);
                     }))
@@ -1553,16 +1563,21 @@ define([
                                 assert.equal(id, 'item-1', `The active event is triggered for ${id}`);
                                 resolve();
                             })
+                            .on('itemchange.test', () => {
+                                assert.ok(false, 'The itemchange event should not be triggered');
+                            })
                             .setActiveItem('item-1');
                     }))
                     .then(() => {
                         assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
                         assert.equal($container.find('.review-panel-part.active').length, 1, 'A test part is now active');
                         assert.equal($container.find('.review-panel-part.active').is('[data-control="Introduction"]'), true, 'The expected test part is now active');
+                        assert.equal($container.find('.review-panel-part.active.expanded').length, 1, 'The test part is expanded');
 
                         assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
                         assert.equal($container.find('.review-panel-section.active').length, 1, 'A test section is now active');
                         assert.equal($container.find('.review-panel-section.active').is('[data-control="assessmentSection-1"]'), true, 'The expected test section is now active');
+                        assert.equal($container.find('.review-panel-section.active.expanded').length, 1, 'The test part is expanded');
 
                         assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
                         assert.equal($container.find('.review-panel-item.active').length, 1, 'A test item is now active');
@@ -1575,6 +1590,9 @@ define([
                             .off('.test')
                             .on('active.test', () => {
                                 assert.ok(false, 'The active event should not be triggered');
+                            })
+                            .on('itemchange.test', () => {
+                                assert.ok(false, 'The itemchange event should not be triggered');
                             })
                             .setActiveItem('item-1');
                         window.setTimeout(resolve, 300);
@@ -1606,7 +1624,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-item-click');
 
-        assert.expect(40);
+        assert.expect(50);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -1630,32 +1648,47 @@ define([
                     .then(() => {
                         assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
                         assert.equal($container.find('.review-panel-part.active').length, 0, 'No test part is active yet');
+                        assert.equal($container.find('.review-panel-part.expanded').length, 0, 'No test part is expanded yet');
 
                         assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
                         assert.equal($container.find('.review-panel-section.active').length, 0, 'No test section is active yet');
+                        assert.equal($container.find('.review-panel-section.expanded').length, 0, 'No test section is expanded yet');
 
                         assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
                         assert.equal($container.find('.review-panel-item.active').length, 0, 'No test item is active yet');
 
                         assert.equal($container.find('.review-panel-content .active').length, 0, 'No element is active yet');
                     })
-                    .then(() => new Promise(resolve => {
-                        instance
-                            .off('.test')
-                            .on('active.test', id => {
-                                assert.equal(id, 'item-3', `The active event is triggered for ${id}`);
-                                resolve();
-                            });
+                    .then(() => {
+                        instance.off('.test');
+                        const promises = [
+                            new Promise(resolve => {
+                                instance.on('active.test', id => {
+                                    assert.equal(id, 'item-3', `The active event is triggered for ${id}`);
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('itemchange.test', (id, position) => {
+                                    assert.equal(id, 'item-3', `The itemchange event is triggered for ${id}`);
+                                    assert.equal(position, 2, `The itemchange event is triggered for position ${position}`);
+                                    resolve();
+                                });
+                            })
+                        ];
                         $container.find('[data-control="item-3"]').click();
-                    }))
+                        return Promise.all(promises);
+                    })
                     .then(() => {
                         assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
                         assert.equal($container.find('.review-panel-part.active').length, 1, 'A test part is now active');
                         assert.equal($container.find('.review-panel-part.active').is('[data-control="QTIExamples"]'), true, 'The expected test part is now active');
+                        assert.equal($container.find('.review-panel-part.active.expanded').length, 1, 'The test part is expanded');
 
                         assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
                         assert.equal($container.find('.review-panel-section.active').length, 1, 'A test section is now active');
                         assert.equal($container.find('.review-panel-section.active').is('[data-control="assessmentSection-2"]'), true, 'The expected test section is now active');
+                        assert.equal($container.find('.review-panel-section.active.expanded').length, 1, 'The test section is expanded');
 
                         assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
                         assert.equal($container.find('.review-panel-item.active').length, 1, 'A test item is now active');
@@ -1668,27 +1701,43 @@ define([
                             .off('.test')
                             .on('active.test', () => {
                                 assert.ok(false, 'The active event should not be triggered');
+                            })
+                            .on('itemchange.test', () => {
+                                assert.ok(false, 'The itemchange event should not be triggered');
                             });
                         $container.find('[data-control="item-3"]').click();
                         window.setTimeout(resolve, 300);
                     }))
-                    .then(() => new Promise(resolve => {
-                        instance
-                            .off('.test')
-                            .on('active.test', id => {
-                                assert.equal(id, 'item-1', `The active event is triggered for ${id}`);
-                                resolve();
-                            });
+                    .then(() => {
+                        instance.off('.test');
+                        const promises = [
+                            new Promise(resolve => {
+                                instance.on('active.test', id => {
+                                    assert.equal(id, 'item-1', `The active event is triggered for ${id}`);
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('itemchange.test', (id, position) => {
+                                    assert.equal(id, 'item-1', `The itemchange event is triggered for ${id}`);
+                                    assert.equal(position, 0, `The itemchange event is triggered for position ${position}`);
+                                    resolve();
+                                });
+                            })
+                        ];
                         $container.find('[data-control="item-1"]').click();
-                    }))
+                        return Promise.all(promises);
+                    })
                     .then(() => {
                         assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
                         assert.equal($container.find('.review-panel-part.active').length, 1, 'A test part is now active');
                         assert.equal($container.find('.review-panel-part.active').is('[data-control="Introduction"]'), true, 'The expected test part is now active');
+                        assert.equal($container.find('.review-panel-part.active.expanded').length, 1, 'The test part is expanded');
 
                         assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
                         assert.equal($container.find('.review-panel-section.active').length, 1, 'A test section is now active');
                         assert.equal($container.find('.review-panel-section.active').is('[data-control="assessmentSection-1"]'), true, 'The expected test section is now active');
+                        assert.equal($container.find('.review-panel-section.active.expanded').length, 1, 'The test section is expanded');
 
                         assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
                         assert.equal($container.find('.review-panel-item.active').length, 1, 'A test item is now active');
@@ -1701,10 +1750,92 @@ define([
                             .off('.test')
                             .on('active.test', () => {
                                 assert.ok(false, 'The active event should not be triggered');
+                            })
+                            .on('itemchange.test', () => {
+                                assert.ok(false, 'The itemchange event should not be triggered');
                             });
                         $container.find('[data-control="item-1"]').click();
                         window.setTimeout(resolve, 300);
                     }))
+                    .catch(err => {
+                        assert.pushResult({
+                            result: false,
+                            message: err
+                        });
+                    })
+                    .then(() => instance.destroy());
+            })
+            .after('destroy', () => {
+                assert.equal($container.children().length, 0, 'The container is now empty');
+                assert.ok(!instance.is('ready'), 'The component is not ready anymore');
+                ready();
+            })
+            .on('error', err => {
+                assert.ok(false, 'The operation should not fail!');
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+                ready();
+            });
+    });
+
+    QUnit.test('active item filter', assert => {
+        const ready = assert.async();
+        const $container = $('#fixture-item-change');
+
+        assert.expect(13);
+
+        assert.equal($container.children().length, 0, 'The container is empty');
+
+        const instance = reviewPanelFactory($container, {}, reviewDataIncorrect)
+            .on('init', function () {
+                assert.equal(this, instance, 'The instance has been initialized');
+            })
+            .on('ready', () => {
+                assert.ok(instance.is('ready'), 'The component is ready');
+                assert.equal($container.children().length, 1, 'The container contains an element');
+
+                assert.equal(instance.getActiveFilter(), 'all', 'The "All" filter is activated by default');
+
+                Promise
+                    .resolve()
+                    .then(() => new Promise(resolve => {
+                        instance
+                            .off('.test')
+                            .on('active.test', id => {
+                                assert.equal(id, 'item-1', `The active event is triggered for ${id}`);
+                                resolve();
+                            })
+                            .setActiveItem('item-1');
+                    }))
+                    .then(() => {
+                        instance.off('.test');
+                        const promises = [
+                            new Promise(resolve => {
+                                instance.on('active.test', id => {
+                                    assert.equal(id, 'item-3', `The active event is triggered for ${id}`);
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('itemchange.test', (id, position) => {
+                                    assert.equal(id, 'item-3', `The itemchange event is triggered for ${id}`);
+                                    assert.equal(position, 2, `The itemchange event is triggered for position ${position}`);
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('filterchange.test', filterId => {
+                                    assert.equal(filterId, 'incorrect', 'The filterchange event is triggered with the expected parameter');
+                                    resolve();
+                                });
+                            })
+                        ];
+                        instance.setActiveFilter('incorrect');
+                        assert.equal(instance.getActiveFilter(), 'incorrect', 'The "Incorrect" filter is now activated');
+                        return Promise.all(promises);
+                    })
                     .catch(err => {
                         assert.pushResult({
                             result: false,
@@ -1746,11 +1877,12 @@ define([
             })
             .on('ready', () => {
                 assert.equal($container.children().length, 1, 'The container contains an element');
+                instance.setActiveItem('item-1');
                 ready();
             })
             .on('itemchange', (id, position) => {
                 const item = instance.getData().itemsMap.get(id);
-                $item.innerHTML = `<h1>${item.label}</h1><p>${id} at #${position}</p>`;
+                $item.html(`<h1>${item.label}</h1><p>${id} at #${position}</p>`);
             })
             .on('error', err => {
                 assert.ok(false, 'The operation should not fail!');

@@ -261,6 +261,7 @@ define([
      * @fires itemchange When an item is selected by the user (either a click on item or a filter)
      */
     function reviewPanelFactory(container, config = {}, map = null) {
+        let component;
         let controls = null;
         let activeFilter = null;
         let activeItem = null;
@@ -289,13 +290,27 @@ define([
 
             // then find the chain of elements to activate
             const $target = findControl(controls.$content, itemId);
-            const $parents = $target.parentsUntil(controls.$content, cssSelectors.control);
-            $target
-                .add($parents)
-                .addClass(cssClasses.active);
+            if ($target.length) {
+                const $parents = $target.parentsUntil(controls.$content, cssSelectors.control);
+                $target
+                    .add($parents)
+                    .addClass(cssClasses.active);
 
-            // finally make sure the item is visible
-            autoscroll($target, controls.$content);
+                // finally make sure the item is visible
+                autoscroll($target, controls.$content);
+            }
+        };
+
+        /**
+         * Emits the itemchange event with respect to the current active item
+         */
+        const itemChange = () => {
+            /**
+             * @event itemchange
+             * @param {String} itemId
+             * @param {Number} position
+             */
+            component.trigger('itemchange', activeItem.id, activeItem.position);
         };
 
         /**
@@ -414,11 +429,7 @@ define([
                     const $target = findControl(controls.$content, id);
 
                     if ($target.length) {
-                        // first, collapse all expanded blocks
-                        this.collapse();
-
-                        // then expand the target and its parents
-                        // also expand first child blocks
+                        // will expand the target, its parents and first child blocks
                         let $collapsed = $target.parentsUntil(controls.$content, cssSelectors.collapsible)
                             .add($target.find(cssSelectors.collapsible).filter(':first-child'));
 
@@ -426,15 +437,22 @@ define([
                             $collapsed = $collapsed.add($target);
                         }
 
-                        $collapsed.each((index, el) => {
-                            el.classList.add(cssClasses.expanded);
+                        if ($collapsed.filter(cssSelectors.expanded).length !== $collapsed.length) {
+                            // first, collapse all expanded blocks
+                            this.collapse();
 
-                            /**
-                             * @event expand
-                             * @param {String} id - the identifier of the expanded element
-                             */
-                            this.trigger('expand', el.dataset.control);
-                        });
+                            // then expand the blocks
+                            $collapsed.each((index, el) => {
+                                el.classList.add(cssClasses.expanded);
+
+                                /**
+                                 * @event expand
+                                 * @param {String} id - the identifier of the expanded element
+                                 */
+                                this.trigger('expand', el.dataset.control);
+                            });
+
+                        }
                     }
                 }
 
@@ -534,7 +552,7 @@ define([
         /**
          * @typedef {component} reviewPanel
          */
-        const component = componentFactory(api, defaults)
+        component = componentFactory(api, defaults)
             // set the component's layout
             .setTemplate(panelTpl)
 
@@ -590,7 +608,11 @@ define([
 
                 // select item
                 controls.$content.on('click', cssSelectors.item, e => {
+                    const currentId = activeItem && activeItem.id;
                     this.setActiveItem(e.currentTarget.dataset.control);
+                    if (activeItem && activeItem.id !== currentId) {
+                        itemChange();
+                    }
                 });
 
                 this.update();
@@ -609,6 +631,24 @@ define([
                  */
                 this.setState('ready', true)
                     .trigger('ready');
+            })
+
+            // auto expand the block that contains the active item
+            .on('active', function onReviewPanelActiveItem(itemId) {
+                this.expand(itemId);
+            })
+
+            // make sure the active item remain selected and visible when updating the display
+            .on('update', function onReviewPanelUpdate(filteredData) {
+                if (activeItem) {
+                    // if the active item is not available anymore, select the first available one
+                    if (!filteredData.itemsMap.has(activeItem.id)) {
+                        controls.$content.find(`${cssSelectors.item}:nth(0)`).click();
+                    } else {
+                        selectItem(activeItem.id);
+                        this.expand(activeItem.id);
+                    }
+                }
             })
 
             // data update

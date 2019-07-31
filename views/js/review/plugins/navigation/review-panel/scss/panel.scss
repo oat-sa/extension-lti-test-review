@@ -26,6 +26,7 @@ $borderWidth: 1px;
 $sidePadding: 8px;
 $boxPadding: 5px;
 $space: 5px;
+$focusSpace: 2px;
 $panelMargin: 10px;
 
 $panelBackground: $canvas;
@@ -107,7 +108,7 @@ $incorrectColor: $error;
             line-height: $lineHeight;
             padding: 0 $sidePadding;
             font-size: 1.5rem;
-            &::after {
+            .collapsible-arrow::before {
                 @include tao-icon-setup;
                 @include icon-down;
                 line-height: inherit;
@@ -120,11 +121,28 @@ $incorrectColor: $error;
         }
         // child block must be displayed in an expanded element
         &.expanded {
-            > .review-panel-label::after {
-                @include icon-up;
+            > .review-panel-label {
+                .collapsible-arrow::before {
+                    @include icon-up;
+                }
             }
             > .review-panel-block {
                 display: block;
+            }
+        }
+    }
+    .navigable {
+        position: relative;
+        &:focus {
+            outline: 0 none;
+            &:after {
+                content: ' ';
+                position: absolute;
+                top: $focusSpace;
+                left: $focusSpace;
+                bottom: $focusSpace;
+                right: $focusSpace;
+                border: $borderWidth dashed $textColor;
             }
         }
     }
@@ -176,6 +194,15 @@ $incorrectColor: $error;
             .review-panel-label {
                 font-size: 1.4rem;
                 font-weight: bold;
+            }
+
+            &:focus {
+                &:after {
+                    top: -$space;
+                    left: -$space;
+                    bottom: -$space;
+                    right: -$space;
+                }
             }
         }
     }

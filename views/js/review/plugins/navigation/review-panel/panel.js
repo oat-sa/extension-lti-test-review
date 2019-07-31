@@ -113,6 +113,7 @@ define([
         collapsibleLabel: `.${cssClasses.collapsible} > .review-panel-label`,
         expanded: `.${cssClasses.expanded}`,
         active: `.${cssClasses.active}`,
+        navigable: '.navigable',
         control: '[data-control]',
         content: '.review-panel-content',
         filtersContainer: '.review-panel-filters',
@@ -538,6 +539,10 @@ define([
                     controls.$footerScore.text(`${filteredData.score}/${filteredData.maxScore}`);
                     hider.toggle(controls.$filters, filteredData.score !== filteredData.maxScore);
 
+                    this.getElement()
+                        .find(cssSelectors.navigable)
+                        .each((index, el) => el.setAttribute('tabindex', index + 1));
+
                     /**
                      * @event update
                      * @param {reviewPanelData} filteredData
@@ -595,6 +600,12 @@ define([
                     $filters: this.getElement().find(cssSelectors.filter),
                     $content: this.getElement().find(cssSelectors.content),
                 };
+
+                this.getElement().on('keydown', cssSelectors.navigable, e => {
+                    if(e.key === ' ' || e.key === 'Enter') {
+                        e.currentTarget.click();
+                    }
+                });
 
                 // change filter on click
                 controls.$filtersContainer.on('click', cssSelectors.filter, e => {

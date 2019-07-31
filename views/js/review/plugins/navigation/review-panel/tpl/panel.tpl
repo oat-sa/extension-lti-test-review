@@ -9,7 +9,7 @@
 {{/if}}
     <ul class="review-panel-filters plain">
     {{#each filters}}
-        <li class="review-panel-filter" data-control="{{id}}">
+        <li class="review-panel-filter navigable" data-control="{{id}}">
             <span class="review-panel-label" title="{{title}}">{{label}}</span>
         </li>
     {{/each}}

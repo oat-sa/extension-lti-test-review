@@ -20,7 +20,6 @@
 
 namespace oat\taoReview\models;
 
-
 use common_Exception;
 use common_exception_Error;
 use core_kernel_classes_Resource;

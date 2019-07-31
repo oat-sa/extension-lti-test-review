@@ -20,7 +20,6 @@
 
 namespace oat\taoReview\models;
 
-
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDeliveryRdf\model\DeliveryContainerService;
 use oat\taoOutcomeUi\model\Wrapper\ResultServiceWrapper;

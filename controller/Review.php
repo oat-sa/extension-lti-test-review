@@ -53,7 +53,7 @@ class Review extends tao_actions_SinglePageModule
      * @throws common_exception_Error
      * @throws common_exception_NotFound
      */
-    public function index()
+    public function index(): void
     {
         $launchData = LtiService::singleton()->getLtiSession()->getLaunchData();
 
@@ -71,21 +71,18 @@ class Review extends tao_actions_SinglePageModule
         $this->composeView('delegated-view', $data, 'pages/index.tpl', 'tao');
     }
 
-    public function getItems()
-    {
-        // TBD
-    }
-
     /**
      * Provides the definition data and the state for a particular item
      */
-    public function getItem()
+    public function getItem(): void
     {
         try {
             $this->validateCsrf();
 
+            $params = $this->getPsrRequest()->getQueryParams();
+
             $itemUri = $this->getRequestParameter('itemUri');
-            $resultId = $this->getRequestParameter('resultId');
+            $resultId = $this->getRequestParameter('serviceCallId');
 
             $response = [
                 'baseUrl' => '',
@@ -94,13 +91,13 @@ class Review extends tao_actions_SinglePageModule
 
             // previewing a result
             if ($resultId) {
-                if (!$this->hasRequestParameter('itemDefinition')) {
-                    throw new \common_exception_MissingParameter('itemDefinition', $this->getRequestURI());
-                }
-
-                if (!$this->hasRequestParameter('deliveryUri')) {
-                    throw new \common_exception_MissingParameter('deliveryUri', $this->getRequestURI());
-                }
+//                if (!$this->hasRequestParameter('itemDefinition')) {
+//                    throw new \common_exception_MissingParameter('itemDefinition', $this->getRequestURI());
+//                }
+//
+//                if (!$this->hasRequestParameter('deliveryUri')) {
+//                    throw new \common_exception_MissingParameter('deliveryUri', $this->getRequestURI());
+//                }
 
                 $itemDefinition = $this->getRequestParameter('itemDefinition');
                 $delivery = new \core_kernel_classes_Resource($this->getRequestParameter('deliveryUri'));
@@ -124,8 +121,8 @@ class Review extends tao_actions_SinglePageModule
 
             $response['success'] = true;
         } catch (\Exception $e) {
-            $response = $this->getErrorResponse($e);
-            $code = $this->getErrorCode($e);
+            $response = $e->getMessage();
+            $code = 400;
         }
 
         $this->returnJson($response, $code ?? 200);
@@ -136,7 +133,7 @@ class Review extends tao_actions_SinglePageModule
      * @param string $deliveryUri
      *
      * @return string
-     * @throws \common_exception_Error
+     * @throws common_exception_Error
      */
     protected function getUserLanguage($resultId, $deliveryUri)
     {
@@ -155,7 +152,6 @@ class Review extends tao_actions_SinglePageModule
 
     /**
      * @throws common_Exception
-     * @throws InvalidServiceManagerException
      */
     public function init(): void
     {

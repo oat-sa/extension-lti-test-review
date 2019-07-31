@@ -1866,7 +1866,16 @@ define([
         const $container = $('#visual-test .panel');
         const $item = $('#visual-test .item');
         const instance = reviewPanelFactory($container, {}, reviewDataIncorrect);
-
+        const data = {
+            correct: reviewDataCorrect,
+            incorrect: reviewDataIncorrect
+        };
+        const showItem = (id, position) => {
+            const item = instance.getData().itemsMap.get(id);
+            if (item) {
+                $item.html(`<h1>${item.label}</h1><p>${id} at #${position}</p>`);
+            }
+        };
         assert.expect(3);
 
         assert.equal($container.children().length, 0, 'The container is empty');
@@ -1878,12 +1887,20 @@ define([
             .on('ready', () => {
                 assert.equal($container.children().length, 1, 'The container contains an element');
                 instance.setActiveItem('item-1');
+
+                const $header = $('#visual-test .header');
+                $header
+                    .on('click', 'button', e => {
+                        $header.find('button').removeClass('btn-success');
+                        e.currentTarget.classList.add('btn-success');
+                        instance.setData(data[e.currentTarget.dataset.control]);
+                    })
+                    .find('[data-control="correct"]').click();
+
                 ready();
             })
-            .on('itemchange', (id, position) => {
-                const item = instance.getData().itemsMap.get(id);
-                $item.html(`<h1>${item.label}</h1><p>${id} at #${position}</p>`);
-            })
+            .after('update', () => showItem(instance.getActiveItem(), instance.getActiveItemPosition()))
+            .on('itemchange', showItem)
             .on('error', err => {
                 assert.ok(false, 'The operation should not fail!');
                 assert.pushResult({

@@ -46,7 +46,9 @@
             #visual-test .header {
                 background-color: #266d9c;
                 height: 40px;
+                line-height: 40px;
                 flex: 0 0 auto;
+                text-align: center;
             }
             #visual-test .content {
                 background-color: white;
@@ -90,7 +92,10 @@
             <div id="fixture-item-change"></div>
         </div>
         <div id="visual-test">
-            <div class="header"></div>
+            <div class="header">
+                <button class="small" data-control="correct">Correct</button>
+                <button class="small" data-control="incorrect">Incorrect</button>
+            </div>
             <div class="content">
                 <aside class="panel"></aside>
                 <section class="item"></section>

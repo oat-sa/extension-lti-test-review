@@ -130,7 +130,7 @@ $incorrectColor: $error;
     }
 
     .review-panel-header {
-        @include review-panel-item-layout();
+        @include review-panel-line-layout(space-between);
         padding: $boxPadding $sidePadding;
         background-color: $headerBackground;
         color: $headerColor;
@@ -146,7 +146,7 @@ $incorrectColor: $error;
     }
 
     .review-panel-footer {
-        @include review-panel-item-layout();
+        @include review-panel-line-layout(space-between);
         padding: $boxPadding $sidePadding;
         background-color: $footerBackground;
         color: $footerColor;

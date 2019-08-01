@@ -112,14 +112,16 @@ define([
                 const testMap = testRunner.getTestMap();
                 const context = testRunner.getTestContext();
                 const item = getItem(testMap, context.itemIdentifier);
+                const itemsCount = getItemsCount(testMap);
+
 
                 // check TestMap if empty
                 if( _.isPlainObject(testMap) && _.size(testMap) === 0){
                     return false;
                 }
 
-                // first item of the test
-                if (item.position === 0) {
+                // last item of the test
+                if (item.position === itemsCount - 1) {
                     return false;
                 }
 
@@ -132,15 +134,14 @@ define([
                 const testMap = testRunner.getTestMap();
                 const context = testRunner.getTestContext();
                 const item = getItem(testMap, context.itemIdentifier);
-                const itemsCount = getItemsCount(testMap);
-
+                
                 // check TestMap if empty
                 if( _.isPlainObject(testMap) && _.size(testMap) === 0){
                     return false;
                 }
 
-                //last item of the test
-                if (item.position === itemsCount - 1) {
+                //first item of the test
+                if (item.position === 0) {
                     return false;
                 }
 

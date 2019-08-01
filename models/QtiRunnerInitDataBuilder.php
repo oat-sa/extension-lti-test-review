@@ -21,18 +21,20 @@
 namespace oat\taoReview\models;
 
 use common_Exception;
-use core_kernel_classes_Resource;
 use oat\generis\model\OntologyAwareTrait;
-use oat\oatbox\service\ServiceManager;
-use oat\taoDelivery\model\execution\OntologyService;
-use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoDeliveryRdf\model\DeliveryContainerService;
+use oat\taoOutcomeUi\helper\ResponseVariableFormatter;
+use oat\taoOutcomeUi\model\ResultsService;
 use oat\taoOutcomeUi\model\Wrapper\ResultServiceWrapper;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTest\models\runner\QtiRunnerService;
 use oat\taoQtiTest\models\runner\QtiRunnerServiceContext;
-use oat\taoQtiTest\models\TestModelService;
-use taoQtiTest_helpers_TestRunnerUtils;
+use oat\taoResultServer\models\classes\ResultServerService;
+use qtism\data\AssessmentSection;
+use qtism\data\TestPart;
+use taoQtiTest_helpers_Utils;
+use taoResultServer_models_classes_OutcomeVariable;
+use taoResultServer_models_classes_ResponseVariable;
 
 class QtiRunnerInitDataBuilder
 {
@@ -50,21 +52,24 @@ class QtiRunnerInitDataBuilder
     /** @var DeliveryExecutionManagerService */
     private $deliveryExecutionService;
 
-    /** @var ResultServiceWrapper */
+    /** @var ResultsService */
     private $resultService;
+
+    /** @var ResultServerService */
+    private $resultServerService;
 
     public function __construct(
         DeliveryContainerService $deliveryContainerService,
         QtiRunnerService $qtiRunnerService,
-        QtiRunnerMapBuilder $qtiRunnerMapBuilder,
         DeliveryExecutionManagerService $deliveryExecutionService,
-        ResultServiceWrapper $resultService
+        ResultServiceWrapper $resultService,
+        ResultServerService $resultServerService
     ) {
         $this->deliveryContainerService = $deliveryContainerService;
         $this->qtiRunnerService = $qtiRunnerService;
-        $this->qtiRunnerMapBuilder = $qtiRunnerMapBuilder;
         $this->deliveryExecutionService = $deliveryExecutionService;
-        $this->resultService = $resultService;
+        $this->resultService = $resultService->getService();
+        $this->resultServerService = $resultServerService;
     }
 
     /**
@@ -77,46 +82,96 @@ class QtiRunnerInitDataBuilder
     {
         $serviceContext = $this->getServiceContext($deliveryExecutionId);
 
-        $ref = taoQtiTest_helpers_TestRunnerUtils::getItemRef($serviceContext->getTestSession(), '0', $serviceContext);
+//        $ref = taoQtiTest_helpers_TestRunnerUtils::getItemRef($serviceContext->getTestSession(), '0', $serviceContext);
 
-        /** @var TestModelService $testModelService */
-        $testModelService = ServiceManager::getServiceManager()->get(TestModelService::SERVICE_ID);
-        $items = $testModelService->getItems($this->getResource($serviceContext->getTestDefinitionUri()));
-        /** @var core_kernel_classes_Resource $first */
-        $first = array_shift($items);
+//        /** @var TestModelService $testModelService */
+//        $testModelService = ServiceManager::getServiceManager()->get(TestModelService::SERVICE_ID);
+//        $items = $testModelService->getItems($this->getResource($serviceContext->getTestDefinitionUri()));
+//        /** @var core_kernel_classes_Resource $first */
+//        $first = array_shift($items);
+
+        //            'itemData'       => $this->qtiRunnerService->getItemData($serviceContext, $serviceContext->getTestCompilationUri()),
+//              formatted as itemURI|publicFolderURI|privateFolderURI
 
 
         $init = [
-            'itemIdentifier' => $first->getUri(),
-
-//            'itemData'       => $this->qtiRunnerService->getItemData($serviceContext, $serviceContext->getTestCompilationUri()),
-//              formatted as itemURI|publicFolderURI|privateFolderURI
-
-            'testMap' => $this->qtiRunnerService->getTestMap($serviceContext),
+            'itemIdentifier' => null,
+            'itemData' => null,
+            'testMap' => $this->getTestMap($serviceContext, $deliveryExecutionId),
             'testContext' => $this->qtiRunnerService->getTestContext($serviceContext),
             'testData' => $this->qtiRunnerService->getTestData($serviceContext),
-            'testResponses' => $this->getItemData($serviceContext),
+//            'testResponses' => $this->getItemData($serviceContext),
             'success' => true,
         ];
 
         return $init;
     }
 
-    /**
-     * @return OntologyService
-     */
-    protected function getOntologyService(): OntologyService
+    protected function getTestMap(QtiRunnerServiceContext $context, string $deliveryExecutionId)
     {
-        return $this->getServiceManager()->get(ServiceProxy::SERVICE_ID);
+        $deliveryExecution = $this->deliveryExecutionService->getDeliveryExecutionById($deliveryExecutionId);
+        $delivery = $deliveryExecution->getDelivery();
+
+        $filterSubmission = ResultsService::VARIABLES_FILTER_LAST_SUBMITTED;
+        $filterTypes = [
+            taoResultServer_models_classes_ResponseVariable::class,
+            taoResultServer_models_classes_OutcomeVariable::class
+        ];
+
+        $implementation = $this->resultServerService->getResultStorage($delivery->getUri());
+        $this->resultService->setImplementation($implementation);
+
+        $variables = $this->getResultVariables($deliveryExecution->getIdentifier(), $filterSubmission, $filterTypes);
+
+        $testDefinition = taoQtiTest_helpers_Utils::getTestDefinition($context->getTestCompilationUri());
+
+        $map = [
+            'scope' => 'test',
+            'parts' => []
+        ];
+
+        foreach ($testDefinition->getTestParts() as $testPart) {
+            /** @var TestPart $testPart */
+            $sections = [];
+            foreach ($testPart->getAssessmentSections() as $section) {
+                /** @var AssessmentSection $section */
+                $sections[$section->getIdentifier()] = [
+                    'id' => $section->getIdentifier(),
+                    'label' => $section->getTitle()
+                ];
+            }
+
+            $map['parts'][$testPart->getIdentifier()] = [
+                'id' => $testPart->getIdentifier(),
+                'label' => $testPart->getIdentifier(),
+                'sections' => $sections,
+            ];
+        }
+
+//        print_r($variables);
+
+        return $map;
     }
 
-    private function getItemData()
+    protected function getResultVariables($resultId, $filterSubmission, $filterTypes = array())
     {
-        return [
-            ['itemDefinition' => 'item-1', 'state' => null],
-            ['itemDefinition' => 'item-2', 'state' => null],
-            ['itemDefinition' => 'item-3', 'state' => null],
-        ];
+        $variables = $this->resultService->getStructuredVariables($resultId, $filterSubmission, array_merge($filterTypes, [\taoResultServer_models_classes_ResponseVariable::class]));
+        $displayedVariables = $this->resultService->filterStructuredVariables($variables, $filterTypes);
+
+        $responses = ResponseVariableFormatter::formatStructuredVariablesToItemState($variables);
+        $excludedVariables = array_flip(['numAttempts', 'duration']);
+
+        foreach ($displayedVariables as &$item) {
+            if (!isset($item['uri'])) {
+                continue;
+            }
+            $itemUri = $item['uri'];
+            $item['state'] = isset($responses[$itemUri][$item['attempt']])
+                ? json_encode(array_diff_key($responses[$itemUri][$item['attempt']], $excludedVariables))
+                : null;
+        }
+
+        return $displayedVariables;
     }
 
     /**

@@ -25,6 +25,7 @@ use oat\taoDeliveryRdf\model\DeliveryContainerService;
 use oat\taoOutcomeUi\model\Wrapper\ResultServiceWrapper;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTest\models\runner\QtiRunnerService;
+use oat\taoResultServer\models\classes\ResultServerService;
 
 class QtiRunnerInitDataBuilderFactory extends ConfigurableService
 {
@@ -37,9 +38,9 @@ class QtiRunnerInitDataBuilderFactory extends ConfigurableService
         return new QtiRunnerInitDataBuilder(
             $locator->get(DeliveryContainerService::SERVICE_ID),
             $locator->get(QtiRunnerService::SERVICE_ID),
-            $locator->get(QtiRunnerMapBuilderFactory::SERVICE_ID)->create(),
             $locator->get(DeliveryExecutionManagerService::SERVICE_ID),
-            $locator->get(ResultServiceWrapper::SERVICE_ID)
+            $locator->get(ResultServiceWrapper::SERVICE_ID),
+            $locator->get(ResultServerService::SERVICE_ID)
         );
     }
 }

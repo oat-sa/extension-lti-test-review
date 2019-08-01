@@ -129,6 +129,7 @@ class QtiRunnerInitDataBuilder
             'parts' => []
         ];
 
+        $position = 0;
         foreach ($testDefinition->getTestParts() as $testPart) {
             /** @var TestPart $testPart */
             $sections = [];
@@ -144,13 +145,14 @@ class QtiRunnerInitDataBuilder
                     $items[$itemId] = [
                         'id' => $itemId,
                         'label' => $itemData['data']['attributes']['label'],
-                        'position' => 0,
+                        'position' => $position,
                         'categories' => [],
                         'score' => 0,
                         'maxScore' => 0
                     ];
 
                     $this->fillItemsData($itemId, $item->getHref(), $itemData['data']);
+                    $position++;
                 }
 
                 $sectionId = $section->getIdentifier();

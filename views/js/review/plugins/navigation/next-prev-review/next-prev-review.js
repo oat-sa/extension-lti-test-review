@@ -27,13 +27,11 @@ define([
     'i18n',
     'ui/hider',
     'taoTests/runner/plugin',
-    'taoQtiTest/runner/helpers/map',
-    'taoQtiTest/runner/helpers/navigation',
     'util/shortcut',
     'util/namespace',
     'tpl!taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
     'css!taoReview/review/plugins/navigation/next-prev-review/css/next-prev-review'
-], function ($, _, __, hider, pluginFactory, mapHelper, navigationHelper, shortcut, namespaceHelper, buttonTpl){
+], function ($, _, __, hider, pluginFactory, shortcut, namespaceHelper, buttonTpl){
     'use strict';
 
     /**
@@ -53,7 +51,45 @@ define([
             control : 'prev',
         }
     };
+/**
+     * Get active item from the test map
+     * @param {Object} map - The assessment test map
+     * @returns {Object} the active item
+     */
+    const getItem = (map, itemIdentifier) => {
+        const parts = map.parts;
+        let result = {};
 
+        _.forEach(parts, function(part) {
+            const sections = part.sections;
+            if (sections) {
+                _.forEach(sections, function(section) {
+                    const items = section.items;
+                    _.forEach(items, function(item) {
+                        if (item.id === itemIdentifier) {
+                            result = item;
+                        }
+                    });
+                });
+            }
+        });
+        return result;
+    };
+    const getItemsCount = (map) => {
+        const parts = map.parts;
+        let result = 0;
+
+        _.forEach(parts, function(part) {
+            const sections = part.sections;
+            if (sections) {
+                _.forEach(sections, function(section) {
+                    const items = section.items;
+                    result += items.length;
+                });
+            }
+        });
+        return result;
+    };
     /**
      * Returns the configured plugin
      */
@@ -75,6 +111,7 @@ define([
             const canDoNext = () => {
                 const testMap = testRunner.getTestMap();
                 const context = testRunner.getTestContext();
+                const item = getItem(testMap, context.itemIdentifier);
 
                 // check TestMap if empty
                 if( _.isPlainObject(testMap) && _.size(testMap) === 0){
@@ -82,7 +119,7 @@ define([
                 }
 
                 // first item of the test
-                if (navigationHelper.isLast(testMap, context.itemIdentifier)) {
+                if (item.position === 0) {
                     return false;
                 }
 
@@ -94,16 +131,16 @@ define([
             const canDoPrevious = () => {
                 const testMap = testRunner.getTestMap();
                 const context = testRunner.getTestContext();
-                let previousSection;
-                let previousPart;
+                const item = getItem(testMap, context.itemIdentifier);
+                const itemsCount = getItemsCount(testMap);
 
                 // check TestMap if empty
                 if( _.isPlainObject(testMap) && _.size(testMap) === 0){
                     return false;
                 }
 
-                //first item of the test
-                if (navigationHelper.isFirst(testMap, context.itemIdentifier)) {
+                //last item of the test
+                if (item.position === itemsCount - 1) {
                     return false;
                 }
 

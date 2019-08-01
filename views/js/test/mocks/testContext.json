@@ -1,6 +1,4 @@
 {
   "itemIdentifier": "item-1",
-  "itemPosition": 0,
-  "isLinear": false,
-  "canMoveBackward": true
+  "itemPosition": 0
 }

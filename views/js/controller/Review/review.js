@@ -17,13 +17,20 @@
  */
 define([
     'jquery',
+    'ui/feedback',
+    'core/logger',
     'taoReview/review/component/qtiTestReviewComponent'
 ], function (
     $,
+    feedback,
+    loggerFactory,
     reviewFactory
 ) {
     'use strict';
-
+   /**
+    * Create a dedicated logger
+    */
+   var logger = loggerFactory('taoReview/controller/Review/review');
     /**
      * Controls the taoReview delivery page
      *
@@ -44,8 +51,6 @@ define([
                     resultId: execution,
                     deliveryUri: delivery
                 },
-                readOnly: true,
-                fullPage: false,
                 plugins: [{
                     module: 'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
                     bundle: 'taoReview/loader/qtiReview.min',
@@ -53,7 +58,7 @@ define([
                 }]
             })
             .on('error', err => {
-                console.error(err);
+                logger.error(err);
                 if (err && err.message) {
                     feedback().error(err.message);
                 }

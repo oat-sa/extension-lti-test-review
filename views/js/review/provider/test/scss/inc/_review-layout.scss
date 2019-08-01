@@ -1,19 +1,9 @@
-@import "inc/bootstrap";
-
 .test-review-scope {
-
     position: relative;
-    // display: flex;
-
-    // height: calc(100vh - #{(map-get($heights, header) + map-get($heights, footer)) * 1px});
-
     .test-runner-sections {
-
         /* flex column value */
         flex: 1 1 0%;
-
         overflow: hidden;
-
         /* is also a flex container */
         display: flex;
         flex-direction: row;
@@ -21,14 +11,9 @@
 
     .test-sidebar {
         background: $canvas;
-
         /* side bars are supposed to have no width until they've got content */
         flex: 0 1 auto;
-
-        // height: calc(100vh - #{(map-get($heights, header) + map-get($heights, footer) + map-get($heights, horizontal-action-bar) * 2) * 1px});
-
         overflow-y: auto;
-
         max-width: 350px;
         & > .qti-panel {
             max-width: 350px;
@@ -63,13 +48,9 @@
 
     .content-wrapper {
         position: relative;
-
         flex: 1 1 0%;
-
         overflow: auto;
-
         padding: 0;
-
         .overlay {
             position: absolute;
             left: 0;
@@ -88,7 +69,6 @@
 
     #qti-content {
         -webkit-overflow-scrolling: touch;
-        // max-width: map-get($widths, item-max-width) * 1px;
         width: 100%;
         margin: auto;
     }
@@ -105,14 +85,12 @@
     }
 
     .size-wrapper {
-        // max-width: map-get($widths, size-wrapper) * 1px;
         margin: auto;
         width: 100%;
     }
 
     #qti-rubrics {
         margin: auto;
-        // max-width: map-get($widths, item-max-width) * 1px;
         width: 100%;
         .qti-rubricBlock {
             margin: 20px 0;
@@ -129,7 +107,6 @@
 
 .previewer-component {
     background: inherit;
-
     &.fullpage {
         position: absolute;
         top: 0;
@@ -137,7 +114,6 @@
         right: 0;
         bottom: 0;
         z-index: 100000;
-
         .test-previewer-scope {
             height: 100vh;
         }

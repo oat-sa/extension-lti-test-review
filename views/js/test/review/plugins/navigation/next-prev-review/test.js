@@ -24,7 +24,7 @@ define([
     'lodash',
     'i18n',
     'ui/hider',
-    'taoReview/review/runner',
+    'taoReview/review/component/qtiTestReviewComponent',
     'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
     'json!taoReview/test/mocks/item-1.json',
     'json!taoReview/test/mocks/item-2.json',
@@ -52,37 +52,13 @@ define([
 ) {
     'use strict';
 
-    const runnerConfig = {
+    const componentConfig = {
         serviceCallId : 'foo',
-        providers : {
-            runner: {
-                id: 'qtiTestReviewProvider',
-                module: 'taoReview/review/provider/test/qtiTestReviewProvider',
-                bundle: 'taoReview/loader/qtiReview.min',
-                category: 'runner'
-            },
-            proxy: {
-                id: 'qtiTestReviewProxy',
-                module: 'taoReview/review/proxy/qtiTestReviewProxy',
-                bundle: 'taoReview/loader/qtiReview.min',
-                category: 'proxy'
-            },
-            communicator: {
-                id: 'request',
-                module: 'core/communicator/request',
-                bundle: 'loader/vendor.min',
-                category: 'communicator'
-            },
-            plugins: [{
-                module: 'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
-                bundle: 'taoReview/loader/qtiReview.min',
-                category: 'navigation'
-            }]
-        },
-        options : {
-            fullPage: false,
-            readOnly: true
-        }
+        plugins: [{
+            module: 'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
+            bundle: 'taoReview/loader/qtiReview.min',
+            category: 'navigation'
+        }]
     };
 
     // Prevent the AJAX mocks to pollute the logs
@@ -144,7 +120,7 @@ define([
         const ready = assert.async();
         assert.expect(3);
 
-        reviewFactory('#fixture-api', runnerConfig)
+        reviewFactory('#fixture-api', componentConfig)
             .on('ready', function (runner) {
                 assert.equal(typeof pluginFactory, 'function', 'The module exposes a function');
                 assert.equal(typeof pluginFactory(runner), 'object', 'The factory produces an instance');
@@ -173,7 +149,7 @@ define([
     ]).test('plugin API ', (data, assert) =>  {
         const ready = assert.async();
         assert.expect(1);
-        reviewFactory('#fixture-api', runnerConfig)
+        reviewFactory('#fixture-api', componentConfig)
             .on('ready', function (runner) {
                 const plugin = pluginFactory(runner);
                 assert.equal(typeof plugin[data.title], 'function', `The instances expose a ${data.title} function`);
@@ -188,7 +164,7 @@ define([
         const ready = assert.async();
         assert.expect(11);
 
-        reviewFactory('#fixture-enable', runnerConfig)
+        reviewFactory('#fixture-enable', componentConfig)
             .on('ready', function (runner) {
                 const areaBroker = runner.getAreaBroker();
                 const plugin = runner.getPlugin('next-prev-review');
@@ -250,7 +226,7 @@ define([
     QUnit.test('next-prev-review', assert =>  {
         const ready = assert.async();
         assert.expect(17);
-        reviewFactory('#fixture-show', runnerConfig)
+        reviewFactory('#fixture-show', componentConfig)
             .on('ready', function (runner) {
                 const areaBroker = runner.getAreaBroker();
                 const $navigation = areaBroker.getPanelArea();
@@ -313,13 +289,15 @@ define([
                         });
                     })
                     .then(function () {
-                        runner
-                            .off('.test')
-                            .after('move.test', function(direction) {
-                                assert.equal(direction, 'previous', 'The move with direction === previous is submitted');
-                                resolve();
-                            });
-                        $prevButton.click();
+                        return new Promise(function (resolve) {
+                            runner
+                                .off('.test')
+                                .after('move.test', function(direction) {
+                                    assert.equal(direction, 'previous', 'The move with direction === previous is submitted');
+                                    resolve();
+                                });
+                            $prevButton.click();
+                        });
                     })
                     .then(function () {
                         return new Promise(function (resolve) {
@@ -334,13 +312,15 @@ define([
                         });
                     })
                     .then(function () {
-                        runner
-                            .off('.test')
-                            .after('move.test', function(direction) {
-                                assert.equal(direction, 'previous', 'The move with direction === previous is submitted');
-                                resolve();
-                            });
-                        $prevButton.click();
+                        return new Promise(function (resolve) {
+                            runner
+                                .off('.test')
+                                .after('move.test', function(direction) {
+                                    assert.equal(direction, 'previous', 'The move with direction === previous is submitted');
+                                    resolve();
+                                });
+                            $prevButton.click();
+                        });
                     })
                     .then(function () {
                         return new Promise(function (resolve) {
@@ -375,7 +355,7 @@ define([
 
         assert.expect(1);
 
-        reviewFactory($container, runnerConfig)
+        reviewFactory($container, componentConfig)
             .on('error', function(err) {
                 assert.ok(false, 'An error has occurred');
                 assert.pushResult({
@@ -386,9 +366,10 @@ define([
             })
             .on('ready', function(runner) {
                 runner
-                    .after('renderitem.runnerComponent', function() {
+                    .after('renderitem.test', function() {
                         assert.ok(true, 'The review has been rendered');
                         ready();
+                        runner.off('.test')
                     })
             });
     });

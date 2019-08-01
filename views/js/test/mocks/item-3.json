@@ -127,19 +127,6 @@
   "schemaLocations": {
     "http://www.imsglobal.org/xsd/imsqti_v2p2": "http://www.imsglobal.org/xsd/qti/qtiv2p2/imsqti_v2p2.xsd"
   },
-  "stylesheets": {
-    "stylesheet_5d3863a91947b588062763": {
-      "serial": "stylesheet_5d3863a91947b588062763",
-      "qtiClass": "stylesheet",
-      "attributes": {
-        "href": "tao-user-styles.css",
-        "type": "text/css",
-        "media": "all",
-        "title": ""
-      },
-      "debug": { "relatedItem": "item_5d3863a919416724485526" }
-    }
-  },
   "outcomes": {
     "outcomedeclaration_5d3863a91951e883520636": {
       "identifier": "SCORE",

@@ -20,13 +20,14 @@
  */
 define([
     'context',
-    'taoReview/review/runner',
+    'taoTests/runner/runnerComponent',
+    'tpl!taoReview/review/component/qtiTestReviewComponent',
     'css!taoReview/review/provider/test/css/test'
-], function (context, reviewFactory) {
+], function (context, runnerComponentFactory, runnerTpl) {
     'use strict';
 
     /**
-     * Builds a test runner to review a test
+     * Builds a component with test runner to review a test
      * @param {jQuery|HTMLElement|String} container - The container in which renders the component
      * @param {Object} [config] - The testRunner options
      * @param {Object[]} [config.plugins] - Additional plugins to load
@@ -40,7 +41,7 @@ define([
 
         const testRunnerConfig = {
             testDefinition: config.testDefinition || 'test-container',
-            serviceCallId: config.testUri.resultId,
+            serviceCallId: config.testUri && config.testUri.resultId || 'review',
             providers: {
                 runner: {
                     id: 'qtiTestReviewProvider',
@@ -63,8 +64,7 @@ define([
                 plugins: config.plugins || []
             },
             options: {
-                readOnly: config.readOnly,
-                fullPage: config.fullPage,
+                readOnly: true,
                 plugins: config.pluginsOptions
             }
         };
@@ -72,6 +72,16 @@ define([
         //extra context config
         testRunnerConfig.loadFromBundle = !!context.bundle;
 
-        return reviewFactory(container, testRunnerConfig, template);
+        return runnerComponentFactory(container, testRunnerConfig, template || runnerTpl)
+            .on('render', function() {
+                const {fullPage, readOnly} = this.getConfig().options;
+                this.setState('fullpage', fullPage);
+                this.setState('readonly', readOnly);
+            })
+            .on('ready', function(runner) {
+                runner.on('destroy', () => {
+                    this.destroy();
+                });
+            });
     };
 });

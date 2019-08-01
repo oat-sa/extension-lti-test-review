@@ -21,7 +21,7 @@
  */
 define([
     'jquery',
-    'taoReview/review/runner',
+    'taoReview/review/component/qtiTestReviewComponent',
     'taoReview/review/provider/test/qtiTestReviewProvider',
     'json!taoReview/test/mocks/item-1.json',
     'json!taoReview/test/mocks/testData.json',
@@ -41,34 +41,6 @@ define([
     testResponses
 ) {
     'use strict';
-
-    const runnerConfig = {
-        serviceCallId: 'foo',
-        providers: {
-            runner: {
-                id: 'qtiTestReviewProvider',
-                module: 'taoReview/review/provider/test/qtiTestReviewProvider',
-                bundle: 'taoReview/loader/qtiReview.min',
-                category: 'runner'
-            },
-            proxy: {
-                id: 'qtiTestReviewProxy',
-                module: 'taoReview/review/proxy/qtiTestReviewProxy',
-                bundle: 'taoReview/loader/qtiReview.min',
-                category: 'proxy'
-            },
-            communicator: {
-                id: 'request',
-                module: 'core/communicator/request',
-                bundle: 'loader/vendor.min',
-                category: 'communicator'
-            }
-        },
-        options : {
-            fullPage: false,
-            readOnly: true
-        },
-    };
 
     // Prevent the AJAX mocks to pollute the logs
     $.mockjaxSettings.logger = null;
@@ -95,7 +67,7 @@ define([
         assert.equal(typeof qtiTestReviewProvider, 'object', 'The module exposes an object');
         assert.equal(qtiTestReviewProvider.name, 'qtiTestReviewProvider', 'The provider has the expected name');
 
-        reviewFactory('#fixture-api', runnerConfig)
+        reviewFactory('#fixture-api')
             .on('ready', runner => {
                 assert.ok(true, 'The provider works with the runner');
                 runner.destroy();
@@ -131,7 +103,7 @@ define([
             }
         });
 
-        reviewFactory('#fixture-render', runnerConfig)
+        reviewFactory('#fixture-render')
             .on('ready', runner => {
                 const areaBroker = runner.getAreaBroker();
                 Promise.resolve()
@@ -169,15 +141,13 @@ define([
     QUnit.test('install', assert => {
         const ready = assert.async();
         assert.expect(2);
-        const config = Object.assign({}, runnerConfig);
-        config.providers = Object.assign({}, runnerConfig.providers);
-        config.providers.plugins = [{
-            module: 'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
-            bundle: 'taoReview/loader/qtiReview.min',
-            category: 'navigation'
-        }];
-        config.options = {
-            plugins: {
+        const config = {
+            plugins: [{
+                module: 'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
+                bundle: 'taoReview/loader/qtiReview.min',
+                category: 'navigation'
+            }],
+            pluginsOptions: {
                 'next-prev-review': {
                     foo: 'bar'
                 }
@@ -198,7 +168,7 @@ define([
                 const plugin = runner.getPlugin('next-prev-review');
 
                 assert.equal(typeof plugin, 'object', 'The plugin exists');
-                assert.deepEqual(plugin.getConfig(), config.options.plugins['next-prev-review'], 'The plugin received the config');
+                assert.deepEqual(plugin.getConfig(), config.pluginsOptions['next-prev-review'], 'The plugin received the config');
 
                 runner.destroy();
             })
@@ -208,11 +178,12 @@ define([
     QUnit.test('init', assert => {
         const ready = assert.async();
         assert.expect(11);
-        const config = Object.assign({}, runnerConfig);
-        config.options = {
-            plugins: {
-                close: {
-                    foo: 'bar'
+        const config = {
+            options: {
+                plugins: {
+                    close: {
+                        foo: 'bar'
+                    }
                 }
             }
         };
@@ -409,15 +380,12 @@ define([
     }]).test('render item ', (data, assert) => {
         const ready = assert.async();
         const $container = $('#fixture-item');
-        const serviceCallId = 'previewer';
-        const config = Object.assign({}, runnerConfig);
-        config.serviceCallId = serviceCallId;
 
         assert.expect(5);
 
         $.mockjax(data.mock);
 
-        reviewFactory($container, config)
+        reviewFactory($container)
             .on('error', function (err) {
                 assert.ok(false, 'An error has occurred');
                 assert.pushResult({
@@ -512,7 +480,7 @@ define([
             }
         });
 
-        reviewFactory($container, runnerConfig)
+        reviewFactory($container)
             .on('error', function (err) {
                 assert.ok(false, 'An error has occurred');
                 assert.pushResult({

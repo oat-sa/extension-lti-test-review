@@ -47,16 +47,22 @@ define([
     /**
      * @typedef {reviewPanelElement} reviewPanelSection
      * @property {reviewPanelItem[]} items - The list of items contained in the section
+     * @property {Number} score - The test taker's score for this item
+     * @property {Number} maxScore - The max possible score for this item
      */
 
     /**
      * @typedef {reviewPanelElement} reviewPanelPart
      * @property {reviewPanelSection[]} sections - The list of sections contained in the test part
+     * @property {Number} score - The test taker's score for this item
+     * @property {Number} maxScore - The max possible score for this item
      */
 
     /**
      * @typedef {Object} reviewPanelMap
      * @property {reviewPanelPart[]} parts - The list of test parts to display
+     * @property {Number} score - The test taker's score for this item
+     * @property {Number} maxScore - The max possible score for this item
      */
 
     /**
@@ -170,8 +176,8 @@ define([
      * @returns {reviewPanelData}
      */
     const filterData = (map, filter) => {
-        let score = 0;
-        let maxScore = 0;
+        const score = map && map.score || 0;
+        const maxScore = map && map.maxScore || 0;
         const itemsMap = new Map();
         if (!_.isFunction(filter)) {
             filter = () => true;
@@ -183,9 +189,6 @@ define([
                         const items = reduceArray(partSection.items, (sectionItems, sectionItem) => {
                             sectionItem = Object.assign({}, sectionItem);
                             sectionItem.cls = getItemIconCls(sectionItem);
-
-                            score += sectionItem.score || 0;
-                            maxScore += sectionItem.maxScore || 0;
 
                             if (filter(sectionItem, partSection, testPart)) {
                                 sectionItems.push(sectionItem);
@@ -236,9 +239,15 @@ define([
      *                  position: 0,
      *                  score: 2,
      *                  maxScore: 2
-     *              }]
-     *          }]
-     *      }]
+     *              }],
+     *              score: 2,
+     *              maxScore: 2
+     *          }],
+     *          score: 2,
+     *          maxScore: 2
+     *      }],
+     *      score: 2,
+     *      maxScore: 2
      *  };
      *  const component = reviewPanelFactory(container, config)
      *      .on('ready', function onComponentReady() {

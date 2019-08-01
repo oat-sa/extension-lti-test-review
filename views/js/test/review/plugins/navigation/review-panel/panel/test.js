@@ -491,9 +491,15 @@ define([
                         position: 0,
                         score: 0,
                         maxScore: 1
-                    }]
-                }]
-            }]
+                    }],
+                    score: 0,
+                    maxScore: 1
+                }],
+                score: 0,
+                maxScore: 1
+            }],
+            score: 0,
+            maxScore: 1
         };
         const initialDataAll = {
             testMap: {
@@ -510,8 +516,12 @@ define([
                             position: 0,
                             score: 0,
                             maxScore: 1
-                        }]
-                    }]
+                        }],
+                        score: 0,
+                        maxScore: 1
+                    }],
+                    score: 0,
+                    maxScore: 1
                 }]
             },
             score: 0,
@@ -677,9 +687,15 @@ define([
                         position: 0,
                         score: 1,
                         maxScore: 1
-                    }]
-                }]
-            }]
+                    }],
+                    score: 1,
+                    maxScore: 1
+                }],
+                score: 1,
+                maxScore: 1
+            }],
+            score: 1,
+            maxScore: 1
         };
         const initialDataAll = {
             testMap: {
@@ -696,8 +712,12 @@ define([
                             position: 0,
                             score: 1,
                             maxScore: 1
-                        }]
-                    }]
+                        }],
+                        score: 1,
+                        maxScore: 1
+                    }],
+                    score: 1,
+                    maxScore: 1
                 }]
             },
             score: 1,

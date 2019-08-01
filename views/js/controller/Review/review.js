@@ -17,13 +17,18 @@
  */
 define([
     'jquery',
+    'core/logger',
     'taoReview/review/component/qtiTestReviewComponent'
 ], function (
     $,
+    loggerFactory,
     reviewFactory
 ) {
     'use strict';
-
+   /**
+    * Create a dedicated logger
+    */
+   var logger = loggerFactory('taoReview/controller/Review/review');
     /**
      * Controls the taoReview delivery page
      *
@@ -53,7 +58,7 @@ define([
                 }]
             })
             .on('error', err => {
-                console.error(err);
+                logger.error(err);
                 if (err && err.message) {
                     feedback().error(err.message);
                 }

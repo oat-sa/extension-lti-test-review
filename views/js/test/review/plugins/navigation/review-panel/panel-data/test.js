@@ -41,7 +41,7 @@ define([
      * @param {Object} testMap
      * @returns {Object}
      */
-    const getTestRunner = (testMap) => {
+    const getTestRunner = testMap => {
         return {
             getTestMap() {
                 return testMap;

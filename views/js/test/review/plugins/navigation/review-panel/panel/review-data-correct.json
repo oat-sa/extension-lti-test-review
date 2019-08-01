@@ -1,0 +1,97 @@
+{
+  "parts": [
+    {
+      "id": "Introduction",
+      "label": "Introduction",
+      "sections": [
+        {
+          "id": "assessmentSection-1",
+          "label": "Section 1",
+          "items": [
+            {
+              "id": "item-1",
+              "label": "Example_0_Introduction",
+              "position": 0,
+              "score": 0,
+              "maxScore": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "QTIExamples",
+      "label": "QTIExamples",
+      "sections": [
+        {
+          "id": "assessmentSection-2",
+          "label": "Section 1",
+          "items": [
+            {
+              "id": "item-2",
+              "label": "example_1_TAO",
+              "position": 1,
+              "score": 2,
+              "maxScore": 2
+            },
+            {
+              "id": "item-3",
+              "label": "example_2_Math",
+              "position": 2,
+              "score": 3,
+              "maxScore": 3
+            },
+            {
+              "id": "item-4",
+              "label": "Example_3_Baudelaire",
+              "position": 3,
+              "score": 2,
+              "maxScore": 2
+            },
+            {
+              "id": "item-5",
+              "label": "Example_4_Appearance",
+              "position": 4,
+              "score": 2,
+              "maxScore": 2
+            }
+          ]
+        },
+        {
+          "id": "assessmentSection-3",
+          "label": "Section 2",
+          "items": [
+            {
+              "id": "item-6",
+              "label": "Example_5_picasso",
+              "position": 5,
+              "score": 2,
+              "maxScore": 2
+            },
+            {
+              "id": "item-7",
+              "label": "Example_6_Geography",
+              "position": 6,
+              "score": 2,
+              "maxScore": 2
+            },
+            {
+              "id": "item-8",
+              "label": "Example_7_Geo 2",
+              "position": 7,
+              "score": 2,
+              "maxScore": 2
+            },
+            {
+              "id": "item-9",
+              "label": "Example_8_Geo 3",
+              "position": 8,
+              "score": 2,
+              "maxScore": 2
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

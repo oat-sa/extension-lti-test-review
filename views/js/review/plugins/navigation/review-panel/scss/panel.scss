@@ -1,0 +1,300 @@
+/**
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; under version 2
+ * of the License (non-upgradable).
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ *
+ * Copyright (c) 2019 Open Assessment Technologies SA ;
+ */
+@import "inc/bootstrap";
+
+$minPanelWidth: 250px;
+$maxPanelWidth: 250px;
+$scoreWidth: 30px;
+$iconWidth: 30px;
+$lineHeight: 3rem;
+$borderWidth: 1px;
+$sidePadding: 8px;
+$boxPadding: 5px;
+$space: 5px;
+$focusSpace: 2px;
+$panelMargin: 10px;
+
+$panelBackground: $canvas;
+$panelColor: $textColor;
+$headerBackground: $uiHeaderBg;
+$headerColor: $panelColor;
+$footerBackground: $panelBackground;
+$footerColor: $panelColor;
+
+$partBackground: mix($textHighlight, $websiteBorder, 70%);
+$partBackgroundHover: mix($textHighlight, $websiteBorder, 50%);
+$partBackgroundActive: mix($textHighlight, $websiteBorder, 45%);
+
+$sectionBorderColor: $textHighlight;
+$sectionBackground: mix($textHighlight, $grey, 80%);
+$sectionBackgroundHover: mix($textHighlight, $grey, 75%);
+$sectionBackgroundActive: mix($textHighlight, $grey, 60%);
+
+$itemBackground: white();
+$itemBackgroundHover: lighten($lightBlueGrey, 3);
+$itemBackgroundActive: lighten($lightBlueGrey, 5);
+
+$defaultIconColor: $grey;
+$incorrectColor: $error;
+
+@mixin review-panel-line-layout($justify) {
+    display: flex;
+    flex-direction: row;
+    justify-content: $justify;
+}
+
+@mixin review-panel-item-layout($justify:space-between) {
+    @include review-panel-line-layout($justify);
+    .review-panel-label {
+        flex: 1 1 auto;
+        width: calc(100% - #{$scoreWidth});
+        text-align: left;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .review-panel-score {
+        flex: 0 0 auto;
+        width: $scoreWidth;
+        text-align: right;
+    }
+}
+
+.review-panel {
+    @include disableSelect();
+    background-color: $panelBackground;
+    color: $panelColor;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    cursor: default;
+    @if $minPanelWidth == $maxPanelWidth {
+        width: $minPanelWidth;
+    } @else {
+        min-width: $minPanelWidth;
+        max-width: $maxPanelWidth;
+    }
+    height: 100%;
+    padding: $panelMargin;
+
+    .review-panel-label {
+        display: block;
+        white-space: nowrap;
+    }
+    .review-panel-score {
+        display: block;
+        white-space: nowrap;
+    }
+    .collapsible {
+        // label of collapsible elements must display a dropdown icon
+        > .review-panel-label {
+            cursor: pointer;
+            width: 100%;
+            line-height: $lineHeight;
+            padding: 0 $sidePadding;
+            font-size: 1.5rem;
+            .collapsible-arrow::before {
+                @include tao-icon-setup;
+                @include icon-down;
+                line-height: inherit;
+                float: right;
+            }
+        }
+        // by default every block is collapsed
+        > .review-panel-block {
+            display: none;
+        }
+        // child block must be displayed in an expanded element
+        &.expanded {
+            > .review-panel-label {
+                .collapsible-arrow::before {
+                    @include icon-up;
+                }
+            }
+            > .review-panel-block {
+                display: block;
+            }
+        }
+    }
+    .navigable {
+        position: relative;
+        &:focus {
+            outline: 0 none;
+            &:after {
+                content: ' ';
+                position: absolute;
+                top: $focusSpace;
+                left: $focusSpace;
+                bottom: $focusSpace;
+                right: $focusSpace;
+                border: $borderWidth dashed $textColor;
+            }
+        }
+    }
+
+    .review-panel-header {
+        @include review-panel-line-layout(space-between);
+        padding: $boxPadding $sidePadding;
+        background-color: $headerBackground;
+        color: $headerColor;
+
+        .review-panel-label {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        .review-panel-score {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+    }
+
+    .review-panel-footer {
+        @include review-panel-line-layout(space-between);
+        padding: $boxPadding $sidePadding;
+        background-color: $footerBackground;
+        color: $footerColor;
+
+        .review-panel-label {
+            font-size: 1.4rem;
+            padding-left: $iconWidth;
+        }
+        .review-panel-score {
+            font-size: 1.2rem;
+        }
+    }
+
+    .review-panel-filters {
+        @include review-panel-line-layout(space-evenly);
+        padding: 3rem 0 1rem 0;
+
+        .review-panel-filter {
+            display: block;
+            border-bottom: $borderWidth solid transparent;
+            cursor: pointer;
+            padding: 0 $sidePadding;
+
+            &.active {
+                border-bottom: $borderWidth solid $textColor;
+            }
+            .review-panel-label {
+                font-size: 1.4rem;
+                font-weight: bold;
+            }
+
+            &:focus {
+                &:after {
+                    top: -$space;
+                    left: -$space;
+                    bottom: -$space;
+                    right: -$space;
+                }
+            }
+        }
+    }
+
+    .review-panel-content {
+        flex: 0 1 auto;
+        overflow-y: auto;
+    }
+
+    .review-panel-part {
+        margin-top: $borderWidth;
+        > .review-panel-label {
+            background-color: $partBackground;
+            &:hover {
+                background-color: $partBackgroundHover;
+            }
+        }
+        &.active {
+            > .review-panel-label {
+                background-color: $partBackgroundActive;
+            }
+        }
+    }
+
+    .review-panel-section {
+        > .review-panel-label {
+            background-color: $sectionBackground;
+            border-bottom: $borderWidth solid $sectionBorderColor;
+            &:hover {
+                background-color: $sectionBackgroundHover;
+            }
+        }
+        &.active {
+            > .review-panel-label {
+                background-color: $sectionBackgroundActive;
+            }
+        }
+    }
+
+    .review-panel-item {
+        @include review-panel-item-layout();
+        background: $itemBackground;
+        cursor: pointer;
+        line-height: $lineHeight;
+        padding: 0 $sidePadding;
+
+        margin: $borderWidth 0;
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &.active {
+            background: $itemBackgroundActive;
+        }
+        &:hover {
+            background: $itemBackgroundHover;
+        }
+
+        .review-panel-label {
+            font-size: 1.4rem;
+        }
+        .review-panel-score {
+            font-size: 1.2rem;
+        }
+
+        // icons
+        .review-panel-label:before {
+            @include tao-icon-setup;
+            content: ' ';
+            display: inline-block;
+            text-align: right;
+            color: $defaultIconColor;
+            width: $iconWidth;
+            padding-right: $space;
+            line-height: inherit;
+        }
+        &.item-info {
+            .review-panel-label:before {
+                @include icon-info;
+            }
+        }
+        &.item-correct {
+            .review-panel-label:before {
+                @include icon-result-ok;
+            }
+        }
+        &.item-incorrect {
+            .review-panel-label:before {
+                @include icon-result-nok;
+                color: $incorrectColor;
+            }
+        }
+    }
+}
+

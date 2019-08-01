@@ -1,0 +1,27 @@
+{
+  "testMap": {
+    "parts": [{
+        "id": "QTIExamples",
+        "label": "QTIExamples",
+        "sections": [
+          {
+            "id": "assessmentSection-2",
+            "label": "Section 1",
+            "items": [
+              {
+                "id": "item-3",
+                "label": "example_2_Math",
+                "cls": "item-incorrect",
+                "position": 2,
+                "score": 2,
+                "maxScore": 3
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "score": 16,
+  "maxScore": 17
+}

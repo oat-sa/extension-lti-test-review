@@ -99,14 +99,14 @@ class QtiRunnerInitDataBuilder
                 'itemPosition' => 0
             ]),
             'testData' => $this->qtiRunnerService->getTestData($serviceContext),
-//            'testResponses' => $this->getItemData($serviceContext),
+            'testResponses' => $this->getResponses($deliveryExecutionId),
             'success' => true,
         ];
 
         return $init;
     }
 
-    protected function getTestMap(QtiRunnerServiceContext $context, string $deliveryExecutionId)
+    protected function getResponses(string $deliveryExecutionId)
     {
         $deliveryExecution = $this->deliveryExecutionService->getDeliveryExecutionById($deliveryExecutionId);
         $delivery = $deliveryExecution->getDelivery();
@@ -122,6 +122,17 @@ class QtiRunnerInitDataBuilder
 
         $variables = $this->getResultVariables($deliveryExecution->getIdentifier(), $filterSubmission, $filterTypes);
 
+        $responses = [];
+
+        foreach ($variables as $variable) {
+            $responses[$variable['internalIdentifier']] = json_decode($variable['state'], true);
+        }
+
+        return $responses;
+    }
+
+    protected function getTestMap(QtiRunnerServiceContext $context)
+    {
         $testDefinition = taoQtiTest_helpers_Utils::getTestDefinition($context->getTestCompilationUri());
 
         $map = [
@@ -170,8 +181,6 @@ class QtiRunnerInitDataBuilder
                 'sections' => $sections,
             ];
         }
-
-//        print_r($variables);
 
         return $map;
     }

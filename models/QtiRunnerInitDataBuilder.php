@@ -31,6 +31,7 @@ use oat\taoQtiTest\models\runner\QtiRunnerService;
 use oat\taoQtiTest\models\runner\QtiRunnerServiceContext;
 use oat\taoResultServer\models\classes\ResultServerService;
 use qtism\data\AssessmentSection;
+use qtism\data\AssessmentSectionRef;
 use qtism\data\TestPart;
 use taoQtiTest_helpers_Utils;
 use taoResultServer_models_classes_OutcomeVariable;
@@ -58,6 +59,8 @@ class QtiRunnerInitDataBuilder
     /** @var ResultServerService */
     private $resultServerService;
 
+    private $itemsData = [];
+
     public function __construct(
         DeliveryContainerService $deliveryContainerService,
         QtiRunnerService $qtiRunnerService,
@@ -82,22 +85,14 @@ class QtiRunnerInitDataBuilder
     {
         $serviceContext = $this->getServiceContext($deliveryExecutionId);
 
-//        $ref = taoQtiTest_helpers_TestRunnerUtils::getItemRef($serviceContext->getTestSession(), '0', $serviceContext);
+        $testMap = $this->getTestMap($serviceContext, $deliveryExecutionId);
 
-//        /** @var TestModelService $testModelService */
-//        $testModelService = ServiceManager::getServiceManager()->get(TestModelService::SERVICE_ID);
-//        $items = $testModelService->getItems($this->getResource($serviceContext->getTestDefinitionUri()));
-//        /** @var core_kernel_classes_Resource $first */
-//        $first = array_shift($items);
-
-        //            'itemData'       => $this->qtiRunnerService->getItemData($serviceContext, $serviceContext->getTestCompilationUri()),
-//              formatted as itemURI|publicFolderURI|privateFolderURI
-
+        $firstItem = array_shift($this->itemsData);
 
         $init = [
-            'itemIdentifier' => null,
-            'itemData' => null,
-            'testMap' => $this->getTestMap($serviceContext, $deliveryExecutionId),
+            'itemIdentifier' => $firstItem['itemId'],
+            'itemData' => $firstItem['itemData'],
+            'testMap' => $testMap,
             'testContext' => $this->qtiRunnerService->getTestContext($serviceContext),
             'testData' => $this->qtiRunnerService->getTestData($serviceContext),
 //            'testResponses' => $this->getItemData($serviceContext),
@@ -135,14 +130,36 @@ class QtiRunnerInitDataBuilder
             $sections = [];
             foreach ($testPart->getAssessmentSections() as $section) {
                 /** @var AssessmentSection $section */
-                $sections[$section->getIdentifier()] = [
-                    'id' => $section->getIdentifier(),
-                    'label' => $section->getTitle()
+
+                $items = [];
+                foreach ($section->getSectionParts() as $item) {
+                    /** @var AssessmentSectionRef $item */
+                    $itemData = $this->qtiRunnerService->getItemData($context, $item->getHref());
+
+                    $itemId = $item->getIdentifier();
+                    $items[$itemId] = [
+                        'id' => $itemId,
+                        'label' => $itemData['data']['attributes']['label'],
+                        'position' => 0,
+                        'categories' => [],
+                        'score' => 0,
+                        'maxScore' => 0
+                    ];
+
+                    $this->fillItemsData($itemId, $item->getHref(), $itemData['data']);
+                }
+
+                $sectionId = $section->getIdentifier();
+                $sections[$sectionId] = [
+                    'id' => $sectionId,
+                    'label' => $section->getTitle(),
+                    'items' => $items
                 ];
             }
 
-            $map['parts'][$testPart->getIdentifier()] = [
-                'id' => $testPart->getIdentifier(),
+            $testPartId = $testPart->getIdentifier();
+            $map['parts'][$testPartId] = [
+                'id' => $testPartId,
                 'label' => $testPart->getIdentifier(),
                 'sections' => $sections,
             ];
@@ -151,6 +168,15 @@ class QtiRunnerInitDataBuilder
 //        print_r($variables);
 
         return $map;
+    }
+
+    private function fillItemsData($itemId, $itemRef, $itemData)
+    {
+        $this->itemsData[] = [
+            'itemId' => $itemId,
+            'itemRef' => $itemRef,
+            'itemData' => $itemData,
+        ];
     }
 
     protected function getResultVariables($resultId, $filterSubmission, $filterTypes = array())

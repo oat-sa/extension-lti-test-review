@@ -51,6 +51,13 @@ define([
     $.mockjaxSettings.logger = null;
     $.mockjaxSettings.responseTime = 1;
 
+    // Restore AJAX method after each test
+    QUnit.testDone(function(details) {
+        if(details.name !== 'Visual test' )
+        {
+            $.mockjax.clear();
+        }
+    });
     QUnit.test('module', assert =>  {
         const ready = assert.async();
         const config = {};
@@ -59,7 +66,7 @@ define([
         const review2 = qtiTestReviewFactory('#fixture-api', config);
 
         assert.expect(4);
-        const idMock = $.mockjax({
+        $.mockjax({
             url: '/*',
             responseText: {
                 success: true
@@ -85,8 +92,6 @@ define([
             review2.destroy()
         })
         .then( ()=> {
-            // Restore AJAX method
-            $.mockjax.clear(idMock);
             ready();
         });
 
@@ -138,7 +143,7 @@ define([
 
         assert.expect(1);
 
-        const idMock = $.mockjax(data.mock);
+        $.mockjax(data.mock);
 
         qtiTestReviewFactory($container, config)
             .on('error', function(err) {
@@ -156,8 +161,6 @@ define([
                 });
             })
             .after('destroy', function() {
-                // Restore AJAX method
-                $.mockjax.clear(idMock); 
                 ready();
             });
                   
@@ -170,7 +173,7 @@ define([
 
         assert.expect(2);
 
-        const idMock = $.mockjax({
+        $.mockjax({
             url: '/init*',
             responseText: {
                 success: true
@@ -192,8 +195,6 @@ define([
             })
             .after('destroy', function() {
                 assert.equal($container.children().length, 0, 'The review has been destroyed');
-                // Restore AJAX method
-                $.mockjax.clear(idMock); 
                 ready();
             });
     });
@@ -274,9 +275,10 @@ define([
                 ready();
             })
             .on('ready', function(runner) {
-                runner.after('renderitem.runnerComponent', function() {
+                runner.after('renderitem.test', function() {
                     assert.ok(true, 'The review has been rendered');
                     ready();
+                    runner.off('.test')
                 });
             });
     });

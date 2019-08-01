@@ -81,7 +81,7 @@ define([
                     return false;
                 }
 
-                //first item of the test
+                // first item of the test
                 if (navigationHelper.isLast(testMap, context.itemIdentifier)) {
                     return false;
                 }

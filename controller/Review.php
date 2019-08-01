@@ -73,6 +73,23 @@ class Review extends tao_actions_SinglePageModule
     }
 
     /**
+     * @throws common_Exception
+     */
+    public function init(): void
+    {
+        /** @var QtiRunnerInitDataBuilderFactory $dataBuilder */
+        $dataBuilder = $this->getServiceLocator()->get(QtiRunnerInitDataBuilderFactory::SERVICE_ID);
+
+        $params = $this->getPsrRequest()->getQueryParams();
+
+        if (isset($params['serviceCallId'])) {
+            $data = $dataBuilder->create()->build($params['serviceCallId']);
+        }
+
+        $this->returnJson($data ?? []);
+    }
+
+    /**
      * Provides the definition data and the state for a particular item
      */
     public function getItem(): void
@@ -115,29 +132,10 @@ class Review extends tao_actions_SinglePageModule
         /** @var \taoResultServer_models_classes_ReadableResultStorage $implementation */
         $implementation = $resultServerService->getResultStorage($deliveryUri);
 
-        $testTaker = new \core_kernel_users_GenerisUser(
-            new \core_kernel_classes_Resource($implementation->getTestTaker($resultId))
-        );
+        $testTaker = new \core_kernel_users_GenerisUser($this->getResource($implementation->getTestTaker($resultId)));
         $lang = $testTaker->getPropertyValues(GenerisRdf::PROPERTY_USER_DEFLG);
 
         return empty($lang) ? DEFAULT_LANG : (string)current($lang);
-    }
-
-    /**
-     * @throws common_Exception
-     */
-    public function init(): void
-    {
-        /** @var QtiRunnerInitDataBuilderFactory $dataBuilder */
-        $dataBuilder = $this->getServiceLocator()->get(QtiRunnerInitDataBuilderFactory::SERVICE_ID);
-
-        $params = $this->getPsrRequest()->getQueryParams();
-
-        if (isset($params['serviceCallId'])) {
-            $data = $dataBuilder->create()->build($params['serviceCallId']);
-        }
-
-        $this->returnJson($data ?? []);
     }
 
 }

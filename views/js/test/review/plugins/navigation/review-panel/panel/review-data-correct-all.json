@@ -17,9 +17,13 @@
                 "score": 0,
                 "maxScore": 0
               }
-            ]
+            ],
+            "score": 0,
+            "maxScore": 0
           }
-        ]
+        ],
+        "score": 0,
+        "maxScore": 0
       },
       {
         "id": "QTIExamples",
@@ -61,7 +65,9 @@
                 "score": 2,
                 "maxScore": 2
               }
-            ]
+            ],
+            "score": 9,
+            "maxScore": 9
           },
           {
             "id": "assessmentSection-3",
@@ -99,9 +105,13 @@
                 "score": 2,
                 "maxScore": 2
               }
-            ]
+            ],
+            "score": 8,
+            "maxScore": 8
           }
-        ]
+        ],
+        "score": 17,
+        "maxScore": 17
       }
     ]
   },

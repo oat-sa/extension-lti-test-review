@@ -1,6 +1,7 @@
 {
   "testMap": {
-    "parts": [{
+    "parts": [
+      {
         "id": "QTIExamples",
         "label": "QTIExamples",
         "sections": [
@@ -16,9 +17,13 @@
                 "score": 2,
                 "maxScore": 3
               }
-            ]
+            ],
+            "score": 8,
+            "maxScore": 9
           }
-        ]
+        ],
+        "score": 16,
+        "maxScore": 17
       }
     ]
   },

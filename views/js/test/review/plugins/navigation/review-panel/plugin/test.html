@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Test Review - Review Panel</title>
+        <title>Test Review - Review Panel Plugin</title>
         <base href="../../../../../../../../../tao/views/"/>
         <link rel="stylesheet" type="text/css" href="js/lib/qunit/qunit.css">
         <link rel="stylesheet" type="text/css" href="css/tao-main-style.css">
@@ -26,7 +26,7 @@
                 });
 
                 //load the test
-                require(['taoReview/test/review/plugins/navigation/review-panel/panel/test'], function () {
+                require(['taoReview/test/review/plugins/navigation/review-panel/plugin/test'], function () {
 
                     //Tests loaded, run tests
                     QUnit.start();
@@ -34,7 +34,7 @@
             });
         </script>
         <style>
-            #visual-test {
+            #visual-test .test-runner{
                 position: relative;
                 display: flex;
                 flex-direction: column;
@@ -73,34 +73,12 @@
         <div id="qunit"></div>
         <div id="qunit-fixture">
             <div id="fixture-api"></div>
-            <div id="fixture-init"></div>
             <div id="fixture-render"></div>
-            <div id="fixture-render-data"></div>
-            <div id="fixture-destroy"></div>
-            <div id="fixture-filter"></div>
-            <div id="fixture-data-correct"></div>
-            <div id="fixture-data-incorrect"></div>
-            <div id="fixture-expand"></div>
-            <div id="fixture-toggle"></div>
-            <div id="fixture-panel-click"></div>
-            <div id="fixture-item"></div>
-            <div id="fixture-item-click"></div>
-            <div id="fixture-item-change"></div>
-            <div id="fixture-disable"></div>
+            <div id="fixture-enable"></div>
+            <div id="fixture-show"></div>
+            <div id="fixture-reflect"></div>
+            <div id="fixture-modify"></div>
         </div>
-        <div id="visual-test">
-            <div class="header">
-                <button class="small" data-control="correct">Correct</button>
-                <button class="small" data-control="incorrect">Incorrect</button>
-            </div>
-            <div class="content">
-                <aside class="panel"></aside>
-                <section class="item"></section>
-            </div>
-            <div class="footer">
-                <button class="small" data-control="disable">Disable</button>
-                <button class="small" data-control="enable">Enable</button>
-            </div>
-        </div>
+        <div id="visual-test"></div>
     </body>
 </html>

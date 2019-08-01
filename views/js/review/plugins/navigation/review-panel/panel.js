@@ -47,16 +47,22 @@ define([
     /**
      * @typedef {reviewPanelElement} reviewPanelSection
      * @property {reviewPanelItem[]} items - The list of items contained in the section
+     * @property {Number} score - The test taker's score for this item
+     * @property {Number} maxScore - The max possible score for this item
      */
 
     /**
      * @typedef {reviewPanelElement} reviewPanelPart
      * @property {reviewPanelSection[]} sections - The list of sections contained in the test part
+     * @property {Number} score - The test taker's score for this item
+     * @property {Number} maxScore - The max possible score for this item
      */
 
     /**
      * @typedef {Object} reviewPanelMap
      * @property {reviewPanelPart[]} parts - The list of test parts to display
+     * @property {Number} score - The test taker's score for this item
+     * @property {Number} maxScore - The max possible score for this item
      */
 
     /**
@@ -170,8 +176,8 @@ define([
      * @returns {reviewPanelData}
      */
     const filterData = (map, filter) => {
-        let score = 0;
-        let maxScore = 0;
+        const score = map && map.score || 0;
+        const maxScore = map && map.maxScore || 0;
         const itemsMap = new Map();
         if (!_.isFunction(filter)) {
             filter = () => true;
@@ -183,9 +189,6 @@ define([
                         const items = reduceArray(partSection.items, (sectionItems, sectionItem) => {
                             sectionItem = Object.assign({}, sectionItem);
                             sectionItem.cls = getItemIconCls(sectionItem);
-
-                            score += sectionItem.score || 0;
-                            maxScore += sectionItem.maxScore || 0;
 
                             if (filter(sectionItem, partSection, testPart)) {
                                 sectionItems.push(sectionItem);
@@ -236,9 +239,15 @@ define([
      *                  position: 0,
      *                  score: 2,
      *                  maxScore: 2
-     *              }]
-     *          }]
-     *      }]
+     *              }],
+     *              score: 2,
+     *              maxScore: 2
+     *          }],
+     *          score: 2,
+     *          maxScore: 2
+     *      }],
+     *      score: 2,
+     *      maxScore: 2
      *  };
      *  const component = reviewPanelFactory(container, config)
      *      .on('ready', function onComponentReady() {
@@ -301,6 +310,26 @@ define([
                 autoscroll($target, controls.$content);
             }
         };
+
+        /**
+         * Apply a callback on each navigable element
+         * @param callback
+         */
+        const eachNavigable = callback => {
+            component.getElement()
+                .find(cssSelectors.navigable)
+                .each(callback);
+        };
+
+        /**
+         * Enables the keyboard navigation using 'tab' keys
+         */
+        const enableKeyboard = () => eachNavigable((index, el) => el.setAttribute('tabindex', index + 1));
+
+        /**
+         * Disables the keyboard navigation using 'tab' keys
+         */
+        const disableKeyboard = () => eachNavigable((index, el) => el.setAttribute('tabindex', -1));
 
         /**
          * Emits the itemchange event with respect to the current active item
@@ -539,9 +568,9 @@ define([
                     controls.$footerScore.text(`${filteredData.score}/${filteredData.maxScore}`);
                     hider.toggle(controls.$filters, filteredData.score !== filteredData.maxScore);
 
-                    this.getElement()
-                        .find(cssSelectors.navigable)
-                        .each((index, el) => el.setAttribute('tabindex', index + 1));
+                    if (!this.is('disabled')) {
+                        enableKeyboard();
+                    }
 
                     /**
                      * @event update
@@ -609,20 +638,26 @@ define([
 
                 // change filter on click
                 controls.$filtersContainer.on('click', cssSelectors.filter, e => {
-                    this.setActiveFilter(e.currentTarget.dataset.control);
+                    if (!this.is('disabled')) {
+                        this.setActiveFilter(e.currentTarget.dataset.control);
+                    }
                 });
 
                 // expand/collapse blocks on click
                 controls.$content.on('click', cssSelectors.collapsibleLabel, e => {
-                    this.toggle(e.currentTarget.parentElement.dataset.control);
+                    if (!this.is('disabled')) {
+                        this.toggle(e.currentTarget.parentElement.dataset.control);
+                    }
                 });
 
                 // select item
                 controls.$content.on('click', cssSelectors.item, e => {
-                    const currentId = activeItem && activeItem.id;
-                    this.setActiveItem(e.currentTarget.dataset.control);
-                    if (activeItem && activeItem.id !== currentId) {
-                        itemChange();
+                    if (!this.is('disabled')) {
+                        const currentId = activeItem && activeItem.id;
+                        this.setActiveItem(e.currentTarget.dataset.control);
+                        if (activeItem && activeItem.id !== currentId) {
+                            itemChange();
+                        }
                     }
                 });
 
@@ -643,6 +678,10 @@ define([
                 this.setState('ready', true)
                     .trigger('ready');
             })
+
+            // reflect enable/disabled state
+            .on('enable', () => enableKeyboard)
+            .on('disable', () => disableKeyboard)
 
             // auto expand the block that contains the active item
             .on('active', function onReviewPanelActiveItem(itemId) {

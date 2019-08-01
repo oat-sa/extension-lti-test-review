@@ -17,10 +17,12 @@
  */
 define([
     'jquery',
+    'ui/feedback',
     'core/logger',
     'taoReview/review/component/qtiTestReviewComponent'
 ], function (
     $,
+    feedback,
     loggerFactory,
     reviewFactory
 ) {

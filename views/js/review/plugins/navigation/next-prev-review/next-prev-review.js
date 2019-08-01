@@ -83,8 +83,7 @@ define([
             const sections = part.sections;
             if (sections) {
                 _.forEach(sections, function(section) {
-                    const items = section.items;
-                    result += items.length;
+                    result += _.size(section.items);
                 });
             }
         });
@@ -104,16 +103,15 @@ define([
             const testData = testRunner.getTestData();
             const testConfig = testData && testData.config || {};
             const pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
+            const testMap = testRunner.getTestMap();
+            const itemsCount = getItemsCount(testMap);
 
             /**
              * Check if the "Next" functionality should be available or not
              */
             const canDoNext = () => {
-                const testMap = testRunner.getTestMap();
                 const context = testRunner.getTestContext();
                 const item = getItem(testMap, context.itemIdentifier);
-                const itemsCount = getItemsCount(testMap);
-
 
                 // check TestMap if empty
                 if( _.isPlainObject(testMap) && _.size(testMap) === 0){
@@ -131,7 +129,6 @@ define([
              * Check if the "Previous" functionality should be available or not
              */
             const canDoPrevious = () => {
-                const testMap = testRunner.getTestMap();
                 const context = testRunner.getTestContext();
                 const item = getItem(testMap, context.itemIdentifier);
                 

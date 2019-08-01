@@ -31,6 +31,7 @@ use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiService;
 use oat\taoLti\models\classes\LtiVariableMissingException;
+use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
 use oat\taoReview\models\DeliveryExecutionFinderService;
@@ -76,56 +77,28 @@ class Review extends tao_actions_SinglePageModule
      */
     public function getItem(): void
     {
-        try {
-            $this->validateCsrf();
+        $params = $this->getPsrRequest()->getQueryParams();
 
-            $params = $this->getPsrRequest()->getQueryParams();
+        $deliveryExecutionId = $params['serviceCallId'];
+        $itemDefinition = $params['itemUri'];
 
-            $itemUri = $this->getRequestParameter('itemUri');
-            $resultId = $this->getRequestParameter('serviceCallId');
+        /** @var DeliveryExecutionManagerService $des */
+        $deManagerService = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
+        $execution = $deManagerService->getDeliveryExecutionById($deliveryExecutionId);
+        $delivery = $execution->getDelivery();
 
-            $response = [
-                'baseUrl' => '',
-                'content' => [],
-            ];
+        $itemPreviewer = new ItemPreviewer();
+        $itemPreviewer->setServiceLocator($this->getServiceLocator());
 
-            // previewing a result
-            if ($resultId) {
-//                if (!$this->hasRequestParameter('itemDefinition')) {
-//                    throw new \common_exception_MissingParameter('itemDefinition', $this->getRequestURI());
-//                }
-//
-//                if (!$this->hasRequestParameter('deliveryUri')) {
-//                    throw new \common_exception_MissingParameter('deliveryUri', $this->getRequestURI());
-//                }
+        $response['content'] = $itemPreviewer->setItemDefinition($itemDefinition)
+            ->setUserLanguage($this->getUserLanguage($deliveryExecutionId, $delivery->getUri()))
+            ->setDelivery($delivery)
+            ->loadCompiledItemData();
 
-                $itemDefinition = $this->getRequestParameter('itemDefinition');
-                $delivery = new \core_kernel_classes_Resource($this->getRequestParameter('deliveryUri'));
+        $response['baseUrl'] = $itemPreviewer->getBaseUrl();
+        $response['success'] = true;
 
-                $itemPreviewer = new ItemPreviewer();
-                $itemPreviewer->setServiceLocator($this->getServiceLocator());
-
-                $response['content'] = $itemPreviewer->setItemDefinition($itemDefinition)
-                    ->setUserLanguage($this->getUserLanguage($resultId, $delivery->getUri()))
-                    ->setDelivery($delivery)
-                    ->loadCompiledItemData();
-
-                $response['baseUrl'] = $itemPreviewer->getBaseUrl();
-
-            } else if ($itemUri) {
-                // Load RESOURCE item data
-                // TODO
-            } else {
-                throw new \common_exception_BadRequest('Either itemUri or resultId needs to be provided.');
-            }
-
-            $response['success'] = true;
-        } catch (\Exception $e) {
-            $response = $e->getMessage();
-            $code = 400;
-        }
-
-        $this->returnJson($response, $code ?? 200);
+        $this->returnJson($response);
     }
 
     /**

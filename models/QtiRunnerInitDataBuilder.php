@@ -29,6 +29,7 @@ use oat\taoOutcomeUi\model\Wrapper\ResultServiceWrapper;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTest\models\runner\QtiRunnerService;
 use oat\taoQtiTest\models\runner\QtiRunnerServiceContext;
+use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
 use qtism\data\AssessmentSection;
 use qtism\data\AssessmentSectionRef;
@@ -91,7 +92,7 @@ class QtiRunnerInitDataBuilder
 
         $init = [
             'itemIdentifier' => $firstItem['itemId'],
-            'itemData' => $firstItem['itemData'],
+            'itemData' => null,
             'testMap' => $testMap,
             'testContext' => $this->qtiRunnerService->getTestContext($serviceContext),
             'testData' => $this->qtiRunnerService->getTestData($serviceContext),

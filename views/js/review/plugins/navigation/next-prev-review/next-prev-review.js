@@ -19,7 +19,7 @@
 /**
  * Test Runner Navigation Plugin : Next and Previous
  *
- * @author Bertrand Chevrier <bertrand@taotesting.com>
+ * @author Hanna Dzmitryieva <hanna@taotesting.com>
  */
 define([
     'jquery',
@@ -55,14 +55,6 @@ define([
     };
 
     /**
-     * Create the buttons
-     * @returns {jQueryElement} the button
-     */
-    const createElement = function createElement(){
-        return $(buttonTpl(buttonData));
-    };
-
-    /**
      * Returns the configured plugin
      */
     return pluginFactory({
@@ -80,7 +72,7 @@ define([
             /**
              * Check if the "Next" functionality should be available or not
              */
-            const canDoNext = function canDoNext() {
+            const canDoNext = () => {
                 const testMap = testRunner.getTestMap();
                 const context = testRunner.getTestContext();
 
@@ -99,7 +91,7 @@ define([
             /**
              * Check if the "Previous" functionality should be available or not
              */
-            const canDoPrevious = function canDoPrevious() {
+            const canDoPrevious = () => {
                 const testMap = testRunner.getTestMap();
                 const context = testRunner.getTestContext();
                 let previousSection;
@@ -115,32 +107,7 @@ define([
                     return false;
                 }
 
-                //first item of a section
-                if (navigationHelper.isFirstOf(testMap, context.itemIdentifier, 'section')) {
-
-                    //when entering an adaptive section,
-                    //you can't leave the section from the beginning
-                    if(context.isCatAdaptive){
-                        return false;
-                    }
-
-                    //if the previous section is adaptive or a timed section
-                    previousSection = mapHelper.getItemSection(testMap, context.itemPosition - 1);
-                    if(previousSection.isCatAdaptive || (previousSection.timeConstraint && !context.options.noExitTimedSectionWarning) ){
-                        return false;
-                    }
-                }
-
-                if (navigationHelper.isFirstOf(testMap, context.itemIdentifier, 'part')) {
-
-                    //if the previous part is linear, we don't enter it too
-                    previousPart = mapHelper.getItemPart(testMap, context.itemPosition - 1);
-                    if(previousPart.isLinear){
-                        return false;
-                    }
-
-                }
-                return context.isLinear === false && context.canMoveBackward === true;
+                return true;
             };
             //plugin behavior
             const doNext = () => {
@@ -187,7 +154,7 @@ define([
             };
 
             //create the button (detached)
-            this.$element = createElement();
+            this.$element = $(buttonTpl(buttonData));
             this.$next =$('.review-next', this.$element);
             this.$prev =$('.review-prev', this.$element);
 

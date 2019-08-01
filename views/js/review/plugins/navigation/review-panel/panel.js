@@ -303,6 +303,26 @@ define([
         };
 
         /**
+         * Apply a callback on each navigable element
+         * @param callback
+         */
+        const eachNavigable = callback => {
+            component.getElement()
+                .find(cssSelectors.navigable)
+                .each(callback);
+        };
+
+        /**
+         * Enables the keyboard navigation using 'tab' keys
+         */
+        const enableKeyboard = () => eachNavigable((index, el) => el.setAttribute('tabindex', index + 1));
+
+        /**
+         * Disables the keyboard navigation using 'tab' keys
+         */
+        const disableKeyboard = () => eachNavigable((index, el) => el.setAttribute('tabindex', -1));
+
+        /**
          * Emits the itemchange event with respect to the current active item
          */
         const itemChange = () => {
@@ -539,9 +559,9 @@ define([
                     controls.$footerScore.text(`${filteredData.score}/${filteredData.maxScore}`);
                     hider.toggle(controls.$filters, filteredData.score !== filteredData.maxScore);
 
-                    this.getElement()
-                        .find(cssSelectors.navigable)
-                        .each((index, el) => el.setAttribute('tabindex', index + 1));
+                    if (!this.is('disabled')) {
+                        enableKeyboard();
+                    }
 
                     /**
                      * @event update
@@ -609,20 +629,26 @@ define([
 
                 // change filter on click
                 controls.$filtersContainer.on('click', cssSelectors.filter, e => {
-                    this.setActiveFilter(e.currentTarget.dataset.control);
+                    if (!this.is('disabled')) {
+                        this.setActiveFilter(e.currentTarget.dataset.control);
+                    }
                 });
 
                 // expand/collapse blocks on click
                 controls.$content.on('click', cssSelectors.collapsibleLabel, e => {
-                    this.toggle(e.currentTarget.parentElement.dataset.control);
+                    if (!this.is('disabled')) {
+                        this.toggle(e.currentTarget.parentElement.dataset.control);
+                    }
                 });
 
                 // select item
                 controls.$content.on('click', cssSelectors.item, e => {
-                    const currentId = activeItem && activeItem.id;
-                    this.setActiveItem(e.currentTarget.dataset.control);
-                    if (activeItem && activeItem.id !== currentId) {
-                        itemChange();
+                    if (!this.is('disabled')) {
+                        const currentId = activeItem && activeItem.id;
+                        this.setActiveItem(e.currentTarget.dataset.control);
+                        if (activeItem && activeItem.id !== currentId) {
+                            itemChange();
+                        }
                     }
                 });
 
@@ -643,6 +669,10 @@ define([
                 this.setState('ready', true)
                     .trigger('ready');
             })
+
+            // reflect enable/disabled state
+            .on('enable', () => enableKeyboard)
+            .on('disable', () => disableKeyboard)
 
             // auto expand the block that contains the active item
             .on('active', function onReviewPanelActiveItem(itemId) {

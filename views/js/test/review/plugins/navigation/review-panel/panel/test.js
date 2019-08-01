@@ -1859,6 +1859,139 @@ define([
             });
     });
 
+    QUnit.test('disable', assert => {
+        const ready = assert.async();
+        const $container = $('#fixture-disable');
+
+        assert.expect(27);
+
+        assert.equal($container.children().length, 0, 'The container is empty');
+
+        const instance = reviewPanelFactory($container, {}, reviewDataIncorrect)
+            .on('init', function () {
+                assert.equal(this, instance, 'The instance has been initialized');
+            })
+            .on('ready', () => {
+                assert.ok(instance.is('ready'), 'The component is ready');
+                assert.equal($container.children().length, 1, 'The container contains an element');
+
+                assert.deepEqual(instance.getData().testMap, reviewDataIncorrectAll.testMap, 'The initial data is set: testMap');
+                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
+                assert.deepEqual(instance.getData().score, reviewDataIncorrectAll.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrectAll.maxScore, 'The initial data is set: maxScore');
+
+                assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
+                assert.equal(instance.is('disabled'), false, 'The instance is not disabled');
+
+                Promise
+                    .resolve()
+                    .then(() => {
+                        assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
+                        assert.equal($container.find('.review-panel-part.active').length, 0, 'No test part is active yet');
+                        assert.equal($container.find('.review-panel-part.expanded').length, 0, 'No test part is expanded yet');
+
+                        assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
+                        assert.equal($container.find('.review-panel-section.active').length, 0, 'No test section is active yet');
+                        assert.equal($container.find('.review-panel-section.expanded').length, 0, 'No test section is expanded yet');
+
+                        assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
+                        assert.equal($container.find('.review-panel-item.active').length, 0, 'No test item is active yet');
+
+                        assert.equal($container.find('.review-panel-content .active').length, 0, 'No element is active yet');
+                    })
+                    .then(() => new Promise(resolve => {
+                        instance
+                            .off('.test')
+                            .after('disable.test', () => {
+                                assert.equal(instance.is('disabled'), true, 'The instance is disabled');
+                                resolve();
+                            })
+                            .disable();
+                    }))
+                    .then(() => new Promise(resolve => {
+                        instance
+                            .off('.test')
+                            .on('collapse.test', () => {
+                                assert.ok(false, 'The collapse event should not be triggered');
+                            })
+                            .on('expand.test', () => {
+                                assert.ok(false, 'The expand event should not be triggered');
+                            })
+                            .on('active.test', () => {
+                                assert.ok(false, 'The active event should not be triggered');
+                            })
+                            .on('itemchange.test', () => {
+                                assert.ok(false, 'The itemchange event should not be triggered');
+                            });
+                        $container.find('[data-control="item-1"]').click();
+                        window.setTimeout(resolve, 300);
+                    }))
+                    .then(() => new Promise(resolve => {
+                        instance
+                            .off('.test')
+                            .on('collapse.test', () => {
+                                assert.ok(false, 'The collapse event should not be triggered');
+                            })
+                            .on('expand.test', () => {
+                                assert.ok(false, 'The expand event should not be triggered');
+                            })
+                            .on('active.test', () => {
+                                assert.ok(false, 'The active event should not be triggered');
+                            })
+                            .on('itemchange.test', () => {
+                                assert.ok(false, 'The itemchange event should not be triggered');
+                            });
+                        $container.find('[data-control="assessmentSection-2"]').click();
+                        window.setTimeout(resolve, 300);
+                    }))
+                    .then(() => new Promise(resolve => {
+                        instance
+                            .off('.test')
+                            .on('collapse.test', () => {
+                                assert.ok(false, 'The collapse event should not be triggered');
+                            })
+                            .on('expand.test', () => {
+                                assert.ok(false, 'The expand event should not be triggered');
+                            })
+                            .on('active.test', () => {
+                                assert.ok(false, 'The active event should not be triggered');
+                            })
+                            .on('itemchange.test', () => {
+                                assert.ok(false, 'The itemchange event should not be triggered');
+                            });
+                        $container.find('[data-control="QTIExamples"]').click();
+                        window.setTimeout(resolve, 300);
+                    }))
+                    .then(() => {
+                        assert.equal($container.find('.review-panel-part.active').length, 0, 'Still no test part is active');
+                        assert.equal($container.find('.review-panel-part.expanded').length, 0, 'Still no test part is expanded');
+                        assert.equal($container.find('.review-panel-section.active').length, 0, 'Still no test section is active');
+                        assert.equal($container.find('.review-panel-section.expanded').length, 0, 'Still no test section is expanded');
+                        assert.equal($container.find('.review-panel-item.active').length, 0, 'Still no test item is active');
+                    })
+                    .catch(err => {
+                        assert.pushResult({
+                            result: false,
+                            message: err
+                        });
+                    })
+                    .then(() => instance.destroy());
+            })
+            .after('destroy', () => {
+                assert.equal($container.children().length, 0, 'The container is now empty');
+                assert.ok(!instance.is('ready'), 'The component is not ready anymore');
+                ready();
+            })
+            .on('error', err => {
+                assert.ok(false, 'The operation should not fail!');
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+                ready();
+            });
+    });
+
     QUnit.module('Visual');
 
     QUnit.test('Visual test', assert => {
@@ -1896,6 +2029,19 @@ define([
                         instance.setData(data[e.currentTarget.dataset.control]);
                     })
                     .find('[data-control="correct"]').click();
+
+                const $footer = $('#visual-test .footer');
+                $footer
+                    .on('click', 'button', e => {
+                        $footer.find('button').removeClass('btn-success');
+                        e.currentTarget.classList.add('btn-success');
+                        if (e.currentTarget.dataset.control === 'disable') {
+                            instance.disable();
+                        } else {
+                            instance.enable();
+                        }
+                    })
+                    .find('[data-control="enable"]').click();
 
                 ready();
             })

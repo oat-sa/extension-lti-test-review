@@ -77,6 +77,8 @@ class Review extends tao_actions_SinglePageModule
      */
     public function init(): void
     {
+        $this->validateCsrf();
+
         /** @var QtiRunnerInitDataBuilderFactory $dataBuilder */
         $dataBuilder = $this->getServiceLocator()->get(QtiRunnerInitDataBuilderFactory::SERVICE_ID);
 
@@ -94,6 +96,8 @@ class Review extends tao_actions_SinglePageModule
      */
     public function getItem(): void
     {
+        $this->validateCsrf();
+
         $params = $this->getPsrRequest()->getQueryParams();
 
         $deliveryExecutionId = $params['serviceCallId'];

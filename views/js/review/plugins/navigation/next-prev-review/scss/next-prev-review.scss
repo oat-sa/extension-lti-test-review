@@ -1,0 +1,36 @@
+
+.next-prev-review {
+  margin: 10px;
+
+  button.small {
+    border-radius: 0;
+    text-transform: uppercase;
+
+    &.review-next {
+      width: 120px;
+      .icon {
+        float: right;
+        display: block;
+        margin-left: 10px;
+        width: 10px;
+      }
+    }
+    .icon {
+      height: 25px;
+      font-size: 2rem;
+    }
+
+    .btn__content {
+      border: transparent 1px dotted;
+    }
+
+    &:focus,
+    .btn__content:focus {
+      outline: none;
+      
+    }
+    &:focus > .btn__content  {
+      border: white 1px dotted;
+    } 
+  }
+}

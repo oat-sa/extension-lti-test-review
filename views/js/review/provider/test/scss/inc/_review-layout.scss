@@ -1,0 +1,135 @@
+.test-review-scope {
+    position: relative;
+    .test-runner-sections {
+        /* flex column value */
+        flex: 1 1 0%;
+        overflow: hidden;
+        /* is also a flex container */
+        display: flex;
+        flex-direction: row;
+    }
+
+    .test-sidebar {
+        background: $canvas;
+        /* side bars are supposed to have no width until they've got content */
+        flex: 0 1 auto;
+        overflow-y: auto;
+        max-width: 350px;
+        & > .qti-panel {
+            max-width: 350px;
+            padding: 10px;
+        }
+        @media only screen and (max-device-width: 800px) {
+            max-width: 200px;
+            & > .qti-panel {
+                max-width: 200px;
+            }
+        }
+        @media only screen and (min-device-width: 800px) and (max-device-width: 1280px) {
+            max-width: 250px;
+            & > .qti-panel {
+                max-width: 250px;
+            }
+        }
+        @media only screen and (min-device-width: 1280px) and (max-device-width: 1440px) {
+            max-width: 300px;
+            & > .qti-panel {
+                max-width: 300px;
+            }
+        }
+    }
+    .test-sidebar-left {
+        border-right: 1px $uiGeneralContentBorder solid;
+    }
+
+    .test-sidebar-right {
+        border-left: 1px $uiGeneralContentBorder solid;
+    }
+
+    .content-wrapper {
+        position: relative;
+        flex: 1 1 0%;
+        overflow: auto;
+        padding: 0;
+        .overlay {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            opacity: .9;
+
+            &-full {
+                background-color: $uiGeneralContentBg;
+                opacity: 1;
+            }
+        }
+    }
+
+    #qti-content {
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        margin: auto;
+    }
+
+    #qti-item {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        overflow: visible;
+    }
+
+    .qti-item {
+        padding: 30px;
+    }
+
+    .size-wrapper {
+        margin: auto;
+        width: 100%;
+    }
+
+    #qti-rubrics {
+        margin: auto;
+        width: 100%;
+        .qti-rubricBlock {
+            margin: 20px 0;
+        }
+        .hidden {
+            display: none;
+        }
+    }
+}
+
+.no-controls .test-previewer-scope {
+    height: 100vh;
+}
+
+.previewer-component {
+    background: inherit;
+    &.fullpage {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 100000;
+        .test-previewer-scope {
+            height: 100vh;
+        }
+    }
+
+    &.readonly {
+        .qti-item::before {
+            content: ' ';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100000;
+        }
+    }
+
+}
+

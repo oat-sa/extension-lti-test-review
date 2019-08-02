@@ -1,0 +1,17 @@
+{
+  "title": "Test",
+  "identifier": "Test",
+  "className": "assessmentTest",
+  "toolName": "tao",
+  "exclusivelyLinear": true,
+  "hasTimeLimits": false,
+  "config": {
+    "allowShortcuts": true,
+    "shortcuts": {
+        "next-prev-review": {
+            "next": "arrowright",
+            "prev": "arrowleft"
+        }
+    }
+  }
+}

@@ -19,6 +19,7 @@
 
 namespace oat\taoReview\scripts\update;
 
+use common_Exception;
 use common_ext_ExtensionUpdater;
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
@@ -26,6 +27,9 @@ use oat\tao\model\user\TaoRoles;
 use oat\taoLti\models\classes\LtiRoles;
 use oat\taoReview\controller\Review;
 use oat\taoReview\controller\ReviewTool;
+use oat\taoReview\models\DeliveryExecutionFinderService;
+use oat\taoReview\models\QtiRunnerInitDataBuilderFactory;
+use oat\taoReview\models\QtiRunnerMapBuilderFactory;
 
 /**
  * Class Updater for updating the extension
@@ -37,6 +41,7 @@ class Updater extends common_ext_ExtensionUpdater
      * @param $initialVersion
      *
      * @return string|void
+     * @throws common_Exception
      */
     public function update($initialVersion)
     {
@@ -51,5 +56,16 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('0.2.0');
         }
         $this->skip('0.2.0', '0.5.0');
+
+        if ($this->isVersion('0.5.0')) {
+
+            $serviceManager = $this->getServiceManager();
+
+            $serviceManager->register(DeliveryExecutionFinderService::SERVICE_ID, new DeliveryExecutionFinderService());
+            $serviceManager->register(QtiRunnerInitDataBuilderFactory::SERVICE_ID, new QtiRunnerInitDataBuilderFactory());
+
+            $this->setVersion('0.6.0');
+        }
+
     }
 }

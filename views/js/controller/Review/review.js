@@ -17,19 +17,22 @@
  */
 define([
     'jquery',
-    'lodash',
-    'i18n',
-    'module'
+    'ui/feedback',
+    'core/logger',
+    'taoReview/review/component/qtiTestReviewComponent'
 ], function (
     $,
-    _,
-    __,
-    module
+    feedback,
+    loggerFactory,
+    reviewFactory
 ) {
     'use strict';
-
+   /**
+    * Create a dedicated logger
+    */
+   var logger = loggerFactory('taoReview/controller/Review/review');
     /**
-     * Controls the taoProctoring delivery page
+     * Controls the taoReview delivery page
      *
      * @type {Object}
      */
@@ -38,8 +41,28 @@ define([
          * Entry point of the page
          */
         start() {
-            const pageParams = module.config();
-            console.log(pageParams);
+
+            const $container = $('.container');
+            const execution = $container.data('execution');
+            const delivery = $container.data('delivery');
+
+            reviewFactory($(".content-wrap", document), {
+                testUri: {
+                    resultId: execution,
+                    deliveryUri: delivery
+                },
+                plugins: [{
+                    module: 'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
+                    bundle: 'taoReview/loader/qtiReview.min',
+                    category: 'navigation'
+                }]
+            })
+            .on('error', err => {
+                logger.error(err);
+                if (err && err.message) {
+                    feedback().error(err.message);
+                }
+            } );
         }
     };
 });

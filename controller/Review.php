@@ -21,12 +21,21 @@
 
 namespace oat\taoReview\controller;
 
+use common_Exception;
 use common_exception_Error;
-use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
-use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
+use common_exception_NotFound;
+use oat\generis\model\GenerisRdf;
+use oat\generis\model\OntologyAwareTrait;
+use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\taoLti\models\classes\LtiException;
+use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiService;
 use oat\taoLti\models\classes\LtiVariableMissingException;
+use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
+use oat\taoQtiTestPreviewer\models\ItemPreviewer;
+use oat\taoResultServer\models\classes\ResultServerService;
+use oat\taoReview\models\DeliveryExecutionFinderService;
+use oat\taoReview\models\QtiRunnerInitDataBuilderFactory;
 use tao_actions_SinglePageModule;
 
 /**
@@ -35,36 +44,102 @@ use tao_actions_SinglePageModule;
  */
 class Review extends tao_actions_SinglePageModule
 {
+    use OntologyAwareTrait;
+
     /**
+     * @throws InvalidServiceManagerException
      * @throws LtiException
+     * @throws LtiInvalidLaunchDataException
      * @throws LtiVariableMissingException
      * @throws common_exception_Error
+     * @throws common_exception_NotFound
      */
-    public function index()
+    public function index(): void
     {
-        // TODO: Move logic from controller to service with test coverage
-
         $launchData = LtiService::singleton()->getLtiSession()->getLaunchData();
 
-        /** @var LtiLaunchDataService $launchDataService */
-        $launchDataService = $this->getServiceLocator()->get(LtiLaunchDataService::SERVICE_ID);
+        /** @var DeliveryExecutionFinderService $finder */
+        $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
 
-        /** @var LtiResultAliasStorage $ltiResultIdStorage */
-        $ltiResultIdStorage = $this->getServiceLocator()->get(LtiResultAliasStorage::SERVICE_ID);
+        $execution = $finder->findDeliveryExecution($launchData);
+        $delivery = $execution->getDelivery();
 
+        $data = [
+            'execution' => $execution->getUri(),
+            'delivery'  => $delivery->getUri(),
+        ];
 
-        $resultIdentifier = $launchData->hasVariable('lis_result_sourcedid')
-            ? $launchData->getVariable('lis_result_sourcedid')
-            : $launchDataService->findDeliveryExecutionFromLaunchData($launchData);
+        $this->composeView('delegated-view', $data, 'pages/index.tpl', 'tao');
+    }
 
-        $deliveryExecutionId = $ltiResultIdStorage->getDeliveryExecutionId($resultIdentifier);
+    /**
+     * @throws common_Exception
+     */
+    public function init(): void
+    {
+        $this->validateCsrf();
 
-        if ($deliveryExecutionId !== null) {
-            $params['delivery_execution'] = $deliveryExecutionId;
+        /** @var QtiRunnerInitDataBuilderFactory $dataBuilder */
+        $dataBuilder = $this->getServiceLocator()->get(QtiRunnerInitDataBuilderFactory::SERVICE_ID);
+
+        $params = $this->getPsrRequest()->getQueryParams();
+
+        if (isset($params['serviceCallId'])) {
+            $data = $dataBuilder->create()->build($params['serviceCallId']);
         }
 
-        $this->setClientRoute(_url('index', 'Review', 'taoReview', $params ?? []));
-        $this->composeView('delegated-view', null, 'pages/index.tpl', 'tao');
+        $this->returnJson($data ?? []);
+    }
+
+    /**
+     * Provides the definition data and the state for a particular item
+     */
+    public function getItem(): void
+    {
+        $this->validateCsrf();
+
+        $params = $this->getPsrRequest()->getQueryParams();
+
+        $deliveryExecutionId = $params['serviceCallId'];
+        $itemDefinition = $params['itemUri'];
+
+        /** @var DeliveryExecutionManagerService $des */
+        $deManagerService = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
+        $execution = $deManagerService->getDeliveryExecutionById($deliveryExecutionId);
+        $delivery = $execution->getDelivery();
+
+        $itemPreviewer = new ItemPreviewer();
+        $itemPreviewer->setServiceLocator($this->getServiceLocator());
+
+        $response['content'] = $itemPreviewer->setItemDefinition($itemDefinition)
+            ->setUserLanguage($this->getUserLanguage($deliveryExecutionId, $delivery->getUri()))
+            ->setDelivery($delivery)
+            ->loadCompiledItemData();
+
+        $response['baseUrl'] = $itemPreviewer->getBaseUrl();
+        $response['success'] = true;
+
+        $this->returnJson($response);
+    }
+
+    /**
+     * @param string $resultId
+     * @param string $deliveryUri
+     *
+     * @return string
+     * @throws common_exception_Error
+     */
+    protected function getUserLanguage($resultId, $deliveryUri)
+    {
+        /** @var ResultServerService $resultServerService */
+        $resultServerService = $this->getServiceLocator()->get(ResultServerService::SERVICE_ID);
+        /** @var \taoResultServer_models_classes_ReadableResultStorage $implementation */
+        $implementation = $resultServerService->getResultStorage($deliveryUri);
+
+        $testTaker = new \core_kernel_users_GenerisUser($this->getResource($implementation->getTestTaker($resultId)));
+        $lang = $testTaker->getPropertyValues(GenerisRdf::PROPERTY_USER_DEFLG);
+
+        return empty($lang) ? DEFAULT_LANG : (string)current($lang);
     }
 
 }

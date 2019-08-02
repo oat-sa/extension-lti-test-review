@@ -29,7 +29,6 @@ use oat\taoOutcomeUi\model\Wrapper\ResultServiceWrapper;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTest\models\runner\QtiRunnerService;
 use oat\taoQtiTest\models\runner\QtiRunnerServiceContext;
-use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
 use qtism\data\AssessmentSection;
 use qtism\data\AssessmentSectionRef;
@@ -47,9 +46,6 @@ class QtiRunnerInitDataBuilder
 
     /** @var QtiRunnerService */
     private $qtiRunnerService;
-
-    /** @var QtiRunnerMapBuilder */
-    private $qtiRunnerMapBuilder;
 
     /** @var DeliveryExecutionManagerService */
     private $deliveryExecutionService;

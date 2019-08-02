@@ -57,8 +57,8 @@ class DeliveryExecutionFinderService extends ConfigurableService
         /** @var LtiResultAliasStorage $ltiResultIdStorage */
         $ltiResultIdStorage = $this->getServiceLocator()->get(LtiResultAliasStorage::SERVICE_ID);
 
-        $resultIdentifier = !$data->hasVariable(self::LTI_SOURCE_ID)
-            ? $data->getVariable(srlf::LTI_SOURCE_ID)
+        $resultIdentifier = $data->hasVariable(self::LTI_SOURCE_ID)
+            ? $data->getVariable(self::LTI_SOURCE_ID)
             : $launchDataService->findDeliveryExecutionFromLaunchData($data);
 
         $deliveryExecutionId = $ltiResultIdStorage->getDeliveryExecutionId($resultIdentifier);

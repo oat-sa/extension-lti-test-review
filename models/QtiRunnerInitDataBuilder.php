@@ -95,7 +95,7 @@ class QtiRunnerInitDataBuilder
             'itemData' => null,
             'testMap' => $testMap,
             'testContext' => array_merge($this->qtiRunnerService->getTestContext($serviceContext), [
-                'itemIdentifier' => 'item-1',
+                'itemIdentifier' => $firstItem['itemRef'],
                 'itemPosition' => 0
             ]),
             'testData' => $this->qtiRunnerService->getTestData($serviceContext),
@@ -137,7 +137,8 @@ class QtiRunnerInitDataBuilder
 
         $map = [
             'scope' => 'test',
-            'parts' => []
+            'parts' => [],
+            'jumps' => [],
         ];
 
         $position = 0;

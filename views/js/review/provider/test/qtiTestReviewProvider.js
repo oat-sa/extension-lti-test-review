@@ -47,7 +47,32 @@ define([
     layoutTpl
 ) {
     'use strict';
+    // temporary due to luck of jumps in testMap
+    /**
+     * Get active item from the test map
+     * @param {Object} map - The assessment test map
+     * @returns {Object} the active item
+     */
+    const getItem = (map, position) => {
+        const parts = map.parts;
+        let result = {};
 
+        _.forEach(parts, function(part) {
+            const sections = part.sections;
+            if (sections) {
+                _.forEach(sections, function(section) {
+                    const items = section.items;
+                    _.forEach(items, function(item) {
+                        if (item.position === position) {
+                            result = item;
+                        }
+                    });
+                });
+            }
+        });
+        return result;
+    };
+    // end temporary
     /**
      * A Test runner provider to be registered against the runner
      */
@@ -172,10 +197,22 @@ define([
                     const testNavigator = testNavigatorFactory(testData, testContext, testMap);
                     // try the navigation if the actionParams context meaningful data
                     if(direction === 'next') {
-                        newTestContext = testNavigator.nextItem();
+                        // newTestContext = testNavigator.nextItem();
+                        // temporary due to luck of jumps in testMap
+                        newTestContext = Object.assign({}, testContext);
+                        newTestContext.itemPosition = testContext.itemPosition + 1;
+                        const item = getItem(testMap, newTestContext.itemPosition);
+                        newTestContext.itemIdentifier = item.id;
+                        // end temporary
                     }
                     if(direction === 'previous') {
-                        newTestContext = testNavigator.previousItem();
+                        // newTestContext = testNavigator.previousItem();
+                        // temporary due to luck of jumps in testMap
+                        newTestContext = Object.assign({}, testContext);
+                        newTestContext.itemPosition = testContext.itemPosition - 1;
+                        const item = getItem(testMap, newTestContext.itemPosition);
+                        newTestContext.itemIdentifier = item.id;
+                        // end temporary
                     }
                     this.unloadItem(testContext.itemIdentifier);
                     this.setTestContext(newTestContext);

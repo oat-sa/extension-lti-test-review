@@ -51,7 +51,9 @@ define([
             control : 'prev',
         }
     };
-/**
+
+    // temporary due to luck of jumps in testMap
+    /**
      * Get active item from the test map
      * @param {Object} map - The assessment test map
      * @returns {Object} the active item
@@ -89,6 +91,7 @@ define([
         });
         return result;
     };
+    // end temporary
     /**
      * Returns the configured plugin
      */

@@ -95,7 +95,7 @@ class QtiRunnerInitDataBuilder
             'itemData' => null,
             'testMap' => $testMap,
             'testContext' => array_merge($this->qtiRunnerService->getTestContext($serviceContext), [
-                'itemIdentifier' => $firstItem['itemRef'],
+                'itemIdentifier' => $firstItem['itemId'],
                 'itemPosition' => 0
             ]),
             'testData' => $this->qtiRunnerService->getTestData($serviceContext),

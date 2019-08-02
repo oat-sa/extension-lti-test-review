@@ -55,15 +55,16 @@ class Updater extends common_ext_ExtensionUpdater
 
             $this->setVersion('0.2.0');
         }
+        $this->skip('0.2.0', '0.5.0');
 
-        if ($this->isVersion('0.2.0')) {
+        if ($this->isVersion('0.5.0')) {
 
             $serviceManager = $this->getServiceManager();
 
             $serviceManager->register(DeliveryExecutionFinderService::SERVICE_ID, new DeliveryExecutionFinderService());
             $serviceManager->register(QtiRunnerInitDataBuilderFactory::SERVICE_ID, new QtiRunnerInitDataBuilderFactory());
 
-            $this->setVersion('0.3.0');
+            $this->setVersion('0.6.0');
         }
 
     }

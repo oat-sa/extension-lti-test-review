@@ -169,12 +169,6 @@ define([
                     const testContext = this.getTestContext();
                     const testMap = this.getTestMap();
 
-                    //we just block those actions and the end of the test
-                    if (direction === 'next' && navigationHelper.isLast(testMap, testContext.itemIdentifier))
-                    {
-                        throw offlineErrorHelper.buildErrorFromContext(offlineErrorHelper.getOfflineExitError());
-                    }
-
                     const testNavigator = testNavigatorFactory(testData, testContext, testMap);
                     // try the navigation if the actionParams context meaningful data
                     if(direction === 'next') {

@@ -138,6 +138,7 @@ class QtiRunnerInitDataBuilder
         $map = [
             'scope' => 'test',
             'parts' => [],
+            'stats' => [],
             'jumps' => [],
         ];
 
@@ -171,7 +172,8 @@ class QtiRunnerInitDataBuilder
                 $sections[$sectionId] = [
                     'id' => $sectionId,
                     'label' => $section->getTitle(),
-                    'items' => $items
+                    'items' => $items,
+                    'stats' => []
                 ];
             }
 
@@ -180,6 +182,7 @@ class QtiRunnerInitDataBuilder
                 'id' => $testPartId,
                 'label' => $testPart->getIdentifier(),
                 'sections' => $sections,
+                'stats' => []
             ];
         }
 

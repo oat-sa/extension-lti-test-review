@@ -21,8 +21,8 @@
 define([
     'context',
     'taoTests/runner/runnerComponent',
-    'tpl!taoReview/review/component/qtiTestReviewComponent',
-    'css!taoReview/review/provider/test/css/test'
+    'tpl!taoReview/review/component/tpl/qtiTestReviewComponent',
+    'css!taoReview/review/provider/css/qtiTestReviewProvider'
 ], function (context, runnerComponentFactory, runnerTpl) {
     'use strict';
 
@@ -45,7 +45,7 @@ define([
             providers: {
                 runner: {
                     id: 'qtiTestReviewProvider',
-                    module: 'taoReview/review/provider/test/qtiTestReviewProvider',
+                    module: 'taoReview/review/provider/qtiTestReviewProvider',
                     bundle: 'taoReview/loader/qtiReview.min',
                     category: 'runner'
                 },

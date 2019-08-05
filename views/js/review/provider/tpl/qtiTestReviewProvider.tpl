@@ -16,7 +16,7 @@
             <div id="qti-content"></div>
         </section>
     </div>
-    
+
     <nav class="action-bar content-action-bar horizontal-action-bar bottom-action-bar">
         <div class="control-box size-wrapper">
             <div class="lft tools-box"></div>

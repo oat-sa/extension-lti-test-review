@@ -27,10 +27,12 @@ define([
     reviewFactory
 ) {
     'use strict';
-   /**
-    * Create a dedicated logger
-    */
-   var logger = loggerFactory('taoReview/controller/Review/review');
+
+    /**
+     * Create a dedicated logger
+     */
+    const logger = loggerFactory('taoReview/controller');
+
     /**
      * Controls the taoReview delivery page
      *

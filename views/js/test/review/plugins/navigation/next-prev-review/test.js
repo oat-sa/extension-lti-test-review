@@ -34,7 +34,7 @@ define([
     'json!taoReview/test/mocks/testMap.json',
     'json!taoReview/test/mocks/testResponses.json',
     'lib/jquery.mockjax/jquery.mockjax',
-    'css!taoReview/review/provider/test/css/test'
+    'css!taoReview/review/provider/css/qtiTestReviewProvider'
 ], function (
     $,
     _,

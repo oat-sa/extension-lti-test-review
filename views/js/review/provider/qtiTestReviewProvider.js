@@ -23,6 +23,7 @@
  */
 define([
     'jquery',
+    'lodash',
     'i18n',
     'taoTests/runner/areaBroker',
     'taoTests/runner/proxy',
@@ -31,10 +32,10 @@ define([
     'taoQtiItem/runner/qtiItemRunner',
     'taoQtiTest/runner/config/assetManager',
     'taoQtiTest/runner/navigator/navigator',
-    'taoQtiTest/runner/helpers/navigation',
-    'tpl!taoReview/review/provider/test/tpl/test'
+    'tpl!taoReview/review/provider/tpl/qtiTestReviewProvider'
 ], function (
     $,
+    _,
     __,
     areaBrokerFactory,
     proxyFactory,
@@ -43,7 +44,6 @@ define([
     qtiItemRunner,
     assetManagerFactory,
     testNavigatorFactory,
-    navigationHelper,
     layoutTpl
 ) {
     'use strict';
@@ -186,7 +186,7 @@ define([
                             this.itemRunner.setState(response);
                         }
                     }
-                    
+
                 })
                 .on('move', function(direction){
                     let newTestContext;

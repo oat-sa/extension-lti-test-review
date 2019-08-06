@@ -28,6 +28,7 @@ define([
     'taoTests/runner/areaBroker',
     'taoTests/runner/proxy',
     'taoTests/runner/testStore',
+    'taoQtiTest/runner/helpers/map',
     'taoQtiTest/runner/ui/toolbox/toolbox',
     'taoQtiItem/runner/qtiItemRunner',
     'taoQtiTest/runner/config/assetManager',
@@ -40,6 +41,7 @@ define([
     areaBrokerFactory,
     proxyFactory,
     testStoreFactory,
+    mapHelper,
     toolboxFactory,
     qtiItemRunner,
     assetManagerFactory,
@@ -47,32 +49,7 @@ define([
     layoutTpl
 ) {
     'use strict';
-    // temporary due to luck of jumps in testMap
-    /**
-     * Get active item from the test map
-     * @param {Object} map - The assessment test map
-     * @returns {Object} the active item
-     */
-    const getItem = (map, position) => {
-        const parts = map.parts;
-        let result = {};
 
-        _.forEach(parts, function(part) {
-            const sections = part.sections;
-            if (sections) {
-                _.forEach(sections, function(section) {
-                    const items = section.items;
-                    _.forEach(items, function(item) {
-                        if (item.position === position) {
-                            result = item;
-                        }
-                    });
-                });
-            }
-        });
-        return result;
-    };
-    // end temporary
     /**
      * A Test runner provider to be registered against the runner
      */
@@ -92,11 +69,12 @@ define([
             const identifier = config.serviceCallId || `test-${Date.now()}`;
             return testStoreFactory(identifier);
         },
+
         /**
          * Installation of the provider, called during test runner init phase.
          */
         install() {
-            const {plugins} = this.getConfig().options;
+            const {plugins} = this.getConfig().options || {};
             if (plugins) {
                 _.forEach(this.getPlugins(), plugin => {
                     if (_.isPlainObject(plugin) && _.isFunction(plugin.setConfig)) {
@@ -108,6 +86,7 @@ define([
                 });
             }
         },
+
         /**
          * Initialize and load the area broker with a correct mapping
          * @returns {areaBroker}
@@ -149,6 +128,12 @@ define([
         init() {
             const dataHolder = this.getDataHolder();
             const areaBroker = this.getAreaBroker();
+            const load = () => {
+                const testContext = this.getTestContext();
+                if (testContext && testContext.itemIdentifier) {
+                    this.loadItem(testContext.itemIdentifier);
+                }
+            };
 
             areaBroker.setComponent('toolbox', toolboxFactory());
             areaBroker.getToolbox().init();
@@ -169,6 +154,8 @@ define([
                         } else {
                             this.loadItem(itemIdentifier);
                         }
+                    } else {
+                        load();
                     }
                 })
                 .on('loaditem', (itemRef, itemData) => {
@@ -182,13 +169,13 @@ define([
                         const itemIdentifier = context.itemIdentifier;
                         const responses = dataHolder.get('testResponses');
                         const response = responses[itemIdentifier];
-                        if(response) {
+                        if (response) {
                             this.itemRunner.setState(response);
                         }
                     }
 
                 })
-                .on('move', function(direction){
+                .on('move', function (direction) {
                     let newTestContext;
                     const testData = this.getTestData();
                     const testContext = this.getTestContext();
@@ -196,21 +183,21 @@ define([
 
                     const testNavigator = testNavigatorFactory(testData, testContext, testMap);
                     // try the navigation if the actionParams context meaningful data
-                    if(direction === 'next') {
+                    if (direction === 'next') {
                         // newTestContext = testNavigator.nextItem();
                         // temporary due to luck of jumps in testMap
                         newTestContext = Object.assign({}, testContext);
                         newTestContext.itemPosition = testContext.itemPosition + 1;
-                        const item = getItem(testMap, newTestContext.itemPosition);
+                        const item = mapHelper.getItemAt(testMap, newTestContext.itemPosition);
                         newTestContext.itemIdentifier = item.id;
                         // end temporary
                     }
-                    if(direction === 'previous') {
+                    if (direction === 'previous') {
                         // newTestContext = testNavigator.previousItem();
                         // temporary due to luck of jumps in testMap
                         newTestContext = Object.assign({}, testContext);
                         newTestContext.itemPosition = testContext.itemPosition - 1;
-                        const item = getItem(testMap, newTestContext.itemPosition);
+                        const item = mapHelper.getItemAt(testMap, newTestContext.itemPosition);
                         newTestContext.itemIdentifier = item.id;
                         // end temporary
                     }
@@ -218,10 +205,7 @@ define([
                     this.setTestContext(newTestContext);
                 })
                 .on('unloaditem', () => {
-                    const testContext = this.getTestContext();
-                    if(testContext && testContext.itemIdentifier) {
-                        this.loadItem(testContext.itemIdentifier);
-                    }
+                    load();
                 })
                 .on('resumeitem', () => {
                     this.trigger('enableitem enablenav');
@@ -253,8 +237,9 @@ define([
                     dataHolder.set('testData', data.testData);
                     dataHolder.set('testResponses', data.testResponses);
                     return data;
-            });
+                });
         },
+
         /**
          * Rendering phase of the test runner
          *

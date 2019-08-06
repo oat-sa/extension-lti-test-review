@@ -632,6 +632,7 @@ define([
 
                 this.getElement().on('keydown', cssSelectors.navigable, e => {
                     if(e.key === ' ' || e.key === 'Enter') {
+                        e.preventDefault();
                         e.currentTarget.click();
                     }
                 });

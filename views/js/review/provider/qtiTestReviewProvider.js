@@ -96,10 +96,10 @@ define([
                 contentWrapper: $('.content-wrapper', $layout),
                 content: $('#qti-content', $layout),
                 toolbox: $('.bottom-action-bar .tools-box', $layout),
-                navigation: $('.bottom-action-bar .navi-box-list', $layout),
+                navigation: $('.test-sidebar-left .navi-box', $layout),
                 control: $('.top-action-bar .control-box', $layout),
                 actionsBar: $('.bottom-action-bar .control-box', $layout),
-                panel: $('.test-sidebar-left', $layout),
+                panel: $('.test-sidebar-left .panel-box', $layout),
                 header: $('.top-action-bar .tools-box', $layout),
                 context: $('.top-action-bar .navi-box-list', $layout)
             });
@@ -196,7 +196,7 @@ define([
             return this.getProxy()
                 .init()
                 .then(data => {
-                    if (data.testMap && _.isEmpty(data.testMap.jumps)) {
+                    if (data.testMap && _.isEmpty(mapHelper.getJumps(data.testMap))) {
                         mapHelper.createJumpTable(data.testMap);
                     }
                     dataHolder.set('testMap', data.testMap);

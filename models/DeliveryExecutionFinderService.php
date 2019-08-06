@@ -37,7 +37,7 @@ class DeliveryExecutionFinderService extends ConfigurableService
 {
     public const SERVICE_ID = 'taoReview/DeliveryExecutionFinderService';
 
-    protected const LTI_SOURCE_ID = 'lis_result_sourcedid';
+    public const LTI_SOURCE_ID = 'lis_result_sourcedid';
 
     /**
      * @param LtiLaunchData $data
@@ -61,7 +61,7 @@ class DeliveryExecutionFinderService extends ConfigurableService
             throw new LtiInvalidLaunchDataException('Wrong result ID provided');
         }
 
-        return $this->getOntologyService()->getDeliveryExecution($deliveryExecutionId); // и этого
+        return $this->getOntologyService()->getDeliveryExecution($deliveryExecutionId);
     }
 
     protected function getLtiResultIdStorage(): LtiResultAliasStorage

@@ -21,66 +21,58 @@ namespace oat\taoReview\test\unit\model;
 
 use oat\generis\test\TestCase;
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
+use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
 use oat\taoLti\models\classes\LtiLaunchData;
-use oat\taoProctoring\model\deliveryLog\DeliveryLog;
 use oat\taoReview\models\DeliveryExecutionFinderService;
-use Zend\ServiceManager\ServiceLocatorInterface;
 
 class DeliveryExecutionFinderServiceTest extends TestCase
 {
+    /** @var LtiResultAliasStorage|\PHPUnit_Framework_MockObject_MockObject */
+    private $ltiResultAliasStorage;
+
+    /** @var LtiLaunchDataService|\PHPUnit_Framework_MockObject_MockObject */
+    private $ltiLaunchDataService;
+
+    /** @var DeliveryExecutionFinderService */
+    private $subject;
+
+    /** @var LtiLaunchData */
+    private $launchData;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->ltiResultAliasStorage = $this->createMock(LtiResultAliasStorage::class);
+        $this->ltiLaunchDataService = $this->createMock(LtiLaunchDataService::class);
+
+        $this->subject = new DeliveryExecutionFinderService();
+        $this->subject->setServiceLocator($this->getServiceLocatorMock([
+            LtiResultAliasStorage::SERVICE_ID => $this->ltiResultAliasStorage,
+            LtiLaunchDataService::SERVICE_ID => $this->ltiLaunchDataService
+        ]));
+    }
+
     public function testFindDeliveryExecutionByExecutionId()
     {
         $launchData = new LtiLaunchData([
-            'lis_result_sourcedid' => 'v5ba19e6ltos1lmljfv8fgnb07:::S3294476:::29123:::dyJ86SiwwA9'
+            DeliveryExecutionFinderService::LTI_SOURCE_ID => 'v5ba19e6ltos1lmljfv8fgnb07:::S3294476:::29123:::dyJ86SiwwA9'
         ], [
             'execution' => 'http://selor.docker/tao.rdf#i1562270728176451'
         ]);
 
-        $service = $this->getDEFinderServiceMock('http://some/delivery#id');
-
-        $found = $service->findDeliveryExecution($launchData);
-
-        print_r($found);
+        //DeliveryExecution
+        $e = $this->subject->findDeliveryExecution($launchData);
 
     }
 
-//    public function testFindDeliveryExecutionByLisResultSourceId()
-//    {
-//
-//    }
-
-    private function getDEFinderServiceMock($returnValue): DeliveryExecutionFinderService
+    public function testFindDeliveryExecutionByLisResultSourceId()
     {
-        $serviceLocatorMock = $this->getMockedServiceLocator($returnValue);
 
-        $service = new DeliveryExecutionFinderService();
-        $service->setServiceLocator($serviceLocatorMock);
-
-//        /$service->method('getLaunchDataService')->willReturn($this->getLtiLaunchDataService($returnValue));
-
-        return $service;
     }
 
-    /**
-     * @param $returnValue
-     *
-     * @return LtiLaunchDataService
-     */
-    private function getLtiLaunchDataService($returnValue): LtiLaunchDataService
+    public function testNotFoundDeliveryExecution()
     {
-        $serviceLocatorMock = $this->getMockedServiceLocator($returnValue);
 
-        $service = new LtiLaunchDataService();
-        $service->setServiceLocator($serviceLocatorMock);
-
-        return $service;
-    }
-
-    private function getMockedServiceLocator($returnValue): ServiceLocatorInterface
-    {
-        $deliveryLogMock = $this->getMockBuilder(DeliveryLog::class)->disableOriginalConstructor()->getMock();
-        $deliveryLogMock->method('get')->willReturn($returnValue);
-
-        return $this->getServiceLocatorMock([DeliveryLog::SERVICE_ID => $deliveryLogMock]);
     }
 }

@@ -63,38 +63,44 @@ class DeliveryExecutionFinderServiceTest extends TestCase
 
     public function testFindDeliveryExecutionByExecutionId()
     {
-        $sid = 'v5ba19e6ltos1lmljfv8fgnb07:::S3294476:::29123:::dyJ86SiwwA9';
-        $eid = 'http://selor.docker/tao.rdf#i1562270728176451';
+        $sourceId = 'v5ba19e6ltos1lmljfv8fgnb07:::S3294476:::29123:::dyJ86SiwwA9';
+        $executionId = 'http://selor.docker/tao.rdf#i1562270728176451';
 
-        $launchData = new LtiLaunchData([DeliveryExecutionFinderService::LTI_SOURCE_ID => $sid], ['execution' => $eid]);
+        $launchData = new LtiLaunchData(
+            [DeliveryExecutionFinderService::LTI_SOURCE_ID => $sourceId],
+            ['execution' => $executionId]
+        );
 
         /** @var DeliveryExecutionInterface|PHPUnit_Framework_MockObject_MockObject $implementation */
         $implementation = $this->getMock(DeliveryExecutionInterface::class);
-        $implementation->method('getIdentifier')->willReturn($eid);
+        $implementation->method('getIdentifier')->willReturn($executionId);
 
-        $this->ltiResultAliasStorage->method('getDeliveryExecutionId')->willReturn($eid);
-        $this->ltiLaunchDataService->method('findDeliveryExecutionFromLaunchData')->willReturn(new core_kernel_classes_Resource($eid));
+        $this->ltiResultAliasStorage->method('getDeliveryExecutionId')->willReturn($executionId);
+        $this->ltiLaunchDataService->method('findDeliveryExecutionFromLaunchData')->willReturn(new core_kernel_classes_Resource($executionId));
         $this->executionServiceProxy->method('getDeliveryExecution')->willReturn(new DeliveryExecution($implementation));
 
         /** @var DeliveryExecution $deliveryExecution */
         $deliveryExecution = $this->subject->findDeliveryExecution($launchData);
 
         $this->assertInstanceOf(DeliveryExecution::class, $deliveryExecution);
-        $this->assertEquals($eid, $deliveryExecution->getIdentifier());
+        $this->assertEquals($executionId, $deliveryExecution->getIdentifier());
     }
 
     public function testFindDeliveryExecutionByLisResultSourceId()
     {
-        $sid = 'v5ba19e6ltos1lmljfv8fgnb07:::S3294476:::29123:::dyJ86SiwwA9';
-        $eid = 'http://selor.docker/tao.rdf#i1562270728176451';
+        $sourceId = 'v5ba19e6ltos1lmljfv8fgnb07:::S3294476:::29123:::dyJ86SiwwA9';
+        $executionId = 'http://selor.docker/tao.rdf#i1562270728176451';
 
-        $launchData = new LtiLaunchData([DeliveryExecutionFinderService::LTI_SOURCE_ID => $sid], []);
+        $launchData = new LtiLaunchData(
+            [DeliveryExecutionFinderService::LTI_SOURCE_ID => $sourceId],
+            []
+        );
 
         /** @var DeliveryExecutionInterface|PHPUnit_Framework_MockObject_MockObject $implementation */
         $implementation = $this->getMock(DeliveryExecutionInterface::class);
-        $implementation->method('getIdentifier')->willReturn($eid);
+        $implementation->method('getIdentifier')->willReturn($executionId);
 
-        $this->ltiResultAliasStorage->method('getDeliveryExecutionId')->willReturn($eid);
+        $this->ltiResultAliasStorage->method('getDeliveryExecutionId')->willReturn($executionId);
         $this->ltiLaunchDataService->method('findDeliveryExecutionFromLaunchData')->willReturn(null);
         $this->executionServiceProxy->method('getDeliveryExecution')->willReturn(new DeliveryExecution($implementation));
 
@@ -102,15 +108,18 @@ class DeliveryExecutionFinderServiceTest extends TestCase
         $deliveryExecution = $this->subject->findDeliveryExecution($launchData);
 
         $this->assertInstanceOf(DeliveryExecution::class, $deliveryExecution);
-        $this->assertEquals($eid, $deliveryExecution->getIdentifier());
+        $this->assertEquals($executionId, $deliveryExecution->getIdentifier());
     }
 
     public function testNotFoundDeliveryExecution()
     {
-        $sid = 'v5ba19e6ltos1lmljfv8fgnb07:::S3294476:::29123:::dyJ86SiwwA9';
-        $eid = 'http://selor.docker/tao.rdf#i1562270728176451';
+        $sourceId = 'v5ba19e6ltos1lmljfv8fgnb07:::S3294476:::29123:::dyJ86SiwwA9';
+        $executionId = 'http://selor.docker/tao.rdf#i1562270728176451';
 
-        $launchData = new LtiLaunchData([DeliveryExecutionFinderService::LTI_SOURCE_ID => $sid], ['execution' => $eid]);
+        $launchData = new LtiLaunchData(
+            [DeliveryExecutionFinderService::LTI_SOURCE_ID => $sourceId],
+            ['execution' => $executionId]
+        );
 
         $this->ltiResultAliasStorage->method('getDeliveryExecutionId')->willReturn(null);
 

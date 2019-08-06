@@ -290,7 +290,7 @@ define([
             .init();
     });
 
-    QUnit.test('render', assert => {
+    QUnit.test('render layout', assert => {
         assert.expect(12);
         const ready = assert.async();
         const $fixture = $('#fixture-render');
@@ -330,7 +330,7 @@ define([
                         const $container = areaBroker.getContainer();
                         assert.equal($container.length, 1, 'The container still exists');
                     })
-                    .catch(function (err) {
+                    .catch(err => {
                         assert.ok(false, `Error in init method: ${err.message}`);
                         runner.destroy();
                     });
@@ -340,109 +340,59 @@ define([
     });
 
     QUnit.cases.init([{
-        title: 'itemData in init',
-        proxy: {
-            name: 'itemDataInit',
-            init() {
-                return Promise.resolve({
-                    success: true,
-                    itemIdentifier: 'item-1',
-                    itemData: {
-                        content: {
-                            type: 'qti',
-                            data: itemData1
-                        },
-                        baseUrl: '',
-                        state: {}
-                    }
-                });
-            }
-        }
-    }, {
-        title: 'itemRef in init',
-        proxy: {
-            name: 'itemRefInit',
-            init() {
-                return Promise.resolve({
-                    success: true,
-                    itemIdentifier: 'item-2'
-                });
-            },
-            getItem() {
-                return Promise.resolve({
-                    success: true,
-                    content: {
-                        type: 'qti',
-                        data: itemData2
-                    },
-                    baseUrl: '',
-                    state: {}
-                });
-            }
-        }
-    }, {
-        title: 'testContext',
-        proxy: {
-            name: 'testContextInit',
-            init() {
-                return Promise.resolve({
-                    success: true,
-                    testData: testData,
-                    testContext: testContext,
-                    testMap: testMap,
-                    testResponses: testResponses
-                });
-            },
-            getItem() {
-                return Promise.resolve({
-                    success: true,
-                    content: {
-                        type: 'qti',
-                        data: itemData1
-                    },
-                    baseUrl: '',
-                    state: {}
-                });
-            }
+        title: 'item from testContext',
+        initData: {
+            success: true,
+            testData: testData,
+            testContext: testContext,
+            testMap: testMap,
+            testResponses: testResponses
         }
     }, {
         title: 'manual load',
         itemIdentifier: 'item-3',
-        proxy: {
-            name: 'itemRefInit',
+        initData: {
+            success: true
+        }
+    }]).test('render item ', (data, assert) => {
+        assert.expect(6);
+        const ready = assert.async();
+        const $fixture = $('#fixture-item');
+        const items = {
+            'item-1': itemData1,
+            'item-2': itemData2,
+            'item-3': itemData3
+        };
+        const mockProxy = {
+            name: 'itemProxy',
             init() {
-                return Promise.resolve({
-                    success: true
-                });
+                assert.ok(true, 'The init method has been called on the proxy');
+                return Promise.resolve(data.initData);
             },
-            getItem() {
+            getItem(itemIdentifier) {
                 return Promise.resolve({
                     success: true,
                     content: {
                         type: 'qti',
-                        data: itemData3
+                        data: items[itemIdentifier]
                     },
                     baseUrl: '',
                     state: {}
                 });
             }
-        }
-    }]).test('render item ', (data, assert) => {
-        assert.expect(5);
-        const ready = assert.async();
-        const $fixture = $('#fixture-item');
+        };
         const config = {
             renderTo: $fixture,
-            proxyProvider: data.proxy.name
+            proxyProvider: mockProxy.name
         };
-        proxyFactory.registerProvider(data.proxy.name, data.proxy);
+        proxyFactory.registerProvider(mockProxy.name, mockProxy);
         const runner = runnerFactory('qtiTestReviewProvider', [], config)
             .on('ready', () => {
                 Promise.resolve()
                     .then(() => new Promise(resolve => {
                         runner
                             .off('.test')
-                            .after('renderitem.test', function () {
+                            .after('renderitem.test', () => {
                                 assert.ok(true, 'The previewer has been rendered');
                                 resolve();
                             });
@@ -502,144 +452,37 @@ define([
     });
 
     QUnit.cases.init([{
-        title: 'itemData in init',
-        proxy: {
-            name: 'itemDataInit',
-            init() {
-                return Promise.resolve({
-                    success: true,
-                    itemIdentifier: 'item-1',
-                    itemData: {
-                        content: {
-                            type: 'qti',
-                            data: itemData1
-                        },
-                        baseUrl: '',
-                        state: {}
-                    }
-                });
-            }
+        title: 'all data provided',
+        initData: {
+            success: true,
+            testData: testData,
+            testContext: testContext,
+            testMap: testMap,
+            testResponses: testResponses
         }
     }, {
-        title: 'itemRef in init',
-        proxy: {
-            name: 'itemRefInit',
-            init() {
-                return Promise.resolve({
-                    success: true,
-                    itemIdentifier: 'item-2'
-                });
-            },
-            getItem() {
-                return Promise.resolve({
-                    success: true,
-                    content: {
-                        type: 'qti',
-                        data: itemData1
-                    },
-                    baseUrl: '',
-                    state: {}
-                });
-            }
+        title: 'empty jump table',
+        initData: {
+            success: true,
+            testData: testData,
+            testContext: testContext,
+            testMap: Object.assign({}, testMap, {jumps: []}),
+            testResponses: testResponses
         }
     }, {
-        title: 'manual load',
-        itemIdentifier: 'item-3',
-        proxy: {
-            name: 'itemRefInit',
-            init() {
-                return Promise.resolve({
-                    success: true
-                });
-            },
-            getItem() {
-                return Promise.resolve({
-                    success: true,
-                    content: {
-                        type: 'qti',
-                        data: itemData1
-                    },
-                    baseUrl: '',
-                    state: {}
-                });
-            }
+        title: 'missing jump table',
+        initData: {
+            success: true,
+            testData: testData,
+            testContext: testContext,
+            testMap: (() => {
+                const {scope, parts, stats} = testMap;
+                return {scope, parts, stats};
+            })(),
+            testResponses: testResponses
         }
-    }]).test('render item ', (data, assert) => {
-        assert.expect(5);
-        const ready = assert.async();
-        const $fixture = $('#fixture-item');
-        const config = {
-            renderTo: $fixture,
-            proxyProvider: data.proxy.name
-        };
-        proxyFactory.registerProvider(data.proxy.name, data.proxy);
-        const runner = runnerFactory('qtiTestReviewProvider', [], config)
-            .on('ready', () => {
-                Promise.resolve()
-                    .then(() => new Promise(resolve => {
-                        runner
-                            .off('.test')
-                            .after('renderitem.test', function () {
-                                assert.ok(true, 'The previewer has been rendered');
-                                resolve();
-                            });
-                    }))
-                    .then(() => {
-                        runner.off('.test');
-                        const promises = Promise.all([
-                            new Promise(resolve => {
-                                runner.on('beforeunloaditem.test', () => {
-                                    assert.ok(true, 'Event beforeunloaditem has been triggered');
-                                    resolve();
-                                });
-                            }),
-                            new Promise(resolve => {
-                                runner.on('disablenav.test', () => {
-                                    assert.ok(true, 'Event disablenav has been triggered');
-                                    resolve();
-                                });
-                            }),
-                            new Promise(resolve => {
-                                runner.on('disabletools.test', () => {
-                                    assert.ok(true, 'Event disabletools has been triggered');
-                                    resolve();
-                                });
-                            }),
-                            new Promise(resolve => {
-                                runner.on('unloaditem.test', () => {
-                                    assert.ok(true, 'Event unloaditem has been triggered');
-                                    resolve();
-                                });
-                            }),
-                            runner.unloadItem()
-                        ]);
-                        return promises;
-                    })
-                    .catch(err => {
-                        assert.pushResult({
-                            result: false,
-                            message: err
-                        });
-                    })
-                    .then(() => runner.destroy());
-
-                if (data.itemIdentifier) {
-                    runner.loadItem(data.itemIdentifier);
-                }
-            })
-            .on('error', err => {
-                assert.pushResult({
-                    result: false,
-                    message: err
-                });
-                ready();
-            })
-            .on('destroy', ready)
-            .init();
-    });
-
-    QUnit.test('navigate', assert => {
-        assert.expect(10);
+    }]).test('navigate ', (data, assert) => {
+        assert.expect(14);
         const ready = assert.async();
         const $fixture = $('#fixture-navigate');
         const items = {
@@ -651,13 +494,7 @@ define([
             name: 'renderProxy',
             init() {
                 assert.ok(true, 'The init method has been called on the proxy');
-                return Promise.resolve({
-                    success: true,
-                    testData: testData,
-                    testContext: testContext,
-                    testMap: testMap,
-                    testResponses: testResponses
-                });
+                return Promise.resolve(data.initData);
             },
             getItem(itemIdentifier) {
                 assert.ok(true, 'The getItem method has been called on the proxy');
@@ -727,6 +564,24 @@ define([
                     })
                     .next();
             }))
+            .then(() => new Promise(resolve => {
+                runner
+                    .off('.test')
+                    .on('renderitem.test', itemRef => {
+                        assert.equal(itemRef, 'item-1', 'The first item is rendered again');
+                        resolve();
+                    })
+                    .jump(0, 'item');
+            }))
+            .then(() => new Promise(resolve => {
+                runner
+                    .off('.test')
+                    .on('renderitem.test', itemRef => {
+                        assert.equal(itemRef, 'item-3', 'The third item is rendered');
+                        resolve();
+                    })
+                    .jump(2, 'item');
+            }))
             .catch(err => {
                 assert.pushResult({
                     result: false,
@@ -759,7 +614,7 @@ define([
                 this.getAreaBroker()
                     .getNavigationArea()
                     .append($(navigationTpl(testMap.jumps.map(jump => Object.assign({label: `Item ${jump.position + 1}`}, jump)))))
-                    .on('click', e => this.getTestRunner().jump(e.target.dataset.position));
+                    .on('click', e => this.getTestRunner().jump(e.target.dataset.position, 'item'));
             }
         };
         const mockProxy = {

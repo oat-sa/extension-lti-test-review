@@ -24,7 +24,6 @@
 define([
     'jquery',
     'lodash',
-    'i18n',
     'taoTests/runner/areaBroker',
     'taoTests/runner/proxy',
     'taoTests/runner/testStore',
@@ -37,7 +36,6 @@ define([
 ], function (
     $,
     _,
-    __,
     areaBrokerFactory,
     proxyFactory,
     testStoreFactory,
@@ -145,18 +143,7 @@ define([
              */
             this
                 .on('ready', () => {
-                    const itemIdentifier = dataHolder.get('itemIdentifier');
-                    const itemData = dataHolder.get('itemData');
-
-                    if (itemIdentifier) {
-                        if (itemData) {
-                            this.renderItem(itemIdentifier, itemData);
-                        } else {
-                            this.loadItem(itemIdentifier);
-                        }
-                    } else {
-                        load();
-                    }
+                    load();
                 })
                 .on('loaditem', (itemRef, itemData) => {
                     dataHolder.set('itemIdentifier', itemRef);
@@ -173,34 +160,13 @@ define([
                             this.itemRunner.setState(response);
                         }
                     }
-
                 })
-                .on('move', function (direction) {
-                    let newTestContext;
+                .on('move', function (direction, scope, ref) {
                     const testData = this.getTestData();
                     const testContext = this.getTestContext();
                     const testMap = this.getTestMap();
-
                     const testNavigator = testNavigatorFactory(testData, testContext, testMap);
-                    // try the navigation if the actionParams context meaningful data
-                    if (direction === 'next') {
-                        // newTestContext = testNavigator.nextItem();
-                        // temporary due to luck of jumps in testMap
-                        newTestContext = Object.assign({}, testContext);
-                        newTestContext.itemPosition = testContext.itemPosition + 1;
-                        const item = mapHelper.getItemAt(testMap, newTestContext.itemPosition);
-                        newTestContext.itemIdentifier = item.id;
-                        // end temporary
-                    }
-                    if (direction === 'previous') {
-                        // newTestContext = testNavigator.previousItem();
-                        // temporary due to luck of jumps in testMap
-                        newTestContext = Object.assign({}, testContext);
-                        newTestContext.itemPosition = testContext.itemPosition - 1;
-                        const item = mapHelper.getItemAt(testMap, newTestContext.itemPosition);
-                        newTestContext.itemIdentifier = item.id;
-                        // end temporary
-                    }
+                    const newTestContext = testNavigator.navigate(direction, scope || 'item', ref);
                     this.unloadItem(testContext.itemIdentifier);
                     this.setTestContext(newTestContext);
                 })
@@ -230,8 +196,9 @@ define([
             return this.getProxy()
                 .init()
                 .then(data => {
-                    dataHolder.set('itemIdentifier', data.itemIdentifier);
-                    dataHolder.set('itemData', data.itemData);
+                    if (data.testMap && _.isEmpty(data.testMap.jumps)) {
+                        mapHelper.createJumpTable(data.testMap);
+                    }
                     dataHolder.set('testMap', data.testMap);
                     dataHolder.set('testContext', data.testContext);
                     dataHolder.set('testData', data.testData);

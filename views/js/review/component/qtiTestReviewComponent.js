@@ -64,7 +64,8 @@ define([
                 plugins: config.plugins || []
             },
             options: {
-                readOnly: true,
+                fullPage: config.fullPage,
+                readOnly: config.readOnly,
                 plugins: config.pluginsOptions
             }
         };
@@ -73,15 +74,13 @@ define([
         testRunnerConfig.loadFromBundle = !!context.bundle;
 
         return runnerComponentFactory(container, testRunnerConfig, template || runnerTpl)
-            .on('render', function() {
+            .on('render', function onComponentInit() {
                 const {fullPage, readOnly} = this.getConfig().options;
                 this.setState('fullpage', fullPage);
                 this.setState('readonly', readOnly);
             })
-            .on('ready', function(runner) {
-                runner.on('destroy', () => {
-                    this.destroy();
-                });
+            .on('ready', function onComponentReady(runner) {
+                runner.on('destroy', () => this.destroy());
             });
     };
 });

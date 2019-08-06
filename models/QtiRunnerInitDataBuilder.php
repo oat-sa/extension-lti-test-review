@@ -87,8 +87,6 @@ class QtiRunnerInitDataBuilder
         $firstItem = array_shift($this->itemsData);
 
         $init = [
-            'itemIdentifier' => $firstItem['itemId'],
-            'itemData' => null,
             'testMap' => $testMap,
             'testContext' => array_merge($this->qtiRunnerService->getTestContext($serviceContext), [
                 'itemIdentifier' => $firstItem['itemId'],

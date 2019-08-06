@@ -39,20 +39,20 @@ class DeliveryExecutionFinderService extends ConfigurableService
     public const LTI_SOURCE_ID = 'lis_result_sourcedid';
 
     /**
-     * @param LtiLaunchData $data
+     * @param LtiLaunchData $launchData
      *
      * @return DeliveryExecution
      * @throws LtiInvalidLaunchDataException
      * @throws LtiVariableMissingException
      */
-    public function findDeliveryExecution(LtiLaunchData $data): DeliveryExecution
+    public function findDeliveryExecution(LtiLaunchData $launchData): DeliveryExecution
     {
         $launchDataService = $this->getLaunchDataService();
         $ltiResultIdStorage = $this->getLtiResultIdStorage();
 
-        $resultIdentifier = $data->hasVariable(self::LTI_SOURCE_ID)
-            ? $data->getVariable(self::LTI_SOURCE_ID)
-            : $launchDataService->findDeliveryExecutionFromLaunchData($data);
+        $resultIdentifier = $launchData->hasVariable(self::LTI_SOURCE_ID)
+            ? $launchData->getVariable(self::LTI_SOURCE_ID)
+            : $launchDataService->findDeliveryExecutionFromLaunchData($launchData);
 
         $deliveryExecutionId = $ltiResultIdStorage->getDeliveryExecutionId($resultIdentifier);
 

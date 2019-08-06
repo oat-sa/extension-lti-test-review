@@ -73,16 +73,21 @@ class DeliveryExecutionFinderServiceTest extends TestCase
 
         /** @var DeliveryExecutionInterface|PHPUnit_Framework_MockObject_MockObject $implementation */
         $implementation = $this->getMock(DeliveryExecutionInterface::class);
-        $implementation->method('getIdentifier')->willReturn($executionId);
+        $implementation->method('getIdentifier')
+            ->willReturn($executionId);
 
-        $this->ltiResultAliasStorage->method('getDeliveryExecutionId')->willReturn($executionId);
-        $this->ltiLaunchDataService->method('findDeliveryExecutionFromLaunchData')->willReturn(new core_kernel_classes_Resource($executionId));
-        $this->executionServiceProxy->method('getDeliveryExecution')->willReturn(new DeliveryExecution($implementation));
+        $this->ltiResultAliasStorage->method('getDeliveryExecutionId')
+            ->willReturn($executionId);
+
+        $this->ltiLaunchDataService->method('findDeliveryExecutionFromLaunchData')
+            ->willReturn(new core_kernel_classes_Resource($executionId));
+
+        $this->executionServiceProxy->method('getDeliveryExecution')
+            ->willReturn(new DeliveryExecution($implementation));
 
         /** @var DeliveryExecution $deliveryExecution */
         $deliveryExecution = $this->subject->findDeliveryExecution($launchData);
 
-        $this->assertInstanceOf(DeliveryExecution::class, $deliveryExecution);
         $this->assertEquals($executionId, $deliveryExecution->getIdentifier());
     }
 
@@ -98,16 +103,18 @@ class DeliveryExecutionFinderServiceTest extends TestCase
 
         /** @var DeliveryExecutionInterface|PHPUnit_Framework_MockObject_MockObject $implementation */
         $implementation = $this->getMock(DeliveryExecutionInterface::class);
-        $implementation->method('getIdentifier')->willReturn($executionId);
+        $implementation->method('getIdentifier')
+            ->willReturn($executionId);
 
-        $this->ltiResultAliasStorage->method('getDeliveryExecutionId')->willReturn($executionId);
-        $this->ltiLaunchDataService->method('findDeliveryExecutionFromLaunchData')->willReturn(null);
-        $this->executionServiceProxy->method('getDeliveryExecution')->willReturn(new DeliveryExecution($implementation));
+        $this->ltiResultAliasStorage->method('getDeliveryExecutionId')
+            ->willReturn($executionId);
+
+        $this->executionServiceProxy->method('getDeliveryExecution')
+            ->willReturn(new DeliveryExecution($implementation));
 
         /** @var DeliveryExecution $deliveryExecution */
         $deliveryExecution = $this->subject->findDeliveryExecution($launchData);
 
-        $this->assertInstanceOf(DeliveryExecution::class, $deliveryExecution);
         $this->assertEquals($executionId, $deliveryExecution->getIdentifier());
     }
 
@@ -120,8 +127,6 @@ class DeliveryExecutionFinderServiceTest extends TestCase
             [DeliveryExecutionFinderService::LTI_SOURCE_ID => $sourceId],
             ['execution' => $executionId]
         );
-
-        $this->ltiResultAliasStorage->method('getDeliveryExecutionId')->willReturn(null);
 
         $this->expectException(LtiInvalidLaunchDataException::class);
 

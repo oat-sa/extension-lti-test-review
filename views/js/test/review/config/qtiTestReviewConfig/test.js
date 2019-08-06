@@ -20,17 +20,16 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 define([
-
     'lodash',
     'util/url',
     'taoReview/review/config/qtiTestReviewConfig'
-], function(_, urlUtil, reviewConfig) {
+], function (_, urlUtil, reviewConfig) {
     'use strict';
 
     QUnit.module('review Config');
 
-    QUnit.test('module', function(assert) {
-        var config = {
+    QUnit.test('module', assert => {
+        const config = {
             serviceCallId: 'foo'
         };
 
@@ -40,28 +39,26 @@ define([
         assert.notStrictEqual(reviewConfig(config), reviewConfig(config), 'The reviewConfig factory provides a different instance on each call');
     });
 
-    QUnit
-        .cases.init([
-            {title: 'getParameters'},
-            {title: 'getServiceCallId'},
-            {title: 'getServiceController'},
-            {title: 'getServiceExtension'},
-            {title: 'getTestActionUrl'},
-            {title: 'getItemActionUrl'},
-            {title: 'getTimeout'},
-            {title: 'getCommunicationConfig'}
-        ])
-        .test('proxy API ', function(data, assert) {
-            var instance = reviewConfig({
-                serviceCallId: 'foo'
-            });
-
-            assert.expect(1);
-
-            assert.equal(typeof instance[data.title], 'function', 'The reviewConfig instances expose a "' + data.title + '" function');
+    QUnit.cases.init([
+        {title: 'getParameters'},
+        {title: 'getServiceCallId'},
+        {title: 'getServiceController'},
+        {title: 'getServiceExtension'},
+        {title: 'getTestActionUrl'},
+        {title: 'getItemActionUrl'},
+        {title: 'getTimeout'},
+        {title: 'getCommunicationConfig'}
+    ]).test('proxy API ', (data, assert) => {
+        const instance = reviewConfig({
+            serviceCallId: 'foo'
         });
 
-    QUnit.test('reviewConfig factory', function(assert) {
+        assert.expect(1);
+
+        assert.equal(typeof instance[data.title], 'function', `The reviewConfig instances expose a "${data.title}" function`);
+    });
+
+    QUnit.test('reviewConfig factory', assert => {
         assert.expect(1);
 
         reviewConfig({
@@ -70,88 +67,84 @@ define([
         assert.ok(true, 'The reviewConfig() factory must not throw an exception when all the required config entries are provided');
     });
 
-    QUnit
-        .cases.init([{
-            title: 'No item identifier',
-            config: {
-                serviceCallId: 'http://tao.rdf/1234#56789'
-            },
-            expected: {
-                serviceCallId: 'http://tao.rdf/1234#56789'
-            }
-        }, {
-            title: 'Standard item identifier',
-            config: {
-                serviceCallId: 'http://tao.rdf/1234#56789'
-            },
-            itemId: 'http://tao.rdf/item#123',
-            expected: {
-                serviceCallId: 'http://tao.rdf/1234#56789',
-                itemUri: 'http://tao.rdf/item#123'
-            }
-        }, {
-            title: 'Structured item identifier',
-            config: {
-                serviceCallId: 'http://tao.rdf/1234#56789'
-            },
-            itemId: {
-                resultId: 'http://tao.rdf/result#123',
-                itemDefinition: 'http://tao.rdf/item#123',
-                deliveryUri: 'http://tao.rdf/delivery#123'
-            },
-            expected: {
-                serviceCallId: 'http://tao.rdf/1234#56789',
-                resultId: 'http://tao.rdf/result#123',
-                itemDefinition: 'http://tao.rdf/item#123',
-                deliveryUri: 'http://tao.rdf/delivery#123'
-            }
-        }])
-        .test('reviewConfig.getParameters', function(data, assert) {
-            var instance = reviewConfig(data.config);
+    QUnit.cases.init([{
+        title: 'No item identifier',
+        config: {
+            serviceCallId: 'http://tao.rdf/1234#56789'
+        },
+        expected: {
+            serviceCallId: 'http://tao.rdf/1234#56789'
+        }
+    }, {
+        title: 'Standard item identifier',
+        config: {
+            serviceCallId: 'http://tao.rdf/1234#56789'
+        },
+        itemId: 'http://tao.rdf/item#123',
+        expected: {
+            serviceCallId: 'http://tao.rdf/1234#56789',
+            itemUri: 'http://tao.rdf/item#123'
+        }
+    }, {
+        title: 'Structured item identifier',
+        config: {
+            serviceCallId: 'http://tao.rdf/1234#56789'
+        },
+        itemId: {
+            resultId: 'http://tao.rdf/result#123',
+            itemDefinition: 'http://tao.rdf/item#123',
+            deliveryUri: 'http://tao.rdf/delivery#123'
+        },
+        expected: {
+            serviceCallId: 'http://tao.rdf/1234#56789',
+            resultId: 'http://tao.rdf/result#123',
+            itemDefinition: 'http://tao.rdf/item#123',
+            deliveryUri: 'http://tao.rdf/delivery#123'
+        }
+    }]).test('reviewConfig.getParameters', (data, assert) => {
+        const instance = reviewConfig(data.config);
 
-            assert.expect(1);
+        assert.expect(1);
 
-            assert.deepEqual(instance.getParameters(data.itemId), data.expected, 'The reviewConfig.getParameters() method has returned the expected value');
-        });
+        assert.deepEqual(instance.getParameters(data.itemId), data.expected, 'The reviewConfig.getParameters() method has returned the expected value');
+    });
 
-    QUnit
-        .cases.init([
-            {title: 'number', itemId: 10},
-            {title: 'boolean', itemId: true},
-            {title: 'array', itemId: [1, 2, 3]}
-        ])
-        .test('reviewConfig.getParameters#error', function(data, assert) {
-            var expectedServiceCallId = 'http://tao.rdf/1234#56789';
-            var config = {
-                serviceCallId: expectedServiceCallId
-            };
-            var instance = reviewConfig(config);
-
-            assert.expect(1);
-
-            assert.throws(function() {
-                instance.getParameters(data.itemId);
-            }, 'The reviewConfig.getParameters() method should throw an error if the parameter does not have the right type');
-        });
-
-    QUnit.test('reviewConfig.getServiceCallId', function(assert) {
-        var expectedServiceCallId = 'http://tao.rdf/1234#56789';
-        var config = {
+    QUnit.cases.init([
+        {title: 'number', itemId: 10},
+        {title: 'boolean', itemId: true},
+        {title: 'array', itemId: [1, 2, 3]}
+    ]).test('reviewConfig.getParameters#error', (data, assert) => {
+        const expectedServiceCallId = 'http://tao.rdf/1234#56789';
+        const config = {
             serviceCallId: expectedServiceCallId
         };
-        var instance = reviewConfig(config);
+        const instance = reviewConfig(config);
+
+        assert.expect(1);
+
+        assert.throws(() => {
+            instance.getParameters(data.itemId);
+        }, 'The reviewConfig.getParameters() method should throw an error if the parameter does not have the right type');
+    });
+
+    QUnit.test('reviewConfig.getServiceCallId', assert => {
+        const expectedServiceCallId = 'http://tao.rdf/1234#56789';
+        const config = {
+            serviceCallId: expectedServiceCallId
+        };
+        const instance = reviewConfig(config);
 
         assert.expect(1);
 
         assert.equal(instance.getServiceCallId(), expectedServiceCallId, 'The reviewConfig.getServiceCallId() method has returned the expected value');
     });
 
-    QUnit.test('reviewConfig.getServiceController', function(assert) {
-        var expectedServiceController = 'MockRunner';
-        var config = {
+    QUnit.test('reviewConfig.getServiceController', assert => {
+        const expectedServiceController = 'MockRunner';
+        const config = {
             serviceCallId: 'foo'
         };
-        var instance = reviewConfig(config);
+        let instance = reviewConfig(config);
 
         assert.expect(3);
 
@@ -165,12 +158,12 @@ define([
         assert.equal(instance.getServiceController(), expectedServiceController, 'The reviewConfig.getServiceController() method has returned the expected value');
     });
 
-    QUnit.test('reviewConfig.getServiceExtension', function(assert) {
-        var expectedServiceExtension = 'MockExtension';
-        var config = {
+    QUnit.test('reviewConfig.getServiceExtension', assert => {
+        const expectedServiceExtension = 'MockExtension';
+        const config = {
             serviceCallId: 'foo'
         };
-        var instance = reviewConfig(config);
+        let instance = reviewConfig(config);
 
         assert.expect(3);
 
@@ -184,21 +177,21 @@ define([
         assert.equal(instance.getServiceExtension(), expectedServiceExtension, 'The reviewConfig.getServiceExtension() method has returned the expected value');
     });
 
-    QUnit.test('reviewConfig.getTestActionUrl', function(assert) {
-        var config = {
+    QUnit.test('reviewConfig.getTestActionUrl', assert => {
+        const config = {
             serviceCallId: 'foo',
             bootstrap: {
                 serviceController: 'MockRunner',
                 serviceExtension: 'MockExtension'
             }
         };
-        var expectedUrl = urlUtil.route('action1', config.bootstrap.serviceController, config.bootstrap.serviceExtension, {
+        const expectedUrl = urlUtil.route('action1', config.bootstrap.serviceController, config.bootstrap.serviceExtension, {
             serviceCallId: config.serviceCallId
         });
-        var expectedUrl2 = urlUtil.route('action2', config.bootstrap.serviceController, config.bootstrap.serviceExtension, {
+        const expectedUrl2 = urlUtil.route('action2', config.bootstrap.serviceController, config.bootstrap.serviceExtension, {
             serviceCallId: config.serviceCallId
         });
-        var instance = reviewConfig(config);
+        const instance = reviewConfig(config);
 
         assert.expect(2);
 
@@ -206,24 +199,24 @@ define([
         assert.equal(instance.getTestActionUrl('action2'), expectedUrl2, 'The reviewConfig.getTestActionUrl() method has returned the expected value');
     });
 
-    QUnit.test('reviewConfig.getItemActionUrl', function(assert) {
-        var config = {
+    QUnit.test('reviewConfig.getItemActionUrl', assert => {
+        const config = {
             serviceCallId: 'foo',
             bootstrap: {
                 serviceController: 'MockRunner',
                 serviceExtension: 'MockExtension'
             }
         };
-        var actionName = 'MockAction';
-        var expectedUrl = urlUtil.route(actionName, config.bootstrap.serviceController, config.bootstrap.serviceExtension, {
+        const actionName = 'MockAction';
+        const expectedUrl = urlUtil.route(actionName, config.bootstrap.serviceController, config.bootstrap.serviceExtension, {
             serviceCallId: config.serviceCallId,
             itemUri: 'item1'
         });
-        var expectedUrl2 = urlUtil.route(actionName, config.bootstrap.serviceController, config.bootstrap.serviceExtension, {
+        const expectedUrl2 = urlUtil.route(actionName, config.bootstrap.serviceController, config.bootstrap.serviceExtension, {
             serviceCallId: config.serviceCallId,
             itemUri: 'item2'
         });
-        var instance = reviewConfig(config);
+        const instance = reviewConfig(config);
 
         assert.expect(2);
 
@@ -231,11 +224,11 @@ define([
         assert.equal(instance.getItemActionUrl('item2', actionName), expectedUrl2, 'The reviewConfig.getItemActionUrl() method has returned the expected value');
     });
 
-    QUnit.test('reviewConfig.getTimeout', function(assert) {
-        var config = {
+    QUnit.test('reviewConfig.getTimeout', assert => {
+        const config = {
             serviceCallId: 'foo'
         };
-        var instance = reviewConfig(config);
+        let instance = reviewConfig(config);
 
         assert.expect(2);
 
@@ -246,17 +239,17 @@ define([
         assert.equal(instance.getTimeout(), 10000, 'The reviewConfig.getTimeout() method has returned the expected value');
     });
 
-    QUnit.test('reviewConfig.getCommunicationConfig', function(assert) {
-        var config = {
+    QUnit.test('reviewConfig.getCommunicationConfig', assert => {
+        const config = {
             serviceCallId: 'http://tao.dev/mockServiceCallId#123',
             bootstrap: {
                 serviceController: 'MockRunner',
                 serviceExtension: 'MockExtension'
             }
         };
-        var expected = {
-            enabled: undefined,
-            type: undefined,
+        const expected = {
+            enabled: undefined, /* eslint-disable-line */
+            type: undefined,    /* eslint-disable-line */
             params: {
                 service: urlUtil.route(
                     'message',
@@ -266,11 +259,11 @@ define([
                         serviceCallId: config.serviceCallId
                     }
                 ),
-                timeout: undefined
+                timeout: undefined  /* eslint-disable-line */
             },
             syncActions: []
         };
-        var instance = reviewConfig(config);
+        let instance = reviewConfig(config);
 
         assert.expect(3);
 

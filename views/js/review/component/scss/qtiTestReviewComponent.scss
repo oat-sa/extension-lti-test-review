@@ -15,6 +15,8 @@
  *
  * Copyright (c) 2019 Open Assessment Technologies SA ;
  */
+@import "inc/bootstrap";
+
 .previewer-component {
     background: inherit;
 
@@ -30,8 +32,9 @@
     &.fullpage {
         // high number because of the surrounding that already contains such big values
         @include previewer-overlay(100000);
+        background: $uiGeneralContentBg;
 
-        .test-previewer-scope {
+        .test-review-scope {
             height: 100vh;
         }
     }

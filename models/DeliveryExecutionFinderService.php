@@ -19,14 +19,11 @@
 
 namespace oat\taoReview\models;
 
-
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
 use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
 use oat\oatbox\service\ConfigurableService;
-use oat\oatbox\service\exception\InvalidServiceManagerException;
 use oat\taoDelivery\model\execution\DeliveryExecution;
-use oat\taoDelivery\model\execution\OntologyService;
-use oat\taoDelivery\model\execution\ServiceProxy;
+use oat\taoDelivery\model\execution\ServiceProxy as ExecutionServiceProxy;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiLaunchData;
 use oat\taoLti\models\classes\LtiVariableMissingException;
@@ -39,27 +36,23 @@ class DeliveryExecutionFinderService extends ConfigurableService
 {
     public const SERVICE_ID = 'taoReview/DeliveryExecutionFinderService';
 
-    protected const LTI_SOURCE_ID = 'lis_result_sourcedid';
+    public const LTI_SOURCE_ID = 'lis_result_sourcedid';
 
     /**
-     * @param LtiLaunchData $data
+     * @param LtiLaunchData $launchData
      *
      * @return DeliveryExecution
-     * @throws InvalidServiceManagerException
      * @throws LtiInvalidLaunchDataException
      * @throws LtiVariableMissingException
      */
-    public function findDeliveryExecution(LtiLaunchData $data): DeliveryExecution
+    public function findDeliveryExecution(LtiLaunchData $launchData): DeliveryExecution
     {
-        /** @var LtiLaunchDataService $launchDataService */
-        $launchDataService = $this->getServiceLocator()->get(LtiLaunchDataService::SERVICE_ID);
+        $launchDataService = $this->getLaunchDataService();
+        $ltiResultIdStorage = $this->getLtiResultIdStorage();
 
-        /** @var LtiResultAliasStorage $ltiResultIdStorage */
-        $ltiResultIdStorage = $this->getServiceLocator()->get(LtiResultAliasStorage::SERVICE_ID);
-
-        $resultIdentifier = $data->hasVariable(self::LTI_SOURCE_ID)
-            ? $data->getVariable(self::LTI_SOURCE_ID)
-            : $launchDataService->findDeliveryExecutionFromLaunchData($data);
+        $resultIdentifier = $launchData->hasVariable(self::LTI_SOURCE_ID)
+            ? $launchData->getVariable(self::LTI_SOURCE_ID)
+            : $launchDataService->findDeliveryExecutionFromLaunchData($launchData);
 
         $deliveryExecutionId = $ltiResultIdStorage->getDeliveryExecutionId($resultIdentifier);
 
@@ -67,15 +60,21 @@ class DeliveryExecutionFinderService extends ConfigurableService
             throw new LtiInvalidLaunchDataException('Wrong result ID provided');
         }
 
-        return $this->getOntologyService()->getDeliveryExecution($deliveryExecutionId);
+        return $this->getExecutionServiceProxy()->getDeliveryExecution($deliveryExecutionId);
     }
 
-    /**
-     * @return OntologyService
-     * @throws InvalidServiceManagerException
-     */
-    protected function getOntologyService(): OntologyService
+    protected function getLtiResultIdStorage(): LtiResultAliasStorage
     {
-        return $this->getServiceManager()->get(ServiceProxy::SERVICE_ID);
+        return $this->getServiceLocator()->get(LtiResultAliasStorage::SERVICE_ID);
+    }
+
+    protected function getLaunchDataService(): LtiLaunchDataService
+    {
+        return $this->getServiceLocator()->get(LtiLaunchDataService::SERVICE_ID);
+    }
+
+    protected function getExecutionServiceProxy(): ExecutionServiceProxy
+    {
+        return $this->getServiceLocator()->get(ExecutionServiceProxy::SERVICE_ID);
     }
 }

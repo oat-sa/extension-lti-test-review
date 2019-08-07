@@ -1,56 +1,61 @@
+$sidePanelBorderWidth: 1px;
+@mixin sidePanelWidth($width) {
+    max-width: $width;
+    & > * {
+        width: #{$width - $sidePanelBorderWidth};
+    }
+}
+
 .test-review-scope {
     position: relative;
+    display: flex;
+    flex-direction: column;
+
+    height: calc(100vh - #{(map-get($heights, header) + map-get($heights, footer)) * 1px});
+
     .test-runner-sections {
-        /* flex column value */
-        flex: 1 1 0%;
+        flex: 1 1 0;
         overflow: hidden;
-        /* is also a flex container */
         display: flex;
         flex-direction: row;
     }
 
     .test-sidebar {
         background: $canvas;
-        /* side bars are supposed to have no width until they've got content */
         flex: 0 1 auto;
         overflow-y: auto;
-        max-width: 350px;
-        & > .qti-panel {
-            max-width: 350px;
-            padding: 0;
-        }
+
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+
+        @include sidePanelWidth(300px);
         @media only screen and (max-device-width: 800px) {
-            max-width: 200px;
-            & > .qti-panel {
-                max-width: 200px;
-            }
+            @include sidePanelWidth(200px);
         }
         @media only screen and (min-device-width: 800px) and (max-device-width: 1280px) {
-            max-width: 250px;
-            & > .qti-panel {
-                max-width: 250px;
-            }
+            @include sidePanelWidth(250px);
         }
-        @media only screen and (min-device-width: 1280px) and (max-device-width: 1440px) {
-            max-width: 300px;
-            & > .qti-panel {
-                max-width: 300px;
-            }
+
+        .panel-box {
+            flex: 0 1 auto;
+            overflow: hidden;
         }
     }
     .test-sidebar-left {
-        border-right: 1px $uiGeneralContentBorder solid;
+        border-right: $sidePanelBorderWidth $uiGeneralContentBorder solid;
     }
 
     .test-sidebar-right {
-        border-left: 1px $uiGeneralContentBorder solid;
+        border-left: $sidePanelBorderWidth $uiGeneralContentBorder solid;
     }
 
     .content-wrapper {
         position: relative;
-        flex: 1 1 0%;
+        flex: 1 1 0;
         overflow: auto;
         padding: 0;
+
         .overlay {
             position: absolute;
             left: 0;
@@ -69,8 +74,9 @@
 
     #qti-content {
         -webkit-overflow-scrolling: touch;
-        width: 100%;
         margin: auto;
+        max-width: map-get($widths, item-max-width) * 1px;
+        width: 100%;
     }
 
     #qti-item {
@@ -86,11 +92,13 @@
 
     .size-wrapper {
         margin: auto;
+        max-width: map-get($widths, size-wrapper) * 1px;
         width: 100%;
     }
 
     #qti-rubrics {
         margin: auto;
+        max-width: map-get($widths, item-max-width) * 1px;
         width: 100%;
         .qti-rubricBlock {
             margin: 20px 0;
@@ -101,7 +109,8 @@
     }
 }
 
-.no-controls .test-previewer-scope {
-    height: 100vh;
+.no-controls {
+    .test-review-scope {
+        height: 100vh;
+    }
 }
-

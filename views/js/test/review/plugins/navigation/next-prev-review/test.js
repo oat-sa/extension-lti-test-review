@@ -34,7 +34,7 @@ define([
     'json!taoReview/test/mocks/testMap.json',
     'json!taoReview/test/mocks/testResponses.json',
     'lib/jquery.mockjax/jquery.mockjax',
-    'css!taoReview/review/provider/test/css/test'
+    'css!taoReview/review/provider/css/qtiTestReviewProvider'
 ], function (
     $,
     _,
@@ -53,7 +53,7 @@ define([
     'use strict';
 
     const componentConfig = {
-        serviceCallId : 'foo',
+        serviceCallId: 'foo',
         plugins: [{
             module: 'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
             bundle: 'taoReview/loader/qtiReview.min',
@@ -116,12 +116,12 @@ define([
 
     QUnit.module('API');
 
-    QUnit.test('module', assert =>  {
+    QUnit.test('module', assert => {
         const ready = assert.async();
         assert.expect(3);
 
         reviewFactory('#fixture-api', componentConfig)
-            .on('ready', function (runner) {
+            .on('ready', runner => {
                 assert.equal(typeof pluginFactory, 'function', 'The module exposes a function');
                 assert.equal(typeof pluginFactory(runner), 'object', 'The factory produces an instance');
                 assert.notStrictEqual(pluginFactory(runner), pluginFactory(runner), 'The factory provides a different instance on each call');
@@ -146,11 +146,11 @@ define([
         {title: 'hide'},
         {title: 'enable'},
         {title: 'disable'}
-    ]).test('plugin API ', (data, assert) =>  {
+    ]).test('plugin API ', (data, assert) => {
         const ready = assert.async();
         assert.expect(1);
         reviewFactory('#fixture-api', componentConfig)
-            .on('ready', function (runner) {
+            .on('ready', runner => {
                 const plugin = pluginFactory(runner);
                 assert.equal(typeof plugin[data.title], 'function', `The instances expose a ${data.title} function`);
                 runner.destroy();
@@ -160,60 +160,57 @@ define([
 
     QUnit.module('UI');
 
-    QUnit.test('render / destroy / enable / disable', assert =>  {
+    QUnit.test('render / destroy / enable / disable', assert => {
         const ready = assert.async();
         assert.expect(11);
 
         reviewFactory('#fixture-enable', componentConfig)
-            .on('ready', function (runner) {
+            .on('ready', runner => {
                 const areaBroker = runner.getAreaBroker();
                 const plugin = runner.getPlugin('next-prev-review');
-                const $navigation = areaBroker.getPanelArea();
+                const $navigation = areaBroker.getNavigationArea();
                 let $element = $navigation.find('[data-control="next-prev-review"]');
                 let $nextButton = $navigation.find('[data-control="next"]');
                 let $prevButton = $navigation.find('[data-control="prev"]');
                 Promise.resolve()
-                    .then(function () {
+                    .then(() => {
                         assert.equal($element.length, 1, 'The element has been inserted');
                         assert.equal($nextButton.length, 1, 'The next button has been inserted');
                         assert.equal($prevButton.length, 1, 'The prev button has been inserted');
                         assert.equal($element.hasClass('disabled'), true, 'The button has been rendered disabled');
                         return plugin.enable();
                     })
-                    .then(function () {
+                    .then(() => {
                         assert.equal($element.hasClass('disabled'), false, 'The element has been enabled');
-                        return new Promise(function (resolve) {
+                        return new Promise(resolve => {
                             runner
                                 .after('disablenav', resolve)
                                 .trigger('disablenav');
                         });
                     })
-                    .then(function () {
+                    .then(() => {
                         assert.equal($element.hasClass('disabled'), true, 'The element has been disabled');
-                        return new Promise(function (resolve) {
+                        return new Promise(resolve => {
                             runner
                                 .after('enablenav', resolve)
                                 .trigger('enablenav');
                         });
                     })
-                    .then(function () {
+                    .then(() => {
                         assert.equal($element.hasClass('disabled'), false, 'The element has been enabled');
                         return plugin.disable();
                     })
-                    .then(function () {
+                    .then(() => {
                         assert.equal($element.hasClass('disabled'), true, 'The element has been disabled');
                         return plugin.destroy();
                     })
-                    .then(function () {
-                        const $element = $navigation.find('[data-control="next-prev-review"]');
-                        const $nextButton = $navigation.find('[data-control="next"]');
-                        const $prevButton = $navigation.find('[data-control="prev"]');
-                        assert.equal($element.length, 0, 'The element has been removed');
-                        assert.equal($nextButton.length, 0, 'The next button has been removed');
-                        assert.equal($prevButton.length, 0, 'The prev button has been removed');
+                    .then(() => {
+                        assert.equal($navigation.find('[data-control="next-prev-review"]').length, 0, 'The element has been removed');
+                        assert.equal($navigation.find('[data-control="next"]').length, 0, 'The next button has been removed');
+                        assert.equal($navigation.find('[data-control="prev"]').length, 0, 'The prev button has been removed');
                         runner.destroy();
                     })
-                    .catch(function (err) {
+                    .catch(err => {
                         assert.ok(false, `Error in init method: ${err.message}`);
                         runner.destroy();
                     });
@@ -223,120 +220,101 @@ define([
 
     QUnit.module('behavior');
 
-    QUnit.test('next-prev-review', assert =>  {
+    QUnit.test('next-prev-review', assert => {
         const ready = assert.async();
         assert.expect(17);
         reviewFactory('#fixture-show', componentConfig)
-            .on('ready', function (runner) {
+            .on('ready', runner => {
                 const areaBroker = runner.getAreaBroker();
-                const $navigation = areaBroker.getPanelArea();
+                const $navigation = areaBroker.getNavigationArea();
                 let $element = $navigation.find('[data-control="next-prev-review"]');
                 let $nextButton = $navigation.find('[data-control="next"]');
                 let $prevButton = $navigation.find('[data-control="prev"]');
                 Promise.resolve()
-                    .then(function () {
-                        return new Promise(function (resolve) {
-                            runner
-                                .after('renderitem', resolve)
-                        });
-                    })
-                    .then(function () {
+                    .then(() => new Promise(resolve => {
+                        runner.after('renderitem', resolve);
+                    }))
+                    .then(() => {
                         assert.equal($element.length, 1, 'The element has been inserted');
                         assert.equal($nextButton.length, 1, 'The next button has been inserted');
                         assert.equal($prevButton.length, 1, 'The prev button has been inserted');
                         assert.equal($prevButton.hasClass('disabled'), true, 'The prevButton has been rendered disabled');
                     })
-                    .then(function () {
-                        return new Promise(function (resolve) {
-                            runner.after('move.test', function(direction) {
+                    .then(() => new Promise(resolve => {
+                        runner.after('move.test', direction => {
+                            assert.equal(direction, 'next', 'The move with direction === next is submitted');
+                            resolve();
+                        });
+                        $nextButton.click();
+                    }))
+                    .then(() => new Promise(resolve => {
+                        runner
+                            .off('.test')
+                            .after('renderitem.test', itemRef => {
+                                assert.equal(itemRef, 'item-2', 'Item "item-2" is rendered');
+                                assert.equal($prevButton.hasClass('disabled'), false, 'The prevButton has been enabled');
+                                resolve();
+                            });
+                    }))
+                    .then(() => new Promise(resolve => {
+                        runner
+                            .off('.test')
+                            .after('move.test', direction => {
                                 assert.equal(direction, 'next', 'The move with direction === next is submitted');
                                 resolve();
                             });
-                            $nextButton.click();
-                        });
-                    })
-                    .then(function () {
-                        return new Promise(function (resolve) {
-                            runner
-                                .off('.test')
-                                .after('renderitem.test', function(itemRef) {
-                                    assert.equal(itemRef, 'item-2', 'Item "item-2" is rendered');
-                                    assert.equal($prevButton.hasClass('disabled'), false, 'The prevButton has been enabled');
-                                    resolve();
-                                });
-                        });
-                    })
-                    .then(function () {
-                        return new Promise(function (resolve) {
-                            runner
-                                .off('.test')
-                                .after('move.test', function(direction) {
-                                    assert.equal(direction, 'next', 'The move with direction === next is submitted');
-                                    resolve();
-                                });
-                            $nextButton.click();
-                        });
-                    })
-                    .then(function () {
-                        return new Promise(function (resolve) {
-                            runner
-                                .off('.test')
-                                .after('renderitem.test', function(itemRef) {
-                                    assert.equal(itemRef, 'item-3', 'Item "item-3" is rendered');
-                                    assert.equal($nextButton.hasClass('disabled'), true, 'The nextButton has been disabled');
-                                    resolve();
-                                });
-                        });
-                    })
-                    .then(function () {
-                        return new Promise(function (resolve) {
-                            runner
-                                .off('.test')
-                                .after('move.test', function(direction) {
-                                    assert.equal(direction, 'previous', 'The move with direction === previous is submitted');
-                                    resolve();
-                                });
-                            $prevButton.click();
-                        });
-                    })
-                    .then(function () {
-                        return new Promise(function (resolve) {
-                            runner
-                                .off('.test')
-                                .after('renderitem.test', function(itemRef) {
-                                    assert.equal(itemRef, 'item-2', 'Item "item-2" is rendered');
-                                    assert.equal($nextButton.hasClass('disabled'), false, 'The nextButton has been enabled');
-                                    assert.equal($prevButton.hasClass('disabled'), false, 'The prevButton has been enabled');
-                                    resolve();
-                                });
-                        });
-                    })
-                    .then(function () {
-                        return new Promise(function (resolve) {
-                            runner
-                                .off('.test')
-                                .after('move.test', function(direction) {
-                                    assert.equal(direction, 'previous', 'The move with direction === previous is submitted');
-                                    resolve();
-                                });
-                            $prevButton.click();
-                        });
-                    })
-                    .then(function () {
-                        return new Promise(function (resolve) {
-                            runner
-                                .off('.test')
-                                .after('renderitem.test', function(itemRef) {
-                                    assert.equal(itemRef, 'item-1', 'Item "item-1" is rendered');
-                                    resolve();
-                                });
-                        });
-                    })
-                    .then(function () {
+                        $nextButton.click();
+                    }))
+                    .then(() => new Promise(resolve => {
+                        runner
+                            .off('.test')
+                            .after('renderitem.test', itemRef => {
+                                assert.equal(itemRef, 'item-3', 'Item "item-3" is rendered');
+                                assert.equal($nextButton.hasClass('disabled'), true, 'The nextButton has been disabled');
+                                resolve();
+                            });
+                    }))
+                    .then(() => new Promise(resolve => {
+                        runner
+                            .off('.test')
+                            .after('move.test', direction => {
+                                assert.equal(direction, 'previous', 'The move with direction === previous is submitted');
+                                resolve();
+                            });
+                        $prevButton.click();
+                    }))
+                    .then(() => new Promise(resolve => {
+                        runner
+                            .off('.test')
+                            .after('renderitem.test', itemRef => {
+                                assert.equal(itemRef, 'item-2', 'Item "item-2" is rendered');
+                                assert.equal($nextButton.hasClass('disabled'), false, 'The nextButton has been enabled');
+                                assert.equal($prevButton.hasClass('disabled'), false, 'The prevButton has been enabled');
+                                resolve();
+                            });
+                    }))
+                    .then(() => new Promise(resolve => {
+                        runner
+                            .off('.test')
+                            .after('move.test', direction => {
+                                assert.equal(direction, 'previous', 'The move with direction === previous is submitted');
+                                resolve();
+                            });
+                        $prevButton.click();
+                    }))
+                    .then(() => new Promise(resolve => {
+                        runner
+                            .off('.test')
+                            .after('renderitem.test', itemRef => {
+                                assert.equal(itemRef, 'item-1', 'Item "item-1" is rendered');
+                                resolve();
+                            });
+                    }))
+                    .then(() => {
                         assert.ok(!hider.isHidden($element), 'The element is visible');
                         return runner.destroy();
                     })
-                    .catch(function (err) {
+                    .catch(err => {
                         assert.ok(false, `Error in init method: ${err.message}`);
                         runner.destroy();
                     });
@@ -345,18 +323,16 @@ define([
     });
 
 
-
     QUnit.module('Visual');
 
-    QUnit.test('Visual test', assert =>  {
+    QUnit.test('Visual test', assert => {
         const ready = assert.async();
         const $container = $('#visual-test');
-        const itemRef = 'item-1';
 
         assert.expect(1);
 
         reviewFactory($container, componentConfig)
-            .on('error', function(err) {
+            .on('error', err => {
                 assert.ok(false, 'An error has occurred');
                 assert.pushResult({
                     result: false,
@@ -364,13 +340,13 @@ define([
                 });
                 ready();
             })
-            .on('ready', function(runner) {
+            .on('ready', runner => {
                 runner
-                    .after('renderitem.test', function() {
+                    .after('renderitem.test', () => {
+                        runner.off('.test');
                         assert.ok(true, 'The review has been rendered');
                         ready();
-                        runner.off('.test')
-                    })
+                    });
             });
     });
 

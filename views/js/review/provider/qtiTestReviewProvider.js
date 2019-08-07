@@ -23,56 +23,31 @@
  */
 define([
     'jquery',
-    'i18n',
+    'lodash',
     'taoTests/runner/areaBroker',
     'taoTests/runner/proxy',
     'taoTests/runner/testStore',
+    'taoQtiTest/runner/helpers/map',
     'taoQtiTest/runner/ui/toolbox/toolbox',
     'taoQtiItem/runner/qtiItemRunner',
     'taoQtiTest/runner/config/assetManager',
     'taoQtiTest/runner/navigator/navigator',
-    'taoQtiTest/runner/helpers/navigation',
-    'tpl!taoReview/review/provider/test/tpl/test'
+    'tpl!taoReview/review/provider/tpl/qtiTestReviewProvider'
 ], function (
     $,
-    __,
+    _,
     areaBrokerFactory,
     proxyFactory,
     testStoreFactory,
+    mapHelper,
     toolboxFactory,
     qtiItemRunner,
     assetManagerFactory,
     testNavigatorFactory,
-    navigationHelper,
     layoutTpl
 ) {
     'use strict';
-    // temporary due to luck of jumps in testMap
-    /**
-     * Get active item from the test map
-     * @param {Object} map - The assessment test map
-     * @returns {Object} the active item
-     */
-    const getItem = (map, position) => {
-        const parts = map.parts;
-        let result = {};
 
-        _.forEach(parts, function(part) {
-            const sections = part.sections;
-            if (sections) {
-                _.forEach(sections, function(section) {
-                    const items = section.items;
-                    _.forEach(items, function(item) {
-                        if (item.position === position) {
-                            result = item;
-                        }
-                    });
-                });
-            }
-        });
-        return result;
-    };
-    // end temporary
     /**
      * A Test runner provider to be registered against the runner
      */
@@ -92,11 +67,12 @@ define([
             const identifier = config.serviceCallId || `test-${Date.now()}`;
             return testStoreFactory(identifier);
         },
+
         /**
          * Installation of the provider, called during test runner init phase.
          */
         install() {
-            const {plugins} = this.getConfig().options;
+            const {plugins} = this.getConfig().options || {};
             if (plugins) {
                 _.forEach(this.getPlugins(), plugin => {
                     if (_.isPlainObject(plugin) && _.isFunction(plugin.setConfig)) {
@@ -108,6 +84,7 @@ define([
                 });
             }
         },
+
         /**
          * Initialize and load the area broker with a correct mapping
          * @returns {areaBroker}
@@ -119,10 +96,10 @@ define([
                 contentWrapper: $('.content-wrapper', $layout),
                 content: $('#qti-content', $layout),
                 toolbox: $('.bottom-action-bar .tools-box', $layout),
-                navigation: $('.bottom-action-bar .navi-box-list', $layout),
+                navigation: $('.test-sidebar-left .navi-box', $layout),
                 control: $('.top-action-bar .control-box', $layout),
                 actionsBar: $('.bottom-action-bar .control-box', $layout),
-                panel: $('.test-sidebar-left', $layout),
+                panel: $('.test-sidebar-left .panel-box', $layout),
                 header: $('.top-action-bar .tools-box', $layout),
                 context: $('.top-action-bar .navi-box-list', $layout)
             });
@@ -149,6 +126,12 @@ define([
         init() {
             const dataHolder = this.getDataHolder();
             const areaBroker = this.getAreaBroker();
+            const load = () => {
+                const testContext = this.getTestContext();
+                if (testContext && testContext.itemIdentifier) {
+                    this.loadItem(testContext.itemIdentifier);
+                }
+            };
 
             areaBroker.setComponent('toolbox', toolboxFactory());
             areaBroker.getToolbox().init();
@@ -160,16 +143,7 @@ define([
              */
             this
                 .on('ready', () => {
-                    const itemIdentifier = dataHolder.get('itemIdentifier');
-                    const itemData = dataHolder.get('itemData');
-
-                    if (itemIdentifier) {
-                        if (itemData) {
-                            this.renderItem(itemIdentifier, itemData);
-                        } else {
-                            this.loadItem(itemIdentifier);
-                        }
-                    }
+                    load();
                 })
                 .on('loaditem', (itemRef, itemData) => {
                     dataHolder.set('itemIdentifier', itemRef);
@@ -182,46 +156,22 @@ define([
                         const itemIdentifier = context.itemIdentifier;
                         const responses = dataHolder.get('testResponses');
                         const response = responses[itemIdentifier];
-                        if(response) {
+                        if (response) {
                             this.itemRunner.setState(response);
                         }
                     }
-                    
                 })
-                .on('move', function(direction){
-                    let newTestContext;
+                .on('move', function (direction, scope, ref) {
                     const testData = this.getTestData();
                     const testContext = this.getTestContext();
                     const testMap = this.getTestMap();
-
                     const testNavigator = testNavigatorFactory(testData, testContext, testMap);
-                    // try the navigation if the actionParams context meaningful data
-                    if(direction === 'next') {
-                        // newTestContext = testNavigator.nextItem();
-                        // temporary due to luck of jumps in testMap
-                        newTestContext = Object.assign({}, testContext);
-                        newTestContext.itemPosition = testContext.itemPosition + 1;
-                        const item = getItem(testMap, newTestContext.itemPosition);
-                        newTestContext.itemIdentifier = item.id;
-                        // end temporary
-                    }
-                    if(direction === 'previous') {
-                        // newTestContext = testNavigator.previousItem();
-                        // temporary due to luck of jumps in testMap
-                        newTestContext = Object.assign({}, testContext);
-                        newTestContext.itemPosition = testContext.itemPosition - 1;
-                        const item = getItem(testMap, newTestContext.itemPosition);
-                        newTestContext.itemIdentifier = item.id;
-                        // end temporary
-                    }
+                    const newTestContext = testNavigator.navigate(direction, scope || 'item', ref);
                     this.unloadItem(testContext.itemIdentifier);
                     this.setTestContext(newTestContext);
                 })
                 .on('unloaditem', () => {
-                    const testContext = this.getTestContext();
-                    if(testContext && testContext.itemIdentifier) {
-                        this.loadItem(testContext.itemIdentifier);
-                    }
+                    load();
                 })
                 .on('resumeitem', () => {
                     this.trigger('enableitem enablenav');
@@ -246,15 +196,17 @@ define([
             return this.getProxy()
                 .init()
                 .then(data => {
-                    dataHolder.set('itemIdentifier', data.itemIdentifier);
-                    dataHolder.set('itemData', data.itemData);
+                    if (data.testMap && _.isEmpty(mapHelper.getJumps(data.testMap))) {
+                        mapHelper.createJumpTable(data.testMap);
+                    }
                     dataHolder.set('testMap', data.testMap);
                     dataHolder.set('testContext', data.testContext);
                     dataHolder.set('testData', data.testData);
                     dataHolder.set('testResponses', data.testResponses);
                     return data;
-            });
+                });
         },
+
         /**
          * Rendering phase of the test runner
          *

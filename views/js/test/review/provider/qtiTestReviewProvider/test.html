@@ -27,25 +27,33 @@
                 });
 
                 //load the test
-                require(['taoReview/test/review/provider/test/test'], function () {
+                require(['taoReview/test/review/provider/qtiTestReviewProvider/test'], function () {
 
                     //Tests loaded, run tests
                     QUnit.start();
                 });
             });
         </script>
+        <style>
+            #visual-test{
+                position: relative;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100vh;
+            }
+        </style>
     </head>
     <body>
         <div id="qunit"></div>
         <div id="qunit-fixture">
-            <div id="feedback-box"></div>
             <div id="fixture-api"></div>
-            <div id="fixture-render"></div>
             <div id="fixture-install"></div>
             <div id="fixture-init"></div>
+            <div id="fixture-render"></div>
             <div id="fixture-item"></div>
+            <div id="fixture-navigate"></div>
         </div>
-        <div id="visual-test">
-        </div>
+        <div id="visual-test"></div>
     </body>
 </html>

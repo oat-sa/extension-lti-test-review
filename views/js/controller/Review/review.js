@@ -27,10 +27,12 @@ define([
     reviewFactory
 ) {
     'use strict';
-   /**
-    * Create a dedicated logger
-    */
-   var logger = loggerFactory('taoReview/controller/Review/review');
+
+    /**
+     * Create a dedicated logger
+     */
+    const logger = loggerFactory('taoReview/controller');
+
     /**
      * Controls the taoReview delivery page
      *
@@ -51,7 +53,12 @@ define([
                     resultId: execution,
                     deliveryUri: delivery
                 },
+                readOnly: true,
                 plugins: [{
+                    module: 'taoReview/review/plugins/navigation/review-panel/plugin',
+                    bundle: 'taoReview/loader/qtiReview.min',
+                    category: 'navigation'
+                }, {
                     module: 'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
                     bundle: 'taoReview/loader/qtiReview.min',
                     category: 'navigation'

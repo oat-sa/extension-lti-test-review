@@ -31,8 +31,8 @@ define([
     'json!taoReview/test/mocks/testMap.json',
     'json!taoReview/test/mocks/testResponses.json',
     'lib/jquery.mockjax/jquery.mockjax'
-], function(
-    $, 
+], function (
+    $,
     _,
     qtiTestReviewFactory,
     itemData1,
@@ -52,13 +52,13 @@ define([
     $.mockjaxSettings.responseTime = 1;
 
     // Restore AJAX method after each test
-    QUnit.testDone(function(details) {
-        if(details.name !== 'Visual test' )
-        {
+    QUnit.testDone(details => {
+        if (details.name !== 'Visual test') {
             $.mockjax.clear();
         }
     });
-    QUnit.test('module', assert =>  {
+
+    QUnit.test('module', assert => {
         const ready = assert.async();
         const config = {};
 
@@ -72,56 +72,58 @@ define([
                 success: true
             }
         });
-        
+
         Promise.all([
-            new Promise(resolve => review1.on('ready', resolve) ),
-            new Promise(resolve => review2.on('ready', resolve) )
+            new Promise(resolve => review1.on('ready', resolve)),
+            new Promise(resolve => review2.on('ready', resolve))
         ])
-        .catch(function(err) {
-            assert.pushResult({
-                result: false,
-                message: err
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(() => {
+                assert.equal(typeof qtiTestReviewFactory, 'function', 'The review module exposes a function');
+                assert.equal(typeof review1, 'object', 'The review factory returns an object');
+                assert.equal(typeof review2, 'object', 'The review factory returns an object');
+                assert.notEqual(review1, review2, 'The review factory returns a different instance on each call');
+                review1.destroy();
+                review2.destroy();
+            })
+            .then(() => {
+                ready();
             });
-        })
-        .then( () => {
-            assert.equal(typeof qtiTestReviewFactory, 'function', 'The review module exposes a function');
-            assert.equal(typeof review1, 'object', 'The review factory returns an object');
-            assert.equal(typeof review2, 'object', 'The review factory returns an object');
-            assert.notEqual(review1, review2, 'The review factory returns a different instance on each call');
-            review1.destroy()
-            review2.destroy()
-        })
-        .then( ()=> {
-            ready();
-        });
 
     });
 
     QUnit.cases.init([{
-        title: 'itemData in init',
-        mock: {
-            url: '/init*',
-            responseText: {
-                success: true,
-                itemIdentifier: 'item-1',
-                itemData: {
-                    content: {
-                        type: 'qti',
-                        data: itemData1
-                    },
-                    baseUrl: '',
-                    state: {}
-                }
-            }
+        title: 'item from testContext',
+        initData: {
+            success: true,
+            testData: testData,
+            testContext: testContext,
+            testMap: testMap,
+            testResponses: testResponses
         }
     }, {
-        title: 'itemRef in init',
-        mock: [{
+        title: 'manual load',
+        itemIdentifier: 'item-3',
+        initData: {
+            success: true
+        }
+    }]).test('render item ', (data, assert) => {
+        const ready = assert.async();
+        const $container = $('#fixture-render');
+        const config = {
+            itemUri: data.itemIdentifier
+        };
+
+        assert.expect(1);
+
+        $.mockjax([{
             url: '/init*',
-            responseText: {
-                success: true,
-                itemIdentifier: 'item-2'
-            }
+            responseText: data.initData
         }, {
             url: '/getItem*',
             responseText: {
@@ -133,40 +135,30 @@ define([
                 baseUrl: '',
                 state: {}
             }
-        }]
-    }]).test('render item ', (data, assert) =>  {
-        const ready = assert.async();
-        const $container = $('#fixture-render');
-        const config = {
-            itemUri: data.itemIdentifier
-        };
-
-        assert.expect(1);
-
-        $.mockjax(data.mock);
+        }]);
 
         qtiTestReviewFactory($container, config)
-            .on('error', function(err) {
-                assert.ok(false, 'An error has occurred');
+            .on('error', err => {
                 assert.pushResult({
                     result: false,
                     message: err
                 });
                 ready();
             })
-            .on('ready', function(runner) {
-                runner.after('renderitem', function() {
+            .on('ready', runner => {
+                runner.after('renderitem', () => {
                     assert.ok(true, 'The review has been rendered');
                     runner.destroy();
                 });
+
+                if (data.itemIdentifier) {
+                    runner.loadItem(data.itemIdentifier);
+                }
             })
-            .after('destroy', function() {
-                ready();
-            });
-                  
+            .after('destroy', ready);
     });
 
-    QUnit.test('destroy', assert =>  {
+    QUnit.test('destroy', assert => {
         const ready = assert.async();
         const $container = $('#fixture-destroy');
         const config = {};
@@ -181,19 +173,18 @@ define([
         });
 
         qtiTestReviewFactory($container, config)
-            .on('error', function(err) {
-                assert.ok(false, 'An error has occurred');
+            .on('error', err => {
                 assert.pushResult({
                     result: false,
                     message: err
                 });
                 ready();
             })
-            .on('ready', function(runner) {
+            .on('ready', runner => {
                 assert.equal($container.children().length, 1, 'The review has been rendered');
                 runner.destroy();
             })
-            .after('destroy', function() {
+            .after('destroy', () => {
                 assert.equal($container.children().length, 0, 'The review has been destroyed');
                 ready();
             });
@@ -201,7 +192,7 @@ define([
 
     QUnit.module('Visual');
 
-    QUnit.test('Visual test', function (assert) {
+    QUnit.test('Visual test', assert => {
         const ready = assert.async();
         const $container = $('#visual-test');
         const config = {
@@ -263,22 +254,21 @@ define([
                 baseUrl: '',
                 state: {}
             }
-        });    
+        });
 
         qtiTestReviewFactory($container, config)
-            .on('error', function(err) {
-                assert.ok(false, 'An error has occurred');
+            .on('error', err => {
                 assert.pushResult({
                     result: false,
                     message: err
                 });
                 ready();
             })
-            .on('ready', function(runner) {
-                runner.after('renderitem.test', function() {
+            .on('ready', runner => {
+                runner.after('renderitem.test', () => {
+                    runner.off('.test');
                     assert.ok(true, 'The review has been rendered');
                     ready();
-                    runner.off('.test')
                 });
             });
     });

@@ -27,76 +27,37 @@ define([
     'i18n',
     'ui/hider',
     'taoTests/runner/plugin',
+    'taoQtiTest/runner/helpers/map',
     'util/shortcut',
     'util/namespace',
     'tpl!taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
     'css!taoReview/review/plugins/navigation/next-prev-review/css/next-prev-review'
-], function ($, _, __, hider, pluginFactory, shortcut, namespaceHelper, buttonTpl){
+], function ($, _, __, hider, pluginFactory, mapHelper, shortcut, namespaceHelper, buttonTpl) {
     'use strict';
 
     /**
      * The display of the next button
      */
     const buttonData = {
-        control : 'next-prev-review',
-        next : {
-            title   : __('Go to the next item'),
-            icon    : 'right',
-            text    : __('Next'),
-            control : 'next',
+        control: 'next-prev-review',
+        next: {
+            title: __('Go to the next item'),
+            icon: 'right',
+            text: __('Next'),
+            control: 'next',
         },
-        prev : {
-            title   : __('Go to the previous item'),
-            icon    : 'left',
-            control : 'prev',
+        prev: {
+            title: __('Go to the previous item'),
+            icon: 'left',
+            control: 'prev',
         }
     };
 
-    // temporary due to luck of jumps in testMap
-    /**
-     * Get active item from the test map
-     * @param {Object} map - The assessment test map
-     * @returns {Object} the active item
-     */
-    const getItem = (map, itemIdentifier) => {
-        const parts = map.parts;
-        let result = {};
-
-        _.forEach(parts, function(part) {
-            const sections = part.sections;
-            if (sections) {
-                _.forEach(sections, function(section) {
-                    const items = section.items;
-                    _.forEach(items, function(item) {
-                        if (item.id === itemIdentifier) {
-                            result = item;
-                        }
-                    });
-                });
-            }
-        });
-        return result;
-    };
-    const getItemsCount = (map) => {
-        const parts = map.parts;
-        let result = 0;
-
-        _.forEach(parts, function(part) {
-            const sections = part.sections;
-            if (sections) {
-                _.forEach(sections, function(section) {
-                    result += _.size(section.items);
-                });
-            }
-        });
-        return result;
-    };
-    // end temporary
     /**
      * Returns the configured plugin
      */
     return pluginFactory({
-        name : 'next-prev-review',
+        name: 'next-prev-review',
 
         /**
          * Initialize the plugin (called during runner's init)
@@ -107,84 +68,66 @@ define([
             const testConfig = testData && testData.config || {};
             const pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
             const testMap = testRunner.getTestMap();
-            const itemsCount = getItemsCount(testMap);
+            const itemsCount = (mapHelper.getJumps(testMap) || []).length;
 
             /**
              * Check if the "Next" functionality should be available or not
              */
             const canDoNext = () => {
                 const context = testRunner.getTestContext();
-                const item = getItem(testMap, context.itemIdentifier);
-
-                // check TestMap if empty
-                if( _.isPlainObject(testMap) && _.size(testMap) === 0){
-                    return false;
-                }
-
-                // last item of the test
-                if (item.position === itemsCount - 1) {
-                    return false;
-                }
-
-                return true;
+                return itemsCount && context.itemPosition < itemsCount - 1;
             };
+
             /**
              * Check if the "Previous" functionality should be available or not
              */
             const canDoPrevious = () => {
                 const context = testRunner.getTestContext();
-                const item = getItem(testMap, context.itemIdentifier);
-                
-                // check TestMap if empty
-                if( _.isPlainObject(testMap) && _.size(testMap) === 0){
-                    return false;
-                }
-
-                //first item of the test
-                if (item.position === 0) {
-                    return false;
-                }
-
-                return true;
+                return itemsCount && context.itemPosition;
             };
-            //plugin behavior
+
+            /**
+             * Plugin behavior: move forward
+             */
             const doNext = () => {
                 if (this.getState('enabled') !== false && canDoNext()) {
                     testRunner.trigger('disablenav');
                     testRunner.next();
                 }
             };
-            //plugin behavior
+
+            /**
+             * Plugin behavior: move backward
+             */
             const doPrevious = () => {
-                if(this.getState('enabled') !== false && canDoPrevious()){
+                if (this.getState('enabled') !== false && canDoPrevious()) {
                     testRunner.trigger('disablenav');
                     testRunner.previous();
                 }
             };
+
             /**
              * Enable the button
+             * @param {jQuery} $button
              */
-            const enableButton = function enableButton (button){
-                button.removeProp('disabled')
-                    .removeClass('disabled');
-            };
+            const enableButton = $button => $button.removeProp('disabled').removeClass('disabled');
+
             /**
              * Disable the button
+             * @param {jQuery} $button
              */
-            const disableButton = function disableButton (button){
-                button.prop('disabled', true)
-                    .addClass('disabled');
-            };
+            const disableButton = $button => $button.prop('disabled', true).addClass('disabled');
+
             /**
              * Disable/enable Next/Prev buttons
              */
             const toggle = () => {
-                if(canDoPrevious()){
+                if (canDoPrevious()) {
                     enableButton(this.$prev);
                 } else {
                     disableButton(this.$prev);
                 }
-                if(canDoNext()){
+                if (canDoNext()) {
                     enableButton(this.$next);
                 } else {
                     disableButton(this.$next);
@@ -193,17 +136,17 @@ define([
 
             //create the button (detached)
             this.$element = $(buttonTpl(buttonData));
-            this.$next =$('.review-next', this.$element);
-            this.$prev =$('.review-prev', this.$element);
+            this.$next = $('.review-next', this.$element);
+            this.$prev = $('.review-prev', this.$element);
 
             //attach behavior
-            this.$next.on('click', function(e){
+            this.$next.on('click', e => {
                 e.preventDefault();
                 testRunner.trigger('nav-next');
             });
 
             //attach behavior
-            this.$prev.on('click', function(e){
+            this.$prev.on('click', e => {
                 e.preventDefault();
                 testRunner.trigger('nav-prev');
             });
@@ -214,7 +157,7 @@ define([
              *  prev: 'shortkey'
              * }
              */
-            if(testConfig.allowShortcuts){
+            if (testConfig.allowShortcuts) {
                 _.forIn(pluginShortcuts, (value, key) => {
                     shortcut.add(namespaceHelper.namespaceAll(value, this.getName(), true), () => {
                         testRunner.trigger(`nav-${key}`, true);
@@ -256,7 +199,7 @@ define([
          */
         render() {
             //attach the element to the navigation area
-            var $container = this.getAreaBroker().getPanelArea();
+            const $container = this.getAreaBroker().getNavigationArea();
             $container.append(this.$element);
         },
 
@@ -272,15 +215,17 @@ define([
          * Enable the buttons
          */
         enable() {
-            this.$element.removeProp('disabled')
+            this.$element
+                .removeProp('disabled')
                 .removeClass('disabled');
         },
 
         /**
          * Disable the buttons
          */
-        disable(){
-            this.$element.prop('disabled', true)
+        disable() {
+            this.$element
+                .prop('disabled', true)
                 .addClass('disabled');
         },
 

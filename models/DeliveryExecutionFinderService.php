@@ -24,6 +24,7 @@ use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\ServiceProxy as ExecutionServiceProxy;
+use oat\taoDelivery\model\execution\Service as ExecutionService;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiLaunchData;
 use oat\taoLti\models\classes\LtiVariableMissingException;
@@ -73,7 +74,7 @@ class DeliveryExecutionFinderService extends ConfigurableService
         return $this->getServiceLocator()->get(LtiLaunchDataService::SERVICE_ID);
     }
 
-    protected function getExecutionServiceProxy(): ExecutionServiceProxy
+    protected function getExecutionServiceProxy(): ExecutionService
     {
         return $this->getServiceLocator()->get(ExecutionServiceProxy::SERVICE_ID);
     }

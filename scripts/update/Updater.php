@@ -55,6 +55,7 @@ class Updater extends common_ext_ExtensionUpdater
 
             $this->setVersion('0.2.0');
         }
+        
         $this->skip('0.2.0', '0.5.0');
 
         if ($this->isVersion('0.5.0')) {
@@ -67,6 +68,6 @@ class Updater extends common_ext_ExtensionUpdater
             $this->setVersion('0.6.0');
         }
 
-        $this->skip('0.6.0', '0.7.0');
+        $this->skip('0.6.0', '0.8.0');
     }
 }

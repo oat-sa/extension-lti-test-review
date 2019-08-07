@@ -64,7 +64,7 @@ class Updater extends common_ext_ExtensionUpdater
             $serviceManager->register(DeliveryExecutionFinderService::SERVICE_ID, new DeliveryExecutionFinderService());
             $serviceManager->register(QtiRunnerInitDataBuilderFactory::SERVICE_ID, new QtiRunnerInitDataBuilderFactory());
 
-            $this->setVersion('0.6.1');
+            $this->setVersion('0.6.0');
         }
 
         $this->skip('0.6.0', '0.7.0');

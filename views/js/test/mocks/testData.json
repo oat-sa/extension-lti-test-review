@@ -8,7 +8,7 @@
   "config": {
     "allowShortcuts": true,
     "shortcuts": {
-        "next-prev-review": {
+        "next-prev": {
             "next": "arrowright",
             "prev": "arrowleft"
         }

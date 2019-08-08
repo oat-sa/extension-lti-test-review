@@ -324,7 +324,7 @@ define([
         /**
          * Enables the keyboard navigation using 'tab' keys
          */
-        const enableKeyboard = () => eachNavigable((index, el) => el.setAttribute('tabindex', index + 1));
+        const enableKeyboard = () => eachNavigable((index, el) => el.setAttribute('tabindex', 0));
 
         /**
          * Disables the keyboard navigation using 'tab' keys

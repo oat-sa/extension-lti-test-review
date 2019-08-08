@@ -22,6 +22,7 @@ define([
     'context',
     'taoTests/runner/runnerComponent',
     'tpl!taoReview/review/component/tpl/qtiTestReviewComponent',
+    'css!taoReview/review/component/css/qtiTestReviewComponent',
     'css!taoReview/review/provider/css/qtiTestReviewProvider'
 ], function (context, runnerComponentFactory, runnerTpl) {
     'use strict';

@@ -29,7 +29,7 @@ return [
     'label' => 'Review',
     'description' => 'Extension for reviewing passed tests, with the display of actual and correct answers.',
     'license' => 'GPL-2.0',
-    'version' => '0.8.0',
+    'version' => '0.9.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => [
         'tao' => '>=37.8.2',

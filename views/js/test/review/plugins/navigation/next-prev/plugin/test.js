@@ -21,11 +21,8 @@
  */
 define([
     'jquery',
-    'lodash',
-    'i18n',
-    'ui/hider',
     'taoReview/review/component/qtiTestReviewComponent',
-    'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
+    'taoReview/review/plugins/navigation/next-prev/plugin',
     'json!taoReview/test/mocks/item-1.json',
     'json!taoReview/test/mocks/item-2.json',
     'json!taoReview/test/mocks/item-3.json',
@@ -37,9 +34,6 @@ define([
     'css!taoReview/review/provider/css/qtiTestReviewProvider'
 ], function (
     $,
-    _,
-    __,
-    hider,
     reviewFactory,
     pluginFactory,
     itemData1,
@@ -55,7 +49,7 @@ define([
     const componentConfig = {
         serviceCallId: 'foo',
         plugins: [{
-            module: 'taoReview/review/plugins/navigation/next-prev-review/next-prev-review',
+            module: 'taoReview/review/plugins/navigation/next-prev/plugin',
             bundle: 'taoReview/loader/qtiReview.min',
             category: 'navigation'
         }]
@@ -164,24 +158,24 @@ define([
         const ready = assert.async();
         assert.expect(11);
 
-        reviewFactory('#fixture-enable', componentConfig)
+        reviewFactory('#fixture-render', componentConfig)
             .on('ready', runner => {
                 const areaBroker = runner.getAreaBroker();
-                const plugin = runner.getPlugin('next-prev-review');
+                const plugin = runner.getPlugin('next-prev');
                 const $navigation = areaBroker.getNavigationArea();
-                let $element = $navigation.find('[data-control="next-prev-review"]');
-                let $nextButton = $navigation.find('[data-control="next"]');
-                let $prevButton = $navigation.find('[data-control="prev"]');
+                const $element = $navigation.find('.next-prev');
+                const $nextButton = $navigation.find('[data-control="next"]');
+                const $prevButton = $navigation.find('[data-control="prev"]');
                 Promise.resolve()
                     .then(() => {
                         assert.equal($element.length, 1, 'The element has been inserted');
                         assert.equal($nextButton.length, 1, 'The next button has been inserted');
                         assert.equal($prevButton.length, 1, 'The prev button has been inserted');
-                        assert.equal($element.hasClass('disabled'), true, 'The button has been rendered disabled');
+                        assert.equal($element.hasClass('disabled'), true, 'The navigation has been rendered disabled');
                         return plugin.enable();
                     })
                     .then(() => {
-                        assert.equal($element.hasClass('disabled'), false, 'The element has been enabled');
+                        assert.equal($element.hasClass('disabled'), false, 'The navigation has been enabled');
                         return new Promise(resolve => {
                             runner
                                 .after('disablenav', resolve)
@@ -189,7 +183,7 @@ define([
                         });
                     })
                     .then(() => {
-                        assert.equal($element.hasClass('disabled'), true, 'The element has been disabled');
+                        assert.equal($element.hasClass('disabled'), true, 'The navigation has been disabled');
                         return new Promise(resolve => {
                             runner
                                 .after('enablenav', resolve)
@@ -197,15 +191,15 @@ define([
                         });
                     })
                     .then(() => {
-                        assert.equal($element.hasClass('disabled'), false, 'The element has been enabled');
+                        assert.equal($element.hasClass('disabled'), false, 'The navigation has been enabled');
                         return plugin.disable();
                     })
                     .then(() => {
-                        assert.equal($element.hasClass('disabled'), true, 'The element has been disabled');
+                        assert.equal($element.hasClass('disabled'), true, 'The navigation has been disabled');
                         return plugin.destroy();
                     })
                     .then(() => {
-                        assert.equal($navigation.find('[data-control="next-prev-review"]').length, 0, 'The element has been removed');
+                        assert.equal($navigation.find('.next-prev').length, 0, 'The element has been removed');
                         assert.equal($navigation.find('[data-control="next"]').length, 0, 'The next button has been removed');
                         assert.equal($navigation.find('[data-control="prev"]').length, 0, 'The prev button has been removed');
                         runner.destroy();
@@ -220,14 +214,14 @@ define([
 
     QUnit.module('behavior');
 
-    QUnit.test('next-prev-review', assert => {
+    QUnit.test('Navigation', assert => {
         const ready = assert.async();
         assert.expect(17);
-        reviewFactory('#fixture-show', componentConfig)
+        reviewFactory('#fixture-navigation', componentConfig)
             .on('ready', runner => {
                 const areaBroker = runner.getAreaBroker();
                 const $navigation = areaBroker.getNavigationArea();
-                let $element = $navigation.find('[data-control="next-prev-review"]');
+                let $element = $navigation.find('.next-prev');
                 let $nextButton = $navigation.find('[data-control="next"]');
                 let $prevButton = $navigation.find('[data-control="prev"]');
                 Promise.resolve()
@@ -238,7 +232,7 @@ define([
                         assert.equal($element.length, 1, 'The element has been inserted');
                         assert.equal($nextButton.length, 1, 'The next button has been inserted');
                         assert.equal($prevButton.length, 1, 'The prev button has been inserted');
-                        assert.equal($prevButton.hasClass('disabled'), true, 'The prevButton has been rendered disabled');
+                        assert.equal($prevButton.is(':disabled'), true, 'The prevButton has been rendered disabled');
                     })
                     .then(() => new Promise(resolve => {
                         runner.after('move.test', direction => {
@@ -252,7 +246,7 @@ define([
                             .off('.test')
                             .after('renderitem.test', itemRef => {
                                 assert.equal(itemRef, 'item-2', 'Item "item-2" is rendered');
-                                assert.equal($prevButton.hasClass('disabled'), false, 'The prevButton has been enabled');
+                                assert.equal($prevButton.is(':disabled'), false, 'The prevButton has been enabled');
                                 resolve();
                             });
                     }))
@@ -270,7 +264,7 @@ define([
                             .off('.test')
                             .after('renderitem.test', itemRef => {
                                 assert.equal(itemRef, 'item-3', 'Item "item-3" is rendered');
-                                assert.equal($nextButton.hasClass('disabled'), true, 'The nextButton has been disabled');
+                                assert.equal($nextButton.is(':disabled'), true, 'The nextButton has been disabled');
                                 resolve();
                             });
                     }))
@@ -288,8 +282,8 @@ define([
                             .off('.test')
                             .after('renderitem.test', itemRef => {
                                 assert.equal(itemRef, 'item-2', 'Item "item-2" is rendered');
-                                assert.equal($nextButton.hasClass('disabled'), false, 'The nextButton has been enabled');
-                                assert.equal($prevButton.hasClass('disabled'), false, 'The prevButton has been enabled');
+                                assert.equal($nextButton.is(':disabled'), false, 'The nextButton has been enabled');
+                                assert.equal($prevButton.is(':disabled'), false, 'The prevButton has been enabled');
                                 resolve();
                             });
                     }))
@@ -311,7 +305,7 @@ define([
                             });
                     }))
                     .then(() => {
-                        assert.ok(!hider.isHidden($element), 'The element is visible');
+                        assert.ok($element.is(':visible'), 'The element is visible');
                         return runner.destroy();
                     })
                     .catch(err => {

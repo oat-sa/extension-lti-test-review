@@ -78,11 +78,13 @@ class QtiRunnerInitDataBuilder
      * @return array
      * @throws common_Exception
      */
-    public function build($deliveryExecutionId): array
+    public function build($deliveryExecutionId)
     {
         $serviceContext = $this->getServiceContext($deliveryExecutionId);
 
-        $testMap = $this->getTestMap($serviceContext, $deliveryExecutionId);
+        $itemsData = $this->getItemsData($deliveryExecutionId);
+
+        $testMap = $this->getTestMap($serviceContext, $itemsData);
 
         $firstItem = array_shift($this->itemsData);
 
@@ -93,14 +95,14 @@ class QtiRunnerInitDataBuilder
                 'itemPosition' => 0
             ]),
             'testData' => $this->qtiRunnerService->getTestData($serviceContext),
-            'testResponses' => $this->getResponses($deliveryExecutionId),
+            'testResponses' => $itemsData,
             'success' => true,
         ];
 
         return $init;
     }
 
-    protected function getResponses(string $deliveryExecutionId)
+    protected function getItemsData(string $deliveryExecutionId)
     {
         $deliveryExecution = $this->deliveryExecutionService->getDeliveryExecutionById($deliveryExecutionId);
         $delivery = $deliveryExecution->getDelivery();
@@ -116,16 +118,31 @@ class QtiRunnerInitDataBuilder
 
         $variables = $this->getResultVariables($deliveryExecution->getIdentifier(), $filterSubmission, $filterTypes);
 
-        $responses = [];
+        $returnValue = [];
 
         foreach ($variables as $variable) {
-            $responses[$variable['internalIdentifier']] = json_decode($variable['state'], true);
+
+            $state = json_decode($variable['state'], true);
+            $stateKeys = array_keys($state);
+
+            $scores = array_filter($variable[taoResultServer_models_classes_ResponseVariable::class], function ($key) use ($stateKeys) {
+                return in_array($key, $stateKeys, true);
+            }, ARRAY_FILTER_USE_KEY);
+
+            array_walk($scores, function (&$value) {
+                $value = $value['isCorrect'] === 'correct';
+            });
+
+            $returnValue[$variable['internalIdentifier']] = [
+                'state' => $state,
+                'score' => $scores
+            ];
         }
 
-        return $responses;
+        return $returnValue;
     }
 
-    protected function getTestMap(QtiRunnerServiceContext $context)
+    protected function getTestMap(QtiRunnerServiceContext $context, array $itemsStates)
     {
         $testDefinition = taoQtiTest_helpers_Utils::getTestDefinition($context->getTestCompilationUri());
 
@@ -149,13 +166,17 @@ class QtiRunnerInitDataBuilder
                     $itemData = $this->qtiRunnerService->getItemData($context, $item->getHref());
 
                     $itemId = $item->getIdentifier();
+                    $score = $itemsStates[$itemId]['score'] ?: [];
+
                     $items[$itemId] = [
                         'id' => $itemId,
                         'label' => $itemData['data']['attributes']['label'],
                         'position' => $position,
                         'categories' => [],
-                        'score' => 0,
-                        'maxScore' => 0
+                        'informational' => false,
+                        'skipped' => false,
+                        'score' => array_sum($score),
+                        'maxScore' => count($score)
                     ];
 
                     $this->fillItemsData($itemId, $item->getHref(), $itemData['data']);

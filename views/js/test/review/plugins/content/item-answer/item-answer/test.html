@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Test Review - Item Answer Tabs</title>
+        <title>Test Review - Item Answer Component</title>
         <base href="../../../../../../../../../tao/views/"/>
         <link rel="stylesheet" type="text/css" href="js/lib/qunit/qunit.css">
         <link rel="stylesheet" type="text/css" href="css/tao-main-style.css">
@@ -26,7 +26,7 @@
                 });
 
                 //load the test
-                require(['taoReview/test/review/plugins/content/item-answer/tabs/test'], function () {
+                require(['taoReview/test/review/plugins/content/item-answer/item-answer/test'], function () {
 
                     //Tests loaded, run tests
                     QUnit.start();
@@ -62,6 +62,7 @@
                 background-color: #f3f1ef;
                 border-right: 1px #ddd solid;
                 flex: 0 0 auto;
+                width: 250px;
             }
             #visual-test .content .item {
                 background-color: #eee;
@@ -75,22 +76,32 @@
             <div id="fixture-api"></div>
             <div id="fixture-init"></div>
             <div id="fixture-render"></div>
+            <div id="fixture-hide"></div>
+            <div id="fixture-disable"></div>
             <div id="fixture-destroy"></div>
-            <div id="fixture-data-correct"></div>
-            <div id="fixture-data-incorrect"></div>
+            <div id="fixture-score"></div>
+            <div id="fixture-correct"></div>
+            <div id="fixture-incorrect"></div>
+            <div id="fixture-skipped"></div>
+            <div id="fixture-informational"></div>
         </div>
         <div id="visual-test">
             <div class="header">
                 <button class="small" data-control="correct">Correct</button>
                 <button class="small" data-control="incorrect">Incorrect</button>
+                <button class="small" data-control="skipped">Skipped</button>
+                <button class="small" data-control="informational">Informational</button>
             </div>
             <div class="content">
                 <aside class="panel"></aside>
-                <section class="item"></section>
+                <section class="item">
+                    <div class="tool"></div>
+                    <div class="item-content"></div>
+                </section>
             </div>
             <div class="footer">
-                <button class="small" data-control="disable">Disable</button>
                 <button class="small" data-control="enable">Enable</button>
+                <button class="small" data-control="disable">Disable</button>
             </div>
         </div>
     </body>

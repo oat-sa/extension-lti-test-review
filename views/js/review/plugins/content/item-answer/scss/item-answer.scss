@@ -17,4 +17,41 @@
  */
 @import "inc/bootstrap";
 
-.item-answer-tabs {}
+$borderWidth: 2px;
+$borderColor: $info;
+.item-answer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    .item-answer-bar {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        border-bottom: $borderWidth solid $borderColor;
+    }
+    .item-answer-tabs {
+        position: relative;
+
+        /**/border: 1px solid black;
+        /**/height: 44px;
+        /**/width: 300px;
+    }
+    .item-answer-score {
+        position: relative;
+
+        /**/border: 1px solid black;
+        /**/height: 44px;
+        /**/width: 300px;
+    }
+    .item-answer-status {
+        position: relative;
+        height: 32px;
+        line-height: 20px;
+
+        /**/border: 1px solid black;
+    }
+
+}

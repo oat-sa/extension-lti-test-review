@@ -1,0 +1,14 @@
+{
+	"version": 3,
+	"file": "item-answer.css",
+	"sources": [
+		"../scss/item-answer.scss",
+		"../../../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_bootstrap.scss",
+		"../../../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_variables.scss",
+		"../../../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_functions.scss",
+		"../../../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_colors.scss",
+		"../../../../../../../../tao/views/scss/inc/fonts/_tao-icon-vars.scss"
+	],
+	"names": [],
+	"mappings": "AAqBA,AAAA,YAAY,AAAC,CACT,QAAQ,CAAE,QAAQ,CAClB,OAAO,CAAE,IAAI,CACb,cAAc,CAAE,MAAM,CAgCzB,AAnCD,AAKI,YALQ,CAKR,gBAAgB,AAAC,CACb,QAAQ,CAAE,QAAQ,CAClB,OAAO,CAAE,IAAI,CACb,cAAc,CAAE,GAAG,CACnB,eAAe,CAAE,aAAa,CAE9B,aAAa,CAbP,GAAG,CAamB,KAAK,CI9BlC,OAAgB,CJ+BlB,AAZL,AAaI,YAbQ,CAaR,iBAAiB,AAAC,CACd,QAAQ,CAAE,QAAQ,CAEd,MAAM,CAAE,eAAe,CACvB,MAAM,CAAE,IAAI,CACZ,KAAK,CAAE,KAAK,CACnB,AAnBL,AAoBI,YApBQ,CAoBR,kBAAkB,AAAC,CACf,QAAQ,CAAE,QAAQ,CAEd,MAAM,CAAE,eAAe,CACvB,MAAM,CAAE,IAAI,CACZ,KAAK,CAAE,KAAK,CACnB,AA1BL,AA2BI,YA3BQ,CA2BR,mBAAmB,AAAC,CAChB,QAAQ,CAAE,QAAQ,CAClB,MAAM,CAAE,IAAI,CACZ,WAAW,CAAE,IAAI,CAEb,MAAM,CAAE,eAAe,CAC9B"
+}

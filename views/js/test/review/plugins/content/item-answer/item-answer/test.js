@@ -495,7 +495,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-status');
 
-        assert.expect(64);
+        assert.expect(65);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 

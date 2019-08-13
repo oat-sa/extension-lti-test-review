@@ -26,6 +26,7 @@ define([
     'json!taoReview/test/mocks/item-1.json',
     'json!taoReview/test/mocks/item-2.json',
     'json!taoReview/test/mocks/item-3.json',
+    'json!taoReview/test/mocks/item-4.json',
     'json!taoReview/test/mocks/testData.json',
     'json!taoReview/test/mocks/testContext.json',
     'json!taoReview/test/mocks/testMap.json',
@@ -39,6 +40,7 @@ define([
     itemData1,
     itemData2,
     itemData3,
+    itemData4,
     testData,
     testContext,
     testMap,
@@ -106,6 +108,18 @@ define([
             content: {
                 type: 'qti',
                 data: itemData3
+            },
+            baseUrl: '',
+            state: {}
+        }
+    });
+    $.mockjax({
+        url: '/getItem*item-4',
+        responseText: {
+            success: true,
+            content: {
+                type: 'qti',
+                data: itemData4
             },
             baseUrl: '',
             state: {}

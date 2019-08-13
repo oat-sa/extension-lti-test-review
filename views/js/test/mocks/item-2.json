@@ -154,7 +154,16 @@
         "baseType": "identifier"
       },
       "debug": { "relatedItem": "item_5d3863a91248d773093803" },
-      "defaultValue": []
+      "defaultValue": [],
+      "mapping": [],
+      "areaMapping": [],
+      "howMatch": "http:\/\/www.imsglobal.org\/question\/qti_v2p1\/rptemplates\/match_correct",
+      "correctResponses": [
+        "choice_1"
+      ],
+      "mappingAttributes": {
+        "defaultValue": 0
+      }
     }
   },
   "feedbacks": [],

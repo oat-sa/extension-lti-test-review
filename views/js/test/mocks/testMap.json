@@ -24,9 +24,12 @@
               "viewed": true,
               "categories": [],
               "informational": false,
+              "skipped": false,
               "index": 1,
               "positionInPart": 0,
-              "positionInSection": 0
+              "positionInSection": 0,
+              "score": 1,
+              "maxScore": 1
             }
           },
           "stats": {
@@ -55,9 +58,12 @@
               "viewed": true,
               "categories": [],
               "informational": false,
+              "skipped": true,
               "index": 1,
               "positionInPart": 1,
-              "positionInSection": 0
+              "positionInSection": 0,
+              "score": 0,
+              "maxScore": 1
             },
             "item-3": {
               "id": "item-3",
@@ -70,9 +76,30 @@
               "viewed": false,
               "categories": [],
               "informational": false,
+              "skipped": false,
               "index": 2,
               "positionInPart": 2,
-              "positionInSection": 1
+              "positionInSection": 1,
+              "score": 0,
+              "maxScore": 1
+            },
+            "item-4": {
+              "id": "item-4",
+              "label": "Item 16",
+              "position": 3,
+              "occurrence": 0,
+              "remainingAttempts": -1,
+              "answered": false,
+              "flagged": false,
+              "viewed": false,
+              "categories": [],
+              "informational": true,
+              "skipped": false,
+              "index": 2,
+              "positionInPart": 2,
+              "positionInSection": 1,
+              "score": 0,
+              "maxScore": 0
             }
           },
           "stats": {
@@ -80,7 +107,7 @@
             "answered": 1,
             "flagged": 0,
             "viewed": 1,
-            "total": 2,
+            "total": 3,
             "questionsViewed": 1
           }
         }
@@ -90,7 +117,7 @@
         "answered": 2,
         "flagged": 0,
         "viewed": 2,
-        "total": 3,
+        "total": 4,
         "questionsViewed": 2
       }
     }
@@ -100,7 +127,7 @@
     "answered": 2,
     "flagged": 0,
     "viewed": 2,
-    "total": 3,
+    "total": 4,
     "questionsViewed": 2
   },
   "jumps": [
@@ -121,6 +148,12 @@
       "section": "assessmentSection-2",
       "part": "testPart-1",
       "position": 2
+    },
+    {
+      "identifier": "item-4",
+      "section": "assessmentSection-2",
+      "part": "testPart-1",
+      "position": 3
     }
   ]
 }

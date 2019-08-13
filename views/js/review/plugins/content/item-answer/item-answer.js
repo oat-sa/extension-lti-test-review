@@ -38,6 +38,7 @@ define([
 
     /**
      * @typedef {Object} itemAnswerConfig - The config for the item answer component.
+     * @property {String} [skippedText] - The text displayed when the item has the status "skipped"
      * @property {String} [status] - The status of the item from the list ['correct', 'incorrect', 'skipped', 'informational']
      * @property {String} [score] - The student's score on the item
      */
@@ -47,6 +48,7 @@ define([
      * @type {itemAnswerConfig}
      */
     const defaults = {
+        skippedText: __('No response'),
         status: 'informational',
         score: ''
     };
@@ -129,6 +131,7 @@ define([
      *
      * @param {HTMLElement|String} container
      * @param {itemAnswerConfig} config - The config for the item answer component.
+     * @param {String} [config.skippedText] - The text displayed when the item has the status "skipped"
      * @param {String} [config.status] - The status of the item from the list ['correct', 'incorrect', 'skipped', 'informational']
      * @param {String} [config.score] - The student's score on the item
      * @returns {itemAnswerComponent}
@@ -278,7 +281,10 @@ define([
                     $status: this.getElement().find('.item-answer-status')
                 };
 
-                const tabs = tabsFactory(controls.$tabs)
+                const tabs = tabsFactory(controls.$tabs, {
+                    activeTab: this.getActiveTab(),
+                    tabs: tabsByStatus[this.getStatus()]
+                })
                     .on('tabchange', name => {
                         tabName = name;
 
@@ -297,7 +303,14 @@ define([
                     });
 
                 this
-                    .on('statuschange', status => tabs.setTabs(tabsByStatus[status]))
+                    .on('statuschange', status => {
+                        tabs.setTabs(tabsByStatus[status]);
+                        if (this.is('disabled')) {
+                            tabs.disable();
+                        }
+
+                        controls.$status.text(status === 'skipped' ? this.getConfig().skippedText : '');
+                    })
                     .on('disable', () => tabs.disable())
                     .on('enable', () => tabs.enable())
                     .on('destroy', () => {

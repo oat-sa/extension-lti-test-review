@@ -22,12 +22,10 @@
 define([
     'jquery',
     'lodash',
-    'i18n',
     'taoReview/review/plugins/content/item-answer/item-answer'
 ], function (
     $,
     _,
-    __,
     itemAnswerFactory
 ) {
     'use strict';
@@ -44,8 +42,8 @@ define([
     QUnit.test('module', assert => {
         const fixture = '#fixture-api';
         assert.expect(3);
-        assert.equal(typeof itemAnswerFactory, 'function', 'The module exposes a function');
-        assert.equal(typeof getInstance(fixture), 'object', 'The factory produces an object');
+        assert.strictEqual(typeof itemAnswerFactory, 'function', 'The module exposes a function');
+        assert.strictEqual(typeof getInstance(fixture), 'object', 'The factory produces an object');
         assert.notStrictEqual(getInstance(fixture), getInstance(fixture), 'The factory provides a different object on each call');
     });
 
@@ -68,7 +66,7 @@ define([
     ]).test('inherited API', (data, assert) => {
         const instance = getInstance('#fixture-api');
         assert.expect(1);
-        assert.equal(typeof instance[data.title], 'function', `The instance exposes a "${data.title}" function`);
+        assert.strictEqual(typeof instance[data.title], 'function', `The instance exposes a "${data.title}" function`);
     });
 
 
@@ -80,7 +78,7 @@ define([
     ]).test('event API ', (data, assert) => {
         const instance = getInstance('#fixture-api');
         assert.expect(1);
-        assert.equal(typeof instance[data.title], 'function', `The instance exposes a "${data.title}" function`);
+        assert.strictEqual(typeof instance[data.title], 'function', `The instance exposes a "${data.title}" function`);
     });
 
     QUnit.cases.init([
@@ -99,7 +97,7 @@ define([
     ]).test('component API ', (data, assert) => {
         const instance = getInstance('#fixture-api');
         assert.expect(1);
-        assert.equal(typeof instance[data.title], 'function', `The instance exposes a "${data.title}" function`);
+        assert.strictEqual(typeof instance[data.title], 'function', `The instance exposes a "${data.title}" function`);
     });
 
     QUnit.module('Life cycle');
@@ -210,7 +208,7 @@ define([
 
         assert.expect(10);
 
-        assert.equal($container.children().length, 0, 'The container is empty');
+        assert.strictEqual($container.children().length, 0, 'The container is empty');
 
         const instance = itemAnswerFactory($container)
             .on('init', function () {
@@ -245,11 +243,11 @@ define([
         const $container = $('#fixture-hide');
 
         assert.expect(17);
-        assert.equal($container.children().length, 0, 'The container is empty');
+        assert.strictEqual($container.children().length, 0, 'The container is empty');
 
         const instance = itemAnswerFactory($container)
             .on('init', function () {
-                assert.equal(this, instance, 'The instance has been initialized');
+                assert.strictEqual(this, instance, 'The instance has been initialized');
             })
             .on('ready', () => {
                 assert.ok(instance.is('ready'), 'The component is ready');
@@ -262,7 +260,7 @@ define([
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
 
-                assert.equal($container.find('.item-answer:visible').length, 1, 'The component is visible');
+                assert.strictEqual($container.find('.item-answer:visible').length, 1, 'The component is visible');
 
                 Promise
                     .resolve()
@@ -277,7 +275,7 @@ define([
                     }))
                     .then(() => {
                         assert.ok(instance.is('hidden'), 'The component is hidden');
-                        assert.equal($container.find('.item-answer:visible').length, 0, 'The component is hidden');
+                        assert.strictEqual($container.find('.item-answer:visible').length, 0, 'The component is hidden');
                     })
                     .then(() => new Promise(resolve => {
                         instance
@@ -290,7 +288,7 @@ define([
                     }))
                     .then(() => {
                         assert.ok(!instance.is('hidden'), 'The component is visible');
-                        assert.equal($container.find('.item-answer:visible').length, 1, 'The component is visible');
+                        assert.strictEqual($container.find('.item-answer:visible').length, 1, 'The component is visible');
                     })
                     .catch(err => {
                         assert.pushResult({
@@ -314,12 +312,12 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-disable');
 
-        assert.expect(17);
-        assert.equal($container.children().length, 0, 'The container is empty');
+        assert.expect(27);
+        assert.strictEqual($container.children().length, 0, 'The container is empty');
 
         const instance = itemAnswerFactory($container)
             .on('init', function () {
-                assert.equal(this, instance, 'The instance has been initialized');
+                assert.strictEqual(this, instance, 'The instance has been initialized');
             })
             .on('ready', () => {
                 assert.ok(instance.is('ready'), 'The component is ready');
@@ -332,7 +330,11 @@ define([
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
 
-                assert.equal($container.find('.item-answer').is('.disabled'), false, 'The component is enabled');
+                assert.strictEqual($container.find('.item-answer').is('.disabled'), false, 'The component is enabled');
+
+                assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
+                assert.strictEqual($container.find('.action').length, 1, '1 tab is rendered');
+                assert.strictEqual($container.find('.action:enabled').length, 1, 'The tab actions are enabled');
 
                 Promise
                     .resolve()
@@ -347,7 +349,35 @@ define([
                     }))
                     .then(() => {
                         assert.ok(instance.is('disabled'), 'The component is disabled');
-                        assert.equal($container.find('.item-answer').is('.disabled'), true, 'The component is disabled');
+                        assert.strictEqual($container.find('.item-answer').is('.disabled'), true, 'The component is disabled');
+                        assert.strictEqual($container.find('.action:enabled').length, 0, 'The tab actions are disabled');
+                    })
+                    .then(() => {
+                        instance.off('.test');
+
+                        const promise = Promise.all([
+                            new Promise(resolve => {
+                                instance.on('statuschange.test', status => {
+                                    assert.strictEqual(status, 'incorrect', 'The status changed to incorrect');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('tabchange.test', name => {
+                                    assert.strictEqual(name, 'answer', 'The answer tab is active');
+                                    resolve();
+                                });
+                            })
+                        ]);
+
+                        instance.setIncorrect();
+
+                        return promise;
+                    })
+                    .then(() => {
+                        assert.strictEqual(instance.getStatus(), 'incorrect', 'The current status is "incorrect"');
+                        assert.strictEqual($container.find('.action').length, 2, '2 tabs are rendered');
+                        assert.strictEqual($container.find('.action:enabled').length, 0, 'The tab actions are disabled');
                     })
                     .then(() => new Promise(resolve => {
                         instance
@@ -360,7 +390,8 @@ define([
                     }))
                     .then(() => {
                         assert.ok(!instance.is('disabled'), 'The component is enabled');
-                        assert.equal($container.find('.item-answer').is('.disabled'), false, 'The component is enabled');
+                        assert.strictEqual($container.find('.item-answer').is('.disabled'), false, 'The component is enabled');
+                        assert.strictEqual($container.find('.action:enabled').length, 2, 'The tab actions are enabled');
                     })
                     .catch(err => {
                         assert.pushResult({
@@ -386,18 +417,18 @@ define([
 
         assert.expect(4);
 
-        assert.equal($container.children().length, 0, 'The container is empty');
+        assert.strictEqual($container.children().length, 0, 'The container is empty');
 
         const instance = itemAnswerFactory($container)
             .on('init', function () {
-                assert.equal(this, instance, 'The instance has been initialized');
+                assert.strictEqual(this, instance, 'The instance has been initialized');
             })
             .on('ready', () => {
-                assert.equal($container.children().length, 1, 'The container contains an element');
+                assert.strictEqual($container.children().length, 1, 'The container contains an element');
                 instance.destroy();
             })
             .after('destroy', () => {
-                assert.equal($container.children().length, 0, 'The container is now empty');
+                assert.strictEqual($container.children().length, 0, 'The container is now empty');
                 ready();
             })
             .on('error', err => {
@@ -417,7 +448,7 @@ define([
 
         assert.expect(16);
 
-        assert.equal($container.children().length, 0, 'The container is empty');
+        assert.strictEqual($container.children().length, 0, 'The container is empty');
 
         const instance = itemAnswerFactory($container)
             .on('init', function () {
@@ -462,9 +493,9 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-status');
 
-        assert.expect(43);
+        assert.expect(47);
 
-        assert.equal($container.children().length, 0, 'The container is empty');
+        assert.strictEqual($container.children().length, 0, 'The container is empty');
 
         const instance = itemAnswerFactory($container)
             .on('init', function () {
@@ -484,6 +515,7 @@ define([
 
                 assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
                 assert.strictEqual(instance.getActiveTab(), 'answer', 'The active tab is "answer"');
+                assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
 
                 Promise
                     .resolve()
@@ -518,6 +550,7 @@ define([
                         assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
                         assert.strictEqual($container.children().is('.skipped'), true, 'The component got the state skipped');
                         assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
+                        assert.strictEqual($container.find('.item-answer-status').text().trim(), instance.getConfig().skippedText, 'The status area is not empty');
                     })
                     .then(() => new Promise(resolve => {
                         instance
@@ -559,6 +592,7 @@ define([
                         assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
                         assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
                         assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
+                        assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
                     })
                     .then(() => {
                         instance.off('.test');
@@ -591,6 +625,7 @@ define([
                         assert.strictEqual($container.children().is('.incorrect'), true, 'The component got the state incorrect');
                         assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
                         assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
+                        assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
                     })
                     .catch(err => {
                         assert.pushResult({
@@ -614,9 +649,9 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-correct');
 
-        assert.expect(24);
+        assert.expect(26);
 
-        assert.equal($container.children().length, 0, 'The container is empty');
+        assert.strictEqual($container.children().length, 0, 'The container is empty');
 
         const instance = itemAnswerFactory($container)
             .on('init', function () {
@@ -633,6 +668,7 @@ define([
                 assert.strictEqual($container.find('.item-answer-tabs .tab-group').length, 1, 'The component has rendered the tabs bar');
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
+                assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
 
                 assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
                 assert.strictEqual(instance.getActiveTab(), 'answer', 'The active tab is "answer"');
@@ -670,6 +706,7 @@ define([
                         assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
                         assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
                         assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
+                        assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
 
                         assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab').length, 1, 'Only one tab should be present');
                         assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
@@ -696,9 +733,9 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-incorrect');
 
-        assert.expect(25);
+        assert.expect(27);
 
-        assert.equal($container.children().length, 0, 'The container is empty');
+        assert.strictEqual($container.children().length, 0, 'The container is empty');
 
         const instance = itemAnswerFactory($container)
             .on('init', function () {
@@ -715,6 +752,7 @@ define([
                 assert.strictEqual($container.find('.item-answer-tabs .tab-group').length, 1, 'The component has rendered the tabs bar');
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
+                assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
 
                 assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
                 assert.strictEqual(instance.getActiveTab(), 'answer', 'The active tab is "answer"');
@@ -752,6 +790,7 @@ define([
                         assert.strictEqual($container.children().is('.incorrect'), true, 'The component got the state incorrect');
                         assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
                         assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
+                        assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
 
                         assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab').length, 2, 'Two tabs should be present');
                         assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
@@ -778,12 +817,13 @@ define([
     QUnit.test('skipped', assert => {
         const ready = assert.async();
         const $container = $('#fixture-skipped');
+        const skippedText = 'skipped item';
 
-        assert.expect(25);
+        assert.expect(27);
 
-        assert.equal($container.children().length, 0, 'The container is empty');
+        assert.strictEqual($container.children().length, 0, 'The container is empty');
 
-        const instance = itemAnswerFactory($container)
+        const instance = itemAnswerFactory($container, {skippedText})
             .on('init', function () {
                 assert.strictEqual(this, instance, 'The instance has been initialized');
             })
@@ -798,6 +838,7 @@ define([
                 assert.strictEqual($container.find('.item-answer-tabs .tab-group').length, 1, 'The component has rendered the tabs bar');
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
+                assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
 
                 assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
                 assert.strictEqual(instance.getActiveTab(), 'answer', 'The active tab is "answer"');
@@ -835,6 +876,7 @@ define([
                         assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
                         assert.strictEqual($container.children().is('.skipped'), true, 'The component got the state skipped');
                         assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
+                        assert.strictEqual($container.find('.item-answer-status').text().trim(), skippedText, 'The status area is not empty');
 
                         assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab').length, 2, 'Two tabs should be present');
                         assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
@@ -862,9 +904,9 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-informational');
 
-        assert.expect(24);
+        assert.expect(26);
 
-        assert.equal($container.children().length, 0, 'The container is empty');
+        assert.strictEqual($container.children().length, 0, 'The container is empty');
 
         const instance = itemAnswerFactory($container)
             .on('init', function () {
@@ -881,6 +923,7 @@ define([
                 assert.strictEqual($container.find('.item-answer-tabs .tab-group').length, 1, 'The component has rendered the tabs bar');
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
+                assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
 
                 assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
                 assert.strictEqual(instance.getActiveTab(), 'answer', 'The active tab is "answer"');
@@ -918,6 +961,7 @@ define([
                         assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
                         assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
                         assert.strictEqual($container.children().is('.informational'), true, 'The component got the state informational');
+                        assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
 
                         assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab').length, 1, 'Only one tab should be present');
                         assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
@@ -965,14 +1009,14 @@ define([
 
         assert.expect(3);
 
-        assert.equal($container.children().length, 0, 'The container is empty');
+        assert.strictEqual($container.children().length, 0, 'The container is empty');
 
         const instance = itemAnswerFactory($container, config)
             .on('init', function () {
-                assert.equal(this, instance, 'The instance has been initialized');
+                assert.strictEqual(this, instance, 'The instance has been initialized');
             })
             .on('ready', () => {
-                assert.equal($container.children().length, 1, 'The container contains an element');
+                assert.strictEqual($container.children().length, 1, 'The container contains an element');
 
                 monitorClick($header, status => {
                     switch (status) {
@@ -997,7 +1041,7 @@ define([
                     }
                 });
                 monitorClick($footer, status => {
-                    if (status === 'disabled') {
+                    if (status === 'disable') {
                         instance.disable();
                     } else {
                         instance.enable();

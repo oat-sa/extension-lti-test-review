@@ -291,7 +291,7 @@ define([
     });
 
     QUnit.test('render layout', assert => {
-        assert.expect(12);
+        assert.expect(13);
         const ready = assert.async();
         const $fixture = $('#fixture-render');
         const mockProxy = {
@@ -324,6 +324,7 @@ define([
                         assert.equal(areaBroker.getHeaderArea().length, 1, 'The header area exists');
                         assert.equal(areaBroker.getArea('context').length, 1, 'The context area exists');
                         assert.equal(areaBroker.getArea('contentWrapper').length, 1, 'The contentWrapper area exists');
+                        assert.equal(areaBroker.getArea('itemTool').length, 1, 'The itemTool area exists');
                         return runner.destroy();
                     })
                     .then(() => {

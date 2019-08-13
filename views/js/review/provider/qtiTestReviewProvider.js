@@ -94,6 +94,7 @@ define([
 
             return areaBrokerFactory($layout, {
                 contentWrapper: $('.content-wrapper', $layout),
+                itemTool: $('.item-tool', $layout),
                 content: $('#qti-content', $layout),
                 toolbox: $('.bottom-action-bar .tools-box', $layout),
                 navigation: $('.test-sidebar-left .navi-box', $layout),

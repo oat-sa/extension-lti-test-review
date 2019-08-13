@@ -495,7 +495,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-status');
 
-        assert.expect(65);
+        assert.expect(66);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
@@ -633,10 +633,10 @@ define([
                                 });
                             }),
                             new Promise(resolve => {
-                                instance.on('tabchange.test', () => {
-                                    assert.ok(false, 'The answer tab is already active');
+                                instance.on('tabchange.test', name => {
+                                    assert.strictEqual(name, 'answer', 'The answer tab is active');
+                                    resolve();
                                 });
-                                window.setTimeout(resolve, 200);
                             })
                         ]);
 
@@ -969,7 +969,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-informational');
 
-        assert.expect(26);
+        assert.expect(27);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
@@ -1007,10 +1007,10 @@ define([
                                 });
                             }),
                             new Promise(resolve => {
-                                instance.on('tabchange.test', () => {
-                                    assert.ok(false, 'The answer tab is already active');
+                                instance.on('tabchange.test', name => {
+                                    assert.strictEqual(name, 'answer', 'The answer tab is active');
+                                    resolve();
                                 });
-                                window.setTimeout(resolve, 200);
                             })
                         ]);
 

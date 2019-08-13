@@ -83,6 +83,17 @@ define([
     };
 
     /**
+     * Defines the tab containing student response when incorrect
+     * @type {tabConfig}
+     */
+    const informationalTab = {
+        name: 'answer',
+        label: __('Informational item'),
+        icon: 'info',
+        cls: 'informational'
+    };
+
+    /**
      * Defines tabs by status
      * @type {Object}
      */
@@ -90,8 +101,14 @@ define([
         correct: [answerCorrectTab],
         incorrect: [answerIncorrectTab, correctTab],
         skipped: [answerIncorrectTab, correctTab],
-        informational: []
+        informational: [informationalTab]
     };
+
+    /**
+     * List of possible states
+     * @type {String[]}
+     */
+    const states = ['correct', 'incorrect', 'skipped', 'informational'];
 
     /**
      * Builds a component that shows up the item status regarding the responses.
@@ -116,9 +133,12 @@ define([
      * @param {String} [config.score] - The student's score on the item
      * @returns {itemAnswerComponent}
      * @fires ready - When the component is ready to work
+     * @fires statuschange - Each time the status is changed, the status being given as parameter
+     * @fires tabchange - Each time a tab is activated, the name being given as parameter
      */
     function itemAnswerFactory(container, config) {
         let controls = null;
+        let tabName = 'answer';
 
         const api = {
             /**
@@ -136,6 +156,11 @@ define([
              */
             setScore(score) {
                 this.getConfig().score = score;
+
+                if (this.is('rendered')) {
+                    controls.$score.text(score);
+                }
+
                 return this;
             },
 
@@ -145,6 +170,34 @@ define([
              */
             getStatus() {
                 return this.getConfig().status;
+            },
+
+            /**
+             * Defines the item status
+             * @param {String} status
+             * @returns {itemAnswerComponent}
+             * @fires statuschange
+             */
+            setStatus(status) {
+                this.getConfig().status = status;
+
+                // reflect the state onto the component
+                states.forEach(state => this.setState(state, status === state));
+
+                /**
+                 * @event statuschange
+                 * @param {String} status
+                 */
+                this.trigger('statuschange', status);
+                return this;
+            },
+
+            /**
+             * Gets the name of the active tab
+             * @returns {String}
+             */
+            getActiveTab() {
+                return tabName;
             },
 
             /**
@@ -176,12 +229,7 @@ define([
              * @returns {itemAnswerComponent}
              */
             setCorrect() {
-                this.getConfig().status = 'correct';
-                this.setState('correct', true);
-                this.setState('incorrect', false);
-                this.setState('skipped', false);
-                this.setState('informational', false);
-                return this;
+                return this.setStatus('correct');
             },
 
             /**
@@ -189,12 +237,7 @@ define([
              * @returns {itemAnswerComponent}
              */
             setIncorrect() {
-                this.getConfig().status = 'incorrect';
-                this.setState('correct', false);
-                this.setState('incorrect', true);
-                this.setState('skipped', false);
-                this.setState('informational', false);
-                return this;
+                return this.setStatus('incorrect');
             },
 
             /**
@@ -202,12 +245,7 @@ define([
              * @returns {itemAnswerComponent}
              */
             setSkipped() {
-                this.getConfig().status = 'skipped';
-                this.setState('correct', false);
-                this.setState('incorrect', false);
-                this.setState('skipped', true);
-                this.setState('informational', false);
-                return this;
+                return this.setStatus('skipped');
             },
 
             /**
@@ -215,12 +253,7 @@ define([
              * @returns {itemAnswerComponent}
              */
             setInformational() {
-                this.getConfig().status = 'informational';
-                this.setState('correct', false);
-                this.setState('incorrect', false);
-                this.setState('skipped', false);
-                this.setState('informational', true);
-                return this;
+                return this.setStatus('informational');
             }
         };
 
@@ -246,6 +279,15 @@ define([
                 };
 
                 const tabs = tabsFactory(controls.$tabs)
+                    .on('tabchange', name => {
+                        tabName = name;
+
+                        /**
+                         * @event tabchange
+                         * @param {String} name
+                         */
+                        this.trigger('tabchange', name);
+                    })
                     .on('ready', () => {
                         /**
                          * @event ready
@@ -255,6 +297,7 @@ define([
                     });
 
                 this
+                    .on('statuschange', status => tabs.setTabs(tabsByStatus[status]))
                     .on('disable', () => tabs.disable())
                     .on('enable', () => tabs.enable())
                     .on('destroy', () => {

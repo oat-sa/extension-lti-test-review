@@ -24,6 +24,16 @@ $borderColor: $info;
     display: flex;
     flex-direction: column;
 
+    &.informational {
+        visibility: hidden;
+
+        .item-answer-tabs,
+        .item-answer-score,
+        .item-answer-status {
+            visibility: hidden;
+        }
+    }
+
     .item-answer-bar {
         position: relative;
         display: flex;

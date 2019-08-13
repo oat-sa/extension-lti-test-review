@@ -87,6 +87,8 @@ define([
         {title: 'getScore'},
         {title: 'setScore'},
         {title: 'getStatus'},
+        {title: 'setStatus'},
+        {title: 'getActiveTab'},
         {title: 'isCorrect'},
         {title: 'isSkipped'},
         {title: 'isInformational'},
@@ -413,7 +415,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-score');
 
-        assert.expect(13);
+        assert.expect(16);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -433,12 +435,170 @@ define([
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
 
+                assert.strictEqual($container.find('.item-answer-score').text().trim(), '', 'Not score set yet');
+
                 assert.strictEqual(instance.setScore('5/5'), instance, 'setScore() is fluent');
                 assert.strictEqual(instance.getScore(), '5/5', 'Score is set to "5/5"');
+
+                assert.strictEqual($container.find('.item-answer-score').text().trim(), '5/5', 'The score has been set');
+
                 instance.setScore('');
                 assert.strictEqual(instance.getScore(), '', 'Score is set to ""');
+                assert.strictEqual($container.find('.item-answer-score').text().trim(), '', 'The score is empty');
 
                 instance.destroy();
+            })
+            .on('destroy', ready)
+            .on('error', err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+                ready();
+            });
+    });
+
+    QUnit.test('status', assert => {
+        const ready = assert.async();
+        const $container = $('#fixture-status');
+
+        assert.expect(43);
+
+        assert.equal($container.children().length, 0, 'The container is empty');
+
+        const instance = itemAnswerFactory($container)
+            .on('init', function () {
+                assert.strictEqual(this, instance, 'The instance has been initialized');
+            })
+            .on('ready', () => {
+                assert.ok(instance.is('ready'), 'The instance is ready to work');
+
+                assert.strictEqual($container.children().length, 1, 'The container contains an element');
+                assert.strictEqual($container.children().is('.item-answer'), true, 'The container contains the expected element');
+
+                assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
+                assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
+                assert.strictEqual($container.find('.item-answer-tabs .tab-group').length, 1, 'The component has rendered the tabs bar');
+                assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
+                assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
+
+                assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
+                assert.strictEqual(instance.getActiveTab(), 'answer', 'The active tab is "answer"');
+
+                Promise
+                    .resolve()
+                    .then(() => {
+                        instance.off('.test');
+
+                        const promise = Promise.all([
+                            new Promise(resolve => {
+                                instance.on('statuschange.test', status => {
+                                    assert.strictEqual(status, 'skipped', 'The status changed to skipped');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('tabchange.test', name => {
+                                    assert.strictEqual(name, 'answer', 'The answer tab is active');
+                                    resolve();
+                                });
+                            })
+                        ]);
+
+                        assert.strictEqual(instance.setStatus('skipped'), instance, 'setStatus() is fluent');
+
+                        return promise;
+                    })
+                    .then(() => {
+                        assert.strictEqual(instance.isCorrect(), false, 'The item is not correct');
+                        assert.strictEqual(instance.isSkipped(), true, 'The item is skipped');
+                        assert.strictEqual(instance.isInformational(), false, 'The item is not informational');
+
+                        assert.strictEqual($container.children().is('.correct'), false, 'The component did not get the state correct');
+                        assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
+                        assert.strictEqual($container.children().is('.skipped'), true, 'The component got the state skipped');
+                        assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
+                    })
+                    .then(() => new Promise(resolve => {
+                        instance
+                            .off('.test')
+                            .on('tabchange.test', name => {
+                                assert.strictEqual(name, 'correct', 'The correct tab is active');
+                                resolve();
+                            });
+                        $container.find('[data-tab-name="correct"]').click();
+                    }))
+                    .then(() => {
+                        instance.off('.test');
+
+                        const promise = Promise.all([
+                            new Promise(resolve => {
+                                instance.on('statuschange.test', status => {
+                                    assert.strictEqual(status, 'correct', 'The status changed to correct');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('tabchange.test', name => {
+                                    assert.strictEqual(name, 'answer', 'The answer tab is active');
+                                    resolve();
+                                });
+                            })
+                        ]);
+
+                        assert.strictEqual(instance.setStatus('correct'), instance, 'setStatus() is fluent');
+
+                        return promise;
+                    })
+                    .then(() => {
+                        assert.strictEqual(instance.isCorrect(), true, 'The item is correct');
+                        assert.strictEqual(instance.isSkipped(), false, 'The item is not skipped');
+                        assert.strictEqual(instance.isInformational(), false, 'The item is not informational');
+
+                        assert.strictEqual($container.children().is('.correct'), true, 'The component got the state correct');
+                        assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
+                        assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
+                        assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
+                    })
+                    .then(() => {
+                        instance.off('.test');
+
+                        const promise = Promise.all([
+                            new Promise(resolve => {
+                                instance.on('statuschange.test', status => {
+                                    assert.strictEqual(status, 'incorrect', 'The status changed to incorrect');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('tabchange.test', name => {
+                                    assert.strictEqual(name, 'answer', 'The answer tab is active');
+                                    resolve();
+                                });
+                            })
+                        ]);
+
+                        assert.strictEqual(instance.setStatus('incorrect'), instance, 'setStatus() is fluent');
+
+                        return promise;
+                    })
+                    .then(() => {
+                        assert.strictEqual(instance.isCorrect(), false, 'The item is not correct');
+                        assert.strictEqual(instance.isSkipped(), false, 'The item is not skipped');
+                        assert.strictEqual(instance.isInformational(), false, 'The item is not informational');
+
+                        assert.strictEqual($container.children().is('.correct'), false, 'The component did not get the state correct');
+                        assert.strictEqual($container.children().is('.incorrect'), true, 'The component got the state incorrect');
+                        assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
+                        assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
+                    })
+                    .catch(err => {
+                        assert.pushResult({
+                            result: false,
+                            message: err
+                        });
+                    })
+                    .then(() => instance.destroy());
             })
             .on('destroy', ready)
             .on('error', err => {
@@ -454,7 +614,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-correct');
 
-        assert.expect(18);
+        assert.expect(24);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -474,17 +634,53 @@ define([
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
 
-                assert.strictEqual(instance.setCorrect(), instance, 'setCorrect() is fluent');
-                assert.strictEqual(instance.isCorrect(), true, 'The item is correct');
-                assert.strictEqual(instance.isSkipped(), false, 'The item is not skipped');
-                assert.strictEqual(instance.isInformational(), false, 'The item is not informational');
+                assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
+                assert.strictEqual(instance.getActiveTab(), 'answer', 'The active tab is "answer"');
 
-                assert.strictEqual($container.children().is('.correct'), true, 'The component got the state correct');
-                assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
-                assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
-                assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
+                Promise
+                    .resolve()
+                    .then(() => {
+                        instance.off('.test');
 
-                instance.destroy();
+                        const promise = Promise.all([
+                            new Promise(resolve => {
+                                instance.on('statuschange.test', status => {
+                                    assert.strictEqual(status, 'correct', 'The status changed to correct');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('tabchange.test', name => {
+                                    assert.strictEqual(name, 'answer', 'The answer tab is active');
+                                    resolve();
+                                });
+                            })
+                        ]);
+
+                        assert.strictEqual(instance.setCorrect(), instance, 'setCorrect() is fluent');
+
+                        return promise;
+                    })
+                    .then(() => {
+                        assert.strictEqual(instance.isCorrect(), true, 'The item is correct');
+                        assert.strictEqual(instance.isSkipped(), false, 'The item is not skipped');
+                        assert.strictEqual(instance.isInformational(), false, 'The item is not informational');
+
+                        assert.strictEqual($container.children().is('.correct'), true, 'The component got the state correct');
+                        assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
+                        assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
+                        assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
+
+                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab').length, 1, 'Only one tab should be present');
+                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
+                    })
+                    .catch(err => {
+                        assert.pushResult({
+                            result: false,
+                            message: err
+                        });
+                    })
+                    .then(() => instance.destroy());
             })
             .on('destroy', ready)
             .on('error', err => {
@@ -500,7 +696,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-incorrect');
 
-        assert.expect(18);
+        assert.expect(25);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -520,17 +716,54 @@ define([
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
 
-                assert.strictEqual(instance.setIncorrect(), instance, 'setIncorrect() is fluent');
-                assert.strictEqual(instance.isCorrect(), false, 'The item is not correct');
-                assert.strictEqual(instance.isSkipped(), false, 'The item is not skipped');
-                assert.strictEqual(instance.isInformational(), false, 'The item is not informational');
+                assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
+                assert.strictEqual(instance.getActiveTab(), 'answer', 'The active tab is "answer"');
 
-                assert.strictEqual($container.children().is('.correct'), false, 'The component did not get the state correct');
-                assert.strictEqual($container.children().is('.incorrect'), true, 'The component got the state incorrect');
-                assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
-                assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
+                Promise
+                    .resolve()
+                    .then(() => {
+                        instance.off('.test');
 
-                instance.destroy();
+                        const promise = Promise.all([
+                            new Promise(resolve => {
+                                instance.on('statuschange.test', status => {
+                                    assert.strictEqual(status, 'incorrect', 'The status changed to incorrect');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('tabchange.test', name => {
+                                    assert.strictEqual(name, 'answer', 'The answer tab is active');
+                                    resolve();
+                                });
+                            })
+                        ]);
+
+                        assert.strictEqual(instance.setIncorrect(), instance, 'setIncorrect() is fluent');
+
+                        return promise;
+                    })
+                    .then(() => {
+                        assert.strictEqual(instance.isCorrect(), false, 'The item is not correct');
+                        assert.strictEqual(instance.isSkipped(), false, 'The item is not skipped');
+                        assert.strictEqual(instance.isInformational(), false, 'The item is not informational');
+
+                        assert.strictEqual($container.children().is('.correct'), false, 'The component did not get the state correct');
+                        assert.strictEqual($container.children().is('.incorrect'), true, 'The component got the state incorrect');
+                        assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
+                        assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
+
+                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab').length, 2, 'Two tabs should be present');
+                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
+                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="correct"]').length, 1, 'The tab "correct" is set');
+                    })
+                    .catch(err => {
+                        assert.pushResult({
+                            result: false,
+                            message: err
+                        });
+                    })
+                    .then(() => instance.destroy());
             })
             .on('destroy', ready)
             .on('error', err => {
@@ -546,7 +779,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-skipped');
 
-        assert.expect(18);
+        assert.expect(25);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -566,17 +799,54 @@ define([
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
 
-                assert.strictEqual(instance.setSkipped(), instance, 'setSkipped() is fluent');
-                assert.strictEqual(instance.isCorrect(), false, 'The item is not correct');
-                assert.strictEqual(instance.isSkipped(), true, 'The item is skipped');
-                assert.strictEqual(instance.isInformational(), false, 'The item is not informational');
+                assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
+                assert.strictEqual(instance.getActiveTab(), 'answer', 'The active tab is "answer"');
 
-                assert.strictEqual($container.children().is('.correct'), false, 'The component did not get the state correct');
-                assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
-                assert.strictEqual($container.children().is('.skipped'), true, 'The component got the state skipped');
-                assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
+                Promise
+                    .resolve()
+                    .then(() => {
+                        instance.off('.test');
 
-                instance.destroy();
+                        const promise = Promise.all([
+                            new Promise(resolve => {
+                                instance.on('statuschange.test', status => {
+                                    assert.strictEqual(status, 'skipped', 'The status changed to skipped');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('tabchange.test', name => {
+                                    assert.strictEqual(name, 'answer', 'The answer tab is active');
+                                    resolve();
+                                });
+                            })
+                        ]);
+
+                        assert.strictEqual(instance.setSkipped(), instance, 'setSkipped() is fluent');
+
+                        return promise;
+                    })
+                    .then(() => {
+                        assert.strictEqual(instance.isCorrect(), false, 'The item is not correct');
+                        assert.strictEqual(instance.isSkipped(), true, 'The item is skipped');
+                        assert.strictEqual(instance.isInformational(), false, 'The item is not informational');
+
+                        assert.strictEqual($container.children().is('.correct'), false, 'The component did not get the state correct');
+                        assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
+                        assert.strictEqual($container.children().is('.skipped'), true, 'The component got the state skipped');
+                        assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
+
+                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab').length, 2, 'Two tabs should be present');
+                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
+                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="correct"]').length, 1, 'The tab "correct" is set');
+                    })
+                    .catch(err => {
+                        assert.pushResult({
+                            result: false,
+                            message: err
+                        });
+                    })
+                    .then(() => instance.destroy());
             })
             .on('destroy', ready)
             .on('error', err => {
@@ -592,7 +862,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-informational');
 
-        assert.expect(18);
+        assert.expect(24);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -612,17 +882,53 @@ define([
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
 
-                assert.strictEqual(instance.setInformational(), instance, 'setInformational() is fluent');
-                assert.strictEqual(instance.isCorrect(), false, 'The item is not correct');
-                assert.strictEqual(instance.isSkipped(), false, 'The item is not skipped');
-                assert.strictEqual(instance.isInformational(), true, 'The item is informational');
+                assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
+                assert.strictEqual(instance.getActiveTab(), 'answer', 'The active tab is "answer"');
 
-                assert.strictEqual($container.children().is('.correct'), false, 'The component did not get the state correct');
-                assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
-                assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
-                assert.strictEqual($container.children().is('.informational'), true, 'The component got the state informational');
+                Promise
+                    .resolve()
+                    .then(() => {
+                        instance.off('.test');
 
-                instance.destroy();
+                        const promise = Promise.all([
+                            new Promise(resolve => {
+                                instance.on('statuschange.test', status => {
+                                    assert.strictEqual(status, 'informational', 'The status changed to informational');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('tabchange.test', name => {
+                                    assert.strictEqual(name, 'answer', 'The answer tab is active');
+                                    resolve();
+                                });
+                            })
+                        ]);
+
+                        assert.strictEqual(instance.setInformational(), instance, 'setInformational() is fluent');
+
+                        return promise;
+                    })
+                    .then(() => {
+                        assert.strictEqual(instance.isCorrect(), false, 'The item is not correct');
+                        assert.strictEqual(instance.isSkipped(), false, 'The item is not skipped');
+                        assert.strictEqual(instance.isInformational(), true, 'The item is informational');
+
+                        assert.strictEqual($container.children().is('.correct'), false, 'The component did not get the state correct');
+                        assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
+                        assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
+                        assert.strictEqual($container.children().is('.informational'), true, 'The component got the state informational');
+
+                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab').length, 1, 'Only one tab should be present');
+                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
+                    })
+                    .catch(err => {
+                        assert.pushResult({
+                            result: false,
+                            message: err
+                        });
+                    })
+                    .then(() => instance.destroy());
             })
             .on('destroy', ready)
             .on('error', err => {
@@ -702,6 +1008,9 @@ define([
                 activateFirst($footer);
 
                 ready();
+            })
+            .on('statuschange tabchange', () => {
+                $item.html(`<h1>Item status: ${instance.getStatus()} / ${instance.getActiveTab()}</h1>`);
             })
             .on('error', err => {
                 assert.pushResult({

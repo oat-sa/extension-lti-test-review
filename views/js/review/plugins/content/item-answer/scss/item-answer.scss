@@ -17,51 +17,151 @@
  */
 @import "inc/bootstrap";
 
+$focusSpace: 5px;
 $borderWidth: 2px;
 $borderColor: $info;
+$backgroundColor: $uiGeneralContentBg;
+$skippedColor: blacken($error, .2);
+$tabTextColor: $textColor;
+$tabBackgroundColor: $canvas;
+$activeTabTextColor: $textColor;
+$activeTabBackgroundColor: $uiGeneralContentBg;
+$correctColor: blacken($success, .2);
+$incorrectColor: blacken($error, .2);
+
 .item-answer {
     position: relative;
     display: flex;
     flex-direction: column;
+    background-color: $backgroundColor;
 
     &.informational {
         visibility: hidden;
-
-        .item-answer-tabs,
-        .item-answer-score,
-        .item-answer-status {
-            visibility: hidden;
-        }
     }
 
     .item-answer-bar {
         position: relative;
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
-
-        border-bottom: $borderWidth solid $borderColor;
+        align-content: stretch;
+        align-items: flex-end;
+        height: 44px;
     }
     .item-answer-tabs {
         position: relative;
+        flex: 0 0 auto;
+        height: 100%;
 
-        /**/border: 1px solid black;
-        /**/height: 44px;
-        /**/width: 300px;
+        .answer-tabs {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: inline-flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            height: 100%;
+
+            .tab {
+                border-top: $borderWidth solid $backgroundColor;
+                border-bottom: $borderWidth solid $borderColor;
+                padding: 0;
+                margin: 0;
+                height: 100%;
+
+                .action {
+                    border-radius: 0;
+                    padding: 5px 15px;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    display: flex;
+                    align-items: center;
+                    height: 100%;
+                    min-width: 200px;
+
+                    background-color: $tabBackgroundColor;
+                    color: $tabTextColor;
+                    text-shadow: none;
+
+                    .icon {
+                        display: inline-block;
+                        font-size: 2.5rem;
+                        font-weight: bold;
+                        padding: 0;
+                    }
+                    .label {
+                        padding-top: 5px;
+                        display: inline-block;
+                        text-align: center;
+                        flex: 1 1 auto;
+                    }
+                }
+
+                &.active {
+                    border: $borderWidth solid $borderColor;
+                    border-bottom: 0 none;
+
+                    &:last-child:first-child {
+                        border: 0 none;
+                        border-top: $borderWidth solid $backgroundColor;
+                        border-bottom: $borderWidth solid $borderColor;
+                    }
+
+                    .action {
+                        color: $activeTabTextColor;
+                        background-color: $activeTabBackgroundColor;
+                    }
+                }
+            }
+        }
     }
+
     .item-answer-score {
         position: relative;
-
-        /**/border: 1px solid black;
-        /**/height: 44px;
-        /**/width: 300px;
+        flex: 1 0 auto;
+        text-align: right;
+        font-weight: bold;
+        padding: 10px 5px;
+        border-bottom: $borderWidth solid $borderColor;
     }
+
     .item-answer-status {
         position: relative;
         height: 32px;
         line-height: 20px;
-
-        /**/border: 1px solid black;
+        font-weight: bold;
+        padding-top: 10px;
     }
 
+    &.correct {
+        .icon {
+            color: $correctColor;
+        }
+    }
+
+    &.incorrect,
+    &.skipped {
+        .icon {
+            color: $incorrectColor;
+        }
+    }
+
+    &.skipped {
+        .item-answer-status {
+            text-transform: uppercase;
+            color: $skippedColor;
+        }
+    }
+
+    :focus {
+        outline: 0 none;
+    }
+    &:not(.disabled) {
+        .navigable {
+            position: relative;
+            &:focus {
+                outline: $borderWidth dashed $textColor;
+                outline-offset: -$focusSpace;
+            }
+        }
+    }
 }

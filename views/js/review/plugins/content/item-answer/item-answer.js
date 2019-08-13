@@ -25,6 +25,7 @@ define([
     'ui/tabs',
     'util/capitalize',
     'tpl!taoReview/review/plugins/content/item-answer/tpl/item-answer',
+    'tpl!taoReview/review/plugins/content/item-answer/tpl/answer-tabs',
     'css!taoReview/review/plugins/content/item-answer/css/item-answer'
 ], function (
     _,
@@ -32,13 +33,15 @@ define([
     componentFactory,
     tabsFactory,
     capitalize,
-    componentTpl
+    itemAnswerTpl,
+    answerTabsTpl
 ) {
     'use strict';
 
     /**
      * @typedef {Object} itemAnswerConfig - The config for the item answer component.
      * @property {String} [skippedText] - The text displayed when the item has the status "skipped"
+     * @property {String} [scoreText] - The text displayed to introduce the score
      * @property {String} [status] - The status of the item from the list ['correct', 'incorrect', 'skipped', 'informational']
      * @property {String} [score] - The student's score on the item
      */
@@ -49,6 +52,7 @@ define([
      */
     const defaults = {
         skippedText: __('No response'),
+        scoreText: __('Your Score:'),
         status: 'informational',
         score: ''
     };
@@ -132,6 +136,7 @@ define([
      * @param {HTMLElement|String} container
      * @param {itemAnswerConfig} config - The config for the item answer component.
      * @param {String} [config.skippedText] - The text displayed when the item has the status "skipped"
+     * @param {String} [config.scoreText] - The text displayed to introduce the score
      * @param {String} [config.status] - The status of the item from the list ['correct', 'incorrect', 'skipped', 'informational']
      * @param {String} [config.score] - The student's score on the item
      * @returns {itemAnswerComponent}
@@ -158,10 +163,17 @@ define([
              * @returns {itemAnswerComponent}
              */
             setScore(score) {
-                this.getConfig().score = score;
+                if (!score && 'number' !== typeof score) {
+                    score = '';
+                }
+                this.getConfig().score = `${score}`;
 
                 if (this.is('rendered')) {
-                    controls.$score.text(score);
+                    let scoreText = '';
+                    if (score) {
+                        scoreText = `${this.getConfig().scoreText} ${this.getConfig().score}`;
+                    }
+                    controls.$score.text(scoreText);
                 }
 
                 return this;
@@ -265,7 +277,7 @@ define([
          */
         const itemAnswer = componentFactory(api, defaults)
             // set the component's layout
-            .setTemplate(componentTpl)
+            .setTemplate(itemAnswerTpl)
 
             // auto render on init
             .on('init', function onItemAnswerInit() {
@@ -285,6 +297,7 @@ define([
                     activeTab: this.getActiveTab(),
                     tabs: tabsByStatus[this.getStatus()]
                 })
+                    .setTemplate(answerTabsTpl)
                     .on('tabchange', name => {
                         tabName = name;
 

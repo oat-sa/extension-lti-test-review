@@ -222,7 +222,7 @@ define([
 
                 assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
                 assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
-                assert.strictEqual($container.find('.item-answer-tabs .tab-group').length, 1, 'The component has rendered the tabs bar');
+                assert.strictEqual($container.find('.item-answer-tabs .answer-tabs').length, 1, 'The component has rendered the tabs bar');
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
 
@@ -256,7 +256,7 @@ define([
 
                 assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
                 assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
-                assert.strictEqual($container.find('.item-answer-tabs .tab-group').length, 1, 'The component has rendered the tabs bar');
+                assert.strictEqual($container.find('.item-answer-tabs .answer-tabs').length, 1, 'The component has rendered the tabs bar');
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
 
@@ -326,7 +326,7 @@ define([
 
                 assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
                 assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
-                assert.strictEqual($container.find('.item-answer-tabs .tab-group').length, 1, 'The component has rendered the tabs bar');
+                assert.strictEqual($container.find('.item-answer-tabs .answer-tabs').length, 1, 'The component has rendered the tabs bar');
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
 
@@ -445,12 +445,14 @@ define([
     QUnit.test('score', assert => {
         const ready = assert.async();
         const $container = $('#fixture-score');
+        const scoreText = 'score:';
+        const score = '5/5';
 
         assert.expect(16);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
-        const instance = itemAnswerFactory($container)
+        const instance = itemAnswerFactory($container, {scoreText})
             .on('init', function () {
                 assert.strictEqual(this, instance, 'The instance has been initialized');
             })
@@ -462,16 +464,16 @@ define([
 
                 assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
                 assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
-                assert.strictEqual($container.find('.item-answer-tabs .tab-group').length, 1, 'The component has rendered the tabs bar');
+                assert.strictEqual($container.find('.item-answer-tabs .answer-tabs').length, 1, 'The component has rendered the tabs bar');
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
 
                 assert.strictEqual($container.find('.item-answer-score').text().trim(), '', 'Not score set yet');
 
-                assert.strictEqual(instance.setScore('5/5'), instance, 'setScore() is fluent');
-                assert.strictEqual(instance.getScore(), '5/5', 'Score is set to "5/5"');
+                assert.strictEqual(instance.setScore(score), instance, 'setScore() is fluent');
+                assert.strictEqual(instance.getScore(), score, `Score is set to "${score}"`);
 
-                assert.strictEqual($container.find('.item-answer-score').text().trim(), '5/5', 'The score has been set');
+                assert.strictEqual($container.find('.item-answer-score').text().trim(), `${scoreText} ${score}`, 'The score has been set');
 
                 instance.setScore('');
                 assert.strictEqual(instance.getScore(), '', 'Score is set to ""');
@@ -509,7 +511,7 @@ define([
 
                 assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
                 assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
-                assert.strictEqual($container.find('.item-answer-tabs .tab-group').length, 1, 'The component has rendered the tabs bar');
+                assert.strictEqual($container.find('.item-answer-tabs .answer-tabs').length, 1, 'The component has rendered the tabs bar');
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
 
@@ -665,7 +667,7 @@ define([
 
                 assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
                 assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
-                assert.strictEqual($container.find('.item-answer-tabs .tab-group').length, 1, 'The component has rendered the tabs bar');
+                assert.strictEqual($container.find('.item-answer-tabs .answer-tabs').length, 1, 'The component has rendered the tabs bar');
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
                 assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
@@ -708,8 +710,8 @@ define([
                         assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
                         assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
 
-                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab').length, 1, 'Only one tab should be present');
-                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
                     })
                     .catch(err => {
                         assert.pushResult({
@@ -749,7 +751,7 @@ define([
 
                 assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
                 assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
-                assert.strictEqual($container.find('.item-answer-tabs .tab-group').length, 1, 'The component has rendered the tabs bar');
+                assert.strictEqual($container.find('.item-answer-tabs .answer-tabs').length, 1, 'The component has rendered the tabs bar');
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
                 assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
@@ -792,9 +794,9 @@ define([
                         assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
                         assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
 
-                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab').length, 2, 'Two tabs should be present');
-                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
-                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="correct"]').length, 1, 'The tab "correct" is set');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 2, 'Two tabs should be present');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="correct"]').length, 1, 'The tab "correct" is set');
                     })
                     .catch(err => {
                         assert.pushResult({
@@ -835,7 +837,7 @@ define([
 
                 assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
                 assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
-                assert.strictEqual($container.find('.item-answer-tabs .tab-group').length, 1, 'The component has rendered the tabs bar');
+                assert.strictEqual($container.find('.item-answer-tabs .answer-tabs').length, 1, 'The component has rendered the tabs bar');
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
                 assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
@@ -878,9 +880,9 @@ define([
                         assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
                         assert.strictEqual($container.find('.item-answer-status').text().trim(), skippedText, 'The status area is not empty');
 
-                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab').length, 2, 'Two tabs should be present');
-                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
-                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="correct"]').length, 1, 'The tab "correct" is set');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 2, 'Two tabs should be present');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="correct"]').length, 1, 'The tab "correct" is set');
                     })
                     .catch(err => {
                         assert.pushResult({
@@ -920,7 +922,7 @@ define([
 
                 assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
                 assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
-                assert.strictEqual($container.find('.item-answer-tabs .tab-group').length, 1, 'The component has rendered the tabs bar');
+                assert.strictEqual($container.find('.item-answer-tabs .answer-tabs').length, 1, 'The component has rendered the tabs bar');
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
                 assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
@@ -963,8 +965,8 @@ define([
                         assert.strictEqual($container.children().is('.informational'), true, 'The component got the state informational');
                         assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
 
-                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab').length, 1, 'Only one tab should be present');
-                        assert.strictEqual($container.find('.item-answer-tabs .tab-group .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
                     })
                     .catch(err => {
                         assert.pushResult({

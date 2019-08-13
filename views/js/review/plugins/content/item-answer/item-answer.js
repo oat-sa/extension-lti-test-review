@@ -194,6 +194,7 @@ define([
              * @fires statuschange
              */
             setStatus(status) {
+                const change = this.getConfig().status !== status;
                 this.getConfig().status = status;
 
                 // reflect the state onto the component
@@ -201,9 +202,10 @@ define([
 
                 /**
                  * @event statuschange
-                 * @param {String} status
+                 * @param {String} status - The new status
+                 * @param {Boolean} change - If the status actually changed or not
                  */
-                this.trigger('statuschange', status);
+                this.trigger('statuschange', status, change);
                 return this;
             },
 
@@ -316,13 +318,15 @@ define([
                     });
 
                 this
-                    .on('statuschange', status => {
-                        tabs.setTabs(tabsByStatus[status]);
-                        if (this.is('disabled')) {
-                            tabs.disable();
-                        }
+                    .on('statuschange', (status, change) => {
+                        if (change) {
+                            tabs.setTabs(tabsByStatus[status]);
+                            if (this.is('disabled')) {
+                                tabs.disable();
+                            }
 
-                        controls.$status.text(status === 'skipped' ? this.getConfig().skippedText : '');
+                            controls.$status.text(status === 'skipped' ? this.getConfig().skippedText : '');
+                        }
                     })
                     .on('disable', () => tabs.disable())
                     .on('enable', () => tabs.enable())

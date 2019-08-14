@@ -100,14 +100,24 @@ define([
     };
 
     /**
+     * Defines possible sets of tabs
+     * @type {Object}
+     */
+    const tabsSets = {
+        correct: [answerCorrectTab],
+        incorrect: [answerIncorrectTab, correctTab],
+        informational: [informationalTab]
+    };
+
+    /**
      * Defines tabs by status
      * @type {Object}
      */
     const tabsByStatus = {
-        correct: [answerCorrectTab],
-        incorrect: [answerIncorrectTab, correctTab],
-        skipped: [answerIncorrectTab, correctTab],
-        informational: [informationalTab]
+        correct: tabsSets.correct,
+        incorrect: tabsSets.incorrect,
+        skipped: tabsSets.incorrect,
+        informational: tabsSets.informational
     };
 
     /**
@@ -146,7 +156,7 @@ define([
      */
     function itemAnswerFactory(container, config) {
         let controls = null;
-        let tabName = 'answer';
+        let activeTab = 'answer';
 
         const api = {
             /**
@@ -194,6 +204,7 @@ define([
              * @fires statuschange
              */
             setStatus(status) {
+                const change = this.getConfig().status !== status;
                 this.getConfig().status = status;
 
                 // reflect the state onto the component
@@ -201,9 +212,10 @@ define([
 
                 /**
                  * @event statuschange
-                 * @param {String} status
+                 * @param {String} status - The new status
+                 * @param {Boolean} change - If the status actually changed or not
                  */
-                this.trigger('statuschange', status);
+                this.trigger('statuschange', status, change);
                 return this;
             },
 
@@ -212,7 +224,7 @@ define([
              * @returns {String}
              */
             getActiveTab() {
-                return tabName;
+                return activeTab;
             },
 
             /**
@@ -293,13 +305,18 @@ define([
                     $status: this.getElement().find('.item-answer-status')
                 };
 
-                const tabs = tabsFactory(controls.$tabs, {
-                    activeTab: this.getActiveTab(),
-                    tabs: tabsByStatus[this.getStatus()]
-                })
+                let tabs = tabsByStatus[this.getStatus()];
+                const tabsComponent = tabsFactory(controls.$tabs, {activeTab, tabs})
                     .setTemplate(answerTabsTpl)
                     .on('tabchange', name => {
-                        tabName = name;
+                        activeTab = name;
+
+                        // status based on status and tab
+                        if (name === 'answer' && this.getStatus() === 'skipped') {
+                            controls.$status.text(this.getConfig().skippedText);
+                        } else {
+                            controls.$status.text('');
+                        }
 
                         /**
                          * @event tabchange
@@ -316,18 +333,22 @@ define([
                     });
 
                 this
-                    .on('statuschange', status => {
-                        tabs.setTabs(tabsByStatus[status]);
-                        if (this.is('disabled')) {
-                            tabs.disable();
+                    .on('statuschange', (status, change) => {
+                        if (change && tabs !== tabsByStatus[status]) {
+                            tabs = tabsByStatus[status];
+                            tabsComponent.setTabs(tabs);
+                            if (this.is('disabled')) {
+                                tabsComponent.disable();
+                            }
+                        } else {
+                            // make sure the tabchange is always triggered
+                            tabsComponent.trigger('tabchange', this.getActiveTab());
                         }
-
-                        controls.$status.text(status === 'skipped' ? this.getConfig().skippedText : '');
                     })
-                    .on('disable', () => tabs.disable())
-                    .on('enable', () => tabs.enable())
+                    .on('disable', () => tabsComponent.disable())
+                    .on('enable', () => tabsComponent.enable())
                     .on('destroy', () => {
-                        tabs.destroy();
+                        tabsComponent.destroy();
                     });
 
                 // make sure the status is properly set on init

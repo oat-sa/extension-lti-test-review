@@ -26,6 +26,7 @@ define([
     'json!taoReview/test/mocks/item-1.json',
     'json!taoReview/test/mocks/item-2.json',
     'json!taoReview/test/mocks/item-3.json',
+    'json!taoReview/test/mocks/item-4.json',
     'json!taoReview/test/mocks/testData.json',
     'json!taoReview/test/mocks/testContext.json',
     'json!taoReview/test/mocks/testMap.json',
@@ -39,6 +40,7 @@ define([
     itemData1,
     itemData2,
     itemData3,
+    itemData4,
     testData,
     testContext,
     testMap,
@@ -102,6 +104,18 @@ define([
             content: {
                 type: 'qti',
                 data: itemData3
+            },
+            baseUrl: '',
+            state: {}
+        }
+    });
+    $.mockjax({
+        url: '/getItem*item-4',
+        responseText: {
+            success: true,
+            content: {
+                type: 'qti',
+                data: itemData4
             },
             baseUrl: '',
             state: {}
@@ -216,7 +230,7 @@ define([
 
     QUnit.test('Navigation', assert => {
         const ready = assert.async();
-        assert.expect(17);
+        assert.expect(20);
         reviewFactory('#fixture-navigation', componentConfig)
             .on('ready', runner => {
                 const areaBroker = runner.getAreaBroker();
@@ -264,6 +278,24 @@ define([
                             .off('.test')
                             .after('renderitem.test', itemRef => {
                                 assert.equal(itemRef, 'item-3', 'Item "item-3" is rendered');
+                                assert.equal($prevButton.is(':disabled'), false, 'The prevButton is still enabled');
+                                resolve();
+                            });
+                    }))
+                    .then(() => new Promise(resolve => {
+                        runner
+                            .off('.test')
+                            .after('move.test', direction => {
+                                assert.equal(direction, 'next', 'The move with direction === next is submitted');
+                                resolve();
+                            });
+                        $nextButton.click();
+                    }))
+                    .then(() => new Promise(resolve => {
+                        runner
+                            .off('.test')
+                            .after('renderitem.test', itemRef => {
+                                assert.equal(itemRef, 'item-4', 'Item "item-4" is rendered');
                                 assert.equal($nextButton.is(':disabled'), true, 'The nextButton has been disabled');
                                 resolve();
                             });
@@ -281,7 +313,7 @@ define([
                         runner
                             .off('.test')
                             .after('renderitem.test', itemRef => {
-                                assert.equal(itemRef, 'item-2', 'Item "item-2" is rendered');
+                                assert.equal(itemRef, 'item-3', 'Item "item-3" is rendered');
                                 assert.equal($nextButton.is(':disabled'), false, 'The nextButton has been enabled');
                                 assert.equal($prevButton.is(':disabled'), false, 'The prevButton has been enabled');
                                 resolve();
@@ -300,7 +332,7 @@ define([
                         runner
                             .off('.test')
                             .after('renderitem.test', itemRef => {
-                                assert.equal(itemRef, 'item-1', 'Item "item-1" is rendered');
+                                assert.equal(itemRef, 'item-2', 'Item "item-2" is rendered');
                                 resolve();
                             });
                     }))

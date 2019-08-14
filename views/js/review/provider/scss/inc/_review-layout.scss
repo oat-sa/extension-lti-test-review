@@ -53,8 +53,20 @@ $sidePanelBorderWidth: 1px;
     .content-wrapper {
         position: relative;
         flex: 1 1 0;
-        overflow: auto;
-        padding: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 30px 0 0 30px;
+
+        .item-tool {
+            flex: 0 0 auto;
+        }
+
+        .item-content {
+            flex: 1 1 auto;
+            overflow: auto;
+            width: 100%;
+        }
 
         .overlay {
             position: absolute;
@@ -72,7 +84,7 @@ $sidePanelBorderWidth: 1px;
         }
     }
 
-    #qti-content {
+    #qti-content, .item-tool {
         -webkit-overflow-scrolling: touch;
         margin: auto;
         max-width: map-get($widths, item-max-width) * 1px;
@@ -87,7 +99,7 @@ $sidePanelBorderWidth: 1px;
     }
 
     .qti-item {
-        padding: 30px;
+        padding: 0 0 30px 0;
     }
 
     .size-wrapper {

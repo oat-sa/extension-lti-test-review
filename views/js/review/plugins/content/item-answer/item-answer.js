@@ -311,6 +311,13 @@ define([
                     .on('tabchange', name => {
                         activeTab = name;
 
+                        // status based on status and tab
+                        if (name === 'answer' && this.getStatus() === 'skipped') {
+                            controls.$status.text(this.getConfig().skippedText);
+                        } else {
+                            controls.$status.text('');
+                        }
+
                         /**
                          * @event tabchange
                          * @param {String} name
@@ -336,10 +343,6 @@ define([
                         } else {
                             // make sure the tabchange is always triggered
                             tabsComponent.trigger('tabchange', this.getActiveTab());
-
-                        }
-                        if (change) {
-                            controls.$status.text(status === 'skipped' ? this.getConfig().skippedText : '');
                         }
                     })
                     .on('disable', () => tabsComponent.disable())

@@ -495,7 +495,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-status');
 
-        assert.expect(66);
+        assert.expect(67);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
@@ -566,6 +566,8 @@ define([
                     }))
                     .then(() => {
                         instance.off('.test');
+
+                        assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
 
                         const promise = Promise.all([
                             new Promise(resolve => {

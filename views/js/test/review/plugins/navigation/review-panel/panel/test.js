@@ -50,7 +50,7 @@ define([
     };
     const defaultFooter = {
         label: __('TOTAL'),
-        score: '0/0'
+        score: '0'
     };
     const defaultFilters = [{
         id: 'all',

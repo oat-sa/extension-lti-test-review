@@ -601,7 +601,7 @@ define([
                 if (footerLabel) {
                     initConfig.footer = {
                         label: footerLabel,
-                        score: '0/0'
+                        score: '0'
                     };
                 }
 

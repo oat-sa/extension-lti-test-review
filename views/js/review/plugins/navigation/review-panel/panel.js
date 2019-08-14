@@ -32,30 +32,13 @@ define([
     'use strict';
 
     /**
-     * @typedef {Object} reviewPanelElement
-     * @property {String} id - The element identifier
-     * @property {String} label - The displayed label
+     * @typedef {mapEntry} reviewPanelSection
+     * @property {mapEntry[]} items - The list of items contained in the section
      */
 
     /**
-     * @typedef {reviewPanelElement} reviewPanelItem
-     * @property {Number} position - The position of the item within the test
-     * @property {Number} score - The test taker's score for this item
-     * @property {Number} maxScore - The max possible score for this item
-     */
-
-    /**
-     * @typedef {reviewPanelElement} reviewPanelSection
-     * @property {reviewPanelItem[]} items - The list of items contained in the section
-     * @property {Number} score - The test taker's score for this item
-     * @property {Number} maxScore - The max possible score for this item
-     */
-
-    /**
-     * @typedef {reviewPanelElement} reviewPanelPart
+     * @typedef {mapEntry} reviewPanelPart
      * @property {reviewPanelSection[]} sections - The list of sections contained in the test part
-     * @property {Number} score - The test taker's score for this item
-     * @property {Number} maxScore - The max possible score for this item
      */
 
     /**
@@ -74,7 +57,7 @@ define([
      */
 
     /**
-     * @typedef {reviewPanelElement} reviewPanelFilter
+     * @typedef {mapEntry} reviewPanelFilter
      * @property {String} title - The tooltip displayed on mouse over
      * @property {Function<item, section, part>} [filter] - A callback function applied to filter the data
      */
@@ -95,7 +78,7 @@ define([
             label: __('Incorrect'),
             title: __('Show incorrect items only'),
             filter(item) {
-                return item.score !== item.maxScore;
+                return !item.informational && (!item.maxScore || item.score !== item.maxScore);
             }
         }]
     };
@@ -147,10 +130,13 @@ define([
 
     /**
      * Gets the icon class for a particular item
-     * @param {reviewPanelItem} item
+     * @param {mapEntry} item
      * @returns {String}
      */
     const getItemIconCls = item => {
+        if (item.informational) {
+            return 'item-info';
+        }
         if (item.maxScore) {
             if (item.score === item.maxScore) {
                 return 'item-correct';
@@ -158,7 +144,7 @@ define([
                 return 'item-incorrect';
             }
         }
-        return 'item-info';
+        return 'item-default';
     };
 
     /**
@@ -556,16 +542,24 @@ define([
              */
             update() {
                 if (this.is('rendered')) {
-                    let filteredData;
+                    let filteredData, scorePercent, scoreText;
                     if (data.score !== data.maxScore) {
                         filteredData = filterData(map, activeFilter && activeFilter.filter);
                     } else {
                         filteredData = data;
                     }
 
+                    if (filteredData.maxScore) {
+                        scoreText = `${filteredData.score}/${filteredData.maxScore}`;
+                        scorePercent = `${Math.floor(100 * filteredData.score / filteredData.maxScore) || 0}%`;
+                    } else {
+                        scoreText = `${filteredData.score}`;
+                        scorePercent = '0%';
+                    }
+
                     controls.$content.html(listTpl(filteredData.testMap));
-                    controls.$headerScore.text(`${Math.floor(100 * filteredData.score / filteredData.maxScore) || 0}%`);
-                    controls.$footerScore.text(`${filteredData.score}/${filteredData.maxScore}`);
+                    controls.$headerScore.text(scorePercent);
+                    controls.$footerScore.text(scoreText);
                     hider.toggle(controls.$filters, filteredData.score !== filteredData.maxScore);
 
                     if (!this.is('disabled')) {
@@ -607,7 +601,7 @@ define([
                 if (footerLabel) {
                     initConfig.footer = {
                         label: footerLabel,
-                        score: '0/0'
+                        score: '0'
                     };
                 }
 

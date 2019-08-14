@@ -21,6 +21,7 @@
  */
 define([
     'jquery',
+    'i18n',
     'taoReview/review/component/qtiTestReviewComponent',
     'taoReview/review/plugins/content/item-answer/plugin',
     'json!taoReview/test/mocks/item-1.json',
@@ -35,6 +36,7 @@ define([
     'css!taoReview/review/provider/css/qtiTestReviewProvider'
 ], function (
     $,
+    __,
     reviewFactory,
     pluginFactory,
     itemData1,
@@ -248,6 +250,123 @@ define([
     });
 
     QUnit.module('behavior');
+
+    QUnit.test('status', assert => {
+        const ready = assert.async();
+        assert.expect(47);
+
+        reviewFactory('#fixture-status', componentConfig)
+            .on('ready', runner => {
+                const areaBroker = runner.getAreaBroker();
+                const plugin = runner.getPlugin('item-answer');
+                const $container = areaBroker.getArea('itemTool');
+                const $item = areaBroker.getContentArea();
+
+                assert.strictEqual($container.find('.item-answer').length, 1, 'The itemAnswer component has been rendered');
+                assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
+                assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
+                assert.strictEqual($container.find('.item-answer-tabs .answer-tabs').length, 1, 'The component has rendered the tabs bar');
+                assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
+                assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
+
+                Promise.resolve()
+                    .then(() => new Promise(resolve => {
+                        runner
+                            .off('.test')
+                            .on('renderitem.test', itemRef => {
+                                assert.strictEqual(itemRef, 'item-1', 'The first item is rendered');
+                                resolve();
+                            });
+                    }))
+                    .then(() => {
+                        assert.strictEqual($container.find('.item-answer').is('.correct'), true, 'The component is set to "correct"');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
+                        assert.strictEqual($container.find('.item-answer-score').text().trim(), `${__('Your Score:')} 1/1`, 'The score is set');
+                        assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status is empty');
+
+                        assert.strictEqual($item.find('[data-identifier="choice_1"]').is('.user-selected'), false, 'Choice #1 is not checked');
+                        assert.strictEqual($item.find('[data-identifier="choice_2"]').is('.user-selected'), true, 'Choice #2 is checked');
+                        assert.strictEqual($item.find('[data-identifier="choice_3"]').is('.user-selected'), false, 'Choice #3 is not checked');
+                    })
+                    .then(() => new Promise(resolve => {
+                        runner
+                            .off('.test')
+                            .on('renderitem.test', itemRef => {
+                                assert.strictEqual(itemRef, 'item-2', 'The second item is rendered');
+                                resolve();
+                            })
+                            .next();
+                    }))
+                    .then(() => {
+                        assert.strictEqual($container.find('.item-answer').is('.skipped'), true, 'The component is set to "skipped"');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 2, 'Two one tabs should be present');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
+                        assert.strictEqual($container.find('.item-answer-score').text().trim(), `${__('Your Score:')} 0/1`, 'The score is set');
+                        assert.strictEqual($container.find('.item-answer-status').text().trim(), __('No response'), 'The status is set');
+
+                        assert.strictEqual($item.find('.choice-area [data-identifier="choice_1"]').length, 1, 'Choice #1 is not selected');
+                        assert.strictEqual($item.find('.choice-area [data-identifier="choice_3"]').length, 1, 'Choice #3 is not selected');
+                        assert.strictEqual($item.find('.result-area [data-identifier="choice_2"]').length, 1, 'Choice #2 is selected');
+                        assert.strictEqual($item.find('.result-area [data-identifier="choice_4"]').length, 1, 'Choice #4 is selected');
+
+                        $container.find('.item-answer .tab[data-tab-name="correct"] .action').click();
+                    })
+                    .then(() => {
+                        assert.strictEqual($item.find('.result-area [data-identifier="choice_1"]').length, 1, 'Choice #1 is selected');
+                        assert.strictEqual($item.find('.choice-area [data-identifier="choice_2"]').length, 1, 'Choice #2 is not selected');
+                        assert.strictEqual($item.find('.choice-area [data-identifier="choice_3"]').length, 1, 'Choice #3 is not selected');
+                        assert.strictEqual($item.find('.choice-area [data-identifier="choice_4"]').length, 1, 'Choice #4 is not selected');
+                    })
+                    .then(() => new Promise(resolve => {
+                        runner
+                            .off('.test')
+                            .on('renderitem.test', itemRef => {
+                                assert.strictEqual(itemRef, 'item-3', 'The third item is rendered');
+                                resolve();
+                            })
+                            .next();
+                    }))
+                    .then(() => {
+                        assert.strictEqual($container.find('.item-answer').is('.incorrect'), true, 'The component is set to "incorrect"');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 2, 'Two one tabs should be present');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
+                        assert.strictEqual($container.find('.item-answer-score').text().trim(), `${__('Your Score:')} 0/1`, 'The score is set');
+                        assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status is empty');
+                    })
+                    .then(() => new Promise(resolve => {
+                        runner
+                            .off('.test')
+                            .on('renderitem.test', itemRef => {
+                                assert.strictEqual(itemRef, 'item-4', 'The fourth item is rendered');
+                                resolve();
+                            })
+                            .next();
+                    }))
+                    .then(() => {
+                        assert.strictEqual($container.find('.item-answer').is('.informational'), true, 'The component is set to "informational"');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
+                        assert.strictEqual($container.find('.item-answer-score').text().trim(), `${__('Your Score:')} 0/0`, 'The score is set');
+                        assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status is empty');
+                    })
+                    .then(() => plugin.destroy())
+                    .then(() => {
+                        assert.strictEqual($container.find('.item-answer').length, 0, 'The itemAnswer component has been removed');
+                        assert.strictEqual($container.find('.item-answer-bar').length, 0, 'The component has removed the bar');
+                        assert.strictEqual($container.find('.item-answer-tabs').length, 0, 'The component has removed the tabs area');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs').length, 0, 'The component has removed the tabs bar');
+                        assert.strictEqual($container.find('.item-answer-score').length, 0, 'The component has removed the score area');
+                        assert.strictEqual($container.find('.item-answer-status').length, 0, 'The component has removed the status area');
+                        runner.destroy();
+                    })
+                    .catch(err => {
+                        assert.ok(false, `Error in init method: ${err.message}`);
+                        runner.destroy();
+                    });
+            })
+            .on('destroy', ready);
+    });
 
 
     QUnit.module('Visual');

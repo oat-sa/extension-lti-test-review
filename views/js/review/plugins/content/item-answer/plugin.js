@@ -19,15 +19,80 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 define([
+    'lodash',
     'core/promiseTimeout',
     'taoTests/runner/plugin',
+    'taoQtiTest/runner/helpers/currentItem',
+    'taoQtiTest/runner/helpers/map',
     'taoReview/review/plugins/content/item-answer/item-answer'
 ], function (
+    _,
     promiseTimeout,
     pluginFactory,
+    itemHelper,
+    mapHelper,
     itemAnswerFactory
 ) {
     'use strict';
+
+    /**
+     * Gets the response of the current item
+     * @param {runner} testRunner
+     * @return {Object}
+     */
+    const getItemResponse = testRunner => {
+        const context = testRunner.getTestContext();
+        const dataHolder = testRunner.getDataHolder();
+        let response = null;
+
+        if (context) {
+            const {itemIdentifier} = context;
+            const responses = dataHolder.get('testResponses');
+            response = responses[itemIdentifier];
+        }
+
+        return response;
+    };
+
+    /**
+     * Gets the correct response of the current item
+     * @param {runner} testRunner
+     * @return {Object}
+     */
+    const getItemCorrectResponse = testRunner => {
+        const declarations = itemHelper.getDeclarations(testRunner);
+        const response = {};
+        _.forEach(declarations, declaration => {
+            const {attributes} = declaration;
+            const {identifier, baseType, cardinality} = attributes || {};
+            response[identifier] = {
+                response: itemHelper.toResponse(declaration.correctResponse, baseType, cardinality)
+            };
+        });
+        return response;
+    };
+
+    /**
+     * Replace the state of the current item
+     * @param {String} name
+     * @param {runner} testRunner
+     */
+    const setItemState = (name, testRunner) => {
+        const itemRunner = testRunner.itemRunner;
+        let response = null;
+
+        if (itemRunner) {
+            if (name === 'correct') {
+                response = getItemCorrectResponse(testRunner);
+            } else if (testRunner.getTestContext()) {
+                response = getItemResponse(testRunner);
+            }
+
+            if (response) {
+                itemRunner.setState(response);
+            }
+        }
+    };
 
     /**
      * Test Review Plugin : Item Answer Tabs
@@ -55,12 +120,26 @@ define([
 
                 // control the test runner from the review panel
                 itemAnswer
-                    .on('tabchange', name => {})
+                    .on('tabchange', name => setItemState(name, testRunner))
                     .on('ready', resolve);
 
                 // reflect the test runner state to the review panel
                 testRunner
-                    .on('loaditem', itemRef => {})
+                    .on('renderitem', itemRef => {
+                        const item = mapHelper.getItem(testRunner.getTestMap(), itemRef);
+
+                        itemAnswer.setScore(`${item.score}/${item.maxScore}`);
+
+                        if (item.informational) {
+                            itemAnswer.setInformational();
+                        } else if (item.score && item.score === item.maxScore) {
+                            itemAnswer.setCorrect();
+                        } else if (item.skipped) {
+                            itemAnswer.setSkipped();
+                        } else {
+                            itemAnswer.setIncorrect();
+                        }
+                    })
                     .on(`plugin-show.${this.getName()}`, () => itemAnswer.show())
                     .on(`plugin-hide.${this.getName()}`, () => itemAnswer.hide())
                     .on(`plugin-enable.${this.getName()}`, () => itemAnswer.enable())

@@ -152,15 +152,6 @@ define([
                 })
                 .on('renderitem', () => {
                     this.trigger('enabletools enablenav');
-                    const context = this.getTestContext();
-                    if (context) {
-                        const itemIdentifier = context.itemIdentifier;
-                        const responses = dataHolder.get('testResponses');
-                        const response = responses[itemIdentifier];
-                        if (response) {
-                            this.itemRunner.setState(response);
-                        }
-                    }
                 })
                 .on('move', function (direction, scope, ref) {
                     const testData = this.getTestData();

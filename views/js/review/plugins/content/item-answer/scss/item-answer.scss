@@ -35,10 +35,6 @@ $incorrectColor: blacken($error, .2);
     flex-direction: column;
     background-color: $backgroundColor;
 
-    &.informational {
-        visibility: hidden;
-    }
-
     .item-answer-bar {
         position: relative;
         display: flex;
@@ -126,7 +122,7 @@ $incorrectColor: blacken($error, .2);
 
     .item-answer-status {
         position: relative;
-        height: 32px;
+        height: 40px;
         line-height: 20px;
         font-weight: bold;
         padding-top: 10px;
@@ -150,6 +146,12 @@ $incorrectColor: blacken($error, .2);
             text-transform: uppercase;
             color: $skippedColor;
         }
+    }
+
+    &.disabled,
+    button[disabled] {
+        // unfortunately, we cannot get rid of the !important here, it is used by the existing rule to overload
+        background-color: inherit !important;
     }
 
     :focus {

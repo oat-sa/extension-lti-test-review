@@ -16,7 +16,10 @@
         </aside>
 
         <section class="content-wrapper">
-            <div id="qti-content"></div>
+            <div class="item-tool"></div>
+            <div class="item-content">
+                <div id="qti-content"></div>
+            </div>
         </section>
     </div>
 

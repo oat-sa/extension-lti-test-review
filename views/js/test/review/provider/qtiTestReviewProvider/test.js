@@ -28,6 +28,7 @@ define([
     'json!taoReview/test/mocks/item-1.json',
     'json!taoReview/test/mocks/item-2.json',
     'json!taoReview/test/mocks/item-3.json',
+    'json!taoReview/test/mocks/item-4.json',
     'json!taoReview/test/mocks/testData.json',
     'json!taoReview/test/mocks/testContext.json',
     'json!taoReview/test/mocks/testMap.json',
@@ -43,6 +44,7 @@ define([
     itemData1,
     itemData2,
     itemData3,
+    itemData4,
     testData,
     testContext,
     testMap,
@@ -291,7 +293,7 @@ define([
     });
 
     QUnit.test('render layout', assert => {
-        assert.expect(12);
+        assert.expect(13);
         const ready = assert.async();
         const $fixture = $('#fixture-render');
         const mockProxy = {
@@ -324,6 +326,7 @@ define([
                         assert.equal(areaBroker.getHeaderArea().length, 1, 'The header area exists');
                         assert.equal(areaBroker.getArea('context').length, 1, 'The context area exists');
                         assert.equal(areaBroker.getArea('contentWrapper').length, 1, 'The contentWrapper area exists');
+                        assert.equal(areaBroker.getArea('itemTool').length, 1, 'The itemTool area exists');
                         return runner.destroy();
                     })
                     .then(() => {
@@ -361,7 +364,8 @@ define([
         const items = {
             'item-1': itemData1,
             'item-2': itemData2,
-            'item-3': itemData3
+            'item-3': itemData3,
+            'item-4': itemData4
         };
         const mockProxy = {
             name: 'itemProxy',
@@ -488,7 +492,8 @@ define([
         const items = {
             'item-1': itemData1,
             'item-2': itemData2,
-            'item-3': itemData3
+            'item-3': itemData3,
+            'item-4': itemData4
         };
         const mockProxy = {
             name: 'renderProxy',
@@ -559,7 +564,7 @@ define([
                 runner
                     .off('.test')
                     .on('renderitem.test', itemRef => {
-                        assert.equal(itemRef, 'item-2', 'The third item is rendered again');
+                        assert.equal(itemRef, 'item-2', 'The second item is rendered again');
                         resolve();
                     })
                     .next();
@@ -599,7 +604,8 @@ define([
         const items = {
             'item-1': itemData1,
             'item-2': itemData2,
-            'item-3': itemData3
+            'item-3': itemData3,
+            'item-4': itemData4
         };
         const navigationPlugin = {
             name: 'navigation',

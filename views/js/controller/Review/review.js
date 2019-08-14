@@ -62,6 +62,10 @@ define([
                     module: 'taoReview/review/plugins/navigation/next-prev/plugin',
                     bundle: 'taoReview/loader/qtiReview.min',
                     category: 'navigation'
+                }, {
+                    module: 'taoReview/review/plugins/content/item-answer/plugin',
+                    bundle: 'taoReview/loader/qtiReview.min',
+                    category: 'content'
                 }]
             })
             .on('error', err => {

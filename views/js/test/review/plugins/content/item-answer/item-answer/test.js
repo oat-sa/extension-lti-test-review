@@ -495,7 +495,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-status');
 
-        assert.expect(47);
+        assert.expect(67);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
@@ -526,8 +526,9 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', status => {
+                                instance.on('statuschange.test', (status, change) => {
                                     assert.strictEqual(status, 'skipped', 'The status changed to skipped');
+                                    assert.strictEqual(change, true, 'The status has actually changed');
                                     resolve();
                                 });
                             }),
@@ -566,10 +567,13 @@ define([
                     .then(() => {
                         instance.off('.test');
 
+                        assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
+
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', status => {
+                                instance.on('statuschange.test', (status, change) => {
                                     assert.strictEqual(status, 'correct', 'The status changed to correct');
+                                    assert.strictEqual(change, true, 'The status has actually changed');
                                     resolve();
                                 });
                             }),
@@ -601,8 +605,32 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', status => {
+                                instance.on('statuschange.test', (status, change) => {
                                     assert.strictEqual(status, 'incorrect', 'The status changed to incorrect');
+                                    assert.strictEqual(change, true, 'The status has actually changed');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('tabchange.test', name => {
+                                    assert.strictEqual(name, 'answer', 'The answer tab is active');
+                                    resolve();
+                                });
+                            })
+                        ]);
+
+                        assert.strictEqual(instance.setStatus('incorrect'), instance, 'setStatus() is fluent');
+
+                        return promise;
+                    })
+                    .then(() => {
+                        instance.off('.test');
+
+                        const promise = Promise.all([
+                            new Promise(resolve => {
+                                instance.on('statuschange.test', (status, change) => {
+                                    assert.strictEqual(status, 'incorrect', 'The status changed to incorrect');
+                                    assert.strictEqual(change, false, 'The status has not actually changed');
                                     resolve();
                                 });
                             }),
@@ -629,6 +657,40 @@ define([
                         assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
                         assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
                     })
+                    .then(() => {
+                        instance.off('.test');
+
+                        const promise = Promise.all([
+                            new Promise(resolve => {
+                                instance.on('statuschange.test', (status, change) => {
+                                    assert.strictEqual(status, 'informational', 'The status changed to informational');
+                                    assert.strictEqual(change, true, 'The status has actually changed');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('tabchange.test', name => {
+                                    assert.strictEqual(name, 'answer', 'The answer tab is active');
+                                    resolve();
+                                });
+                            })
+                        ]);
+
+                        assert.strictEqual(instance.setStatus('informational'), instance, 'setStatus() is fluent');
+
+                        return promise;
+                    })
+                    .then(() => {
+                        assert.strictEqual(instance.isCorrect(), false, 'The item is not correct');
+                        assert.strictEqual(instance.isSkipped(), false, 'The item is not skipped');
+                        assert.strictEqual(instance.isInformational(), true, 'The item is informational');
+
+                        assert.strictEqual($container.children().is('.correct'), false, 'The component did not get the state correct');
+                        assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
+                        assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
+                        assert.strictEqual($container.children().is('.informational'), true, 'The component got the state informational');
+                        assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
+                    })
                     .catch(err => {
                         assert.pushResult({
                             result: false,
@@ -651,7 +713,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-correct');
 
-        assert.expect(26);
+        assert.expect(27);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
@@ -682,8 +744,9 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', status => {
+                                instance.on('statuschange.test', (status, change) => {
                                     assert.strictEqual(status, 'correct', 'The status changed to correct');
+                                    assert.strictEqual(change, true, 'The status has actually changed');
                                     resolve();
                                 });
                             }),
@@ -735,7 +798,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-incorrect');
 
-        assert.expect(27);
+        assert.expect(28);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
@@ -766,8 +829,9 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', status => {
+                                instance.on('statuschange.test', (status, change) => {
                                     assert.strictEqual(status, 'incorrect', 'The status changed to incorrect');
+                                    assert.strictEqual(change, true, 'The status has actually changed');
                                     resolve();
                                 });
                             }),
@@ -821,7 +885,7 @@ define([
         const $container = $('#fixture-skipped');
         const skippedText = 'skipped item';
 
-        assert.expect(27);
+        assert.expect(28);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
@@ -852,8 +916,9 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', status => {
+                                instance.on('statuschange.test', (status, change) => {
                                     assert.strictEqual(status, 'skipped', 'The status changed to skipped');
+                                    assert.strictEqual(change, true, 'The status has actually changed');
                                     resolve();
                                 });
                             }),
@@ -906,7 +971,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-informational');
 
-        assert.expect(26);
+        assert.expect(27);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
@@ -937,8 +1002,9 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', status => {
+                                instance.on('statuschange.test', (status, change) => {
                                     assert.strictEqual(status, 'informational', 'The status changed to informational');
+                                    assert.strictEqual(change, false, 'The status has not actually changed');
                                     resolve();
                                 });
                             }),
@@ -1038,6 +1104,7 @@ define([
                             break;
 
                         case 'informational':
+                            instance.setScore('');
                             instance.setInformational();
                             break;
                     }

@@ -30,7 +30,9 @@
           "serial": "container_containerstatic_5d3863a919645253676796",
           "body": "\n            <p>Where does it come from?</p>\n            <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of \"de Finibus Bonorum et Malorum\" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, \"Lorem ipsum dolor sit amet..\", comes from a line in section 1.10.32.</p>\n          ",
           "elements": [],
-          "debug": { "relatedItem": "item_5d3863a919416724485526" }
+          "debug": {
+            "relatedItem": "item_5d3863a919416724485526"
+          }
         },
         "choices": [
           {
@@ -49,9 +51,13 @@
                 "serial": "container_containerstatic_5d3863a91970e074208549",
                 "body": "choice #1",
                 "elements": [],
-                "debug": { "relatedItem": "item_5d3863a919416724485526" }
+                "debug": {
+                  "relatedItem": "item_5d3863a919416724485526"
+                }
               },
-              "debug": { "relatedItem": "item_5d3863a919416724485526" }
+              "debug": {
+                "relatedItem": "item_5d3863a919416724485526"
+              }
             },
             "choice_simpleassociablechoice_5d3863a919776130026657": {
               "identifier": "choice_2",
@@ -68,9 +74,13 @@
                 "serial": "container_containerstatic_5d3863a919790859076852",
                 "body": "choice #2",
                 "elements": [],
-                "debug": { "relatedItem": "item_5d3863a919416724485526" }
+                "debug": {
+                  "relatedItem": "item_5d3863a919416724485526"
+                }
               },
-              "debug": { "relatedItem": "item_5d3863a919416724485526" }
+              "debug": {
+                "relatedItem": "item_5d3863a919416724485526"
+              }
             }
           },
           {
@@ -89,9 +99,13 @@
                 "serial": "container_containerstatic_5d3863a91980b920123630",
                 "body": "choice #1",
                 "elements": [],
-                "debug": { "relatedItem": "item_5d3863a919416724485526" }
+                "debug": {
+                  "relatedItem": "item_5d3863a919416724485526"
+                }
               },
-              "debug": { "relatedItem": "item_5d3863a919416724485526" }
+              "debug": {
+                "relatedItem": "item_5d3863a919416724485526"
+              }
             },
             "choice_simpleassociablechoice_5d3863a91985d417825918": {
               "identifier": "choice_4",
@@ -108,17 +122,25 @@
                 "serial": "container_containerstatic_5d3863a919874535368742",
                 "body": "choice #2",
                 "elements": [],
-                "debug": { "relatedItem": "item_5d3863a919416724485526" }
+                "debug": {
+                  "relatedItem": "item_5d3863a919416724485526"
+                }
               },
-              "debug": { "relatedItem": "item_5d3863a919416724485526" }
+              "debug": {
+                "relatedItem": "item_5d3863a919416724485526"
+              }
             }
           }
         ]
       }
     },
-    "debug": { "relatedItem": "item_5d3863a919416724485526" }
+    "debug": {
+      "relatedItem": "item_5d3863a919416724485526"
+    }
   },
-  "debug": { "relatedItem": "item_5d3863a919416724485526" },
+  "debug": {
+    "relatedItem": "item_5d3863a919416724485526"
+  },
   "namespaces": {
     "": "http://www.imsglobal.org/xsd/imsqti_v2p2",
     "m": "http://www.w3.org/1998/Math/MathML",
@@ -138,7 +160,9 @@
         "baseType": "float",
         "normalMaximum": 1
       },
-      "debug": { "relatedItem": "item_5d3863a919416724485526" },
+      "debug": {
+        "relatedItem": "item_5d3863a919416724485526"
+      },
       "defaultValue": null
     },
     "outcomedeclaration_5d3863a919540477148872": {
@@ -150,7 +174,9 @@
         "cardinality": "single",
         "baseType": "float"
       },
-      "debug": { "relatedItem": "item_5d3863a919416724485526" },
+      "debug": {
+        "relatedItem": "item_5d3863a919416724485526"
+      },
       "defaultValue": "1"
     }
   },
@@ -164,8 +190,22 @@
         "cardinality": "multiple",
         "baseType": "directedPair"
       },
-      "debug": { "relatedItem": "item_5d3863a919416724485526" },
-      "defaultValue": []
+      "debug": {
+        "relatedItem": "item_5d3863a919416724485526"
+      },
+      "defaultValue": [],
+      "mapping": [],
+      "areaMapping": [],
+      "howMatch": "http:\/\/www.imsglobal.org\/question\/qti_v2p1\/rptemplates\/match_correct",
+      "correctResponses": [
+        [
+          "choice_1",
+          "choice_1"
+        ]
+      ],
+      "mappingAttributes": {
+        "defaultValue": 0
+      }
     }
   },
   "feedbacks": [],

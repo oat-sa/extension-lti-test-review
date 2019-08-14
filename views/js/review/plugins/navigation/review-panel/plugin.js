@@ -22,7 +22,7 @@ define([
     'core/promiseTimeout',
     'taoTests/runner/plugin',
     'taoReview/review/plugins/navigation/review-panel/panel',
-    'taoReview/review/plugins/navigation/review-panel/panel-data',
+    'taoReview/review/plugins/navigation/review-panel/panel-data'
 ], function (
     promiseTimeout,
     pluginFactory,

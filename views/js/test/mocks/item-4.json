@@ -1,0 +1,54 @@
+{
+  "identifier": "i1565710130584764",
+  "serial": "item_5d52d7588dd45281445998",
+  "qtiClass": "assessmentItem",
+  "attributes": {
+    "identifier": "i1565710130584764",
+    "title": "Review 3",
+    "label": "Review 3",
+    "xml:lang": "en-US",
+    "adaptive": false,
+    "timeDependent": false,
+    "toolName": "TAO",
+    "toolVersion": "3.3.0-sprint108",
+    "class": ""
+  },
+  "body": {
+    "serial": "container_containeritembody_5d52d7588dd3e434963644",
+    "body": "\n    <div class=\"grid-row\">\n      <div class=\"col-12\">\n        <p>Lorem ipsum dolor sit amet, consectetur adipisicing ...</p>\n      </div>\n    </div>\n  ",
+    "elements": [],
+    "debug": {
+      "relatedItem": "item_5d52d7588dd45281445998"
+    }
+  },
+  "debug": {
+    "relatedItem": "item_5d52d7588dd45281445998"
+  },
+  "namespaces": {
+    "": "http://www.imsglobal.org/xsd/imsqti_v2p2",
+    "m": "http://www.w3.org/1998/Math/MathML",
+    "xsi": "http://www.w3.org/2001/XMLSchema-instance"
+  },
+  "schemaLocations": {
+    "http://www.imsglobal.org/xsd/imsqti_v2p2": "http://www.imsglobal.org/xsd/qti/qtiv2p2/imsqti_v2p2.xsd"
+  },
+  "stylesheets": {
+    "stylesheet_5d52d7588dd8c707575889": {
+      "serial": "stylesheet_5d52d7588dd8c707575889",
+      "qtiClass": "stylesheet",
+      "attributes": {
+        "href": "tao-user-styles.css",
+        "type": "text/css",
+        "media": "all",
+        "title": ""
+      },
+      "debug": {
+        "relatedItem": "item_5d52d7588dd45281445998"
+      }
+    }
+  },
+  "outcomes": [],
+  "responses": [],
+  "feedbacks": [],
+  "apipAccessibility": ""
+}

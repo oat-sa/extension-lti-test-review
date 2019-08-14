@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Test Review - Item Answer Component</title>
+        <base href="../../../../../../../../../tao/views/"/>
+        <link rel="stylesheet" type="text/css" href="js/lib/qunit/qunit.css">
+        <link rel="stylesheet" type="text/css" href="css/tao-main-style.css">
+        <script type="text/javascript" src="js/lib/qunit/qunit.js"></script>
+        <script type="text/javascript" src="js/lib/require.js"></script>
+        <script type="text/javascript" src="js/lib/qunit/qunit-parameterize.js"></script>
+
+        <script type="text/javascript">
+
+            //don't start the test now
+            QUnit.config.autostart = false;
+
+            //load the config
+            require(['/tao/ClientConfig/config'], function () {
+                requirejs.config({
+                    "config": {
+                        "core/request" : {
+                            'noToken' : true
+                        }
+                    }
+                });
+
+                //load the test
+                require(['taoReview/test/review/plugins/content/item-answer/item-answer/test'], function () {
+
+                    //Tests loaded, run tests
+                    QUnit.start();
+                });
+            });
+        </script>
+        <style>
+            #visual-test {
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100vh;
+            }
+            #visual-test .header,
+            #visual-test .footer {
+                background-color: #266d9c;
+                height: 40px;
+                line-height: 40px;
+                flex: 0 0 auto;
+                text-align: center;
+            }
+            #visual-test .content {
+                background-color: white;
+                display: flex;
+                flex-direction: row;
+                flex: 1 1 auto;
+                overflow: hidden;
+            }
+            #visual-test .content .panel {
+                background-color: #f3f1ef;
+                border-right: 1px #ddd solid;
+                flex: 0 0 auto;
+                width: 250px;
+            }
+            #visual-test .content .item {
+                background-color: #fff;
+                flex: 1 1 auto;
+                padding: 50px 100px;
+            }
+            html h1 {
+                margin-top: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="qunit"></div>
+        <div id="qunit-fixture">
+            <div id="fixture-api"></div>
+            <div id="fixture-init"></div>
+            <div id="fixture-render"></div>
+            <div id="fixture-hide"></div>
+            <div id="fixture-disable"></div>
+            <div id="fixture-destroy"></div>
+            <div id="fixture-score"></div>
+            <div id="fixture-status"></div>
+            <div id="fixture-correct"></div>
+            <div id="fixture-incorrect"></div>
+            <div id="fixture-skipped"></div>
+            <div id="fixture-informational"></div>
+        </div>
+        <div id="visual-test">
+            <div class="header">
+                <button class="small" data-control="correct">Correct</button>
+                <button class="small" data-control="incorrect">Incorrect</button>
+                <button class="small" data-control="skipped">Skipped</button>
+                <button class="small" data-control="informational">Informational</button>
+            </div>
+            <div class="content">
+                <aside class="panel"></aside>
+                <section class="item">
+                    <div class="tool"></div>
+                    <div class="item-content"></div>
+                </section>
+            </div>
+            <div class="footer">
+                <button class="small" data-control="enable">Enable</button>
+                <button class="small" data-control="disable">Disable</button>
+            </div>
+        </div>
+    </body>
+</html>

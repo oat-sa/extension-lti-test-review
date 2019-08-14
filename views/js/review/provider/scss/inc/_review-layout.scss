@@ -56,7 +56,7 @@ $sidePanelBorderWidth: 1px;
         display: flex;
         flex-direction: column;
         height: 100%;
-        padding: 30px 0 0 0;
+        padding: 30px 0 0 30px;
 
         .item-tool {
             flex: 0 0 auto;
@@ -99,7 +99,7 @@ $sidePanelBorderWidth: 1px;
     }
 
     .qti-item {
-        padding: 0 30px 30px 30px;
+        padding: 0 0 30px 0;
     }
 
     .size-wrapper {

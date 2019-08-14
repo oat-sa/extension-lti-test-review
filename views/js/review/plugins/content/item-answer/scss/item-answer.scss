@@ -122,14 +122,10 @@ $incorrectColor: blacken($error, .2);
 
     .item-answer-status {
         position: relative;
-        height: 32px;
+        height: 40px;
         line-height: 20px;
         font-weight: bold;
         padding-top: 10px;
-    }
-
-    &.informational {
-        visibility: hidden;
     }
 
     &.correct {

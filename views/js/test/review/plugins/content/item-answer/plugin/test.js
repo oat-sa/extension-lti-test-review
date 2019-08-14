@@ -347,7 +347,7 @@ define([
                         assert.strictEqual($container.find('.item-answer').is('.informational'), true, 'The component is set to "informational"');
                         assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
                         assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
-                        assert.strictEqual($container.find('.item-answer-score').text().trim(), `${__('Your Score:')} 0/0`, 'The score is set');
+                        assert.strictEqual($container.find('.item-answer-score').text().trim(), '', 'The score is empty');
                         assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status is empty');
                     })
                     .then(() => plugin.destroy())

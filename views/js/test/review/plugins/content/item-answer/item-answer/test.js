@@ -1102,6 +1102,7 @@ define([
                             break;
 
                         case 'informational':
+                            instance.setScore('');
                             instance.setInformational();
                             break;
                     }

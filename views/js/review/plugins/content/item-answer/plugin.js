@@ -127,8 +127,9 @@ define([
                 testRunner
                     .on('renderitem', itemRef => {
                         const item = mapHelper.getItem(testRunner.getTestMap(), itemRef);
+                        const score = item.informational ? '' : `${item.score}/${item.maxScore}`;
 
-                        itemAnswer.setScore(`${item.score}/${item.maxScore}`);
+                        itemAnswer.setScore(score);
 
                         if (item.informational) {
                             itemAnswer.setInformational();

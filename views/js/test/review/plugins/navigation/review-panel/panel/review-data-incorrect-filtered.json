@@ -12,6 +12,8 @@
               {
                 "id": "item-3",
                 "label": "example_2_Math",
+                "informational": false,
+                "skipped": false,
                 "cls": "item-incorrect",
                 "position": 2,
                 "score": 2,
@@ -20,13 +22,31 @@
             ],
             "score": 8,
             "maxScore": 9
+          },
+          {
+            "id": "assessmentSection-3",
+            "label": "Section 2",
+            "items": [
+              {
+                "id": "item-9",
+                "label": "Example_8_Geo 3",
+                "informational": false,
+                "skipped": true,
+                "cls": "item-default",
+                "position": 8,
+                "score": 0,
+                "maxScore": 0
+              }
+            ],
+            "score": 6,
+            "maxScore": 6
           }
         ],
-        "score": 16,
-        "maxScore": 17
+        "score": 14,
+        "maxScore": 15
       }
     ]
   },
-  "score": 16,
-  "maxScore": 17
+  "score": 14,
+  "maxScore": 15
 }

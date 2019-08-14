@@ -302,6 +302,11 @@ $incorrectColor: $error;
                 @include icon-info;
             }
         }
+        &.item-default {
+            .review-panel-label:before {
+                @include icon-not-evaluated;
+            }
+        }
         &.item-correct {
             .review-panel-label:before {
                 @include icon-result-ok;

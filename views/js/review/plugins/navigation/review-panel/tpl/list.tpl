@@ -11,7 +11,7 @@
                 {{#each items}}
                     <li class="review-panel-item navigable{{#if active}} active{{/if}} {{cls}}" data-control="{{id}}" data-position="{{position}}" title="{{label}}">
                         <span class="review-panel-label">{{label}}</span>
-                        <span class="review-panel-score">{{#if maxScore}}{{score}}/{{maxScore}}{{else}}-{{/if}}</span>
+                    <span class="review-panel-score">{{#if informational}}-{{else}}{{#if maxScore}}{{score}}/{{maxScore}}{{else}}{{score}}{{/if}}{{/if}}</span>
                     </li>
                 {{/each}}
                 </ul>

@@ -11,6 +11,8 @@
             {
               "id": "item-1",
               "label": "Example_0_Introduction",
+              "informational": true,
+              "skipped": false,
               "position": 0,
               "score": 0,
               "maxScore": 0
@@ -34,6 +36,8 @@
             {
               "id": "item-2",
               "label": "example_1_TAO",
+              "informational": false,
+              "skipped": false,
               "position": 1,
               "score": 2,
               "maxScore": 2
@@ -41,6 +45,8 @@
             {
               "id": "item-3",
               "label": "example_2_Math",
+              "informational": false,
+              "skipped": false,
               "position": 2,
               "score": 2,
               "maxScore": 3
@@ -48,6 +54,8 @@
             {
               "id": "item-4",
               "label": "Example_3_Baudelaire",
+              "informational": false,
+              "skipped": false,
               "position": 3,
               "score": 2,
               "maxScore": 2
@@ -55,6 +63,8 @@
             {
               "id": "item-5",
               "label": "Example_4_Appearance",
+              "informational": false,
+              "skipped": false,
               "position": 4,
               "score": 2,
               "maxScore": 2
@@ -70,6 +80,8 @@
             {
               "id": "item-6",
               "label": "Example_5_picasso",
+              "informational": false,
+              "skipped": false,
               "position": 5,
               "score": 2,
               "maxScore": 2
@@ -77,6 +89,8 @@
             {
               "id": "item-7",
               "label": "Example_6_Geography",
+              "informational": false,
+              "skipped": false,
               "position": 6,
               "score": 2,
               "maxScore": 2
@@ -84,6 +98,8 @@
             {
               "id": "item-8",
               "label": "Example_7_Geo 2",
+              "informational": false,
+              "skipped": false,
               "position": 7,
               "score": 2,
               "maxScore": 2
@@ -91,19 +107,21 @@
             {
               "id": "item-9",
               "label": "Example_8_Geo 3",
+              "informational": false,
+              "skipped": true,
               "position": 8,
-              "score": 2,
-              "maxScore": 2
+              "score": 0,
+              "maxScore": 0
             }
           ],
-          "score": 8,
-          "maxScore": 8
+          "score": 6,
+          "maxScore": 6
         }
       ],
-      "score": 16,
-      "maxScore": 17
+      "score": 14,
+      "maxScore": 15
     }
   ],
-  "score": 16,
-  "maxScore": 17
+  "score": 14,
+  "maxScore": 15
 }

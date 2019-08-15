@@ -95,7 +95,7 @@ class QtiRunnerInitDataBuilder
                 'itemPosition' => 0
             ]),
             'testData' => $this->qtiRunnerService->getTestData($serviceContext),
-            'testResponses' => $itemsData,
+            'testResponses' => array_column($itemsData, 'state', 'identifier'),
             'success' => true,
         ];
 
@@ -125,15 +125,16 @@ class QtiRunnerInitDataBuilder
             $state = json_decode($variable['state'], true);
             $stateKeys = array_keys($state);
 
-            $scores = array_filter($variable[taoResultServer_models_classes_ResponseVariable::class], function ($key) use ($stateKeys) {
+            $scores = array_filter($variable[taoResultServer_models_classes_ResponseVariable::class], static function ($key) use ($stateKeys) {
                 return in_array($key, $stateKeys, true);
             }, ARRAY_FILTER_USE_KEY);
 
-            array_walk($scores, function (&$value) {
+            array_walk($scores, static function (&$value) {
                 $value = $value['isCorrect'] === 'correct';
             });
 
             $returnValue[$variable['internalIdentifier']] = [
+                'identifier' => $variable['internalIdentifier'],
                 'state' => $state,
                 'score' => $scores
             ];

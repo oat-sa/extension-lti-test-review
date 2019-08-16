@@ -1,0 +1,19 @@
+{
+  "item-1": {
+    "RESPONSE": { "response": { "list": { "identifier": ["choice_2"] } } }
+  },
+  "item-2": {
+    "RESPONSE": {
+      "response": { "list": { "identifier": ["choice_2", "choice_4"] } }
+    }
+  },
+  "item-3": {
+    "RESPONSE": {
+      "response": {
+        "list": {
+          "directedPair": [["choice_2", "choice_3"], ["choice_2", "choice_4"]]
+        }
+      }
+    }
+  }
+}

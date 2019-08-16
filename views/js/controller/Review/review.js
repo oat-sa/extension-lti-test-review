@@ -17,19 +17,24 @@
  */
 define([
     'jquery',
-    'lodash',
-    'i18n',
-    'module'
+    'ui/feedback',
+    'core/logger',
+    'taoReview/review/component/qtiTestReviewComponent'
 ], function (
     $,
-    _,
-    __,
-    module
+    feedback,
+    loggerFactory,
+    reviewFactory
 ) {
     'use strict';
 
     /**
-     * Controls the taoProctoring delivery page
+     * Create a dedicated logger
+     */
+    const logger = loggerFactory('taoReview/controller');
+
+    /**
+     * Controls the taoReview delivery page
      *
      * @type {Object}
      */
@@ -38,8 +43,37 @@ define([
          * Entry point of the page
          */
         start() {
-            const pageParams = module.config();
-            console.log(pageParams);
+
+            const $container = $('.container');
+            const execution = $container.data('execution');
+            const delivery = $container.data('delivery');
+
+            reviewFactory($(".content-wrap", document), {
+                testUri: {
+                    resultId: execution,
+                    deliveryUri: delivery
+                },
+                readOnly: true,
+                plugins: [{
+                    module: 'taoReview/review/plugins/navigation/review-panel/plugin',
+                    bundle: 'taoReview/loader/qtiReview.min',
+                    category: 'navigation'
+                }, {
+                    module: 'taoReview/review/plugins/navigation/next-prev/plugin',
+                    bundle: 'taoReview/loader/qtiReview.min',
+                    category: 'navigation'
+                }, {
+                    module: 'taoReview/review/plugins/content/item-answer/plugin',
+                    bundle: 'taoReview/loader/qtiReview.min',
+                    category: 'content'
+                }]
+            })
+            .on('error', err => {
+                logger.error(err);
+                if (err && err.message) {
+                    feedback().error(err.message);
+                }
+            } );
         }
     };
 });

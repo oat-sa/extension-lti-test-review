@@ -1,0 +1,213 @@
+{
+  "identifier": "i1563976549224972",
+  "serial": "item_5d3863a919416724485526",
+  "qtiClass": "assessmentItem",
+  "attributes": {
+    "identifier": "i1563976549224972",
+    "title": "Item 15",
+    "label": "Item 15",
+    "xml:lang": "en-US",
+    "adaptive": false,
+    "timeDependent": false,
+    "toolName": "TAO",
+    "toolVersion": "3.3.0-sprint107",
+    "class": ""
+  },
+  "body": {
+    "serial": "container_containeritembody_5d3863a91940f441674950",
+    "body": "\n    <div class=\"grid-row\">\n      <div class=\"col-12\">\n        {{interaction_matchinteraction_5d3863a919611343974272}}\n      </div>\n    </div>\n  ",
+    "elements": {
+      "interaction_matchinteraction_5d3863a919611343974272": {
+        "serial": "interaction_matchinteraction_5d3863a919611343974272",
+        "qtiClass": "matchInteraction",
+        "attributes": {
+          "responseIdentifier": "RESPONSE",
+          "shuffle": false,
+          "maxAssociations": 0,
+          "minAssociations": 0
+        },
+        "prompt": {
+          "serial": "container_containerstatic_5d3863a919645253676796",
+          "body": "\n            <p>Where does it come from?</p>\n            <p>Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of \"de Finibus Bonorum et Malorum\" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, \"Lorem ipsum dolor sit amet..\", comes from a line in section 1.10.32.</p>\n          ",
+          "elements": [],
+          "debug": {
+            "relatedItem": "item_5d3863a919416724485526"
+          }
+        },
+        "choices": [
+          {
+            "choice_simpleassociablechoice_5d3863a9196ef276278936": {
+              "identifier": "choice_1",
+              "serial": "choice_simpleassociablechoice_5d3863a9196ef276278936",
+              "qtiClass": "simpleAssociableChoice",
+              "attributes": {
+                "identifier": "choice_1",
+                "fixed": false,
+                "showHide": "show",
+                "matchMax": 0,
+                "matchMin": 0
+              },
+              "body": {
+                "serial": "container_containerstatic_5d3863a91970e074208549",
+                "body": "choice #1",
+                "elements": [],
+                "debug": {
+                  "relatedItem": "item_5d3863a919416724485526"
+                }
+              },
+              "debug": {
+                "relatedItem": "item_5d3863a919416724485526"
+              }
+            },
+            "choice_simpleassociablechoice_5d3863a919776130026657": {
+              "identifier": "choice_2",
+              "serial": "choice_simpleassociablechoice_5d3863a919776130026657",
+              "qtiClass": "simpleAssociableChoice",
+              "attributes": {
+                "identifier": "choice_2",
+                "fixed": false,
+                "showHide": "show",
+                "matchMax": 0,
+                "matchMin": 0
+              },
+              "body": {
+                "serial": "container_containerstatic_5d3863a919790859076852",
+                "body": "choice #2",
+                "elements": [],
+                "debug": {
+                  "relatedItem": "item_5d3863a919416724485526"
+                }
+              },
+              "debug": {
+                "relatedItem": "item_5d3863a919416724485526"
+              }
+            }
+          },
+          {
+            "choice_simpleassociablechoice_5d3863a9197f2057076872": {
+              "identifier": "choice_3",
+              "serial": "choice_simpleassociablechoice_5d3863a9197f2057076872",
+              "qtiClass": "simpleAssociableChoice",
+              "attributes": {
+                "identifier": "choice_3",
+                "fixed": false,
+                "showHide": "show",
+                "matchMax": 0,
+                "matchMin": 0
+              },
+              "body": {
+                "serial": "container_containerstatic_5d3863a91980b920123630",
+                "body": "choice #1",
+                "elements": [],
+                "debug": {
+                  "relatedItem": "item_5d3863a919416724485526"
+                }
+              },
+              "debug": {
+                "relatedItem": "item_5d3863a919416724485526"
+              }
+            },
+            "choice_simpleassociablechoice_5d3863a91985d417825918": {
+              "identifier": "choice_4",
+              "serial": "choice_simpleassociablechoice_5d3863a91985d417825918",
+              "qtiClass": "simpleAssociableChoice",
+              "attributes": {
+                "identifier": "choice_4",
+                "fixed": false,
+                "showHide": "show",
+                "matchMax": 0,
+                "matchMin": 0
+              },
+              "body": {
+                "serial": "container_containerstatic_5d3863a919874535368742",
+                "body": "choice #2",
+                "elements": [],
+                "debug": {
+                  "relatedItem": "item_5d3863a919416724485526"
+                }
+              },
+              "debug": {
+                "relatedItem": "item_5d3863a919416724485526"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "debug": {
+      "relatedItem": "item_5d3863a919416724485526"
+    }
+  },
+  "debug": {
+    "relatedItem": "item_5d3863a919416724485526"
+  },
+  "namespaces": {
+    "": "http://www.imsglobal.org/xsd/imsqti_v2p2",
+    "m": "http://www.w3.org/1998/Math/MathML",
+    "xsi": "http://www.w3.org/2001/XMLSchema-instance"
+  },
+  "schemaLocations": {
+    "http://www.imsglobal.org/xsd/imsqti_v2p2": "http://www.imsglobal.org/xsd/qti/qtiv2p2/imsqti_v2p2.xsd"
+  },
+  "outcomes": {
+    "outcomedeclaration_5d3863a91951e883520636": {
+      "identifier": "SCORE",
+      "serial": "outcomedeclaration_5d3863a91951e883520636",
+      "qtiClass": "outcomeDeclaration",
+      "attributes": {
+        "identifier": "SCORE",
+        "cardinality": "single",
+        "baseType": "float",
+        "normalMaximum": 1
+      },
+      "debug": {
+        "relatedItem": "item_5d3863a919416724485526"
+      },
+      "defaultValue": null
+    },
+    "outcomedeclaration_5d3863a919540477148872": {
+      "identifier": "MAXSCORE",
+      "serial": "outcomedeclaration_5d3863a919540477148872",
+      "qtiClass": "outcomeDeclaration",
+      "attributes": {
+        "identifier": "MAXSCORE",
+        "cardinality": "single",
+        "baseType": "float"
+      },
+      "debug": {
+        "relatedItem": "item_5d3863a919416724485526"
+      },
+      "defaultValue": "1"
+    }
+  },
+  "responses": {
+    "responsedeclaration_5d3863a9194b6321995183": {
+      "identifier": "RESPONSE",
+      "serial": "responsedeclaration_5d3863a9194b6321995183",
+      "qtiClass": "responseDeclaration",
+      "attributes": {
+        "identifier": "RESPONSE",
+        "cardinality": "multiple",
+        "baseType": "directedPair"
+      },
+      "debug": {
+        "relatedItem": "item_5d3863a919416724485526"
+      },
+      "defaultValue": [],
+      "mapping": [],
+      "areaMapping": [],
+      "howMatch": "http:\/\/www.imsglobal.org\/question\/qti_v2p1\/rptemplates\/match_correct",
+      "correctResponses": [
+        [
+          "choice_1",
+          "choice_1"
+        ]
+      ],
+      "mappingAttributes": {
+        "defaultValue": 0
+      }
+    }
+  },
+  "feedbacks": [],
+  "apipAccessibility": ""
+}

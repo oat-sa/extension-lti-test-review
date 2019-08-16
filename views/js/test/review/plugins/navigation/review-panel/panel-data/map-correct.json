@@ -24,6 +24,7 @@
               "viewed": true,
               "categories": [],
               "informational": true,
+              "skipped": false,
               "index": 1,
               "positionInPart": 0,
               "positionInSection": 0,
@@ -76,6 +77,7 @@
                 "x-tao-option-calculator"
               ],
               "informational": false,
+              "skipped": false,
               "index": 1,
               "positionInPart": 0,
               "positionInSection": 0,
@@ -95,6 +97,7 @@
                 "x-tao-option-calculator"
               ],
               "informational": false,
+              "skipped": false,
               "index": 2,
               "positionInPart": 1,
               "positionInSection": 1,
@@ -114,6 +117,7 @@
                 "x-tao-option-calculator"
               ],
               "informational": false,
+              "skipped": false,
               "index": 4,
               "positionInPart": 3,
               "positionInSection": 3,
@@ -133,6 +137,7 @@
                 "x-tao-option-calculator"
               ],
               "informational": false,
+              "skipped": false,
               "index": 7,
               "positionInPart": 6,
               "positionInSection": 6,
@@ -152,6 +157,7 @@
                 "x-tao-option-calculator"
               ],
               "informational": false,
+              "skipped": false,
               "index": 5,
               "positionInPart": 4,
               "positionInSection": 4,
@@ -171,6 +177,7 @@
                 "x-tao-option-calculator"
               ],
               "informational": false,
+              "skipped": false,
               "index": 6,
               "positionInPart": 5,
               "positionInSection": 5,
@@ -190,6 +197,7 @@
                 "x-tao-option-calculator"
               ],
               "informational": false,
+              "skipped": false,
               "index": 3,
               "positionInPart": 2,
               "positionInSection": 2,
@@ -209,6 +217,7 @@
                 "x-tao-option-calculator"
               ],
               "informational": false,
+              "skipped": false,
               "index": 8,
               "positionInPart": 7,
               "positionInSection": 7,

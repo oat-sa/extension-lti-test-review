@@ -22,7 +22,7 @@ define([
     'core/promiseTimeout',
     'taoTests/runner/plugin',
     'taoReview/review/plugins/navigation/review-panel/panel',
-    'taoReview/review/plugins/navigation/review-panel/panel-data',
+    'taoReview/review/plugins/navigation/review-panel/panel-data'
 ], function (
     promiseTimeout,
     pluginFactory,
@@ -55,7 +55,7 @@ define([
                 const testRunner = this.getTestRunner();
                 const reviewPanelData = reviewPanelService(testRunner);
                 const reviewPanel = reviewPanelFactory(
-                    this.getAreaBroker().getArea('panel'),
+                    this.getAreaBroker().getPanelArea(),
                     this.getConfig(),
                     reviewPanelData.getReviewPanelMap()
                 );

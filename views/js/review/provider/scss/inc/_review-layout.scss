@@ -1,0 +1,128 @@
+$sidePanelBorderWidth: 1px;
+@mixin sidePanelWidth($width) {
+    max-width: $width;
+    & > * {
+        width: #{$width - $sidePanelBorderWidth};
+    }
+}
+
+.test-review-scope {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+
+    height: calc(100vh - #{(map-get($heights, header) + map-get($heights, footer)) * 1px});
+
+    .test-runner-sections {
+        flex: 1 1 0;
+        overflow: hidden;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .test-sidebar {
+        background: $canvas;
+        flex: 0 1 auto;
+        overflow-y: auto;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+
+        @include sidePanelWidth(300px);
+        @media only screen and (max-device-width: 800px) {
+            @include sidePanelWidth(200px);
+        }
+        @media only screen and (min-device-width: 800px) and (max-device-width: 1280px) {
+            @include sidePanelWidth(250px);
+        }
+
+        .panel-box {
+            flex: 0 1 auto;
+            overflow: hidden;
+        }
+    }
+    .test-sidebar-left {
+        border-right: $sidePanelBorderWidth $uiGeneralContentBorder solid;
+    }
+
+    .test-sidebar-right {
+        border-left: $sidePanelBorderWidth $uiGeneralContentBorder solid;
+    }
+
+    .content-wrapper {
+        position: relative;
+        flex: 1 1 0;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 30px 0 0 30px;
+
+        .item-tool {
+            flex: 0 0 auto;
+        }
+
+        .item-content {
+            flex: 1 1 auto;
+            overflow: auto;
+            width: 100%;
+        }
+
+        .overlay {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            opacity: .9;
+
+            &-full {
+                background-color: $uiGeneralContentBg;
+                opacity: 1;
+            }
+        }
+    }
+
+    #qti-content, .item-tool {
+        -webkit-overflow-scrolling: touch;
+        margin: auto;
+        max-width: map-get($widths, item-max-width) * 1px;
+        width: 100%;
+    }
+
+    #qti-item {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        overflow: visible;
+    }
+
+    .qti-item {
+        padding: 0 0 30px 0;
+    }
+
+    .size-wrapper {
+        margin: auto;
+        max-width: map-get($widths, size-wrapper) * 1px;
+        width: 100%;
+    }
+
+    #qti-rubrics {
+        margin: auto;
+        max-width: map-get($widths, item-max-width) * 1px;
+        width: 100%;
+        .qti-rubricBlock {
+            margin: 20px 0;
+        }
+        .hidden {
+            display: none;
+        }
+    }
+}
+
+.no-controls {
+    .test-review-scope {
+        height: 100vh;
+    }
+}

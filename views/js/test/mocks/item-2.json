@@ -1,0 +1,171 @@
+{
+  "identifier": "i1563976278799470",
+  "serial": "item_5d3863a91248d773093803",
+  "qtiClass": "assessmentItem",
+  "attributes": {
+    "identifier": "i1563976278799470",
+    "title": "Item 14",
+    "label": "Item 14",
+    "xml:lang": "en-US",
+    "adaptive": false,
+    "timeDependent": false,
+    "toolName": "TAO",
+    "toolVersion": "3.3.0-sprint107",
+    "class": ""
+  },
+  "body": {
+    "serial": "container_containeritembody_5d3863a912487066593986",
+    "body": "\n    <div class=\"grid-row\">\n      <div class=\"col-12\">\n        {{interaction_orderinteraction_5d3863a912643259150243}}\n      </div>\n    </div>\n  ",
+    "elements": {
+      "interaction_orderinteraction_5d3863a912643259150243": {
+        "serial": "interaction_orderinteraction_5d3863a912643259150243",
+        "qtiClass": "orderInteraction",
+        "attributes": {
+          "responseIdentifier": "RESPONSE",
+          "shuffle": false,
+          "orientation": "vertical"
+        },
+        "debug": { "relatedItem": "item_5d3863a91248d773093803" },
+        "choices": {
+          "choice_simplechoice_5d3863a9126de401098657": {
+            "identifier": "choice_1",
+            "serial": "choice_simplechoice_5d3863a9126de401098657",
+            "qtiClass": "simpleChoice",
+            "attributes": {
+              "identifier": "choice_1",
+              "fixed": false,
+              "showHide": "show"
+            },
+            "body": {
+              "serial": "container_containerstatic_5d3863a9126f0567192156",
+              "body": "choice #1",
+              "elements": [],
+              "debug": { "relatedItem": "item_5d3863a91248d773093803" }
+            },
+            "debug": { "relatedItem": "item_5d3863a91248d773093803" }
+          },
+          "choice_simplechoice_5d3863a912740427237825": {
+            "identifier": "choice_2",
+            "serial": "choice_simplechoice_5d3863a912740427237825",
+            "qtiClass": "simpleChoice",
+            "attributes": {
+              "identifier": "choice_2",
+              "fixed": false,
+              "showHide": "show"
+            },
+            "body": {
+              "serial": "container_containerstatic_5d3863a912750901650767",
+              "body": "choice #2",
+              "elements": [],
+              "debug": { "relatedItem": "item_5d3863a91248d773093803" }
+            },
+            "debug": { "relatedItem": "item_5d3863a91248d773093803" }
+          },
+          "choice_simplechoice_5d3863a9127da783163659": {
+            "identifier": "choice_3",
+            "serial": "choice_simplechoice_5d3863a9127da783163659",
+            "qtiClass": "simpleChoice",
+            "attributes": {
+              "identifier": "choice_3",
+              "fixed": false,
+              "showHide": "show"
+            },
+            "body": {
+              "serial": "container_containerstatic_5d3863a9127fb278126134",
+              "body": "choice #3",
+              "elements": [],
+              "debug": { "relatedItem": "item_5d3863a91248d773093803" }
+            },
+            "debug": { "relatedItem": "item_5d3863a91248d773093803" }
+          },
+          "choice_simplechoice_5d3863a912888572432728": {
+            "identifier": "choice_4",
+            "serial": "choice_simplechoice_5d3863a912888572432728",
+            "qtiClass": "simpleChoice",
+            "attributes": {
+              "identifier": "choice_4",
+              "fixed": false,
+              "showHide": "show"
+            },
+            "body": {
+              "serial": "container_containerstatic_5d3863a9128a4838278792",
+              "body": "choice #4",
+              "elements": [],
+              "debug": { "relatedItem": "item_5d3863a91248d773093803" }
+            },
+            "debug": { "relatedItem": "item_5d3863a91248d773093803" }
+          }
+        },
+        "prompt": {
+          "serial": "container_containerstatic_5d3863a912671601000791",
+          "body": "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).",
+          "elements": [],
+          "debug": { "relatedItem": "item_5d3863a91248d773093803" }
+        }
+      }
+    },
+    "debug": { "relatedItem": "item_5d3863a91248d773093803" }
+  },
+  "debug": { "relatedItem": "item_5d3863a91248d773093803" },
+  "namespaces": {
+    "": "http://www.imsglobal.org/xsd/imsqti_v2p2",
+    "m": "http://www.w3.org/1998/Math/MathML",
+    "xsi": "http://www.w3.org/2001/XMLSchema-instance"
+  },
+  "schemaLocations": {
+    "http://www.imsglobal.org/xsd/imsqti_v2p2": "http://www.imsglobal.org/xsd/qti/qtiv2p2/imsqti_v2p2.xsd"
+  },
+  "stylesheets": [],
+  "outcomes": {
+    "outcomedeclaration_5d3863a91257b375125710": {
+      "identifier": "SCORE",
+      "serial": "outcomedeclaration_5d3863a91257b375125710",
+      "qtiClass": "outcomeDeclaration",
+      "attributes": {
+        "identifier": "SCORE",
+        "cardinality": "single",
+        "baseType": "float",
+        "normalMaximum": 1
+      },
+      "debug": { "relatedItem": "item_5d3863a91248d773093803" },
+      "defaultValue": null
+    },
+    "outcomedeclaration_5d3863a91259b547253710": {
+      "identifier": "MAXSCORE",
+      "serial": "outcomedeclaration_5d3863a91259b547253710",
+      "qtiClass": "outcomeDeclaration",
+      "attributes": {
+        "identifier": "MAXSCORE",
+        "cardinality": "single",
+        "baseType": "float"
+      },
+      "debug": { "relatedItem": "item_5d3863a91248d773093803" },
+      "defaultValue": "1"
+    }
+  },
+  "responses": {
+    "responsedeclaration_5d3863a912517410513129": {
+      "identifier": "RESPONSE",
+      "serial": "responsedeclaration_5d3863a912517410513129",
+      "qtiClass": "responseDeclaration",
+      "attributes": {
+        "identifier": "RESPONSE",
+        "cardinality": "ordered",
+        "baseType": "identifier"
+      },
+      "debug": { "relatedItem": "item_5d3863a91248d773093803" },
+      "defaultValue": [],
+      "mapping": [],
+      "areaMapping": [],
+      "howMatch": "http:\/\/www.imsglobal.org\/question\/qti_v2p1\/rptemplates\/match_correct",
+      "correctResponses": [
+        "choice_1"
+      ],
+      "mappingAttributes": {
+        "defaultValue": 0
+      }
+    }
+  },
+  "feedbacks": [],
+  "apipAccessibility": ""
+}

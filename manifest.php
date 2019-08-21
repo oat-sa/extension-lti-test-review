@@ -35,6 +35,7 @@ return [
         'tao' => '>=38.6.0',
         'taoLti' => '>=10.1.0',
         'ltiDeliveryProvider' => '>=9.2.0',
+        'taoQtiTest' => '>=34.6.0',
     ],
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoReviewManager',
     'acl' => [

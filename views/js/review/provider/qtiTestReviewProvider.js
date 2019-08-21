@@ -154,10 +154,9 @@ define([
                     this.trigger('enabletools enablenav');
                 })
                 .on('move', function (direction, scope, ref) {
-                    const testData = this.getTestData();
                     const testContext = this.getTestContext();
                     const testMap = this.getTestMap();
-                    const testNavigator = testNavigatorFactory(testData, testContext, testMap);
+                    const testNavigator = testNavigatorFactory(testContext, testMap);
                     const newTestContext = testNavigator.navigate(direction, scope || 'item', ref);
                     this.unloadItem(testContext.itemIdentifier);
                     this.setTestContext(newTestContext);

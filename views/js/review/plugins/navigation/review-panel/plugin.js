@@ -53,7 +53,7 @@ define([
         render() {
             return promiseTimeout(new Promise(resolve => {
                 const testRunner = this.getTestRunner();
-                const reviewPanelData = navigationDataService(testRunner);
+                const reviewPanelData = navigationDataService(testRunner.getTestMap());
                 const reviewPanel = reviewPanelFactory(
                     this.getAreaBroker().getPanelArea(),
                     this.getConfig(),

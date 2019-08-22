@@ -24,51 +24,156 @@ define([
     'taoReview/review/services/navigation-data',
     'json!taoReview/test/review/services/navigation-data/map-correct.json',
     'json!taoReview/test/review/services/navigation-data/map-incorrect.json',
+    'json!taoReview/test/review/services/navigation-data/computed-map-correct.json',
+    'json!taoReview/test/review/services/navigation-data/computed-map-incorrect.json',
+    'json!taoReview/test/review/services/navigation-data/filtered-map-correct-correct.json',
+    'json!taoReview/test/review/services/navigation-data/filtered-map-correct-incorrect.json',
+    'json!taoReview/test/review/services/navigation-data/filtered-map-incorrect-correct.json',
+    'json!taoReview/test/review/services/navigation-data/filtered-map-incorrect-incorrect.json',
     'json!taoReview/test/review/services/navigation-data/review-data-correct.json',
     'json!taoReview/test/review/services/navigation-data/review-data-incorrect.json'
 ], function (
     _,
-    reviewPanelDataService,
+    navigationDataFactory,
     testMapCorrect,
     testMapIncorrect,
+    computedMapCorrect,
+    computedMapIncorrect,
+    filteredMapCorrectCorrect,
+    filteredMapCorrectIncorrect,
+    filteredMapIncorrectCorrect,
+    filteredMapIncorrectIncorrect,
     reviewDataCorrect,
     reviewDataIncorrect
 ) {
     'use strict';
 
-    /**
-     * Simple mock for the test runner
-     * @param {Object} testMap
-     * @returns {Object}
-     */
-    const getTestRunner = testMap => {
-        return {
-            getTestMap() {
-                return testMap;
-            }
-        };
+    const emptyMap = {
+        parts: {},
+        score: 0,
+        maxScore: 0
     };
+
+    QUnit.dump.maxDepth = 20;
 
     QUnit.module('Factory');
 
     QUnit.test('module', assert => {
-        const testRunner = getTestRunner(testMapCorrect);
         assert.expect(3);
-        assert.equal(typeof reviewPanelDataService, 'function', 'The module exposes a function');
-        assert.equal(typeof reviewPanelDataService(testRunner), 'object', 'The factory produces an object');
-        assert.notStrictEqual(reviewPanelDataService(testRunner), reviewPanelDataService(testRunner), 'The factory provides a different object on each call');
+        assert.equal(typeof navigationDataFactory, 'function', 'The module exposes a function');
+        assert.equal(typeof navigationDataFactory(testMapCorrect), 'object', 'The factory produces an object');
+        assert.notStrictEqual(navigationDataFactory(testMapCorrect), navigationDataFactory(testMapCorrect), 'The factory provides a different object on each call');
     });
 
     QUnit.cases.init([
+        {title: 'getMap'},
+        {title: 'setMap'},
+        {title: 'filterMap'},
+        {title: 'computeMap'},
         {title: 'getReviewPanelMap'}
     ]).test('inherited API', (data, assert) => {
-        const testRunner = getTestRunner(testMapCorrect);
-        const instance = reviewPanelDataService(testRunner);
+        const instance = navigationDataFactory(testMapCorrect);
         assert.expect(1);
         assert.equal(typeof instance[data.title], 'function', `The instance exposes a "${data.title}" function`);
     });
 
     QUnit.module('API');
+
+    QUnit.cases.init([{
+        title: 'correct',
+        testMap: testMapCorrect,
+        expected: computedMapCorrect
+    }, {
+        title: 'incorrect',
+        testMap: testMapIncorrect,
+        expected: computedMapIncorrect
+    }]).test('factory', (data, assert) => {
+        const instance = navigationDataFactory(data.testMap);
+        assert.expect(1);
+        assert.deepEqual(instance.getMap(), data.expected, 'The instance has been initialized with the expected data');
+    });
+
+    QUnit.cases.init([{
+        title: 'correct',
+        testMap: testMapCorrect,
+        expected: computedMapCorrect
+    }, {
+        title: 'incorrect',
+        testMap: testMapIncorrect,
+        expected: computedMapIncorrect
+    }]).test('getMap/setMap', (data, assert) => {
+        const instance = navigationDataFactory();
+        assert.expect(3);
+        assert.deepEqual(instance.getMap(), emptyMap, 'The instance has been initialized with empty data');
+        assert.deepEqual(instance.setMap(data.testMap), instance, 'The method setMap() is fluent');
+        assert.deepEqual(instance.getMap(), data.expected, 'The method getMap() returned the expected data');
+    });
+
+    QUnit.test('error using filter', assert => {
+        const instance = navigationDataFactory(testMapCorrect);
+
+        assert.expect(3);
+        assert.deepEqual(instance.getMap(), computedMapCorrect, 'The instance has been initialized with the expected data');
+        assert.throws(() => instance.filterMap('wrong'), 'The method filterMap() must receive a function');
+        assert.throws(() => instance.filterMap(null), 'The method filterMap() must receive a function');
+
+        try {
+            instance.filterMap();
+        } catch(e) {
+            assert.ok(false, 'The method filterMap() should not throw an error if using the default callback');
+        }
+
+        try {
+            instance.filterMap(() => false);
+        } catch(e) {
+            assert.ok(false, 'The method filterMap() should not throw an error if using a callback');
+        }
+    });
+
+    QUnit.test('filter from correct map', assert => {
+        const instance = navigationDataFactory(testMapCorrect);
+        const filterIncorrect = item => !item.informational && (!item.maxScore || item.score !== item.maxScore);
+        const filterCorrect = item => item.informational || (item.maxScore && item.score === item.maxScore);
+
+        assert.expect(7);
+        assert.deepEqual(instance.getMap(), computedMapCorrect, 'The instance has been initialized with the expected data');
+        assert.deepEqual(instance.filterMap(filterIncorrect), instance, 'The method filterMap() is fluent - filter by incorrect');
+        assert.deepEqual(instance.getMap(), filteredMapCorrectIncorrect, 'The exposed test map has been updated to match the filter');
+        assert.deepEqual(instance.filterMap(filterCorrect), instance, 'The method filterMap() is fluent - filter by correct');
+        assert.deepEqual(instance.getMap(), filteredMapCorrectCorrect, 'The exposed test map has been updated to match the filter');
+        assert.deepEqual(instance.filterMap(), instance, 'The method filterMap() is fluent - no filter');
+        assert.deepEqual(instance.getMap(), computedMapCorrect, 'The exposed test map has been reverted to former value');
+    });
+
+    QUnit.test('filter from incorrect map', assert => {
+        const instance = navigationDataFactory(testMapIncorrect);
+        const filterIncorrect = item => !item.informational && (!item.maxScore || item.score !== item.maxScore);
+        const filterCorrect = item => item.informational || (item.maxScore && item.score === item.maxScore);
+
+        assert.expect(7);
+        assert.deepEqual(instance.getMap(), computedMapIncorrect, 'The instance has been initialized with the expected data');
+        assert.deepEqual(instance.filterMap(filterIncorrect), instance, 'The method filterMap() is fluent - filter by incorrect');
+        assert.deepEqual(instance.getMap(), filteredMapIncorrectIncorrect, 'The exposed test map has been updated to match the filter');
+        assert.deepEqual(instance.filterMap(filterCorrect), instance, 'The method filterMap() is fluent - filter by correct');
+        assert.deepEqual(instance.getMap(), filteredMapIncorrectCorrect, 'The exposed test map has been updated to match the filter');
+        assert.deepEqual(instance.filterMap(), instance, 'The method filterMap() is fluent - no filter');
+        assert.deepEqual(instance.getMap(), computedMapIncorrect, 'The exposed test map has been reverted to former value');
+    });
+
+    QUnit.cases.init([{
+        title: 'correct',
+        testMap: testMapCorrect,
+        expected: computedMapCorrect
+    }, {
+        title: 'incorrect',
+        testMap: testMapIncorrect,
+        expected: computedMapIncorrect
+    }]).test('computeMap', (data, assert) => {
+        const instance = navigationDataFactory();
+        assert.expect(2);
+        assert.deepEqual(instance.getMap(), emptyMap, 'The instance has been initialized with empty data');
+        assert.deepEqual(instance.computeMap(data.testMap), data.expected, 'The method computeMap() returns the expected data');
+    });
 
     QUnit.cases.init([{
         title: 'correct',
@@ -79,8 +184,7 @@ define([
         testMap: testMapIncorrect,
         expected: reviewDataIncorrect
     }]).test('getReviewPanelMap', (data, assert) => {
-        const testRunner = getTestRunner(data.testMap);
-        const instance = reviewPanelDataService(testRunner);
+        const instance = navigationDataFactory(data.testMap);
         assert.expect(1);
         assert.deepEqual(instance.getReviewPanelMap(), data.expected, 'The method getReviewPanelMap() returns the expected data');
     });

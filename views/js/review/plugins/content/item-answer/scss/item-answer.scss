@@ -17,8 +17,10 @@
  */
 @import "inc/bootstrap";
 
-$focusSpace: 5px;
+$focusSpace: 2px;
+$focusActiveSpace: $focusSpace + 1px;
 $borderWidth: 2px;
+$focusBorderWidth: 4px;
 $borderColor: $info;
 $backgroundColor: $uiGeneralContentBg;
 $skippedColor: blacken($error, .2);
@@ -161,9 +163,15 @@ $incorrectColor: blacken($error, .2);
         .navigable {
             position: relative;
             &:focus {
-                outline: $borderWidth dashed $textColor;
+                outline: $focusBorderWidth solid $info;
                 outline-offset: -$focusSpace;
             }
         }
+        li.active .navigable {
+            &:focus {
+                outline-offset: -$focusActiveSpace;
+            }
+        }
+        
     }
 }

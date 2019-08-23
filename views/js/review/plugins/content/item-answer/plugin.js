@@ -142,6 +142,8 @@ define([
                         }
                         // remove all tabindex's inside item for right navigation
                         testRunner.getAreaBroker().getContentArea().find("[tabindex]").attr('tabindex', -1);
+                        // add tabindex on itemBody
+                        testRunner.getAreaBroker().getContentArea().find(".qti-itemBody").attr('tabindex', 0);
                     })
                     .on(`plugin-show.${this.getName()}`, () => itemAnswer.show())
                     .on(`plugin-hide.${this.getName()}`, () => itemAnswer.hide())

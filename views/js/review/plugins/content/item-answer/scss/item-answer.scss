@@ -17,10 +17,10 @@
  */
 @import "inc/bootstrap";
 
-$focusSpace: 2px;
+$focusSpace: 1px;
 $focusActiveSpace: $focusSpace + 1px;
 $borderWidth: 2px;
-$focusBorderWidth: 4px;
+$focusBorderWidth: 3px;
 $borderColor: $info;
 $backgroundColor: $uiGeneralContentBg;
 $skippedColor: blacken($error, .2);
@@ -174,4 +174,12 @@ $incorrectColor: blacken($error, .2);
         }
         
     }
+}
+// for navigation
+.qti-itemBody {
+    border: $focusBorderWidth solid transparent;
+}
+.qti-itemBody:focus {
+    border: $focusBorderWidth solid $info;
+    outline: 0 none;
 }

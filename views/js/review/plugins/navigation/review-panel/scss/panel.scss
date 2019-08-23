@@ -21,10 +21,11 @@ $scoreWidth: 30px;
 $iconWidth: 30px;
 $lineHeight: 3rem;
 $borderWidth: 1px;
+$focusedBorderWidth: 3px;
 $sidePadding: 8px;
 $boxPadding: 5px;
 $space: 5px;
-$focusSpace: 2px;
+$focusSpace: 3px;
 $panelMargin: 10px;
 
 $panelBackground: $canvas;
@@ -151,11 +152,12 @@ $incorrectColor: $error;
                 &:after {
                     content: ' ';
                     position: absolute;
-                    top: $focusSpace;
-                    left: $focusSpace;
-                    bottom: $focusSpace;
-                    right: $focusSpace;
-                    border: $borderWidth dashed $textColor;
+                    top: -$focusSpace;
+                    left: -$focusSpace;
+                    bottom: -$focusSpace;
+                    right: -$focusSpace;
+                    border: $focusedBorderWidth solid $info;
+                    z-index: 100;
                 }
             }
         }
@@ -227,7 +229,6 @@ $incorrectColor: $error;
 
     .review-panel-content {
         flex: 0 1 auto;
-        overflow-y: auto;
     }
 
     .review-panel-part {

@@ -33,15 +33,15 @@ define([
      */
     const defaults = {
         buttons: [{
-            title: __('Go to the previous item'),
-            icon: 'left',
-            control: 'prev'
-        }, {
             title: __('Go to the next item'),
             cls: 'right',
             icon: 'right',
             text: __('Next'),
             control: 'next'
+        },{
+            title: __('Go to the previous item'),
+            icon: 'left',
+            control: 'prev'
         }]
     };
 

@@ -139,6 +139,23 @@ define([
 
             this.assetManager = assetManagerFactory();
 
+            // set tabindex=0 in navigation links and hide other links from navigation
+            $(document).find("li a:not([tabindex])").attr("tabindex", 0);
+            $(document).find("a:not([tabindex])").attr("tabindex", -1);
+            // first and second tab will show block and navigate to panel or content
+            const leaveCurrentAndNavigateTo = (e, where) => {
+                e.preventDefault();
+                $(e.target).blur();
+                areaBroker.getArea(where).find(":not(.hidden)[tabindex]").first().focus();
+            }
+            const navigationlink = areaBroker.getContainer().find('.navigationlink');
+            navigationlink.on('click', (e) => {
+                leaveCurrentAndNavigateTo(e, 'panel');
+            });
+            const answerlink = areaBroker.getContainer().find('.answerlink');
+            answerlink.on('click', (e) => {
+                leaveCurrentAndNavigateTo(e, 'contentWrapper');
+            });
             /*
              * Install behavior on events
              */

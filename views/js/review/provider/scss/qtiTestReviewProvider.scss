@@ -5,3 +5,29 @@
 @import "inc/section-container";
 @import "inc/test-dimensions";
 @import 'inc/review-layout';
+
+.jumplink {
+  position: fixed;
+  left: -9999px;
+  background-color: $uiGeneralContentBg;
+  color: $textColor;
+  text-decoration: underline;
+  outline: none;
+  box-shadow: inset 0 0 0px 3px $info;
+  height: 100px;
+  width: 340px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &:focus {
+    visibility: visible;
+    top: 0px;
+    left: 0px;
+    z-index: 1000;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+   }
+ }
+
+header nav ul li a[tabindex]:focus {
+  box-shadow: inset 0 0 0px 3px $info;
+ }

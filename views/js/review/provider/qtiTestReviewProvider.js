@@ -102,7 +102,8 @@ define([
                 actionsBar: $('.bottom-action-bar .control-box', $layout),
                 panel: $('.test-sidebar-left .panel-box', $layout),
                 header: $('.top-action-bar .tools-box', $layout),
-                context: $('.top-action-bar .navi-box-list', $layout)
+                context: $('.top-action-bar .navi-box-list', $layout),
+                sidebar: $('.test-sidebar-left', $layout),
             });
         },
 
@@ -143,19 +144,24 @@ define([
             $(document).find("li a:not([tabindex])").attr("tabindex", 0);
             $(document).find("a:not([tabindex])").attr("tabindex", -1);
             // first and second tab will show block and navigate to panel or content
-            const leaveCurrentAndNavigateTo = (e, where) => {
-                e.preventDefault();
-                $(e.target).blur();
-                areaBroker.getArea(where).find(":not(.hidden)[tabindex]").first().focus();
+            const createJumplink = (link, where) => {
+                if (!link || !where) {
+                    return;
+                }
+                link.on('click', (e) => {
+                    e.preventDefault();
+                    $(e.target).blur();
+                    areaBroker.getArea(where).find(":not(.hidden)[tabindex]").first().focus();
+                });
+                link.on('focus', () => {
+                    areaBroker.getArea(where).addClass('focused');
+                });
+                link.on('blur', () => {
+                    areaBroker.getArea(where).removeClass('focused');
+                });
             }
-            const navigationlink = areaBroker.getContainer().find('.navigationlink');
-            navigationlink.on('click', (e) => {
-                leaveCurrentAndNavigateTo(e, 'panel');
-            });
-            const answerlink = areaBroker.getContainer().find('.answerlink');
-            answerlink.on('click', (e) => {
-                leaveCurrentAndNavigateTo(e, 'contentWrapper');
-            });
+            createJumplink(areaBroker.getContainer().find('.navigationlink'), 'sidebar');
+            createJumplink(areaBroker.getContainer().find('.answerlink'), 'contentWrapper');
             /*
              * Install behavior on events
              */

@@ -75,7 +75,6 @@ $incorrectColor: $error;
 
 .review-panel {
     @include disableSelect();
-    background-color: $panelBackground;
     color: $panelColor;
     position: relative;
     display: flex;

@@ -1,4 +1,5 @@
 $sidePanelBorderWidth: 1px;
+$focusBorderWidth: 3px;
 @mixin sidePanelWidth($width) {
     max-width: $width;
     & > * {
@@ -140,6 +141,9 @@ $sidePanelBorderWidth: 1px;
           transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
          }
        }
+    a[tabindex]:focus, .focused {
+        box-shadow: inset 0 0 0px $focusBorderWidth $info;
+    }
 }
 
 .no-controls {

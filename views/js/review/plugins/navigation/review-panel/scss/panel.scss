@@ -25,7 +25,7 @@ $focusedBorderWidth: 3px;
 $sidePadding: 8px;
 $boxPadding: 5px;
 $space: 5px;
-$focusSpace: 3px;
+$focusSpace: 0px;
 $panelMargin: 10px;
 
 $panelBackground: $canvas;
@@ -151,10 +151,10 @@ $incorrectColor: $error;
                 &:after {
                     content: ' ';
                     position: absolute;
-                    top: -$focusSpace;
-                    left: -$focusSpace;
-                    bottom: -$focusSpace;
-                    right: -$focusSpace;
+                    top: $focusSpace;
+                    left: $focusSpace;
+                    bottom: $focusSpace;
+                    right: $focusSpace;
                     border: $focusedBorderWidth solid $info;
                     z-index: 100;
                 }
@@ -228,6 +228,7 @@ $incorrectColor: $error;
 
     .review-panel-content {
         flex: 0 1 auto;
+        overflow-y: auto;
     }
 
     .review-panel-part {

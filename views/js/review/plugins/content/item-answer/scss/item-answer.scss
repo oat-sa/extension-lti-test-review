@@ -175,11 +175,3 @@ $incorrectColor: blacken($error, .2);
         
     }
 }
-// for navigation
-.qti-itemBody {
-    border: $focusBorderWidth solid transparent;
-}
-.qti-itemBody:focus {
-    border: $focusBorderWidth solid $info;
-    outline: 0 none;
-}

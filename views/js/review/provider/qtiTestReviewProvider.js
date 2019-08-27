@@ -140,9 +140,6 @@ define([
 
             this.assetManager = assetManagerFactory();
 
-            // set tabindex=0 in navigation links and hide other links from navigation
-            $(document).find("li a:not([tabindex])").attr("tabindex", 0);
-            $(document).find("a:not([tabindex])").attr("tabindex", -1);
             // first and second tab will show block and navigate to panel or content
             const createJumplink = (link, where) => {
                 if (!link || !where) {

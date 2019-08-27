@@ -20,8 +20,9 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 define([
-    'lodash'
-], function (_) {
+    'lodash',
+    'core/eventifier'
+], function (_, eventifier) {
     'use strict';
 
     /**
@@ -91,8 +92,31 @@ define([
     /**
      * Manages the test map in order to allow to filter it.
      * Refines the test map to provide the dataset expected by the review panel
+     *
+     * @example
+     *  // initialize with a test map
+     *  const navigationDataService = navigationDataServiceFactory(testMap);
+     *
+     *  // the service can also be created empty
+     *  const navigationDataService = navigationDataServiceFactory();
+     *  // and a test map set later
+     *  navigationDataService.setMap(testMap);
+     *
+     *  // get the current map
+     *  const map = navigationDataService.getMap();
+     *
+     *  // filter the map by informational items
+     *  navigationDataService.filterMap(item => item.informational);
+     *
+     *  // changes on test map can be listened
+     *  navigationDataService.on('mapchange', testMap => {}); // test map rewritten
+     *  navigationDataService.on('mapfilter', testMap => {}); // test map filtered
+     *
+     *
      * @param {testMap} testMap
      * @returns {navigationDataService}
+     * @fires mapchange each time the testMap is changed
+     * @fires mapfilter each time the testMap is filtered
      */
     function navigationDataServiceFactory(testMap = {}) {
         let filteredTestMap;
@@ -102,10 +126,18 @@ define([
          */
         const navigationDataService = {
             /**
-             * Gets the filtered test map
+             * Gets the test map
              * @returns {testMap}
              */
             getMap() {
+                return testMap;
+            },
+
+            /**
+             * Gets the filtered test map
+             * @returns {testMap}
+             */
+            getFilteredMap() {
                 return filteredTestMap;
             },
 
@@ -113,10 +145,19 @@ define([
              * Sets the former test map
              * @param {testMap} map
              * @returns {navigationDataService}
+             * @fires mapchange
              */
             setMap(map) {
                 testMap = this.computeMap(map);
+
+                /**
+                 * @event mapchange
+                 * @param {testMap} testMap
+                 */
+                this.trigger('mapchange', testMap);
+
                 this.filterMap();
+
                 return this;
             },
 
@@ -124,9 +165,11 @@ define([
              * Filters the former map by the provider filter callback.
              * Any item for which the filter returns true will be kept.
              * Empty sections and empty parts will be discarded.
-             * @param {Function} filter
+             * @param {Function} filter - A filter callback that should return truey to keep the passed on item,
+             *                            or should return falsey to reject it.
              * @returns {navigationDataService}
              * @throws TypeError when the filter is not a function
+             * @fires mapfilter
              */
             filterMap(filter = () => true) {
                 if (!_.isFunction(filter)) {
@@ -140,18 +183,28 @@ define([
                                 section = Object.assign({}, section, {
                                     items: _.pick(section.items, filter)
                                 });
+
                                 if (_.size(section.items)) {
                                     sections[sectionId] = section;
                                 }
+
                                 return sections;
                             }, {})
                         });
+
                         if (_.size(part.sections)) {
                             parts[partId] = part;
                         }
+
                         return parts;
                     }, {})
                 });
+
+                /**
+                 * @event mapfilter
+                 * @param {testMap} filteredTestMap
+                 */
+                this.trigger('mapfilter', filteredTestMap);
 
                 return this;
             },
@@ -193,9 +246,13 @@ define([
             }
         };
 
-        return navigationDataService
-            .setMap(testMap)
-            .filterMap();
+        eventifier(navigationDataService);
+
+        if (testMap) {
+            navigationDataService.setMap(testMap);
+        }
+
+        return navigationDataService;
     }
 
     return navigationDataServiceFactory;

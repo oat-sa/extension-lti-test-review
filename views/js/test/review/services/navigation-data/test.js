@@ -66,12 +66,26 @@ define([
     });
 
     QUnit.cases.init([
+        {title: 'on'},
+        {title: 'off'},
+        {title: 'before'},
+        {title: 'after'},
+        {title: 'trigger'},
+        {title: 'spread'}
+    ]).test('event API ', (data, assert) => {
+        const instance = navigationDataFactory(testMapCorrect);
+        assert.expect(1);
+        assert.equal(typeof instance[data.title], 'function', `The instance exposes a "${data.title}" function`);
+    });
+
+    QUnit.cases.init([
         {title: 'getMap'},
+        {title: 'getFilteredMap'},
         {title: 'setMap'},
         {title: 'filterMap'},
         {title: 'computeMap'},
         {title: 'getReviewPanelMap'}
-    ]).test('inherited API', (data, assert) => {
+    ]).test('service API', (data, assert) => {
         const instance = navigationDataFactory(testMapCorrect);
         assert.expect(1);
         assert.equal(typeof instance[data.title], 'function', `The instance exposes a "${data.title}" function`);
@@ -102,11 +116,31 @@ define([
         testMap: testMapIncorrect,
         expected: computedMapIncorrect
     }]).test('getMap/setMap', (data, assert) => {
+        const ready = assert.async();
         const instance = navigationDataFactory();
-        assert.expect(3);
-        assert.deepEqual(instance.getMap(), emptyMap, 'The instance has been initialized with empty data');
-        assert.deepEqual(instance.setMap(data.testMap), instance, 'The method setMap() is fluent');
-        assert.deepEqual(instance.getMap(), data.expected, 'The method getMap() returned the expected data');
+        assert.expect(4);
+        Promise
+            .resolve()
+            .then(() => new Promise(resolve => {
+                instance
+                    .off('.test')
+                    .on('mapchange.test', newMap => {
+                        assert.deepEqual(newMap, data.expected, 'The event mapchange has been emitted');
+                        resolve();
+                    });
+                assert.deepEqual(instance.getMap(), emptyMap, 'The instance has been initialized with empty data');
+                assert.deepEqual(instance.setMap(data.testMap), instance, 'The method setMap() is fluent');
+            }))
+            .then(() => {
+                assert.deepEqual(instance.getMap(), data.expected, 'The method getMap() returned the expected data');
+            })
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('error using filter', assert => {
@@ -119,45 +153,117 @@ define([
 
         try {
             instance.filterMap();
-        } catch(e) {
+        } catch (e) {
             assert.ok(false, 'The method filterMap() should not throw an error if using the default callback');
         }
 
         try {
             instance.filterMap(() => false);
-        } catch(e) {
+        } catch (e) {
             assert.ok(false, 'The method filterMap() should not throw an error if using a callback');
         }
     });
 
     QUnit.test('filter from correct map', assert => {
+        const ready = assert.async();
         const instance = navigationDataFactory(testMapCorrect);
         const filterIncorrect = item => !item.informational && (!item.maxScore || item.score !== item.maxScore);
         const filterCorrect = item => item.informational || (item.maxScore && item.score === item.maxScore);
 
-        assert.expect(7);
-        assert.deepEqual(instance.getMap(), computedMapCorrect, 'The instance has been initialized with the expected data');
-        assert.deepEqual(instance.filterMap(filterIncorrect), instance, 'The method filterMap() is fluent - filter by incorrect');
-        assert.deepEqual(instance.getMap(), filteredMapCorrectIncorrect, 'The exposed test map has been updated to match the filter');
-        assert.deepEqual(instance.filterMap(filterCorrect), instance, 'The method filterMap() is fluent - filter by correct');
-        assert.deepEqual(instance.getMap(), filteredMapCorrectCorrect, 'The exposed test map has been updated to match the filter');
-        assert.deepEqual(instance.filterMap(), instance, 'The method filterMap() is fluent - no filter');
-        assert.deepEqual(instance.getMap(), computedMapCorrect, 'The exposed test map has been reverted to former value');
+        assert.expect(10);
+        Promise
+            .resolve()
+            .then(() => new Promise(resolve => {
+                instance
+                    .off('.test')
+                    .on('mapfilter.test', filterMap => {
+                        assert.deepEqual(filterMap, filteredMapCorrectIncorrect, 'The event mapfilter has been emitted');
+                        resolve();
+                    });
+                assert.deepEqual(instance.getFilteredMap(), computedMapCorrect, 'The instance has been initialized with the expected data');
+                assert.deepEqual(instance.filterMap(filterIncorrect), instance, 'The method filterMap() is fluent - filter by incorrect');
+            }))
+            .then(() => new Promise(resolve => {
+                instance
+                    .off('.test')
+                    .on('mapfilter.test', filterMap => {
+                        assert.deepEqual(filterMap, filteredMapCorrectCorrect, 'The event mapfilter has been emitted');
+                        resolve();
+                    });
+                assert.deepEqual(instance.getFilteredMap(), filteredMapCorrectIncorrect, 'The exposed test map has been updated to match the filter');
+                assert.deepEqual(instance.filterMap(filterCorrect), instance, 'The method filterMap() is fluent - filter by correct');
+            }))
+            .then(() => new Promise(resolve => {
+                instance
+                    .off('.test')
+                    .on('mapfilter.test', filterMap => {
+                        assert.deepEqual(filterMap, computedMapCorrect, 'The event mapfilter has been emitted');
+                        resolve();
+                    });
+                assert.deepEqual(instance.getFilteredMap(), filteredMapCorrectCorrect, 'The exposed test map has been updated to match the filter');
+                assert.deepEqual(instance.filterMap(), instance, 'The method filterMap() is fluent - no filter');
+            }))
+            .then(() => {
+                assert.deepEqual(instance.getFilteredMap(), computedMapCorrect, 'The exposed test map has been reverted to former value');
+            })
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.test('filter from incorrect map', assert => {
+        const ready = assert.async();
         const instance = navigationDataFactory(testMapIncorrect);
         const filterIncorrect = item => !item.informational && (!item.maxScore || item.score !== item.maxScore);
         const filterCorrect = item => item.informational || (item.maxScore && item.score === item.maxScore);
 
-        assert.expect(7);
-        assert.deepEqual(instance.getMap(), computedMapIncorrect, 'The instance has been initialized with the expected data');
-        assert.deepEqual(instance.filterMap(filterIncorrect), instance, 'The method filterMap() is fluent - filter by incorrect');
-        assert.deepEqual(instance.getMap(), filteredMapIncorrectIncorrect, 'The exposed test map has been updated to match the filter');
-        assert.deepEqual(instance.filterMap(filterCorrect), instance, 'The method filterMap() is fluent - filter by correct');
-        assert.deepEqual(instance.getMap(), filteredMapIncorrectCorrect, 'The exposed test map has been updated to match the filter');
-        assert.deepEqual(instance.filterMap(), instance, 'The method filterMap() is fluent - no filter');
-        assert.deepEqual(instance.getMap(), computedMapIncorrect, 'The exposed test map has been reverted to former value');
+        assert.expect(10);
+        Promise
+            .resolve()
+            .then(() => new Promise(resolve => {
+                instance
+                    .off('.test')
+                    .on('mapfilter.test', filterMap => {
+                        assert.deepEqual(filterMap, filteredMapIncorrectIncorrect, 'The event mapfilter has been emitted');
+                        resolve();
+                    });
+                assert.deepEqual(instance.getFilteredMap(), computedMapIncorrect, 'The instance has been initialized with the expected data');
+                assert.deepEqual(instance.filterMap(filterIncorrect), instance, 'The method filterMap() is fluent - filter by incorrect');
+            }))
+            .then(() => new Promise(resolve => {
+                instance
+                    .off('.test')
+                    .on('mapfilter.test', filterMap => {
+                        assert.deepEqual(filterMap, filteredMapIncorrectCorrect, 'The event mapfilter has been emitted');
+                        resolve();
+                    });
+                assert.deepEqual(instance.getFilteredMap(), filteredMapIncorrectIncorrect, 'The exposed test map has been updated to match the filter');
+                assert.deepEqual(instance.filterMap(filterCorrect), instance, 'The method filterMap() is fluent - filter by correct');
+            }))
+            .then(() => new Promise(resolve => {
+                instance
+                    .off('.test')
+                    .on('mapfilter.test', filterMap => {
+                        assert.deepEqual(filterMap, computedMapIncorrect, 'The event mapfilter has been emitted');
+                        resolve();
+                    });
+                assert.deepEqual(instance.getFilteredMap(), filteredMapIncorrectCorrect, 'The exposed test map has been updated to match the filter');
+                assert.deepEqual(instance.filterMap(), instance, 'The method filterMap() is fluent - no filter');
+            }))
+            .then(() => {
+                assert.deepEqual(instance.getFilteredMap(), computedMapIncorrect, 'The exposed test map has been reverted to former value');
+            })
+            .catch(err => {
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+            })
+            .then(ready);
     });
 
     QUnit.cases.init([{

@@ -2115,7 +2115,12 @@ define([
                     .on('click', 'button', e => {
                         $header.find('button').removeClass('btn-success');
                         e.currentTarget.classList.add('btn-success');
-                        instance.setData(data[e.currentTarget.dataset.control]);
+                        const control = e.currentTarget.dataset.control;
+                        if (control === 'incorrect') {
+                            instance.setData(filterData[instance.getActiveFilter()]);
+                        } else {
+                            instance.setData(data[control]);
+                        }
                     })
                     .find('[data-control="correct"]').click();
 

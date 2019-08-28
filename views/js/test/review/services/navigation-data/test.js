@@ -50,23 +50,6 @@ define([
         maxScore: 0
     };
 
-    // adjust mock data
-    const adjustJumps = testMap => {
-        if (testMap && Array.isArray(testMap.jumps)) {
-            testMap.jumps = testMap.jumps.map(jump => {
-                // null values must be made undefined
-                if (jump !== null) {
-                    return jump;
-                }
-            });
-        }
-    };
-    adjustJumps(filteredMapCorrectCorrect);
-    adjustJumps(filteredMapCorrectIncorrect);
-    adjustJumps(filteredMapIncorrectCorrect);
-    adjustJumps(filteredMapIncorrectIncorrect);
-
-
     QUnit.dump.maxDepth = 20;
 
     QUnit.module('Factory');

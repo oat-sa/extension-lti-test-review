@@ -190,16 +190,16 @@
       "part": "Introduction",
       "position": 0
     },
-    null,
-    null,
-    null,
+    {},
+    {},
+    {},
     {
       "identifier": "item-5",
       "section": "assessmentSection-2",
       "part": "QTIExamples",
       "position": 4
     },
-    null,
+    {},
     {
       "identifier": "item-7",
       "section": "assessmentSection-2",

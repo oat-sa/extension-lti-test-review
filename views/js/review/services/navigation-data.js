@@ -182,6 +182,10 @@ define([
                 // make sure the jumps table is set accordingly
                 mapHelper.createJumpTable(filteredTestMap);
 
+                // fix the jumps table, filling the gaps by empty objects
+                const jumps = mapHelper.getJumps(filteredTestMap);
+                _.times(jumps.length, index => jumps[index] = jumps[index] || {});
+
                 /**
                  * @event mapfilter
                  * @param {testMap} filteredTestMap

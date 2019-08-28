@@ -25,9 +25,10 @@ define([
     'i18n',
     'taoReview/review/plugins/navigation/review-panel/panel',
     'json!taoReview/test/review/plugins/navigation/review-panel/panel/map-correct.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data-correct-all.json',
     'json!taoReview/test/review/plugins/navigation/review-panel/panel/map-incorrect.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data-incorrect-all.json',
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel/map-incorrect-filtered.json',
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data-correct.json',
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data-incorrect.json',
     'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data-incorrect-filtered.json'
 ], function (
     $,
@@ -35,9 +36,10 @@ define([
     __,
     reviewPanelFactory,
     testMapCorrect,
-    reviewDataCorrectAll,
     testMapIncorrect,
-    reviewDataIncorrectAll,
+    testMapIncorrectFiltered,
+    reviewDataCorrect,
+    reviewDataIncorrect,
     reviewDataIncorrectFiltered
 ) {
     'use strict';
@@ -527,37 +529,35 @@ define([
             maxScore: 1
         };
         const initialDataAll = {
-            testMap: {
-                parts: [{
-                    id: 'part',
-                    label: 'part',
+            parts: [{
+                id: 'part',
+                label: 'part',
+                position: 0,
+                sections: [{
+                    id: 'section',
+                    label: 'section',
                     position: 0,
-                    sections: [{
-                        id: 'section',
-                        label: 'section',
+                    items: [{
+                        id: 'item',
+                        label: 'item',
+                        informational: false,
+                        skipped: true,
+                        type: 'incorrect',
                         position: 0,
-                        items: [{
-                            id: 'item',
-                            label: 'item',
-                            informational: false,
-                            skipped: true,
-                            type: 'incorrect',
-                            position: 0,
-                            score: 0,
-                            maxScore: 1
-                        }],
                         score: 0,
                         maxScore: 1
                     }],
                     score: 0,
                     maxScore: 1
-                }]
-            },
+                }],
+                score: 0,
+                maxScore: 1
+            }],
             score: 0,
             maxScore: 1
         };
 
-        assert.expect(63);
+        assert.expect(67);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -569,8 +569,8 @@ define([
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
 
-                assert.deepEqual(instance.getData().testMap, initialDataAll.testMap, 'The initial data is set: testMap');
-                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
+                assert.deepEqual(instance.getData().parts, initialDataAll.parts, 'The initial data is set: parts');
+                assert.deepEqual(instance.getData().items instanceof Map, true, 'The initial data is set: items');
                 assert.deepEqual(instance.getData().score, initialDataAll.score, 'The initial data is set: score');
                 assert.deepEqual(instance.getData().maxScore, initialDataAll.maxScore, 'The initial data is set: maxScore');
 
@@ -594,20 +594,28 @@ define([
                         instance.off('.test');
                         const promises = [
                             new Promise(resolve => {
-                                instance.on('datachange.test', newData => {
-                                    assert.deepEqual(newData.testMap, reviewDataCorrectAll.testMap, 'The datachange event is triggered with the expected parameter');
+                                instance.on('datachange.test', data => {
+                                    assert.ok(true, 'The datachange event is emitted');
+                                    assert.deepEqual(data.parts, reviewDataCorrect.parts, 'The event data contains: parts');
+                                    assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
+                                    assert.deepEqual(data.score, reviewDataCorrect.score, 'The event data contains: score');
+                                    assert.deepEqual(data.maxScore, reviewDataCorrect.maxScore, 'The event data contains: maxScore');
                                     resolve();
                                 });
                             }),
                             new Promise(resolve => {
-                                instance.on('update.test', filteredData => {
-                                    assert.deepEqual(filteredData.testMap, reviewDataCorrectAll.testMap, 'The update event is triggered with the expected parameter');
+                                instance.on('update.test', data => {
+                                    assert.ok(true, 'The update event is emitted');
+                                    assert.deepEqual(data.parts, reviewDataCorrect.parts, 'The event data contains: parts');
+                                    assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
+                                    assert.deepEqual(data.score, reviewDataCorrect.score, 'The event data contains: score');
+                                    assert.deepEqual(data.maxScore, reviewDataCorrect.maxScore, 'The event data contains: maxScore');
                                     resolve();
                                 });
                             }),
                         ];
                         assert.equal(instance.setData(testMapCorrect), instance, 'setData is fluent');
-                        assert.deepEqual(instance.getData().testMap, reviewDataCorrectAll.testMap, 'The updated data is set');
+                        assert.deepEqual(instance.getData().parts, reviewDataCorrect.parts, 'The updated data is set');
                         return Promise.all(promises);
                     })
                     .then(() => {
@@ -651,33 +659,20 @@ define([
                         assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is active');
                         assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active');
                     })
-                    .then(() => {
-                        instance.off('.test');
-                        const promises = [
-                            new Promise(resolve => {
-                                instance.on('filterchange.test', filterId => {
-                                    assert.equal(filterId, 'incorrect', 'The filterchange event is triggered with the expected parameter');
-                                    resolve();
-                                });
-                            }),
-                            new Promise(resolve => {
-                                instance.on('update.test', filteredData => {
-                                    assert.deepEqual(filteredData.testMap, reviewDataCorrectAll.testMap, 'The update event is triggered with the expected parameter');
-                                    resolve();
-                                });
-                            }),
-                        ];
+                    .then(() => new Promise(resolve => {
+                        instance
+                            .off('.test')
+                            .on('filterchange.test', filterId => {
+                                assert.equal(filterId, 'incorrect', 'The filterchange event is triggered with the expected parameter');
+                                resolve();
+                            });
+
                         instance.setActiveFilter('incorrect');
 
                         assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), false, 'The first filter is not active anymore');
                         assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), true, 'The second filter is now active');
-                        return Promise.all(promises);
-                    })
+                    }))
                     .then(() => {
-                        assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
-                        assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
-                        assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
-
                         assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
                         assert.equal($container.find('.review-panel-filter:visible').length, 0, 'The filters are not displayed');
                         assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
@@ -750,37 +745,35 @@ define([
             maxScore: 1
         };
         const initialDataAll = {
-            testMap: {
-                parts: [{
-                    id: 'part',
-                    label: 'part',
+            parts: [{
+                id: 'part',
+                label: 'part',
+                position: 0,
+                sections: [{
+                    id: 'section',
+                    label: 'section',
                     position: 0,
-                    sections: [{
-                        id: 'section',
-                        label: 'section',
+                    items: [{
+                        id: 'item',
+                        label: 'item',
+                        informational: false,
+                        skipped: false,
+                        type: 'correct',
                         position: 0,
-                        items: [{
-                            id: 'item',
-                            label: 'item',
-                            informational: false,
-                            skipped: false,
-                            type: 'correct',
-                            position: 0,
-                            score: 1,
-                            maxScore: 1
-                        }],
                         score: 1,
                         maxScore: 1
                     }],
                     score: 1,
                     maxScore: 1
-                }]
-            },
+                }],
+                score: 1,
+                maxScore: 1
+            }],
             score: 1,
             maxScore: 1
         };
 
-        assert.expect(73);
+        assert.expect(69);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -792,8 +785,8 @@ define([
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
 
-                assert.deepEqual(instance.getData().testMap, initialDataAll.testMap, 'The initial data is set: testMap');
-                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
+                assert.deepEqual(instance.getData().parts, initialDataAll.parts, 'The initial data is set: parts');
+                assert.deepEqual(instance.getData().items instanceof Map, true, 'The initial data is set: items');
                 assert.deepEqual(instance.getData().score, initialDataAll.score, 'The initial data is set: score');
                 assert.deepEqual(instance.getData().maxScore, initialDataAll.maxScore, 'The initial data is set: maxScore');
 
@@ -817,20 +810,28 @@ define([
                         instance.off('.test');
                         const promises = [
                             new Promise(resolve => {
-                                instance.on('datachange.test', newData => {
-                                    assert.deepEqual(newData.testMap, reviewDataIncorrectAll.testMap, 'The datachange event is triggered with the expected parameter');
+                                instance.on('datachange.test', data => {
+                                    assert.ok(true, 'The datachange event is emitted');
+                                    assert.deepEqual(data.parts, reviewDataIncorrect.parts, 'The event data contains: parts');
+                                    assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
+                                    assert.deepEqual(data.score, reviewDataIncorrect.score, 'The event data contains: score');
+                                    assert.deepEqual(data.maxScore, reviewDataIncorrect.maxScore, 'The event data contains: maxScore');
                                     resolve();
                                 });
                             }),
                             new Promise(resolve => {
-                                instance.on('update.test', filteredData => {
-                                    assert.deepEqual(filteredData.testMap, reviewDataIncorrectAll.testMap, 'The update event is triggered with the expected parameter');
+                                instance.on('update.test', data => {
+                                    assert.ok(true, 'The update event is emitted');
+                                    assert.deepEqual(data.parts, reviewDataIncorrect.parts, 'The event data contains: parts');
+                                    assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
+                                    assert.deepEqual(data.score, reviewDataIncorrect.score, 'The event data contains: score');
+                                    assert.deepEqual(data.maxScore, reviewDataIncorrect.maxScore, 'The event data contains: maxScore');
                                     resolve();
                                 });
                             }),
                         ];
                         assert.equal(instance.setData(testMapIncorrect), instance, 'setData is fluent');
-                        assert.deepEqual(instance.getData().testMap, reviewDataIncorrectAll.testMap, 'The updated data is set');
+                        assert.deepEqual(instance.getData().parts, reviewDataIncorrect.parts, 'The updated data is set');
                         return Promise.all(promises);
                     })
                     .then(() => {
@@ -876,60 +877,20 @@ define([
                         assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is active');
                         assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active');
                     })
-                    .then(() => {
-                        instance.off('.test');
-                        const promises = [
-                            new Promise(resolve => {
-                                instance.on('filterchange.test', filterId => {
-                                    assert.equal(filterId, 'incorrect', 'The filterchange event is triggered with the expected parameter');
-                                    resolve();
-                                });
-                            }),
-                            new Promise(resolve => {
-                                instance.on('update.test', filteredData => {
-                                    assert.deepEqual(filteredData.testMap, reviewDataIncorrectFiltered.testMap, 'The update event is triggered with the expected parameter');
-                                    resolve();
-                                });
-                            }),
-                        ];
+                    .then(() => new Promise(resolve => {
+                        instance
+                            .off('.test')
+                            .on('filterchange.test', filterId => {
+                                assert.equal(filterId, 'incorrect', 'The filterchange event is triggered with the expected parameter');
+                                resolve();
+                            });
+
                         instance.setActiveFilter('incorrect');
 
                         assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), false, 'The first filter is not active anymore');
                         assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), true, 'The second filter is now active');
-                        return Promise.all(promises);
-                    })
+                    }))
                     .then(() => {
-                        assert.equal($container.find('.review-panel-part').length, 1, 'The test parts are rendered');
-                        assert.equal(
-                            $container.find('.review-panel-part:nth(0) > .review-panel-label').text().trim(),
-                            testMapIncorrect.parts['QTIExamples'].label,
-                            'The first test part got the expected label'
-                        );
-
-                        assert.equal($container.find('.review-panel-section').length, 2, 'The test sections are rendered');
-                        assert.equal(
-                            $container.find('.review-panel-section:nth(0) > .review-panel-label').text().trim(),
-                            testMapIncorrect.parts['QTIExamples'].sections['assessmentSection-2'].label,
-                            'The 1st rendered test section got the expected label'
-                        );
-
-                        assert.equal($container.find('.review-panel-item').length, 2, 'The test items are rendered');
-                        assert.equal(
-                            $container.find('.review-panel-item:nth(0) > .review-panel-label').text().trim(),
-                            testMapIncorrect.parts['QTIExamples'].sections['assessmentSection-2'].items['item-3'].label,
-                            'The 1st rendered test item got the expected label'
-                        );
-                        assert.equal($container.find('.review-panel-item:nth(0)').is('.item-incorrect'), true, 'The 1st item got the expected icon');
-                        assert.equal(
-                            $container.find('.review-panel-item:nth(1) > .review-panel-label').text().trim(),
-                            testMapIncorrect.parts['QTIExamples'].sections['assessmentSection-3'].items['item-9'].label,
-                            'The 1st rendered test item got the expected label'
-                        );
-                        assert.equal($container.find('.review-panel-item:nth(1)').is('.item-default'), true, 'The 2nd item got the expected icon');
-
-                        assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '93%', 'The header score is rendered');
-                        assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '14/15', 'The header score is rendered');
-
                         assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
                         assert.equal($container.find('.review-panel-filter:visible').length, 2, 'The filters are displayed');
                         assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
@@ -975,10 +936,10 @@ define([
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
 
-                assert.deepEqual(instance.getData().testMap, reviewDataIncorrectAll.testMap, 'The initial data is set: testMap');
-                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
-                assert.deepEqual(instance.getData().score, reviewDataIncorrectAll.score, 'The initial data is set: score');
-                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrectAll.maxScore, 'The initial data is set: maxScore');
+                assert.deepEqual(instance.getData().parts, reviewDataIncorrect.parts, 'The initial data is set: parts');
+                assert.deepEqual(instance.getData().items instanceof Map, true, 'The initial data is set: items');
+                assert.deepEqual(instance.getData().score, reviewDataIncorrect.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrect.maxScore, 'The initial data is set: maxScore');
 
                 assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
 
@@ -1206,10 +1167,10 @@ define([
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
 
-                assert.deepEqual(instance.getData().testMap, reviewDataIncorrectAll.testMap, 'The initial data is set: testMap');
-                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
-                assert.deepEqual(instance.getData().score, reviewDataIncorrectAll.score, 'The initial data is set: score');
-                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrectAll.maxScore, 'The initial data is set: maxScore');
+                assert.deepEqual(instance.getData().parts, reviewDataIncorrect.parts, 'The initial data is set: parts');
+                assert.deepEqual(instance.getData().items instanceof Map, true, 'The initial data is set: items');
+                assert.deepEqual(instance.getData().score, reviewDataIncorrect.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrect.maxScore, 'The initial data is set: maxScore');
 
                 assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
 
@@ -1409,10 +1370,10 @@ define([
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
 
-                assert.deepEqual(instance.getData().testMap, reviewDataIncorrectAll.testMap, 'The initial data is set: testMap');
-                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
-                assert.deepEqual(instance.getData().score, reviewDataIncorrectAll.score, 'The initial data is set: score');
-                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrectAll.maxScore, 'The initial data is set: maxScore');
+                assert.deepEqual(instance.getData().parts, reviewDataIncorrect.parts, 'The initial data is set: parts');
+                assert.deepEqual(instance.getData().items instanceof Map, true, 'The initial data is set: items');
+                assert.deepEqual(instance.getData().score, reviewDataIncorrect.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrect.maxScore, 'The initial data is set: maxScore');
 
                 assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
 
@@ -1592,10 +1553,10 @@ define([
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
 
-                assert.deepEqual(instance.getData().testMap, reviewDataIncorrectAll.testMap, 'The initial data is set: testMap');
-                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
-                assert.deepEqual(instance.getData().score, reviewDataIncorrectAll.score, 'The initial data is set: score');
-                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrectAll.maxScore, 'The initial data is set: maxScore');
+                assert.deepEqual(instance.getData().parts, reviewDataIncorrect.parts, 'The initial data is set: parts');
+                assert.deepEqual(instance.getData().items instanceof Map, true, 'The initial data is set: items');
+                assert.deepEqual(instance.getData().score, reviewDataIncorrect.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrect.maxScore, 'The initial data is set: maxScore');
 
                 assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
 
@@ -1739,10 +1700,10 @@ define([
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
 
-                assert.deepEqual(instance.getData().testMap, reviewDataIncorrectAll.testMap, 'The initial data is set: testMap');
-                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
-                assert.deepEqual(instance.getData().score, reviewDataIncorrectAll.score, 'The initial data is set: score');
-                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrectAll.maxScore, 'The initial data is set: maxScore');
+                assert.deepEqual(instance.getData().parts, reviewDataIncorrect.parts, 'The initial data is set: parts');
+                assert.deepEqual(instance.getData().items instanceof Map, true, 'The initial data is set: items');
+                assert.deepEqual(instance.getData().score, reviewDataIncorrect.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrect.maxScore, 'The initial data is set: maxScore');
 
                 assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
 
@@ -1887,7 +1848,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-item-change');
 
-        assert.expect(13);
+        assert.expect(23);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -1929,8 +1890,29 @@ define([
                                 });
                             }),
                             new Promise(resolve => {
+                                instance.on('datachange.test', data => {
+                                    assert.ok(true, 'The datachange event is emitted');
+                                    assert.deepEqual(data.parts, reviewDataIncorrectFiltered.parts, 'The event data contains: parts');
+                                    assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
+                                    assert.deepEqual(data.score, reviewDataIncorrectFiltered.score, 'The event data contains: score');
+                                    assert.deepEqual(data.maxScore, reviewDataIncorrectFiltered.maxScore, 'The event data contains: maxScore');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('update.test', data => {
+                                    assert.ok(true, 'The update event is emitted');
+                                    assert.deepEqual(data.parts, reviewDataIncorrectFiltered.parts, 'The event data contains: parts');
+                                    assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
+                                    assert.deepEqual(data.score, reviewDataIncorrectFiltered.score, 'The event data contains: score');
+                                    assert.deepEqual(data.maxScore, reviewDataIncorrectFiltered.maxScore, 'The event data contains: maxScore');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
                                 instance.on('filterchange.test', filterId => {
                                     assert.equal(filterId, 'incorrect', 'The filterchange event is triggered with the expected parameter');
+                                    instance.setData(testMapIncorrectFiltered);
                                     resolve();
                                 });
                             })
@@ -1978,10 +1960,10 @@ define([
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
 
-                assert.deepEqual(instance.getData().testMap, reviewDataIncorrectAll.testMap, 'The initial data is set: testMap');
-                assert.deepEqual(instance.getData().itemsMap instanceof Map, true, 'The initial data is set: itemsMap');
-                assert.deepEqual(instance.getData().score, reviewDataIncorrectAll.score, 'The initial data is set: score');
-                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrectAll.maxScore, 'The initial data is set: maxScore');
+                assert.deepEqual(instance.getData().parts, reviewDataIncorrect.parts, 'The initial data is set: parts');
+                assert.deepEqual(instance.getData().items instanceof Map, true, 'The initial data is set: items');
+                assert.deepEqual(instance.getData().score, reviewDataIncorrect.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, reviewDataIncorrect.maxScore, 'The initial data is set: maxScore');
 
                 assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
                 assert.equal(instance.is('disabled'), false, 'The instance is not disabled');
@@ -2106,8 +2088,12 @@ define([
             correct: testMapCorrect,
             incorrect: testMapIncorrect
         };
+        const filterData = {
+            all: testMapIncorrect,
+            incorrect: testMapIncorrectFiltered
+        };
         const showItem = (id, position) => {
-            const item = instance.getData().itemsMap.get(id);
+            const item = instance.getData().items.get(id);
             if (item) {
                 $item.html(`<h1>${item.label}</h1><p>${id} at #${position}</p>`);
             }
@@ -2150,6 +2136,7 @@ define([
             })
             .after('update', () => showItem(instance.getActiveItem(), instance.getActiveItemPosition()))
             .on('itemchange', showItem)
+            .on('filterchange', filterId => instance.setData(filterData[filterId]))
             .on('error', err => {
                 assert.ok(false, 'The operation should not fail!');
                 assert.pushResult({

@@ -32,23 +32,6 @@ define([
     'use strict';
 
     /**
-     * @typedef {mapEntry} reviewPanelSection
-     * @property {mapEntry[]} items - The list of items contained in the section
-     */
-
-    /**
-     * @typedef {mapEntry} reviewPanelPart
-     * @property {reviewPanelSection[]} sections - The list of sections contained in the test part
-     */
-
-    /**
-     * @typedef {Object} reviewPanelMap
-     * @property {reviewPanelPart[]} parts - The list of test parts to display
-     * @property {Number} score - The test taker's score for this item
-     * @property {Number} maxScore - The max possible score for this item
-     */
-
-    /**
      * @typedef {Object} reviewPanelData
      * @property {reviewPanelMap} testMap - The test map
      * @property {Map} itemsMap - The list of items, indexed by identifier

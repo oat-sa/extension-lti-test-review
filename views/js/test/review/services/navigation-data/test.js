@@ -29,9 +29,7 @@ define([
     'json!taoReview/test/review/services/navigation-data/filtered-map-correct-correct.json',
     'json!taoReview/test/review/services/navigation-data/filtered-map-correct-incorrect.json',
     'json!taoReview/test/review/services/navigation-data/filtered-map-incorrect-correct.json',
-    'json!taoReview/test/review/services/navigation-data/filtered-map-incorrect-incorrect.json',
-    'json!taoReview/test/review/services/navigation-data/review-data-correct.json',
-    'json!taoReview/test/review/services/navigation-data/review-data-incorrect.json'
+    'json!taoReview/test/review/services/navigation-data/filtered-map-incorrect-incorrect.json'
 ], function (
     _,
     navigationDataFactory,
@@ -42,9 +40,7 @@ define([
     filteredMapCorrectCorrect,
     filteredMapCorrectIncorrect,
     filteredMapIncorrectCorrect,
-    filteredMapIncorrectIncorrect,
-    reviewDataCorrect,
-    reviewDataIncorrect
+    filteredMapIncorrectIncorrect
 ) {
     'use strict';
 
@@ -100,8 +96,7 @@ define([
         {title: 'getFilteredMap'},
         {title: 'setMap'},
         {title: 'filterMap'},
-        {title: 'computeMap'},
-        {title: 'getReviewPanelMap'}
+        {title: 'computeMap'}
     ]).test('service API', (data, assert) => {
         const instance = navigationDataFactory(testMapCorrect);
         assert.expect(1);
@@ -296,20 +291,6 @@ define([
         assert.expect(2);
         assert.deepEqual(instance.getMap(), emptyMap, 'The instance has been initialized with empty data');
         assert.deepEqual(instance.computeMap(data.testMap), data.expected, 'The method computeMap() returns the expected data');
-    });
-
-    QUnit.cases.init([{
-        title: 'correct',
-        testMap: testMapCorrect,
-        expected: reviewDataCorrect
-    }, {
-        title: 'incorrect',
-        testMap: testMapIncorrect,
-        expected: reviewDataIncorrect
-    }]).test('getReviewPanelMap', (data, assert) => {
-        const instance = navigationDataFactory(data.testMap);
-        assert.expect(1);
-        assert.deepEqual(instance.getReviewPanelMap(), data.expected, 'The method getReviewPanelMap() returns the expected data');
     });
 
 });

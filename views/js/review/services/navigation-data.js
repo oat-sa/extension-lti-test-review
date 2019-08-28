@@ -16,7 +16,7 @@
  * Copyright (c) 2019 Open Assessment Technologies SA ;
  */
 /**
- * Helper that will build the dataset for the review panel in the expected format
+ * Service managing the test map, allowing to filter it and listen to change/filter events
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 define([
@@ -40,31 +40,6 @@ define([
      * @property {Boolean} [informational] - If the item is informational
      * @property {Boolean} [skipped] - If the item has been skipped
      */
-
-    /**
-     * Compares two objects by their position properties
-     * @param {mapEntry} a
-     * @param {mapEntry} b
-     * @returns {Number}
-     */
-    const compareByPosition = (a, b) => a.position - b.position;
-
-    /**
-     * Extracts data from a mapEntry
-     * @param {mapEntry} entry
-     * @returns {mapEntry}
-     */
-    const extractData = entry => {
-        const {id, label, position, informational, skipped, score, maxScore} = entry || {};
-        const data = {id, label, position, score, maxScore};
-        if ('undefined' !== typeof informational) {
-            data.informational = informational;
-        }
-        if ('undefined' !== typeof skipped) {
-            data.skipped = skipped;
-        }
-        return data;
-    };
 
     /**
      * Makes sure the score is computed on a collection
@@ -230,26 +205,6 @@ define([
                         )), 'sections')
                     )), 'parts')
                 );
-            },
-
-            /**
-             * Refines the test runner data and build the expected review panel map
-             * @returns {reviewPanelMap}
-             */
-            getReviewPanelMap() {
-                const {parts, score, maxScore} = this.getMap();
-
-                // rebuild the map keeping only relevant data, and sorting elements by position
-                return {
-                    parts: _.map(parts, part => Object.assign(extractData(part), {
-                        sections: _.map(part.sections, section => Object.assign(extractData(section), {
-                            items: _.map(section.items, item => extractData(item))
-                                .sort(compareByPosition)
-                        })).sort(compareByPosition)
-                    })).sort(compareByPosition),
-                    score,
-                    maxScore
-                };
             }
         };
 

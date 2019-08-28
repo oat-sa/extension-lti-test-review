@@ -22,12 +22,12 @@ define([
     'core/promiseTimeout',
     'taoTests/runner/plugin',
     'taoReview/review/plugins/navigation/review-panel/panel',
-    'taoReview/review/services/navigation-data'
+    'taoReview/review/plugins/navigation/review-panel/review-data'
 ], function (
     promiseTimeout,
     pluginFactory,
     reviewPanelFactory,
-    navigationDataService
+    reviewDataHelper
 ) {
     'use strict';
 
@@ -53,11 +53,10 @@ define([
         render() {
             return promiseTimeout(new Promise(resolve => {
                 const testRunner = this.getTestRunner();
-                const reviewPanelData = navigationDataService(testRunner.getTestMap());
                 const reviewPanel = reviewPanelFactory(
                     this.getAreaBroker().getPanelArea(),
                     this.getConfig(),
-                    reviewPanelData.getReviewPanelMap()
+                    reviewDataHelper.getReviewPanelMap(testRunner.getTestMap())
                 );
 
                 // control the test runner from the review panel

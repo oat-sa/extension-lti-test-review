@@ -141,7 +141,7 @@ define([
                             itemAnswer.setIncorrect();
                         }
                         // remove all tabindex's inside item for right navigation
-                        testRunner.getAreaBroker().getContentArea().find("[tabindex]").attr('tabindex', -1);
+                        testRunner.getAreaBroker().getContentArea().find('[tabindex]').attr('tabindex', -1);
                     })
                     .on(`plugin-show.${this.getName()}`, () => itemAnswer.show())
                     .on(`plugin-hide.${this.getName()}`, () => itemAnswer.hide())

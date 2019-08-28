@@ -141,24 +141,30 @@ define([
             this.assetManager = assetManagerFactory();
 
             // first and second tab will show block and navigate to panel or content
-            const createJumplink = (link, where) => {
-                if (!link || !where) {
-                    return;
-                }
-                link.on('click', (e) => {
-                    e.preventDefault();
-                    $(e.target).blur();
-                    areaBroker.getArea(where).find(":not(.hidden)[tabindex]").first().focus();
+            const createJumplinks = (container) => {
+                container.on('click', (e) => {
+                    if ($(e.target).hasClass('jumplink')){
+                        e.preventDefault();
+                        $(e.target).blur();
+                        const where = $(e.target).data('area');
+                        areaBroker.getArea(where).find(":not(.hidden)[tabindex]").first().focus();
+                    }
                 });
-                link.on('focus', () => {
-                    areaBroker.getArea(where).addClass('focused');
+                container.on('focusin', (e) => {
+                    if ($(e.target).hasClass('jumplink')){
+                        const where = $(e.target).data('area');
+                        areaBroker.getArea(where).addClass('focused');
+                    }
+                    
                 });
-                link.on('blur', () => {
-                    areaBroker.getArea(where).removeClass('focused');
+                container.on('focusout', (e) => {
+                    if ($(e.target).hasClass('jumplink')){
+                        const where = $(e.target).data('area');
+                        areaBroker.getArea(where).removeClass('focused');
+                    }
                 });
             }
-            createJumplink(areaBroker.getContainer().find('.navigationlink'), 'sidebar');
-            createJumplink(areaBroker.getContainer().find('.answerlink'), 'contentWrapper');
+            createJumplinks(areaBroker.getContainer().find('.jumplinks'));
             /*
              * Install behavior on events
              */

@@ -25,10 +25,21 @@ define([
     'ui/hider',
     'ui/autoscroll',
     'ui/component',
+    'taoReview/review/plugins/navigation/review-panel/review-data',
     'tpl!taoReview/review/plugins/navigation/review-panel/tpl/panel',
     'tpl!taoReview/review/plugins/navigation/review-panel/tpl/list',
     'css!taoReview/review/plugins/navigation/review-panel/css/panel.css'
-], function ($, _, __, hider, autoscroll, componentFactory, panelTpl, listTpl) {
+], function (
+    $,
+    _,
+    __,
+    hider,
+    autoscroll,
+    componentFactory,
+    reviewDataHelper,
+    panelTpl,
+    listTpl
+) {
     'use strict';
 
     /**
@@ -244,7 +255,7 @@ define([
         let controls = null;
         let activeFilter = null;
         let activeItem = null;
-        let data = filterData(map);
+        let data = null;
 
         /**
          * Selects the active filter
@@ -332,8 +343,8 @@ define([
              * @fires datachange
              */
             setData(newMap) {
-                map = newMap;
-                data = filterData(newMap);
+                map = reviewDataHelper.getReviewPanelMap(newMap);
+                data = filterData(map);
 
                 /**
                  * @event datachange
@@ -524,7 +535,7 @@ define([
              * @fires update once the display has been updated
              */
             update() {
-                if (this.is('rendered')) {
+                if (data && this.is('rendered')) {
                     let filteredData, scorePercent, scoreText;
                     if (data.score !== data.maxScore) {
                         filteredData = filterData(map, activeFilter && activeFilter.filter);
@@ -692,6 +703,10 @@ define([
         // initialize the component with the provided config
         // defer the call to allow to listen to the init event
         _.defer(() => component.init(config));
+
+        if (map) {
+            component.setData(map);
+        }
 
         return component;
     }

@@ -21,13 +21,11 @@
 define([
     'core/promiseTimeout',
     'taoTests/runner/plugin',
-    'taoReview/review/plugins/navigation/review-panel/panel',
-    'taoReview/review/plugins/navigation/review-panel/review-data'
+    'taoReview/review/plugins/navigation/review-panel/panel'
 ], function (
     promiseTimeout,
     pluginFactory,
-    reviewPanelFactory,
-    reviewDataHelper
+    reviewPanelFactory
 ) {
     'use strict';
 
@@ -56,7 +54,7 @@ define([
                 const reviewPanel = reviewPanelFactory(
                     this.getAreaBroker().getPanelArea(),
                     this.getConfig(),
-                    reviewDataHelper.getReviewPanelMap(testRunner.getTestMap())
+                    testRunner.getTestMap()
                 );
 
                 // control the test runner from the review panel

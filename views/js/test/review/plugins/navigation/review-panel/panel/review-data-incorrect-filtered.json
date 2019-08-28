@@ -4,10 +4,12 @@
       {
         "id": "QTIExamples",
         "label": "QTIExamples",
+        "position": 1,
         "sections": [
           {
             "id": "assessmentSection-2",
             "label": "Section 1",
+            "position": 1,
             "items": [
               {
                 "id": "item-3",
@@ -26,6 +28,7 @@
           {
             "id": "assessmentSection-3",
             "label": "Section 2",
+            "position": 5,
             "items": [
               {
                 "id": "item-9",

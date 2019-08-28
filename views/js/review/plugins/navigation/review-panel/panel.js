@@ -123,25 +123,6 @@ define([
     const findExpanded = $target => $target.find(cssSelectors.collapsible + cssSelectors.expanded);
 
     /**
-     * Gets the icon class for a particular item
-     * @param {mapEntry} item
-     * @returns {String}
-     */
-    const getItemIconCls = item => {
-        if (item.informational) {
-            return 'item-info';
-        }
-        if (item.maxScore) {
-            if (item.score === item.maxScore) {
-                return 'item-correct';
-            } else {
-                return 'item-incorrect';
-            }
-        }
-        return 'item-default';
-    };
-
-    /**
      * Reduces an array to another array
      * @param {Array} array
      * @param {Function} callback
@@ -168,7 +149,6 @@ define([
                     const sections = reduceArray(testPart.sections, (partSections, partSection) => {
                         const items = reduceArray(partSection.items, (sectionItems, sectionItem) => {
                             sectionItem = Object.assign({}, sectionItem);
-                            sectionItem.cls = getItemIconCls(sectionItem);
 
                             if (filter(sectionItem, partSection, testPart)) {
                                 sectionItems.push(sectionItem);

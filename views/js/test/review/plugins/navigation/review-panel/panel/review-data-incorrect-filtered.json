@@ -16,7 +16,7 @@
                 "label": "example_2_Math",
                 "informational": false,
                 "skipped": false,
-                "cls": "item-incorrect",
+                "type": "incorrect",
                 "position": 2,
                 "score": 2,
                 "maxScore": 3
@@ -35,7 +35,7 @@
                 "label": "Example_8_Geo 3",
                 "informational": false,
                 "skipped": true,
-                "cls": "item-default",
+                "type": "default",
                 "position": 8,
                 "score": 0,
                 "maxScore": 0

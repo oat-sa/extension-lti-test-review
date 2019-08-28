@@ -24,9 +24,9 @@ define([
     'lodash',
     'i18n',
     'taoReview/review/plugins/navigation/review-panel/panel',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data-correct.json',
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel/map-correct.json',
     'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data-correct-all.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data-incorrect.json',
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel/map-incorrect.json',
     'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data-incorrect-all.json',
     'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data-incorrect-filtered.json'
 ], function (
@@ -34,9 +34,9 @@ define([
     _,
     __,
     reviewPanelFactory,
-    reviewDataCorrect,
+    testMapCorrect,
     reviewDataCorrectAll,
-    reviewDataIncorrect,
+    testMapIncorrect,
     reviewDataIncorrectAll,
     reviewDataIncorrectFiltered
 ) {
@@ -281,7 +281,7 @@ define([
         assert.expect(37);
         assert.equal($container.children().length, 0, 'The container is empty');
 
-        const instance = reviewPanelFactory($container, config, reviewDataIncorrect)
+        const instance = reviewPanelFactory($container, config, testMapIncorrect)
             .on('init', function () {
                 assert.equal(this, instance, 'The instance has been initialized');
             })
@@ -301,7 +301,7 @@ define([
                 assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
                 assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
 
-                _.forEach(reviewDataIncorrect.parts, part => {
+                _.forEach(testMapIncorrect.parts, part => {
                     assert.equal(
                         $container.find(`[data-control="${part.id}"] > .review-panel-label`).text().trim(),
                         part.label,
@@ -358,7 +358,7 @@ define([
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
-        const instance = reviewPanelFactory($container, {}, reviewDataCorrect)
+        const instance = reviewPanelFactory($container, {}, testMapCorrect)
             .on('init', function () {
                 assert.equal(this, instance, 'The instance has been initialized');
             })
@@ -541,7 +541,7 @@ define([
                             label: 'item',
                             informational: false,
                             skipped: true,
-                            cls: 'item-incorrect',
+                            type: 'incorrect',
                             position: 0,
                             score: 0,
                             maxScore: 1
@@ -606,7 +606,7 @@ define([
                                 });
                             }),
                         ];
-                        assert.equal(instance.setData(reviewDataCorrect), instance, 'setData is fluent');
+                        assert.equal(instance.setData(testMapCorrect), instance, 'setData is fluent');
                         assert.deepEqual(instance.getData().testMap, reviewDataCorrectAll.testMap, 'The updated data is set');
                         return Promise.all(promises);
                     })
@@ -615,7 +615,7 @@ define([
                         assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
                         assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
 
-                        _.forEach(reviewDataCorrect.parts, part => {
+                        _.forEach(testMapCorrect.parts, part => {
                             assert.equal(
                                 $container.find(`[data-control="${part.id}"] > .review-panel-label`).text().trim(),
                                 part.label,
@@ -764,7 +764,7 @@ define([
                             label: 'item',
                             informational: false,
                             skipped: false,
-                            cls: 'item-correct',
+                            type: 'correct',
                             position: 0,
                             score: 1,
                             maxScore: 1
@@ -829,7 +829,7 @@ define([
                                 });
                             }),
                         ];
-                        assert.equal(instance.setData(reviewDataIncorrect), instance, 'setData is fluent');
+                        assert.equal(instance.setData(testMapIncorrect), instance, 'setData is fluent');
                         assert.deepEqual(instance.getData().testMap, reviewDataIncorrectAll.testMap, 'The updated data is set');
                         return Promise.all(promises);
                     })
@@ -838,7 +838,7 @@ define([
                         assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
                         assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
 
-                        _.forEach(reviewDataIncorrect.parts, part => {
+                        _.forEach(testMapIncorrect.parts, part => {
                             assert.equal(
                                 $container.find(`[data-control="${part.id}"] > .review-panel-label`).text().trim(),
                                 part.label,
@@ -902,27 +902,27 @@ define([
                         assert.equal($container.find('.review-panel-part').length, 1, 'The test parts are rendered');
                         assert.equal(
                             $container.find('.review-panel-part:nth(0) > .review-panel-label').text().trim(),
-                            reviewDataIncorrect.parts['QTIExamples'].label,
+                            testMapIncorrect.parts['QTIExamples'].label,
                             'The first test part got the expected label'
                         );
 
                         assert.equal($container.find('.review-panel-section').length, 2, 'The test sections are rendered');
                         assert.equal(
                             $container.find('.review-panel-section:nth(0) > .review-panel-label').text().trim(),
-                            reviewDataIncorrect.parts['QTIExamples'].sections['assessmentSection-2'].label,
+                            testMapIncorrect.parts['QTIExamples'].sections['assessmentSection-2'].label,
                             'The 1st rendered test section got the expected label'
                         );
 
                         assert.equal($container.find('.review-panel-item').length, 2, 'The test items are rendered');
                         assert.equal(
                             $container.find('.review-panel-item:nth(0) > .review-panel-label').text().trim(),
-                            reviewDataIncorrect.parts['QTIExamples'].sections['assessmentSection-2'].items['item-3'].label,
+                            testMapIncorrect.parts['QTIExamples'].sections['assessmentSection-2'].items['item-3'].label,
                             'The 1st rendered test item got the expected label'
                         );
                         assert.equal($container.find('.review-panel-item:nth(0)').is('.item-incorrect'), true, 'The 1st item got the expected icon');
                         assert.equal(
                             $container.find('.review-panel-item:nth(1) > .review-panel-label').text().trim(),
-                            reviewDataIncorrect.parts['QTIExamples'].sections['assessmentSection-3'].items['item-9'].label,
+                            testMapIncorrect.parts['QTIExamples'].sections['assessmentSection-3'].items['item-9'].label,
                             'The 1st rendered test item got the expected label'
                         );
                         assert.equal($container.find('.review-panel-item:nth(1)').is('.item-default'), true, 'The 2nd item got the expected icon');
@@ -967,7 +967,7 @@ define([
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
-        const instance = reviewPanelFactory($container, {}, reviewDataIncorrect)
+        const instance = reviewPanelFactory($container, {}, testMapIncorrect)
             .on('init', function () {
                 assert.equal(this, instance, 'The instance has been initialized');
             })
@@ -1198,7 +1198,7 @@ define([
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
-        const instance = reviewPanelFactory($container, {}, reviewDataIncorrect)
+        const instance = reviewPanelFactory($container, {}, testMapIncorrect)
             .on('init', function () {
                 assert.equal(this, instance, 'The instance has been initialized');
             })
@@ -1401,7 +1401,7 @@ define([
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
-        const instance = reviewPanelFactory($container, {}, reviewDataIncorrect)
+        const instance = reviewPanelFactory($container, {}, testMapIncorrect)
             .on('init', function () {
                 assert.equal(this, instance, 'The instance has been initialized');
             })
@@ -1574,7 +1574,7 @@ define([
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
-        const instance = reviewPanelFactory($container, {}, reviewDataIncorrect)
+        const instance = reviewPanelFactory($container, {}, testMapIncorrect)
             .on('init', function () {
                 assert.equal(this, instance, 'The instance has been initialized');
                 const shouldExpand = new Map([['QTIExamples', true], ['assessmentSection-3', true]]);
@@ -1731,7 +1731,7 @@ define([
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
-        const instance = reviewPanelFactory($container, {}, reviewDataIncorrect)
+        const instance = reviewPanelFactory($container, {}, testMapIncorrect)
             .on('init', function () {
                 assert.equal(this, instance, 'The instance has been initialized');
             })
@@ -1891,7 +1891,7 @@ define([
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
-        const instance = reviewPanelFactory($container, {}, reviewDataIncorrect)
+        const instance = reviewPanelFactory($container, {}, testMapIncorrect)
             .on('init', function () {
                 assert.equal(this, instance, 'The instance has been initialized');
             })
@@ -1970,7 +1970,7 @@ define([
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
-        const instance = reviewPanelFactory($container, {}, reviewDataIncorrect)
+        const instance = reviewPanelFactory($container, {}, testMapIncorrect)
             .on('init', function () {
                 assert.equal(this, instance, 'The instance has been initialized');
             })
@@ -2101,10 +2101,10 @@ define([
         const ready = assert.async();
         const $container = $('#visual-test .panel');
         const $item = $('#visual-test .item');
-        const instance = reviewPanelFactory($container, {}, reviewDataIncorrect);
+        const instance = reviewPanelFactory($container, {}, testMapIncorrect);
         const data = {
-            correct: reviewDataCorrect,
-            incorrect: reviewDataIncorrect
+            correct: testMapCorrect,
+            incorrect: testMapIncorrect
         };
         const showItem = (id, position) => {
             const item = instance.getData().itemsMap.get(id);

@@ -37,6 +37,7 @@ define([
     /**
      * @typedef {Object} reviewPanelMap
      * @property {reviewPanelPart[]} parts - The list of test parts to display
+     * @property {Map} items - A map of items, indexed by identifiers
      * @property {Number} score - The test taker's score for this item
      * @property {Number} maxScore - The max possible score for this item
      */
@@ -48,6 +49,25 @@ define([
      * @returns {Number}
      */
     const compareByPosition = (a, b) => a.position - b.position;
+
+    /**
+     * Gets the type for a particular item
+     * @param {mapEntry} item
+     * @returns {String}
+     */
+    const getItemType = item => {
+        if (item.informational) {
+            return 'info';
+        }
+        if (item.maxScore) {
+            if (item.score === item.maxScore) {
+                return 'correct';
+            } else {
+                return 'incorrect';
+            }
+        }
+        return 'default';
+    };
 
     /**
      * Extracts data from a mapEntry
@@ -74,15 +94,21 @@ define([
          */
         getReviewPanelMap(testMap) {
             const {parts, score, maxScore} = testMap;
+            const items = new Map();
 
             // rebuild the map keeping only relevant data, and sorting elements by position
             return {
                 parts: _.map(parts, part => Object.assign(extractData(part), {
                     sections: _.map(part.sections, section => Object.assign(extractData(section), {
-                        items: _.map(section.items, item => extractData(item))
-                            .sort(compareByPosition)
+                        items: _.map(section.items, item => {
+                            const reviewItem = extractData(item);
+                            reviewItem.type = getItemType(item);
+                            items.set(item.id, reviewItem);
+                            return reviewItem;
+                        }).sort(compareByPosition)
                     })).sort(compareByPosition)
                 })).sort(compareByPosition),
+                items,
                 score,
                 maxScore
             };

@@ -63,8 +63,12 @@ define([
         testMap: testMapIncorrect,
         expected: reviewDataIncorrect
     }]).test('getReviewPanelMap', (data, assert) => {
-        assert.expect(1);
-        assert.deepEqual(reviewDataHelper.getReviewPanelMap(data.testMap), data.expected, 'The method getReviewPanelMap() returns the expected data');
+        assert.expect(4);
+        const reviewData = reviewDataHelper.getReviewPanelMap(data.testMap);
+        assert.equal(reviewData.items instanceof Map, true, 'The items collection is set');
+        _.forEach(data.expected, (value, key) => {
+            assert.deepEqual(reviewData[key], value, `The method getReviewPanelMap() returns the expected data for the key ${key}`);
+        });
     });
 
 });

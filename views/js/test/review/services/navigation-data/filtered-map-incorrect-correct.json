@@ -182,5 +182,41 @@
     "viewed": 9,
     "total": 9,
     "questionsViewed": 8
-  }
+  },
+  "jumps": [
+    {
+      "identifier": "item-1",
+      "section": "assessmentSection-1",
+      "part": "Introduction",
+      "position": 0
+    },
+    null,
+    null,
+    null,
+    {
+      "identifier": "item-5",
+      "section": "assessmentSection-2",
+      "part": "QTIExamples",
+      "position": 4
+    },
+    null,
+    {
+      "identifier": "item-7",
+      "section": "assessmentSection-2",
+      "part": "QTIExamples",
+      "position": 6
+    },
+    {
+      "identifier": "item-8",
+      "section": "assessmentSection-2",
+      "part": "QTIExamples",
+      "position": 7
+    },
+    {
+      "identifier": "item-9",
+      "section": "assessmentSection-2",
+      "part": "QTIExamples",
+      "position": 8
+    }
+  ]
 }

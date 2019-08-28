@@ -21,8 +21,9 @@
  */
 define([
     'lodash',
-    'core/eventifier'
-], function (_, eventifier) {
+    'core/eventifier',
+    'taoQtiTest/runner/helpers/map'
+], function (_, eventifier, mapHelper) {
     'use strict';
 
     /**
@@ -102,16 +103,18 @@ define([
      *  // and a test map set later
      *  navigationDataService.setMap(testMap);
      *
-     *  // get the current map
+     *  // changes on test map can be listened
+     *  navigationDataService.on('mapchange', testMap => {}); // test map rewritten
+     *  navigationDataService.on('mapfilter', testMap => {}); // test map filtered
+     *
+     *  // get the stored test map
      *  const map = navigationDataService.getMap();
      *
      *  // filter the map by informational items
      *  navigationDataService.filterMap(item => item.informational);
      *
-     *  // changes on test map can be listened
-     *  navigationDataService.on('mapchange', testMap => {}); // test map rewritten
-     *  navigationDataService.on('mapfilter', testMap => {}); // test map filtered
-     *
+     *  // get the current filtered test map
+     *  const filteredMap = navigationDataService.getFilteredMap();
      *
      * @param {testMap} testMap
      * @returns {navigationDataService}
@@ -145,7 +148,7 @@ define([
              * Sets the former test map
              * @param {testMap} map
              * @returns {navigationDataService}
-             * @fires mapchange
+             * @fires mapchange once the test map has been stored
              */
             setMap(map) {
                 testMap = this.computeMap(map);
@@ -169,13 +172,14 @@ define([
              *                            or should return falsey to reject it.
              * @returns {navigationDataService}
              * @throws TypeError when the filter is not a function
-             * @fires mapfilter
+             * @fires mapfilter once the test map has been filtered
              */
             filterMap(filter = () => true) {
                 if (!_.isFunction(filter)) {
                     throw new TypeError('A filter must be a function!');
                 }
 
+                // filter the test map, only keeping the items that pass the filter callback
                 filteredTestMap = Object.assign({}, testMap, {
                     parts: _.reduce(testMap.parts, (parts, part, partId) => {
                         part = Object.assign({}, part, {
@@ -199,6 +203,9 @@ define([
                         return parts;
                     }, {})
                 });
+
+                // make sure the jumps table is set accordingly
+                mapHelper.createJumpTable(filteredTestMap);
 
                 /**
                  * @event mapfilter
@@ -246,8 +253,10 @@ define([
             }
         };
 
+        // we need to observe the service
         eventifier(navigationDataService);
 
+        // initial test map must be set if any
         if (testMap) {
             navigationDataService.setMap(testMap);
         }

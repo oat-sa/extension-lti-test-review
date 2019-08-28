@@ -128,5 +128,33 @@
     "viewed": 9,
     "total": 9,
     "questionsViewed": 8
-  }
+  },
+  "jumps": [
+    null,
+    {
+      "identifier": "item-2",
+      "section": "assessmentSection-2",
+      "part": "QTIExamples",
+      "position": 1
+    },
+    {
+      "identifier": "item-3",
+      "section": "assessmentSection-2",
+      "part": "QTIExamples",
+      "position": 2
+    },
+    {
+      "identifier": "item-4",
+      "section": "assessmentSection-2",
+      "part": "QTIExamples",
+      "position": 3
+    },
+    null,
+    {
+      "identifier": "item-6",
+      "section": "assessmentSection-2",
+      "part": "QTIExamples",
+      "position": 5
+    }
+  ]
 }

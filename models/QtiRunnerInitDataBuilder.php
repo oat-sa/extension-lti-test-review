@@ -167,7 +167,15 @@ class QtiRunnerInitDataBuilder
                     $itemData = $this->qtiRunnerService->getItemData($context, $item->getHref());
 
                     $itemId = $item->getIdentifier();
-                    $score = $itemsStates[$itemId]['score'] ?: [];
+                    $score = $itemsStates[$itemId]['score'] ?? [];
+                    $responses = $itemsStates[$itemId]['state'] ?? [];
+
+                    $answers = 0;
+                    if (count($responses)) {
+                        foreach ($responses as $response) {
+                            $answers += count($response['response']['list']['identifier'] ?? []);
+                        }
+                    }
 
                     $items[$itemId] = [
                         'id' => $itemId,
@@ -175,7 +183,7 @@ class QtiRunnerInitDataBuilder
                         'position' => $position,
                         'categories' => [],
                         'informational' => false,
-                        'skipped' => false,
+                        'skipped' => empty($answers),
                         'score' => array_sum($score),
                         'maxScore' => count($score)
                     ];

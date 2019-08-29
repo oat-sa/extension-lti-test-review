@@ -39,6 +39,9 @@ use taoResultServer_models_classes_ResponseVariable;
 
 class QtiRunnerInitDataBuilder
 {
+    protected const OUTCOME_VAR_SCORE = 'SCORE';
+    protected const OUTCOME_VAR_MAXSCORE = 'MAXSCORE';
+
     use OntologyAwareTrait;
 
     /** @var DeliveryContainerService */
@@ -122,21 +125,28 @@ class QtiRunnerInitDataBuilder
 
         foreach ($variables as $variable) {
 
-            $state = json_decode($variable['state'], true);
-            $stateKeys = array_keys($state);
+            $score = $maxScore = 0.0;
 
-            $scores = array_filter($variable[taoResultServer_models_classes_ResponseVariable::class], static function ($key) use ($stateKeys) {
-                return in_array($key, $stateKeys, true);
+            $outcome = array_filter($variable[taoResultServer_models_classes_OutcomeVariable::class], static function ($key) {
+                return in_array($key, [static::OUTCOME_VAR_SCORE, static::OUTCOME_VAR_MAXSCORE], true);
             }, ARRAY_FILTER_USE_KEY);
 
-            array_walk($scores, static function (&$value) {
-                $value = $value['isCorrect'] === 'correct';
-            });
+            if (isset($outcome[static::OUTCOME_VAR_SCORE])) {
+                /** @var taoResultServer_models_classes_OutcomeVariable $var */
+                $var = $outcome[static::OUTCOME_VAR_SCORE]['var'];
+                $score = (float)$var->getValue();
+            }
+
+            if (isset($outcome[static::OUTCOME_VAR_MAXSCORE])) {
+                $var = $outcome[static::OUTCOME_VAR_MAXSCORE]['var'];
+                $maxScore = (float)$var->getValue();
+            }
 
             $returnValue[$variable['internalIdentifier']] = [
                 'identifier' => $variable['internalIdentifier'],
-                'state' => $state,
-                'score' => $scores
+                'state' => json_decode($variable['state'], true),
+                'score' => $score,
+                'maxScore' => $maxScore,
             ];
         }
 
@@ -167,7 +177,6 @@ class QtiRunnerInitDataBuilder
                     $itemData = $this->qtiRunnerService->getItemData($context, $item->getHref());
 
                     $itemId = $item->getIdentifier();
-                    $score = $itemsStates[$itemId]['score'] ?? [];
                     $state = $itemsStates[$itemId]['state'] ?? [];
 
                     $answers = 0;
@@ -177,15 +186,18 @@ class QtiRunnerInitDataBuilder
                         }
                     }
 
+                    $isInformational = empty($state);
+                    $isSkipped = !$isInformational && empty($answers);
+
                     $items[$itemId] = [
                         'id' => $itemId,
                         'label' => $itemData['data']['attributes']['label'],
                         'position' => $position,
                         'categories' => [],
-                        'informational' => empty($state) && empty($score),
-                        'skipped' => empty($answers),
-                        'score' => array_sum($score),
-                        'maxScore' => count($score)
+                        'informational' => $isInformational,
+                        'skipped' => $isSkipped,
+                        'score' => $itemsStates[$itemId]['score'],
+                        'maxScore' => $itemsStates[$itemId]['maxScore']
                     ];
 
                     $this->fillItemsData($itemId, $item->getHref(), $itemData['data']);

@@ -143,23 +143,23 @@ define([
             // first and second tab will show block and navigate to panel or content
             const createJumplinks = (container) => {
                 container.on('click', (e) => {
-                    if ($(e.target).hasClass('jumplink')){
+                    if (e.target.classList.contains('jumplink')){
                         e.preventDefault();
-                        $(e.target).blur();
-                        const where = $(e.target).data('area');
+                        e.target.blur();
+                        const where = e.target.dataset.area;
                         areaBroker.getArea(where).find(":not(.hidden)[tabindex]").first().focus();
                     }
                 });
                 container.on('focusin', (e) => {
-                    if ($(e.target).hasClass('jumplink')){
-                        const where = $(e.target).data('area');
+                    if (e.target.classList.contains('jumplink')){
+                        const where = e.target.dataset.area;
                         areaBroker.getArea(where).addClass('focused');
                     }
                     
                 });
                 container.on('focusout', (e) => {
-                    if ($(e.target).hasClass('jumplink')){
-                        const where = $(e.target).data('area');
+                    if (e.target.classList.contains('jumplink')){
+                        const where = e.target.dataset.area;
                         areaBroker.getArea(where).removeClass('focused');
                     }
                 });

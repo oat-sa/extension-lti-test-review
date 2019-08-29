@@ -607,9 +607,9 @@ define([
     }]).test('tab navigation', (data, assert) => {
         assert.expect(5);
         const ready = assert.async();
-        const $fixture = $('#fixture-render');
+        const $fixture = $('#fixture-jumplinks');
         const mockProxy = {
-            name: 'renderProxy',
+            name: 'jumplinksProxy',
             init() {
                 assert.ok(true, 'The init method has been called on the proxy');
                 return Promise.resolve({
@@ -648,6 +648,53 @@ define([
                         assert.ok(false, `Error in init method: ${err.message}`);
                         runner.destroy();
                     });
+            })
+            .on('destroy', ready)
+            .init();
+    });
+
+    QUnit.test('testmapchange event', assert => {
+        assert.expect(3);
+        const ready = assert.async();
+        const $fixture = $('#fixture-testmapchange');
+        const mockProxy = {
+            name: 'testmapchangeProxy',
+            init() {
+                assert.ok(true, 'The init method has been called on the proxy');
+                return Promise.resolve({
+                    success: true
+                });
+            }
+        };
+        const config = {
+            renderTo: $fixture,
+            proxyProvider: mockProxy.name
+        };
+        proxyFactory.registerProvider(mockProxy.name, mockProxy);
+        const runner = runnerFactory('qtiTestReviewProvider', [], config)
+            .on('ready', () => {
+                assert.equal(runner.getTestMap(), null, 'No test map available yet');
+                Promise.resolve()
+                    .then(() => new Promise(resolve => {
+                        runner
+                            .on('.test')
+                            .on('testmapchange.test', newTestMap => {
+                                assert.deepEqual(newTestMap, testMap, 'The test map has been changed');
+                                resolve();
+                            })
+                            .setTestMap(testMap);
+                    }))
+                    .then(() => {
+                        runner
+                            .off('.test');
+                    })
+                    .catch(err => {
+                        assert.pushResult({
+                            result: false,
+                            message: err
+                        });
+                    })
+                    .then(() => runner.on('.test').destroy());
             })
             .on('destroy', ready)
             .init();

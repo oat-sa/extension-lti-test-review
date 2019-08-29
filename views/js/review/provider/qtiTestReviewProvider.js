@@ -72,6 +72,20 @@ define([
          * Installation of the provider, called during test runner init phase.
          */
         install() {
+            // eventify the test map update
+            const defaultSetTestMap = this.setTestMap;
+            this.setTestMap = (...args) => {
+                const result = defaultSetTestMap.apply(this, args);
+
+                /**
+                 * @event testmapchange
+                 * @param {testMap} testMap
+                 */
+                this.trigger('testmapchange', this.getTestMap());
+
+                return result;
+            };
+
             const {plugins} = this.getConfig().options || {};
             if (plugins) {
                 _.forEach(this.getPlugins(), plugin => {

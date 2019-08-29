@@ -87,13 +87,11 @@ define([
 
                 // reflect the filter to the map
                 navigationDataService
-                    .on('mapfilter', filteredMap => {
-                        testRunner.setTestMap(filteredMap);
-                        reviewPanel.setData(filteredMap);
-                    });
+                    .on('mapfilter', filteredMap => testRunner.setTestMap(filteredMap));
 
                 // reflect the test runner state to the review panel
                 testRunner
+                    .on('testmapchange', testMap => reviewPanel.setData(testMap))
                     .on('loaditem', itemRef => reviewPanel.setActiveItem(itemRef))
                     .on(`plugin-show.${this.getName()}`, () => reviewPanel.show())
                     .on(`plugin-hide.${this.getName()}`, () => reviewPanel.hide())

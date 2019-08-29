@@ -26,6 +26,7 @@ define([
     'json!taoReview/test/mocks/item-1.json',
     'json!taoReview/test/mocks/item-2.json',
     'json!taoReview/test/mocks/item-3.json',
+    'json!taoReview/test/mocks/item-4.json',
     'json!taoReview/test/mocks/testData.json',
     'json!taoReview/test/mocks/testContext.json',
     'json!taoReview/test/mocks/testMap.json',
@@ -38,6 +39,7 @@ define([
     itemData1,
     itemData2,
     itemData3,
+    itemData4,
     testData,
     testContext,
     testMap,
@@ -200,15 +202,23 @@ define([
             fullPage: false,
             readOnly: true,
             plugins: [{
+                module: 'taoReview/review/plugins/navigation/review-panel/plugin',
+                bundle: 'taoReview/loader/qtiReview.min',
+                category: 'navigation'
+            }, {
                 module: 'taoReview/review/plugins/navigation/next-prev/plugin',
                 bundle: 'taoReview/loader/qtiReview.min',
                 category: 'navigation'
+            }, {
+                module: 'taoReview/review/plugins/content/item-answer/plugin',
+                bundle: 'taoReview/loader/qtiReview.min',
+                category: 'content'
             }]
         };
 
         assert.expect(1);
 
-        $.mockjax({
+        $.mockjax([{
             url: '/init*',
             responseText: {
                 success: true,
@@ -218,8 +228,7 @@ define([
                 testMap: testMap,
                 testResponses: testResponses
             }
-        });
-        $.mockjax({
+        }, {
             url: '/getItem*item-1',
             responseText: {
                 success: true,
@@ -230,8 +239,7 @@ define([
                 baseUrl: '',
                 state: {}
             }
-        });
-        $.mockjax({
+        }, {
             url: '/getItem*item-2',
             responseText: {
                 success: true,
@@ -242,8 +250,7 @@ define([
                 baseUrl: '',
                 state: {}
             }
-        });
-        $.mockjax({
+        }, {
             url: '/getItem*item-3',
             responseText: {
                 success: true,
@@ -254,10 +261,22 @@ define([
                 baseUrl: '',
                 state: {}
             }
-        });
+        }, {
+            url: '/getItem*item-4',
+            responseText: {
+                success: true,
+                content: {
+                    type: 'qti',
+                    data: itemData4
+                },
+                baseUrl: '',
+                state: {}
+            }
+        }]);
 
         qtiTestReviewFactory($container, config)
             .on('error', err => {
+                console.error(err);
                 assert.pushResult({
                     result: false,
                     message: err

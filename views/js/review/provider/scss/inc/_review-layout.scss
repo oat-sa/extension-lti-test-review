@@ -1,4 +1,5 @@
 $sidePanelBorderWidth: 1px;
+$focusBorderWidth: 3px;
 @mixin sidePanelWidth($width) {
     max-width: $width;
     & > * {
@@ -118,6 +119,30 @@ $sidePanelBorderWidth: 1px;
         .hidden {
             display: none;
         }
+    }
+    .jumplink {
+        position: fixed;
+        left: -9999px;
+        background-color: $uiGeneralContentBg;
+        color: $textColor;
+        text-decoration: underline;
+        outline: none;
+        box-shadow: inset 0 0 0px 3px $info;
+        height: calc(5px + #{(map-get($heights, header) + map-get($heights, horizontal-action-bar)) * 1px});;
+        width: 340px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        &:focus {
+          visibility: visible;
+          top: 0px;
+          left: 0px;
+          z-index: 1000;
+          transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+         }
+       }
+    a[tabindex]:focus, .focused {
+        box-shadow: inset 0 0 0px $focusBorderWidth $info;
     }
 }
 

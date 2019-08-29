@@ -1,4 +1,8 @@
 <main class="test-review-scope">
+    <div class="jumplinks">
+        <a class="jumplink navigationlink" href="#" data-area="sidebar" tabindex="1">{{__ "Jump to:"}} <b>{{__ "Navigation"}}</b></a>
+        <a class="jumplink answerlink" href="#" data-area="contentWrapper" tabindex="1">{{__ "Jump to:"}} <b>{{__ "Question"}}</b></a>
+    </div>
     <div class="action-bar content-action-bar horizontal-action-bar top-action-bar">
         <div class="control-box size-wrapper">
             <div class="lft tools-box"></div>

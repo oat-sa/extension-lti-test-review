@@ -102,7 +102,8 @@ define([
                 actionsBar: $('.bottom-action-bar .control-box', $layout),
                 panel: $('.test-sidebar-left .panel-box', $layout),
                 header: $('.top-action-bar .tools-box', $layout),
-                context: $('.top-action-bar .navi-box-list', $layout)
+                context: $('.top-action-bar .navi-box-list', $layout),
+                sidebar: $('.test-sidebar-left', $layout),
             });
         },
 
@@ -139,6 +140,31 @@ define([
 
             this.assetManager = assetManagerFactory();
 
+            // first and second tab will show block and navigate to panel or content
+            const createJumplinks = (container) => {
+                container.on('click', (e) => {
+                    if (e.target.classList.contains('jumplink')){
+                        e.preventDefault();
+                        e.target.blur();
+                        const where = e.target.dataset.area;
+                        areaBroker.getArea(where).find(":not(.hidden)[tabindex]").first().focus();
+                    }
+                });
+                container.on('focusin', (e) => {
+                    if (e.target.classList.contains('jumplink')){
+                        const where = e.target.dataset.area;
+                        areaBroker.getArea(where).addClass('focused');
+                    }
+                    
+                });
+                container.on('focusout', (e) => {
+                    if (e.target.classList.contains('jumplink')){
+                        const where = e.target.dataset.area;
+                        areaBroker.getArea(where).removeClass('focused');
+                    }
+                });
+            }
+            createJumplinks(areaBroker.getContainer().find('.jumplinks'));
             /*
              * Install behavior on events
              */

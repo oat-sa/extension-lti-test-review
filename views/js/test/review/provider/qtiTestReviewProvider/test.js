@@ -596,6 +596,63 @@ define([
             .then(() => runner.destroy());
     });
 
+    QUnit.cases.init([{
+        title: 'navigationlink',
+        selector: '.navigationlink',
+        area: 'sidebar'
+    }, {
+        title: 'answerlink',
+        selector: '.answerlink',
+        area: 'contentWrapper'
+    }]).test('tab navigation', (data, assert) => {
+        assert.expect(5);
+        const ready = assert.async();
+        const $fixture = $('#fixture-render');
+        const mockProxy = {
+            name: 'renderProxy',
+            init() {
+                assert.ok(true, 'The init method has been called on the proxy');
+                return Promise.resolve({
+                    success: true
+                });
+            }
+        };
+        const config = {
+            renderTo: $fixture,
+            proxyProvider: mockProxy.name
+        };
+        proxyFactory.registerProvider(mockProxy.name, mockProxy);
+        const runner = runnerFactory('qtiTestReviewProvider', [], config)
+            .on('ready', () => {
+                const areaBroker = runner.getAreaBroker();
+                const $container = areaBroker.getContainer();
+                Promise.resolve()
+                    .then(() => {
+                        assert.equal($container.find(data.selector).length, 1, 'The link exists');
+                        $container.find(data.selector).focus();
+                    })
+                    .then(() => {
+                        assert.ok(areaBroker.getArea(data.area).hasClass('focused'), 'The area is focused');
+                        areaBroker.getArea(data.area).append('<div><a href="#" tabindex="0" id="navlink">Nav Link</a></div>');
+                        $container.find(data.selector).click();
+                    })
+                    .then(() => {
+                        assert.equal(areaBroker.getArea(data.area).has($(document.activeElement)).length, 1, 'The active element inside area after click on link');
+                        return runner.destroy();
+                    })
+                    .then(() => {
+                        const $container = areaBroker.getContainer();
+                        assert.equal($container.length, 1, 'The container still exists');
+                    })
+                    .catch(err => {
+                        assert.ok(false, `Error in init method: ${err.message}`);
+                        runner.destroy();
+                    });
+            })
+            .on('destroy', ready)
+            .init();
+    });
+
     QUnit.module('Visual');
 
     QUnit.test('Visual test', assert => {

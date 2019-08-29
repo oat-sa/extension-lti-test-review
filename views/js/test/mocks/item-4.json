@@ -32,21 +32,6 @@
   "schemaLocations": {
     "http://www.imsglobal.org/xsd/imsqti_v2p2": "http://www.imsglobal.org/xsd/qti/qtiv2p2/imsqti_v2p2.xsd"
   },
-  "stylesheets": {
-    "stylesheet_5d52d7588dd8c707575889": {
-      "serial": "stylesheet_5d52d7588dd8c707575889",
-      "qtiClass": "stylesheet",
-      "attributes": {
-        "href": "tao-user-styles.css",
-        "type": "text/css",
-        "media": "all",
-        "title": ""
-      },
-      "debug": {
-        "relatedItem": "item_5d52d7588dd45281445998"
-      }
-    }
-  },
   "outcomes": [],
   "responses": [],
   "feedbacks": [],

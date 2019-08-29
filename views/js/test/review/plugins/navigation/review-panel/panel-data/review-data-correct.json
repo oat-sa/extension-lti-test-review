@@ -16,6 +16,7 @@
               "informational": true,
               "skipped": false,
               "position": 0,
+              "type": "info",
               "score": 0,
               "maxScore": 0
             }
@@ -43,6 +44,7 @@
               "informational": false,
               "skipped": false,
               "position": 1,
+              "type": "correct",
               "score": 2,
               "maxScore": 2
             },
@@ -52,6 +54,7 @@
               "informational": false,
               "skipped": false,
               "position": 2,
+              "type": "correct",
               "score": 2,
               "maxScore": 2
             },
@@ -61,6 +64,7 @@
               "informational": false,
               "skipped": false,
               "position": 3,
+              "type": "correct",
               "score": 3,
               "maxScore": 3
             },
@@ -70,6 +74,7 @@
               "informational": false,
               "skipped": false,
               "position": 4,
+              "type": "correct",
               "score": 2,
               "maxScore": 2
             },
@@ -79,6 +84,7 @@
               "informational": false,
               "skipped": false,
               "position": 5,
+              "type": "correct",
               "score": 2,
               "maxScore": 2
             },
@@ -88,6 +94,7 @@
               "informational": false,
               "skipped": false,
               "position": 6,
+              "type": "correct",
               "score": 2,
               "maxScore": 2
             },
@@ -97,6 +104,7 @@
               "informational": false,
               "skipped": false,
               "position": 7,
+              "type": "correct",
               "score": 2,
               "maxScore": 2
             },
@@ -106,6 +114,7 @@
               "informational": false,
               "skipped": false,
               "position": 8,
+              "type": "correct",
               "score": 2,
               "maxScore": 2
             }

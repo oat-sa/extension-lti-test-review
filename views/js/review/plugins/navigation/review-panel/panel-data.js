@@ -25,14 +25,21 @@ define([
     'use strict';
 
     /**
-     * @typedef {Object} mapEntry
-     * @property {String} id - The element identifier
-     * @property {String} label - The displayed label
-     * @property {Number} position - The position of the item within the test
+     * @typedef {mapEntry} reviewPanelSection
+     * @property {mapEntry[]} items - The list of items contained in the section
+     */
+
+    /**
+     * @typedef {mapEntry} reviewPanelPart
+     * @property {reviewPanelSection[]} sections - The list of sections contained in the test part
+     */
+
+    /**
+     * @typedef {Object} reviewPanelMap
+     * @property {reviewPanelPart[]} parts - The list of test parts to display
+     * @property {Map} items - A map of items, indexed by identifiers
      * @property {Number} score - The test taker's score for this item
      * @property {Number} maxScore - The max possible score for this item
-     * @property {Boolean} [informational] - If the item is informational
-     * @property {Boolean} [skipped] - If the item has been skipped
      */
 
     /**
@@ -44,14 +51,31 @@ define([
     const compareByPosition = (a, b) => a.position - b.position;
 
     /**
+     * Gets the type for a particular item
+     * @param {mapEntry} item
+     * @returns {String}
+     */
+    const getItemType = item => {
+        if (item.informational) {
+            return 'info';
+        }
+        if (item.maxScore) {
+            if (item.score === item.maxScore) {
+                return 'correct';
+            } else {
+                return 'incorrect';
+            }
+        }
+        return 'default';
+    };
+
+    /**
      * Extracts data from a mapEntry
      * @param {mapEntry} entry
-     * @param {Number} score
-     * @param {Number} maxScore
      * @returns {mapEntry}
      */
-    const extractData = (entry, score, maxScore) => {
-        const {id, label, position, informational, skipped} = entry || {};
+    const extractData = entry => {
+        const {id, label, position, informational, skipped, score, maxScore} = entry || {};
         const data = {id, label, position, score, maxScore};
         if ('undefined' !== typeof informational) {
             data.informational = informational;
@@ -62,51 +86,32 @@ define([
         return data;
     };
 
-    /**
-     * Refine the data from the test runner in order to provide the dataset expected by the review panel
-     * @param {testRunner} testRunner
-     * @returns {{}}
-     */
-    function reviewPanelDataService(testRunner) {
-        return {
-            /**
-             * Refines the test runner data and build the expected review panel map
-             * @returns {reviewPanelMap}
-             */
-            getReviewPanelMap() {
-                const testMap = testRunner.getTestMap();
-                let testScore = 0;
-                let testMaxScore = 0;
-                return {
-                    // rebuild the map keeping only relevant data, computing the score and sorting elements by position
-                    // make use of lodash to simplify as the source collection could be either an object or an array
-                    parts: _.map(testMap && testMap.parts, part => {
-                        let partScore = 0;
-                        let partMaxScore = 0;
-                        const sections = _.map(part.sections, section => {
-                            let sectionScore = 0;
-                            let sectionMaxScore = 0;
-                            const items = _.map(section.items, item => {
-                                const itemScore = item.score || 0;
-                                const itemMaxScore = item.maxScore || 0;
-                                sectionScore += itemScore;
-                                sectionMaxScore += itemMaxScore;
-                                return extractData(item, itemScore, itemMaxScore);
-                            }).sort(compareByPosition);
-                            partScore += sectionScore;
-                            partMaxScore += sectionMaxScore;
-                            return Object.assign(extractData(section, sectionScore, sectionMaxScore), {items});
-                        }).sort(compareByPosition);
-                        testScore += partScore;
-                        testMaxScore += partMaxScore;
-                        return Object.assign(extractData(part, partScore, partMaxScore), {sections});
-                    }).sort(compareByPosition),
-                    score: testScore,
-                    maxScore: testMaxScore
-                };
-            }
-        };
-    }
+    return {
+        /**
+         * Refines the test runner data and build the expected review panel map
+         * @param {testMap} testMap
+         * @returns {reviewPanelMap}
+         */
+        getReviewPanelMap(testMap) {
+            const {parts, score, maxScore} = testMap;
+            const items = new Map();
 
-    return reviewPanelDataService;
+            // rebuild the map keeping only relevant data, and sorting elements by position
+            return {
+                parts: _.map(parts, part => Object.assign(extractData(part), {
+                    sections: _.map(part.sections, section => Object.assign(extractData(section), {
+                        items: _.map(section.items, item => {
+                            const reviewItem = extractData(item);
+                            reviewItem.type = getItemType(item);
+                            items.set(item.id, reviewItem);
+                            return reviewItem;
+                        }).sort(compareByPosition)
+                    })).sort(compareByPosition)
+                })).sort(compareByPosition),
+                items,
+                score,
+                maxScore
+            };
+        }
+    };
 });

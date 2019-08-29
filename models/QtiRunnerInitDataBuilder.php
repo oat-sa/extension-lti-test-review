@@ -168,11 +168,11 @@ class QtiRunnerInitDataBuilder
 
                     $itemId = $item->getIdentifier();
                     $score = $itemsStates[$itemId]['score'] ?? [];
-                    $responses = $itemsStates[$itemId]['state'] ?? [];
+                    $state = $itemsStates[$itemId]['state'] ?? [];
 
                     $answers = 0;
-                    if (count($responses)) {
-                        foreach ($responses as $response) {
+                    if (count($state)) {
+                        foreach ($state as $response) {
                             $answers += count($response['response']['list']['identifier'] ?? []);
                         }
                     }
@@ -182,7 +182,7 @@ class QtiRunnerInitDataBuilder
                         'label' => $itemData['data']['attributes']['label'],
                         'position' => $position,
                         'categories' => [],
-                        'informational' => false,
+                        'informational' => empty($state) && empty($score),
                         'skipped' => empty($answers),
                         'score' => array_sum($score),
                         'maxScore' => count($score)

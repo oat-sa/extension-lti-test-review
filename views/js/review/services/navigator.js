@@ -42,31 +42,44 @@ define([
         return Object.assign({}, navigator, {
             /**
              * Navigate to the next item
-             * @returns {testContext} the new test context
+             * @returns {testContext|Boolean} the new test context
              */
             nextItem() {
-                const itemPosition = testContext.itemPosition + 1;
-                return testContextBuilder.buildTestContextFromPosition(testContext, testMap, itemPosition);
+                const next = _.find(mapHelper.getJumps(testMap), jump => jump && jump.position > testContext.itemPosition);
+                if (next) {
+                    return testContextBuilder.buildTestContextFromPosition(testContext, testMap, next.position);
+                }
+
+                return false;
             },
 
             /**
              * Navigate to the next item
-             * @returns {testContext} the new test context
+             * @returns {testContext|Boolean} the new test context
              */
             previousItem() {
-                const itemPosition = testContext.itemPosition - 1;
-                return testContextBuilder.buildTestContextFromPosition(testContext, testMap, itemPosition);
+                const prev = _.findLast(mapHelper.getJumps(testMap), jump => jump && jump.position < testContext.itemPosition);
+                if (prev) {
+                    return testContextBuilder.buildTestContextFromPosition(testContext, testMap, prev.position);
+                }
+
+                return false;
             },
 
             /**
              * Navigate to the next item
-             * @returns {testContext} the new test context
+             * @returns {testContext|Boolean} the new test context
              */
             nextSection() {
                 const sectionStats = mapHelper.getSectionStats(testMap, testContext.sectionId);
                 const section = mapHelper.getSection(testMap, testContext.sectionId);
                 const itemPosition = section.position + sectionStats.total;
-                return testContextBuilder.buildTestContextFromPosition(testContext, testMap, itemPosition);
+                const next = _.find(mapHelper.getJumps(testMap), jump => jump && jump.position >= itemPosition);
+                if (next) {
+                    return testContextBuilder.buildTestContextFromPosition(testContext, testMap, next.position);
+                }
+
+                return false;
             }
         });
     }

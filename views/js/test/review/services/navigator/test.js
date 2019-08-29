@@ -22,8 +22,9 @@
 define([
     'taoReview/review/services/navigator',
     'json!taoReview/test/review/services/navigator/testMap.json',
+    'json!taoReview/test/review/services/navigator/testMapFiltered.json',
     'json!taoReview/test/review/services/navigator/testContexts.json'
-], function (testNavigator, testMap, testContexts) {
+], function (testNavigator, testMap, testMapFiltered, testContexts) {
     'use strict';
 
     QUnit.module('API');
@@ -302,15 +303,56 @@ define([
     QUnit.module('navigator.navigate');
 
     QUnit.test('executes the correct movement', assert => {
-        const aTestNaviagtor = testNavigator(testContexts.context4, testMap);
+        const aTestNavigator = testNavigator(testContexts.context4, testMap);
+        let newTestContext;
 
-        assert.expect(5);
+        assert.expect(9);
 
-        assert.deepEqual(aTestNaviagtor.navigate('next', 'item'), aTestNaviagtor.nextItem());
-        assert.deepEqual(aTestNaviagtor.navigate('previous', 'item'), aTestNaviagtor.previousItem());
-        assert.deepEqual(aTestNaviagtor.navigate('next', 'section'), aTestNaviagtor.nextSection());
-        assert.deepEqual(aTestNaviagtor.navigate('jump', 'item', 3), aTestNaviagtor.jumpItem(3));
+        newTestContext = aTestNavigator.navigate('next', 'item');
+        assert.deepEqual(newTestContext, aTestNavigator.nextItem());
+        assert.equal(newTestContext.itemPosition, 6);
 
-        assert.equal(typeof aTestNaviagtor.navigate('forward', 'test-part', 3), 'undefined');
+        newTestContext = aTestNavigator.navigate('previous', 'item');
+        assert.deepEqual(newTestContext, aTestNavigator.previousItem());
+        assert.equal(newTestContext.itemPosition, 4);
+
+        newTestContext = aTestNavigator.navigate('next', 'section');
+        assert.deepEqual(newTestContext, aTestNavigator.nextSection());
+        assert.equal(newTestContext.itemPosition, 6);
+
+        newTestContext = aTestNavigator.navigate('jump', 'item', 3);
+        assert.deepEqual(newTestContext, aTestNavigator.jumpItem(3));
+        assert.equal(newTestContext.itemPosition, 3);
+
+        assert.equal(typeof aTestNavigator.navigate('forward', 'test-part', 3), 'undefined');
+    });
+
+    QUnit.test('still work with a filtered map', assert => {
+        const aTestNavigator = testNavigator(testContexts.context4, testMapFiltered);
+        let newTestContext;
+
+        assert.expect(11);
+
+        newTestContext = aTestNavigator.navigate('next', 'item');
+        assert.deepEqual(newTestContext, aTestNavigator.nextItem());
+        assert.equal(newTestContext.itemPosition, 7);
+
+        newTestContext = aTestNavigator.navigate('previous', 'item');
+        assert.deepEqual(newTestContext, aTestNavigator.previousItem());
+        assert.equal(newTestContext.itemPosition, 0);
+
+        newTestContext = aTestNavigator.navigate('next', 'section');
+        assert.deepEqual(newTestContext, aTestNavigator.nextSection());
+        assert.equal(newTestContext.itemPosition, 7);
+
+        newTestContext = aTestNavigator.navigate('jump', 'item', 14);
+        assert.deepEqual(newTestContext, aTestNavigator.jumpItem(14));
+        assert.equal(newTestContext.itemPosition, 14);
+
+        newTestContext = aTestNavigator.navigate('jump', 'item', 3);
+        assert.deepEqual(newTestContext, aTestNavigator.jumpItem(3));
+        assert.equal(newTestContext, false);
+
+        assert.equal(typeof aTestNavigator.navigate('forward', 'test-part', 3), 'undefined');
     });
 });

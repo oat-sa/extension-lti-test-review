@@ -31,7 +31,7 @@ define([
     'taoQtiTest/runner/ui/toolbox/toolbox',
     'taoQtiItem/runner/qtiItemRunner',
     'taoQtiTest/runner/config/assetManager',
-    'taoQtiTest/runner/navigator/navigator',
+    'taoReview/review/services/navigator',
     'tpl!taoReview/review/provider/tpl/qtiTestReviewProvider'
 ], function (
     $,
@@ -155,7 +155,6 @@ define([
                         const where = e.target.dataset.area;
                         areaBroker.getArea(where).addClass('focused');
                     }
-                    
                 });
                 container.on('focusout', (e) => {
                     if (e.target.classList.contains('jumplink')){
@@ -163,8 +162,9 @@ define([
                         areaBroker.getArea(where).removeClass('focused');
                     }
                 });
-            }
+            };
             createJumplinks(areaBroker.getContainer().find('.jumplinks'));
+
             /*
              * Install behavior on events
              */

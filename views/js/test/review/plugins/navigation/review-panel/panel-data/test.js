@@ -28,7 +28,7 @@ define([
     'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/review-data-incorrect.json'
 ], function (
     _,
-    reviewPanelDataService,
+    reviewDataHelper,
     testMapCorrect,
     testMapIncorrect,
     reviewDataCorrect,
@@ -36,36 +36,20 @@ define([
 ) {
     'use strict';
 
-    /**
-     * Simple mock for the test runner
-     * @param {Object} testMap
-     * @returns {Object}
-     */
-    const getTestRunner = testMap => {
-        return {
-            getTestMap() {
-                return testMap;
-            }
-        };
-    };
+    QUnit.dump.maxDepth = 20;
 
     QUnit.module('Factory');
 
     QUnit.test('module', assert => {
-        const testRunner = getTestRunner(testMapCorrect);
-        assert.expect(3);
-        assert.equal(typeof reviewPanelDataService, 'function', 'The module exposes a function');
-        assert.equal(typeof reviewPanelDataService(testRunner), 'object', 'The factory produces an object');
-        assert.notStrictEqual(reviewPanelDataService(testRunner), reviewPanelDataService(testRunner), 'The factory provides a different object on each call');
+        assert.expect(1);
+        assert.equal(typeof reviewDataHelper, 'object', 'The module exposes an object');
     });
 
     QUnit.cases.init([
         {title: 'getReviewPanelMap'}
-    ]).test('inherited API', (data, assert) => {
-        const testRunner = getTestRunner(testMapCorrect);
-        const instance = reviewPanelDataService(testRunner);
+    ]).test('helper API', (data, assert) => {
         assert.expect(1);
-        assert.equal(typeof instance[data.title], 'function', `The instance exposes a "${data.title}" function`);
+        assert.equal(typeof reviewDataHelper[data.title], 'function', `The helper exposes a "${data.title}" function`);
     });
 
     QUnit.module('API');
@@ -79,10 +63,12 @@ define([
         testMap: testMapIncorrect,
         expected: reviewDataIncorrect
     }]).test('getReviewPanelMap', (data, assert) => {
-        const testRunner = getTestRunner(data.testMap);
-        const instance = reviewPanelDataService(testRunner);
-        assert.expect(1);
-        assert.deepEqual(instance.getReviewPanelMap(), data.expected, 'The method getReviewPanelMap() returns the expected data');
+        assert.expect(4);
+        const reviewData = reviewDataHelper.getReviewPanelMap(data.testMap);
+        assert.equal(reviewData.items instanceof Map, true, 'The items collection is set');
+        _.forEach(data.expected, (value, key) => {
+            assert.deepEqual(reviewData[key], value, `The method getReviewPanelMap() returns the expected data for the key ${key}`);
+        });
     });
 
 });

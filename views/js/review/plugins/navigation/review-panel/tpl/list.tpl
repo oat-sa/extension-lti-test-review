@@ -9,7 +9,7 @@
                 <span class="review-panel-label navigable" title="{{label}}">{{label}}<span class="collapsible-arrow"></span></span>
                 <ul class="review-panel-block plain">
                 {{#each items}}
-                    <li class="review-panel-item navigable{{#if active}} active{{/if}} {{cls}}" data-control="{{id}}" data-position="{{position}}" title="{{label}}">
+                    <li class="review-panel-item navigable{{#if active}} active{{/if}}{{#if type}} item-{{type}}{{/if}}" data-control="{{id}}" data-position="{{position}}" title="{{label}}">
                         <span class="review-panel-label">{{label}}</span>
                     <span class="review-panel-score">{{#if informational}}-{{else}}{{#if maxScore}}{{score}}/{{maxScore}}{{else}}{{score}}{{/if}}{{/if}}</span>
                     </li>

@@ -24,6 +24,7 @@
               "viewed": true,
               "categories": [],
               "informational": true,
+              "skipped": false,
               "index": 1,
               "positionInPart": 0,
               "positionInSection": 0,
@@ -31,6 +32,8 @@
               "maxScore": 0
             }
           },
+          "score": 0,
+          "maxScore": 0,
           "stats": {
             "questions": 0,
             "answered": 0,
@@ -38,11 +41,11 @@
             "viewed": 1,
             "total": 1,
             "questionsViewed": 0
-          },
-          "score": 0,
-          "maxScore": 0
+          }
         }
       },
+      "score": 0,
+      "maxScore": 0,
       "stats": {
         "questions": 0,
         "answered": 0,
@@ -50,9 +53,7 @@
         "viewed": 1,
         "total": 1,
         "questionsViewed": 0
-      },
-      "score": 0,
-      "maxScore": 0
+      }
     },
     "QTIExamples": {
       "id": "QTIExamples",
@@ -67,99 +68,24 @@
           "position": 1,
           "timeConstraint": null,
           "items": {
-            "item-2": {
-              "id": "item-2",
-              "label": "example_1_TAO",
-              "position": 1,
-              "occurrence": 0,
-              "remainingAttempts": 1,
-              "answered": false,
-              "flagged": false,
-              "viewed": false,
-              "categories": [
-                "x-tao-option-calculator"
-              ],
-              "informational": false,
-              "index": 1,
-              "positionInPart": 0,
-              "positionInSection": 0,
-              "score": 1,
-              "maxScore": 2
-            },
-            "item-3": {
-              "id": "item-3",
-              "label": "example_2_Math",
-              "position": 2,
-              "occurrence": 0,
-              "remainingAttempts": 1,
-              "answered": false,
-              "flagged": false,
-              "viewed": false,
-              "categories": [
-                "x-tao-option-calculator"
-              ],
-              "informational": false,
-              "index": 2,
-              "positionInPart": 1,
-              "positionInSection": 1,
-              "score": 0,
-              "maxScore": 2
-            },
-            "item-4": {
-              "id": "item-4",
-              "label": "Example_3_Baudelaire",
-              "position": 3,
-              "occurrence": 0,
-              "remainingAttempts": 1,
-              "answered": false,
-              "flagged": false,
-              "viewed": false,
-              "categories": [
-                "x-tao-option-calculator"
-              ],
-              "informational": false,
-              "index": 3,
-              "positionInPart": 2,
-              "positionInSection": 2,
-              "score": 2,
-              "maxScore": 3
-            },
             "item-5": {
               "id": "item-5",
               "label": "Example_4_Appearance",
               "position": 4,
               "occurrence": 0,
               "remainingAttempts": 1,
-              "answered": false,
+              "answered": true,
               "flagged": false,
-              "viewed": false,
+              "viewed": true,
               "categories": [
                 "x-tao-option-calculator"
               ],
               "informational": false,
+              "skipped": false,
               "index": 4,
               "positionInPart": 3,
               "positionInSection": 3,
               "score": 2,
-              "maxScore": 2
-            },
-            "item-6": {
-              "id": "item-6",
-              "label": "Example_5_picasso",
-              "position": 5,
-              "occurrence": 0,
-              "remainingAttempts": 1,
-              "answered": false,
-              "flagged": false,
-              "viewed": false,
-              "categories": [
-                "x-tao-option-calculator"
-              ],
-              "informational": false,
-              "index": 5,
-              "positionInPart": 4,
-              "positionInSection": 4,
-              "score": 1,
               "maxScore": 2
             },
             "item-7": {
@@ -168,13 +94,14 @@
               "position": 6,
               "occurrence": 0,
               "remainingAttempts": 1,
-              "answered": false,
+              "answered": true,
               "flagged": false,
-              "viewed": false,
+              "viewed": true,
               "categories": [
                 "x-tao-option-calculator"
               ],
               "informational": false,
+              "skipped": false,
               "index": 6,
               "positionInPart": 5,
               "positionInSection": 5,
@@ -187,13 +114,14 @@
               "position": 7,
               "occurrence": 0,
               "remainingAttempts": 1,
-              "answered": false,
+              "answered": true,
               "flagged": false,
-              "viewed": false,
+              "viewed": true,
               "categories": [
                 "x-tao-option-calculator"
               ],
               "informational": false,
+              "skipped": false,
               "index": 7,
               "positionInPart": 6,
               "positionInSection": 6,
@@ -206,13 +134,14 @@
               "position": 8,
               "occurrence": 0,
               "remainingAttempts": 1,
-              "answered": false,
+              "answered": true,
               "flagged": false,
-              "viewed": false,
+              "viewed": true,
               "categories": [
                 "x-tao-option-calculator"
               ],
               "informational": false,
+              "skipped": false,
               "index": 8,
               "positionInPart": 7,
               "positionInSection": 7,
@@ -220,40 +149,40 @@
               "maxScore": 2
             }
           },
+          "score": 12,
+          "maxScore": 17,
           "stats": {
             "questions": 8,
-            "answered": 0,
+            "answered": 8,
             "flagged": 0,
-            "viewed": 0,
+            "viewed": 8,
             "total": 8,
-            "questionsViewed": 0
-          },
-          "score": 12,
-          "maxScore": 17
+            "questionsViewed": 8
+          }
         }
       },
+      "score": 12,
+      "maxScore": 17,
       "stats": {
         "questions": 8,
-        "answered": 0,
+        "answered": 8,
         "flagged": 0,
-        "viewed": 0,
+        "viewed": 8,
         "total": 8,
-        "questionsViewed": 0
-      },
-      "score": 12,
-      "maxScore": 17
+        "questionsViewed": 8
+      }
     }
-  },
-  "stats": {
-    "questions": 8,
-    "answered": 0,
-    "flagged": 0,
-    "viewed": 1,
-    "total": 9,
-    "questionsViewed": 0
   },
   "score": 12,
   "maxScore": 17,
+  "stats": {
+    "questions": 8,
+    "answered": 8,
+    "flagged": 0,
+    "viewed": 9,
+    "total": 9,
+    "questionsViewed": 8
+  },
   "jumps": [
     {
       "identifier": "item-1",
@@ -261,36 +190,16 @@
       "part": "Introduction",
       "position": 0
     },
-    {
-      "identifier": "item-2",
-      "section": "assessmentSection-2",
-      "part": "QTIExamples",
-      "position": 1
-    },
-    {
-      "identifier": "item-3",
-      "section": "assessmentSection-2",
-      "part": "QTIExamples",
-      "position": 2
-    },
-    {
-      "identifier": "item-4",
-      "section": "assessmentSection-2",
-      "part": "QTIExamples",
-      "position": 3
-    },
+    {},
+    {},
+    {},
     {
       "identifier": "item-5",
       "section": "assessmentSection-2",
       "part": "QTIExamples",
       "position": 4
     },
-    {
-      "identifier": "item-6",
-      "section": "assessmentSection-2",
-      "part": "QTIExamples",
-      "position": 5
-    },
+    {},
     {
       "identifier": "item-7",
       "section": "assessmentSection-2",

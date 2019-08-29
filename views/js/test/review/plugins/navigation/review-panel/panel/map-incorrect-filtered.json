@@ -1,0 +1,132 @@
+{
+  "scope": "test",
+  "parts": {
+    "QTIExamples": {
+      "id": "QTIExamples",
+      "label": "QTIExamples",
+      "position": 1,
+      "isLinear": true,
+      "sections": {
+        "assessmentSection-2": {
+          "id": "assessmentSection-2",
+          "label": "Section 1",
+          "isCatAdaptive": false,
+          "position": 1,
+          "timeConstraint": null,
+          "items": {
+            "item-3": {
+              "id": "item-3",
+              "label": "example_2_Math",
+              "position": 2,
+              "occurrence": 0,
+              "remainingAttempts": 1,
+              "answered": true,
+              "flagged": false,
+              "viewed": true,
+              "categories": [
+                "x-tao-option-calculator"
+              ],
+              "informational": false,
+              "skipped": false,
+              "index": 2,
+              "positionInPart": 1,
+              "positionInSection": 1,
+              "score": 2,
+              "maxScore": 3
+            }
+          },
+          "score": 8,
+          "maxScore": 9,
+          "stats": {
+            "questions": 4,
+            "answered": 4,
+            "flagged": 0,
+            "viewed": 4,
+            "total": 4,
+            "questionsViewed": 4
+          }
+        },
+        "assessmentSection-3": {
+          "id": "assessmentSection-3",
+          "label": "Section 2",
+          "isCatAdaptive": false,
+          "position": 5,
+          "timeConstraint": null,
+          "items": {
+            "item-9": {
+              "id": "item-9",
+              "label": "Example_8_Geo 3",
+              "position": 8,
+              "occurrence": 0,
+              "remainingAttempts": 1,
+              "answered": true,
+              "flagged": false,
+              "viewed": true,
+              "categories": [
+                "x-tao-option-calculator"
+              ],
+              "informational": false,
+              "skipped": true,
+              "index": 8,
+              "positionInPart": 7,
+              "positionInSection": 7,
+              "score": 0,
+              "maxScore": 0
+            }
+          },
+          "score": 6,
+          "maxScore": 6,
+          "stats": {
+            "questions": 4,
+            "answered": 4,
+            "flagged": 0,
+            "viewed": 4,
+            "total": 4,
+            "questionsViewed": 4
+          }
+        }
+      },
+      "score": 14,
+      "maxScore": 15,
+      "stats": {
+        "questions": 8,
+        "answered": 8,
+        "flagged": 0,
+        "viewed": 8,
+        "total": 8,
+        "questionsViewed": 8
+      }
+    }
+  },
+  "score": 14,
+  "maxScore": 15,
+  "stats": {
+    "questions": 8,
+    "answered": 8,
+    "flagged": 0,
+    "viewed": 9,
+    "total": 9,
+    "questionsViewed": 8
+  },
+  "jumps": [
+    null,
+    null,
+    {
+      "identifier": "item-3",
+      "section": "assessmentSection-2",
+      "part": "QTIExamples",
+      "position": 2
+    },
+    null,
+    null,
+    null,
+    null,
+    null,
+    {
+      "identifier": "item-9",
+      "section": "assessmentSection-2",
+      "part": "QTIExamples",
+      "position": 8
+    }
+  ]
+}

@@ -21,11 +21,11 @@
  */
 define([
     'lodash',
-    'taoReview/review/plugins/navigation/review-panel/review-data',
-    'json!taoReview/test/review/plugins/navigation/review-panel/review-data/map-correct.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/review-data/map-incorrect.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/review-data/review-data-correct.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/review-data/review-data-incorrect.json'
+    'taoReview/review/plugins/navigation/review-panel/panel-data',
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/map-correct.json',
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/map-incorrect.json',
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/review-data-correct.json',
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/review-data-incorrect.json'
 ], function (
     _,
     reviewDataHelper,

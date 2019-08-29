@@ -25,7 +25,7 @@ define([
     'ui/hider',
     'ui/autoscroll',
     'ui/component',
-    'taoReview/review/plugins/navigation/review-panel/review-data',
+    'taoReview/review/plugins/navigation/review-panel/panel-data',
     'tpl!taoReview/review/plugins/navigation/review-panel/tpl/panel',
     'tpl!taoReview/review/plugins/navigation/review-panel/tpl/list',
     'css!taoReview/review/plugins/navigation/review-panel/css/panel.css'

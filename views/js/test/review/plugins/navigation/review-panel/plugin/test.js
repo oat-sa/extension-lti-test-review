@@ -59,6 +59,14 @@ define([
                     control: $('.footer', $fixture)
                 });
             },
+            install() {
+                const defaultSetTestMap = this.setTestMap;
+                this.setTestMap = (...args) => {
+                    const result = defaultSetTestMap.apply(this, args);
+                    this.trigger('testmapchange', this.getTestMap());
+                    return result;
+                };
+            },
             init() {
                 this.setTestMap(testMap);
             }

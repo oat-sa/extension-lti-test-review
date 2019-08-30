@@ -33,15 +33,15 @@ define([
      */
     const defaults = {
         buttons: [{
-            title: __('Go to the previous item'),
-            icon: 'left',
-            control: 'prev'
-        }, {
             title: __('Go to the next item'),
             cls: 'right',
             icon: 'right',
             text: __('Next'),
             control: 'next'
+        },{
+            title: __('Go to the previous item'),
+            icon: 'left',
+            control: 'prev'
         }]
     };
 
@@ -154,7 +154,7 @@ define([
                 this.getElement().on('click', '.action', e => {
                     const control = e.currentTarget.dataset.control;
                     if (control && !this.is('disabled') && !disabledButtons.has(control)) {
-
+                        e.currentTarget.classList.add('active');
                         /**
                          * @event click
                          * @param {Object} control
@@ -184,6 +184,12 @@ define([
                             const control = el.dataset.control;
                             if (!disabledButtons.has(control)) {
                                 el.disabled = false;
+                            }
+                            if (el.classList.contains('active')) {
+                                if (!disabledButtons.has(control)) {
+                                    el.focus();
+                                }
+                                el.classList.remove('active');
                             }
                         });
                 }

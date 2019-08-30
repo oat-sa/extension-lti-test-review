@@ -3,16 +3,19 @@
     {
       "id": "Introduction",
       "label": "Introduction",
+      "position": 0,
       "sections": [
         {
           "id": "assessmentSection-1",
           "label": "Section 1",
+          "position": 0,
           "items": [
             {
               "id": "item-1",
               "label": "Example_0_Introduction",
               "informational": true,
               "skipped": false,
+              "type": "info",
               "position": 0,
               "score": 0,
               "maxScore": 0
@@ -28,16 +31,19 @@
     {
       "id": "QTIExamples",
       "label": "QTIExamples",
+      "position": 1,
       "sections": [
         {
           "id": "assessmentSection-2",
           "label": "Section 1",
+          "position": 1,
           "items": [
             {
               "id": "item-2",
               "label": "example_1_TAO",
               "informational": false,
               "skipped": false,
+              "type": "correct",
               "position": 1,
               "score": 2,
               "maxScore": 2
@@ -47,6 +53,7 @@
               "label": "example_2_Math",
               "informational": false,
               "skipped": false,
+              "type": "incorrect",
               "position": 2,
               "score": 2,
               "maxScore": 3
@@ -56,6 +63,7 @@
               "label": "Example_3_Baudelaire",
               "informational": false,
               "skipped": false,
+              "type": "correct",
               "position": 3,
               "score": 2,
               "maxScore": 2
@@ -65,6 +73,7 @@
               "label": "Example_4_Appearance",
               "informational": false,
               "skipped": false,
+              "type": "correct",
               "position": 4,
               "score": 2,
               "maxScore": 2
@@ -76,12 +85,14 @@
         {
           "id": "assessmentSection-3",
           "label": "Section 2",
+          "position": 5,
           "items": [
             {
               "id": "item-6",
               "label": "Example_5_picasso",
               "informational": false,
               "skipped": false,
+              "type": "correct",
               "position": 5,
               "score": 2,
               "maxScore": 2
@@ -91,6 +102,7 @@
               "label": "Example_6_Geography",
               "informational": false,
               "skipped": false,
+              "type": "correct",
               "position": 6,
               "score": 2,
               "maxScore": 2
@@ -100,6 +112,7 @@
               "label": "Example_7_Geo 2",
               "informational": false,
               "skipped": false,
+              "type": "correct",
               "position": 7,
               "score": 2,
               "maxScore": 2
@@ -109,6 +122,7 @@
               "label": "Example_8_Geo 3",
               "informational": false,
               "skipped": true,
+              "type": "default",
               "position": 8,
               "score": 0,
               "maxScore": 0

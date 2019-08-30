@@ -38,7 +38,9 @@
             "viewed": 1,
             "total": 1,
             "questionsViewed": 0
-          }
+          },
+          "score": 0,
+          "maxScore": 0
         }
       },
       "stats": {
@@ -48,7 +50,9 @@
         "viewed": 1,
         "total": 1,
         "questionsViewed": 0
-      }
+      },
+      "score": 0,
+      "maxScore": 0
     },
     "QTIExamples": {
       "id": "QTIExamples",
@@ -223,7 +227,9 @@
             "viewed": 0,
             "total": 8,
             "questionsViewed": 0
-          }
+          },
+          "score": 12,
+          "maxScore": 17
         }
       },
       "stats": {
@@ -233,7 +239,9 @@
         "viewed": 0,
         "total": 8,
         "questionsViewed": 0
-      }
+      },
+      "score": 12,
+      "maxScore": 17
     }
   },
   "stats": {
@@ -244,6 +252,8 @@
     "total": 9,
     "questionsViewed": 0
   },
+  "score": 12,
+  "maxScore": 17,
   "jumps": [
     {
       "identifier": "item-1",

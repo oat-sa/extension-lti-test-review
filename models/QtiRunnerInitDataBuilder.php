@@ -39,6 +39,9 @@ use taoResultServer_models_classes_ResponseVariable;
 
 class QtiRunnerInitDataBuilder
 {
+    protected const OUTCOME_VAR_SCORE = 'SCORE';
+    protected const OUTCOME_VAR_MAXSCORE = 'MAXSCORE';
+
     use OntologyAwareTrait;
 
     /** @var DeliveryContainerService */
@@ -78,11 +81,13 @@ class QtiRunnerInitDataBuilder
      * @return array
      * @throws common_Exception
      */
-    public function build($deliveryExecutionId): array
+    public function build($deliveryExecutionId)
     {
         $serviceContext = $this->getServiceContext($deliveryExecutionId);
 
-        $testMap = $this->getTestMap($serviceContext, $deliveryExecutionId);
+        $itemsData = $this->getItemsData($deliveryExecutionId);
+
+        $testMap = $this->getTestMap($serviceContext, $itemsData);
 
         $firstItem = array_shift($this->itemsData);
 
@@ -93,14 +98,14 @@ class QtiRunnerInitDataBuilder
                 'itemPosition' => 0
             ]),
             'testData' => $this->qtiRunnerService->getTestData($serviceContext),
-            'testResponses' => $this->getResponses($deliveryExecutionId),
+            'testResponses' => array_column($itemsData, 'state', 'identifier'),
             'success' => true,
         ];
 
         return $init;
     }
 
-    protected function getResponses(string $deliveryExecutionId)
+    protected function getItemsData(string $deliveryExecutionId)
     {
         $deliveryExecution = $this->deliveryExecutionService->getDeliveryExecutionById($deliveryExecutionId);
         $delivery = $deliveryExecution->getDelivery();
@@ -116,16 +121,39 @@ class QtiRunnerInitDataBuilder
 
         $variables = $this->getResultVariables($deliveryExecution->getIdentifier(), $filterSubmission, $filterTypes);
 
-        $responses = [];
+        $returnValue = [];
 
         foreach ($variables as $variable) {
-            $responses[$variable['internalIdentifier']] = json_decode($variable['state'], true);
+
+            $score = $maxScore = 0.0;
+
+            $outcome = array_filter($variable[taoResultServer_models_classes_OutcomeVariable::class], static function ($key) {
+                return in_array($key, [static::OUTCOME_VAR_SCORE, static::OUTCOME_VAR_MAXSCORE], true);
+            }, ARRAY_FILTER_USE_KEY);
+
+            if (isset($outcome[static::OUTCOME_VAR_SCORE])) {
+                /** @var taoResultServer_models_classes_OutcomeVariable $var */
+                $var = $outcome[static::OUTCOME_VAR_SCORE]['var'];
+                $score = (float)$var->getValue();
+            }
+
+            if (isset($outcome[static::OUTCOME_VAR_MAXSCORE])) {
+                $var = $outcome[static::OUTCOME_VAR_MAXSCORE]['var'];
+                $maxScore = (float)$var->getValue();
+            }
+
+            $returnValue[$variable['internalIdentifier']] = [
+                'identifier' => $variable['internalIdentifier'],
+                'state' => json_decode($variable['state'], true),
+                'score' => $score,
+                'maxScore' => $maxScore,
+            ];
         }
 
-        return $responses;
+        return $returnValue;
     }
 
-    protected function getTestMap(QtiRunnerServiceContext $context)
+    protected function getTestMap(QtiRunnerServiceContext $context, array $itemsStates)
     {
         $testDefinition = taoQtiTest_helpers_Utils::getTestDefinition($context->getTestCompilationUri());
 
@@ -149,13 +177,27 @@ class QtiRunnerInitDataBuilder
                     $itemData = $this->qtiRunnerService->getItemData($context, $item->getHref());
 
                     $itemId = $item->getIdentifier();
+                    $state = $itemsStates[$itemId]['state'] ?? [];
+
+                    $answers = 0;
+                    if (count($state)) {
+                        foreach ($state as $response) {
+                            $answers += count($response['response']['list']['identifier'] ?? []);
+                        }
+                    }
+
+                    $isInformational = empty($state);
+                    $isSkipped = !$isInformational && empty($answers);
+
                     $items[$itemId] = [
                         'id' => $itemId,
                         'label' => $itemData['data']['attributes']['label'],
                         'position' => $position,
                         'categories' => [],
-                        'score' => 0,
-                        'maxScore' => 0
+                        'informational' => $isInformational,
+                        'skipped' => $isSkipped,
+                        'score' => $itemsStates[$itemId]['score'],
+                        'maxScore' => $itemsStates[$itemId]['maxScore']
                     ];
 
                     $this->fillItemsData($itemId, $item->getHref(), $itemData['data']);

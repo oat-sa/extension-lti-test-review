@@ -25,7 +25,6 @@ define([
     'taoTests/runner/runner',
     'taoTests/runner/areaBroker',
     'taoQtiTest/runner/helpers/map',
-    'taoQtiTest/runner/helpers/navigation',
     'taoReview/review/plugins/navigation/review-panel/plugin',
     'tpl!taoReview/test/review/plugins/navigation/review-panel/plugin/layout',
     'json!taoReview/test/review/plugins/navigation/review-panel/plugin/map.json'
@@ -35,7 +34,6 @@ define([
     runnerFactory,
     areaBrokerFactory,
     mapHelper,
-    navigationHelper,
     reviewPanelPlugin,
     layoutTpl,
     testMap
@@ -44,7 +42,7 @@ define([
 
     /**
      * Builds a test runner instance, injecting the plugin
-     * @param fixture
+     * @param {String} fixture
      * @returns {runner}
      */
     const getTestRunner = fixture => {
@@ -60,6 +58,14 @@ define([
                     navigation: $('.footer', $fixture),
                     control: $('.footer', $fixture)
                 });
+            },
+            install() {
+                const defaultSetTestMap = this.setTestMap;
+                this.setTestMap = (...args) => {
+                    const result = defaultSetTestMap.apply(this, args);
+                    this.trigger('testmapchange', this.getTestMap());
+                    return result;
+                };
             },
             init() {
                 this.setTestMap(testMap);
@@ -435,6 +441,109 @@ define([
             .then(ready);
     });
 
+    QUnit.test('update the filter', assert => {
+        assert.expect(37);
+        const ready = assert.async();
+        const runner = getTestRunner('#fixture-filter');
+        const areaBroker = runner.getAreaBroker();
+        const $container = areaBroker.getArea('panel');
+
+        Promise.resolve()
+            .then(() => new Promise(resolve => {
+                runner
+                    .on('ready', resolve)
+                    .on('move', (direction, scope, position) => {
+                        const item = mapHelper.getItemAt(runner.getTestMap(), position);
+                        if (item) {
+                            runner.loadItem(item.id);
+                        }
+                    })
+                    .init();
+            }))
+            .then(() => {
+                const plugin = runner.getPlugin('review-panel');
+                assert.ok(!!plugin, 'The plugin exists');
+                assert.equal(typeof plugin, 'object', 'The plugin is returned');
+                assert.equal($container.find('.review-panel').length, 1, 'The component has been inserted');
+                assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
+                assert.equal($container.find('.review-panel-content').children().length, 1, 'The content area is not empty');
+
+                assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
+                assert.equal($container.find('.review-panel-section').length, 2, 'The test sections are rendered');
+                assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
+            })
+            .then(() => new Promise(resolve => {
+                const item = mapHelper.getItemAt(runner.getTestMap(), 0);
+                runner
+                    .off('.test')
+                    .on('renderitem.test', itemRef => {
+                        assert.equal(itemRef, item.id, 'The expected item has been rendered');
+                        assert.equal($container.find(`.review-panel-item.active[data-control="${itemRef}"]`).length, 1, 'A test item is active');
+                        resolve();
+                    });
+                $container.find(`.review-panel-item[data-control="${item.id}"]`).click();
+            }))
+            .then(() => new Promise(resolve => {
+                assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
+                assert.equal($container.find('.review-panel-filter:visible').length, 2, 'The filters are displayed');
+                assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
+                assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is active');
+                assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active');
+
+                const item = mapHelper.getItemAt(runner.getTestMap(), 1);
+                runner
+                    .off('.test')
+                    .on('renderitem.test', itemRef => {
+                        assert.equal(itemRef, item.id, 'The expected item has been rendered');
+                        assert.equal($container.find(`.review-panel-item.active[data-control="${itemRef}"]`).length, 1, 'A test item is active');
+                        resolve();
+                    });
+                $container.find('.review-panel-filter:nth(1)').click();
+            }))
+            .then(() => new Promise(resolve => {
+                assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
+                assert.equal($container.find('.review-panel-filter:visible').length, 2, 'The filters are displayed');
+                assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
+                assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), false, 'The first filter is not active');
+                assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), true, 'The second filter is active');
+
+                assert.equal($container.find('.review-panel-part').length, 1, 'The test parts are rendered');
+                assert.equal($container.find('.review-panel-section').length, 1, 'The test sections are rendered');
+                assert.equal($container.find('.review-panel-item').length, 4, 'The test items are rendered');
+
+                $container.find('.review-panel-filter:nth(0)').click();
+
+                window.setTimeout(resolve, 200);
+            }))
+
+            .then(() => {
+                assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
+                assert.equal($container.find('.review-panel-filter:visible').length, 2, 'The filters are displayed');
+                assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
+                assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is active');
+                assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active');
+
+                assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
+                assert.equal($container.find('.review-panel-section').length, 2, 'The test sections are rendered');
+                assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
+            })
+            .then(() => new Promise(resolve => {
+                runner
+                    .on('destroy', resolve)
+                    .destroy();
+            }))
+            .then(() => {
+                assert.equal($container.find('.review-panel').length, 0, 'The component has been removed');
+                assert.equal($container.find('.review-panel-part').length, 0, 'The test parts have been removed');
+                assert.equal($container.find('.review-panel-section').length, 0, 'The test sections have been removed');
+                assert.equal($container.find('.review-panel-item').length, 0, 'The test items have been removed');
+            })
+            .catch(err => {
+                assert.ok(false, `Error in init method: ${err.message}`);
+            })
+            .then(ready);
+    });
+
     QUnit.module('Visual');
 
     QUnit.test('Visual test', assert => {
@@ -459,12 +568,20 @@ define([
             .on('move', function (direction, scope, position) {
                 let item = null;
                 if (direction === 'previous') {
-                    if (currentItem && !navigationHelper.isFirst(testMap, currentItem.id)) {
-                        item = mapHelper.getItemAt(this.getTestMap(), currentItem.position - 1);
+                    const first = _.find(mapHelper.getJumps(this.getTestMap()), jump => jump.identifier);
+                    if (currentItem && currentItem !== first) {
+                        position = currentItem.position - 1;
+                        do {
+                            item = mapHelper.getItemAt(this.getTestMap(), position --);
+                        } while (position >= 0 && !item);
                     }
                 } else if (direction === 'next') {
-                    if (currentItem && !navigationHelper.isLast(testMap, currentItem.id)) {
-                        item = mapHelper.getItemAt(this.getTestMap(), currentItem.position + 1);
+                    const last = _.findLast(mapHelper.getJumps(this.getTestMap()), jump => jump.identifier);
+                    if (currentItem && currentItem !== last) {
+                        position = currentItem.position + 1;
+                        do {
+                            item = mapHelper.getItemAt(this.getTestMap(), position ++);
+                        } while (position <= last.position && !item);
                     }
                 } else {
                     item = mapHelper.getItemAt(this.getTestMap(), position);

@@ -25,41 +25,26 @@ define([
     'ui/hider',
     'ui/autoscroll',
     'ui/component',
+    'taoReview/review/plugins/navigation/review-panel/panel-data',
     'tpl!taoReview/review/plugins/navigation/review-panel/tpl/panel',
     'tpl!taoReview/review/plugins/navigation/review-panel/tpl/list',
     'css!taoReview/review/plugins/navigation/review-panel/css/panel.css'
-], function ($, _, __, hider, autoscroll, componentFactory, panelTpl, listTpl) {
+], function (
+    $,
+    _,
+    __,
+    hider,
+    autoscroll,
+    componentFactory,
+    reviewDataHelper,
+    panelTpl,
+    listTpl
+) {
     'use strict';
-
-    /**
-     * @typedef {mapEntry} reviewPanelSection
-     * @property {mapEntry[]} items - The list of items contained in the section
-     */
-
-    /**
-     * @typedef {mapEntry} reviewPanelPart
-     * @property {reviewPanelSection[]} sections - The list of sections contained in the test part
-     */
-
-    /**
-     * @typedef {Object} reviewPanelMap
-     * @property {reviewPanelPart[]} parts - The list of test parts to display
-     * @property {Number} score - The test taker's score for this item
-     * @property {Number} maxScore - The max possible score for this item
-     */
-
-    /**
-     * @typedef {Object} reviewPanelData
-     * @property {reviewPanelMap} testMap - The test map
-     * @property {Map} itemsMap - The list of items, indexed by identifier
-     * @property {Number} score - The test taker's score for the test
-     * @property {Number} maxScore - The max possible score for the test
-     */
 
     /**
      * @typedef {mapEntry} reviewPanelFilter
      * @property {String} title - The tooltip displayed on mouse over
-     * @property {Function<item, section, part>} [filter] - A callback function applied to filter the data
      */
 
     /**
@@ -76,10 +61,7 @@ define([
         }, {
             id: 'incorrect',
             label: __('Incorrect'),
-            title: __('Show incorrect items only'),
-            filter(item) {
-                return !item.informational && (!item.maxScore || item.score !== item.maxScore);
-            }
+            title: __('Show incorrect items only')
         }]
     };
 
@@ -129,82 +111,6 @@ define([
     const findExpanded = $target => $target.find(cssSelectors.collapsible + cssSelectors.expanded);
 
     /**
-     * Gets the icon class for a particular item
-     * @param {mapEntry} item
-     * @returns {String}
-     */
-    const getItemIconCls = item => {
-        if (item.informational) {
-            return 'item-info';
-        }
-        if (item.maxScore) {
-            if (item.score === item.maxScore) {
-                return 'item-correct';
-            } else {
-                return 'item-incorrect';
-            }
-        }
-        return 'item-default';
-    };
-
-    /**
-     * Reduces an array to another array
-     * @param {Array} array
-     * @param {Function} callback
-     * @returns {Array}
-     */
-    const reduceArray = (array, callback) => (array || []).reduce(callback, []);
-
-    /**
-     * Refines the data to display the panel with respect to the current filter
-     * @param {reviewPanelMap} map
-     * @param {Function} [filter] - A callback function applied to filter the data
-     * @returns {reviewPanelData}
-     */
-    const filterData = (map, filter) => {
-        const score = map && map.score || 0;
-        const maxScore = map && map.maxScore || 0;
-        const itemsMap = new Map();
-        if (!_.isFunction(filter)) {
-            filter = () => true;
-        }
-        return {
-            testMap: {
-                parts: reduceArray(map && map.parts, (testParts, testPart) => {
-                    const sections = reduceArray(testPart.sections, (partSections, partSection) => {
-                        const items = reduceArray(partSection.items, (sectionItems, sectionItem) => {
-                            sectionItem = Object.assign({}, sectionItem);
-                            sectionItem.cls = getItemIconCls(sectionItem);
-
-                            if (filter(sectionItem, partSection, testPart)) {
-                                sectionItems.push(sectionItem);
-                                itemsMap.set(sectionItem.id, sectionItem);
-                            }
-
-                            return sectionItems;
-                        });
-
-                        if (items.length) {
-                            partSections.push(Object.assign({}, partSection, {items}));
-                        }
-
-                        return partSections;
-                    });
-
-                    if (sections.length) {
-                        testParts.push(Object.assign({}, testPart, {sections}));
-                    }
-
-                    return testParts;
-                })
-            },
-            itemsMap,
-            score,
-            maxScore
-        };
-    };
-
-    /**
      * Builds a review panel, that will show the test data with score.
      *
      * @example
@@ -212,7 +118,7 @@ define([
      *  const config = {
      *      // ...
      *  };
-     *  const data = {
+     *  const testMap = {
      *      parts: [{
      *          id: 'part-1',
      *          label: 'Part 1',
@@ -235,7 +141,7 @@ define([
      *      score: 2,
      *      maxScore: 2
      *  };
-     *  const component = reviewPanelFactory(container, config)
+     *  const component = reviewPanelFactory(container, config, testMap)
      *      .on('ready', function onComponentReady() {
      *          // ...
      *      });
@@ -245,7 +151,7 @@ define([
      * @param {String} [config.headerLabel] - Header label
      * @param {String} [config.footerLabel] - Footer label
      * @param {reviewPanelFilter[]} [config.filters] - The list of available filters
-     * @param {reviewPanelMap|null} map
+     * @param {testMap|null} map
      * @returns {component}
      * @fires ready - When the component is ready to work
      * @fires update When the navigation panel has been updated
@@ -261,7 +167,7 @@ define([
         let controls = null;
         let activeFilter = null;
         let activeItem = null;
-        let data = filterData(map);
+        let data = null;
 
         /**
          * Selects the active filter
@@ -336,7 +242,7 @@ define([
         const api = {
             /**
              * Gets the panel data
-             * @returns {reviewPanelData}
+             * @returns {reviewPanelMap}
              */
             getData() {
                 return data;
@@ -344,17 +250,16 @@ define([
 
             /**
              * Sets the panel data
-             * @param {reviewPanelMap} newMap
+             * @param {testMap} newMap
              * @returns {reviewPanel}
              * @fires datachange
              */
             setData(newMap) {
-                map = newMap;
-                data = filterData(newMap);
+                data = reviewDataHelper.getReviewPanelMap(newMap);
 
                 /**
                  * @event datachange
-                 * @param {reviewPanelData} data
+                 * @param {reviewPanelMap} data
                  */
                 this.trigger('datachange', data);
 
@@ -382,7 +287,6 @@ define([
 
                     if (this.is('rendered')) {
                         selectFilter(filterId);
-                        this.update();
                     }
 
                     /**
@@ -415,11 +319,11 @@ define([
              * Sets the active item
              * @param {String} itemId
              * @returns {reviewPanel}
-             * @fires expand for each activated element
+             * @fires active for each activated element
              */
             setActiveItem(itemId) {
-                if (data && data.itemsMap.has(itemId) && (!activeItem || activeItem.id !== itemId)) {
-                    activeItem = data.itemsMap.get(itemId);
+                if (data && data.items.has(itemId) && (!activeItem || activeItem.id !== itemId)) {
+                    activeItem = data.items.get(itemId);
 
                     if (this.is('rendered')) {
                         selectItem(itemId);
@@ -541,26 +445,21 @@ define([
              * @fires update once the display has been updated
              */
             update() {
-                if (this.is('rendered')) {
-                    let filteredData, scorePercent, scoreText;
-                    if (data.score !== data.maxScore) {
-                        filteredData = filterData(map, activeFilter && activeFilter.filter);
-                    } else {
-                        filteredData = data;
-                    }
+                if (data && this.is('rendered')) {
+                    let scorePercent, scoreText;
 
-                    if (filteredData.maxScore) {
-                        scoreText = `${filteredData.score}/${filteredData.maxScore}`;
-                        scorePercent = `${Math.floor(100 * filteredData.score / filteredData.maxScore) || 0}%`;
+                    if (data.maxScore) {
+                        scoreText = `${data.score}/${data.maxScore}`;
+                        scorePercent = `${Math.floor(100 * data.score / data.maxScore) || 0}%`;
                     } else {
-                        scoreText = `${filteredData.score}`;
+                        scoreText = `${data.score}`;
                         scorePercent = '0%';
                     }
 
-                    controls.$content.html(listTpl(filteredData.testMap));
+                    controls.$content.html(listTpl(data));
                     controls.$headerScore.text(scorePercent);
                     controls.$footerScore.text(scoreText);
-                    hider.toggle(controls.$filters, filteredData.score !== filteredData.maxScore);
+                    hider.toggle(controls.$filters, data.score !== data.maxScore);
 
                     if (!this.is('disabled')) {
                         enableKeyboard();
@@ -568,9 +467,9 @@ define([
 
                     /**
                      * @event update
-                     * @param {reviewPanelData} filteredData
+                     * @param {reviewPanelMap} data
                      */
-                    this.trigger('update', filteredData);
+                    this.trigger('update', data);
                 }
 
                 return this;
@@ -684,10 +583,10 @@ define([
             })
 
             // make sure the active item remain selected and visible when updating the display
-            .on('update', function onReviewPanelUpdate(filteredData) {
+            .on('update', function onReviewPanelUpdate() {
                 if (activeItem) {
                     // if the active item is not available anymore, select the first available one
-                    if (!filteredData.itemsMap.has(activeItem.id)) {
+                    if (!data.items.has(activeItem.id)) {
                         controls.$content.find(`${cssSelectors.item}:nth(0)`).click();
                     } else {
                         selectItem(activeItem.id);
@@ -709,6 +608,10 @@ define([
         // initialize the component with the provided config
         // defer the call to allow to listen to the init event
         _.defer(() => component.init(config));
+
+        if (map) {
+            component.setData(map);
+        }
 
         return component;
     }

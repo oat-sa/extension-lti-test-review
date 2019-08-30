@@ -52,8 +52,7 @@ define([
          */
         init() {
             const testRunner = this.getTestRunner();
-            const testData = testRunner.getTestData();
-            const testConfig = testData && testData.config || {};
+            const testConfig = testRunner.getConfig();
             const pluginShortcuts = (testConfig.shortcuts || {})[this.getName()] || {};
 
             /**
@@ -96,19 +95,13 @@ define([
                 const buttons = buttonsFactory(this.getAreaBroker().getNavigationArea());
 
                 /**
-                 * Get the amount of navigable items
-                 * @returns {Number}
-                 */
-                const getItemsCount = () => (mapHelper.getJumps(testRunner.getTestMap()) || []).length;
-
-                /**
                  * Check if the "Next" functionality should be available or not
                  * @returns {Boolean}
                  */
                 const canDoNext = () => {
-                    const itemsCount = getItemsCount();
+                    const last = _.findLast(mapHelper.getJumps(testRunner.getTestMap()), jump => jump && jump.identifier);
                     const context = testRunner.getTestContext();
-                    return itemsCount && context.itemPosition < itemsCount - 1;
+                    return last && context.itemPosition < last.position;
                 };
 
                 /**
@@ -116,9 +109,9 @@ define([
                  * @returns {Boolean}
                  */
                 const canDoPrevious = () => {
-                    const itemsCount = getItemsCount();
+                    const first = _.find(mapHelper.getJumps(testRunner.getTestMap()), jump => jump && jump.identifier);
                     const context = testRunner.getTestContext();
-                    return itemsCount && context.itemPosition;
+                    return first && context.itemPosition > first.position;
                 };
 
                 /**
@@ -161,7 +154,7 @@ define([
 
                 // reflect the test runner state to the navigation buttons and performs the navigation on demand
                 testRunner
-                    .on('loaditem', toggle)
+                    .on('loaditem testmapchange', toggle)
                     .on('nav-next', doNext)
                     .on('nav-prev', doPrevious)
                     .on(`plugin-show.${this.getName()}`, () => buttons.show())

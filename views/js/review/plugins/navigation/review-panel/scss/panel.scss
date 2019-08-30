@@ -21,10 +21,11 @@ $scoreWidth: 30px;
 $iconWidth: 30px;
 $lineHeight: 3rem;
 $borderWidth: 1px;
+$focusedBorderWidth: 3px;
 $sidePadding: 8px;
 $boxPadding: 5px;
 $space: 5px;
-$focusSpace: 2px;
+$focusSpace: 0px;
 $panelMargin: 10px;
 
 $panelBackground: $canvas;
@@ -74,7 +75,6 @@ $incorrectColor: $error;
 
 .review-panel {
     @include disableSelect();
-    background-color: $panelBackground;
     color: $panelColor;
     position: relative;
     display: flex;
@@ -155,7 +155,8 @@ $incorrectColor: $error;
                     left: $focusSpace;
                     bottom: $focusSpace;
                     right: $focusSpace;
-                    border: $borderWidth dashed $textColor;
+                    border: $focusedBorderWidth solid $info;
+                    z-index: 100;
                 }
             }
         }

@@ -21,15 +21,34 @@
 define([
     'core/promiseTimeout',
     'taoTests/runner/plugin',
-    'taoReview/review/plugins/navigation/review-panel/panel',
-    'taoReview/review/plugins/navigation/review-panel/panel-data'
+    'taoReview/review/services/navigation-data',
+    'taoReview/review/plugins/navigation/review-panel/panel'
 ], function (
     promiseTimeout,
     pluginFactory,
-    reviewPanelFactory,
-    reviewPanelService
+    navigationDataServiceFactory,
+    reviewPanelFactory
 ) {
     'use strict';
+
+    const filters = {
+        /**
+         * No filter, keep all items
+         * @returns {Boolean}
+         */
+        all() {
+            return true;
+        },
+
+        /**
+         * Filter for incorrect items
+         * @param {mapEntry} item
+         * @returns {Boolean}
+         */
+        incorrect(item) {
+            return !item.informational && (!item.maxScore || item.score !== item.maxScore);
+        }
+    };
 
     /**
      * Test Review Plugin : Review Panel
@@ -53,20 +72,26 @@ define([
         render() {
             return promiseTimeout(new Promise(resolve => {
                 const testRunner = this.getTestRunner();
-                const reviewPanelData = reviewPanelService(testRunner);
+                const navigationDataService = navigationDataServiceFactory(testRunner.getTestMap());
                 const reviewPanel = reviewPanelFactory(
                     this.getAreaBroker().getPanelArea(),
                     this.getConfig(),
-                    reviewPanelData.getReviewPanelMap()
+                    navigationDataService.getMap()
                 );
 
                 // control the test runner from the review panel
                 reviewPanel
+                    .on('filterchange', filterId => navigationDataService.filterMap(filters[filterId]))
                     .on('itemchange', (itemRef, position) => testRunner.jump(position, 'item'))
                     .on('ready', resolve);
 
+                // reflect the filter to the map
+                navigationDataService
+                    .on('mapfilter', filteredMap => testRunner.setTestMap(filteredMap));
+
                 // reflect the test runner state to the review panel
                 testRunner
+                    .on('testmapchange', testMap => reviewPanel.setData(testMap))
                     .on('loaditem', itemRef => reviewPanel.setActiveItem(itemRef))
                     .on(`plugin-show.${this.getName()}`, () => reviewPanel.show())
                     .on(`plugin-hide.${this.getName()}`, () => reviewPanel.hide())

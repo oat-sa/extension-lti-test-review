@@ -31,7 +31,7 @@ define([
     'taoQtiTest/runner/ui/toolbox/toolbox',
     'taoQtiItem/runner/qtiItemRunner',
     'taoQtiTest/runner/config/assetManager',
-    'taoQtiTest/runner/navigator/navigator',
+    'taoReview/review/services/navigator',
     'tpl!taoReview/review/provider/tpl/qtiTestReviewProvider'
 ], function (
     $,
@@ -72,6 +72,20 @@ define([
          * Installation of the provider, called during test runner init phase.
          */
         install() {
+            // eventify the test map update
+            const defaultSetTestMap = this.setTestMap;
+            this.setTestMap = (...args) => {
+                const result = defaultSetTestMap.apply(this, args);
+
+                /**
+                 * @event testmapchange
+                 * @param {testMap} testMap
+                 */
+                this.trigger('testmapchange', this.getTestMap());
+
+                return result;
+            };
+
             const {plugins} = this.getConfig().options || {};
             if (plugins) {
                 _.forEach(this.getPlugins(), plugin => {
@@ -102,7 +116,8 @@ define([
                 actionsBar: $('.bottom-action-bar .control-box', $layout),
                 panel: $('.test-sidebar-left .panel-box', $layout),
                 header: $('.top-action-bar .tools-box', $layout),
-                context: $('.top-action-bar .navi-box-list', $layout)
+                context: $('.top-action-bar .navi-box-list', $layout),
+                sidebar: $('.test-sidebar-left', $layout),
             });
         },
 
@@ -139,6 +154,31 @@ define([
 
             this.assetManager = assetManagerFactory();
 
+            // first and second tab will show block and navigate to panel or content
+            const createJumplinks = (container) => {
+                container.on('click', (e) => {
+                    if (e.target.classList.contains('jumplink')){
+                        e.preventDefault();
+                        e.target.blur();
+                        const where = e.target.dataset.area;
+                        areaBroker.getArea(where).find(":not(.hidden)[tabindex]").first().focus();
+                    }
+                });
+                container.on('focusin', (e) => {
+                    if (e.target.classList.contains('jumplink')){
+                        const where = e.target.dataset.area;
+                        areaBroker.getArea(where).addClass('focused');
+                    }
+                });
+                container.on('focusout', (e) => {
+                    if (e.target.classList.contains('jumplink')){
+                        const where = e.target.dataset.area;
+                        areaBroker.getArea(where).removeClass('focused');
+                    }
+                });
+            };
+            createJumplinks(areaBroker.getContainer().find('.jumplinks'));
+
             /*
              * Install behavior on events
              */
@@ -154,10 +194,9 @@ define([
                     this.trigger('enabletools enablenav');
                 })
                 .on('move', function (direction, scope, ref) {
-                    const testData = this.getTestData();
                     const testContext = this.getTestContext();
                     const testMap = this.getTestMap();
-                    const testNavigator = testNavigatorFactory(testData, testContext, testMap);
+                    const testNavigator = testNavigatorFactory(testContext, testMap);
                     const newTestContext = testNavigator.navigate(direction, scope || 'item', ref);
                     this.unloadItem(testContext.itemIdentifier);
                     this.setTestContext(newTestContext);

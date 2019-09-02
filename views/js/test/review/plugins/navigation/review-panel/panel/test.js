@@ -329,7 +329,7 @@ define([
 
                 assert.equal($container.find('.review-panel-item:nth(0)').is('.item-info'), true, 'The 1st item got the expected icon');
                 assert.equal($container.find('.review-panel-item:nth(2)').is('.item-incorrect'), true, 'The 3rd item got the expected icon');
-                assert.equal($container.find('.review-panel-item:nth(8)').is('.item-default'), true, 'The last item got the expected icon');
+                assert.equal($container.find('.review-panel-item:nth(8)').is('.item-skipped'), true, 'The last item got the expected icon');
                 assert.equal($container.find('.review-panel-item.item-correct').length, 6, 'The other items got the expected icon');
 
                 assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
@@ -865,7 +865,7 @@ define([
 
                         assert.equal($container.find('.review-panel-item:nth(0)').is('.item-info'), true, 'The 1st item got the expected icon');
                         assert.equal($container.find('.review-panel-item:nth(2)').is('.item-incorrect'), true, 'The 3rd item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(8)').is('.item-default'), true, 'The last item got the expected icon');
+                        assert.equal($container.find('.review-panel-item:nth(8)').is('.item-skipped'), true, 'The last item got the expected icon');
                         assert.equal($container.find('.review-panel-item.item-correct').length, 6, 'The other items got the expected icon');
 
                         assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '93%', 'The header score is rendered');

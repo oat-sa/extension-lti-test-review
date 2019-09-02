@@ -66,6 +66,9 @@ define([
                 return 'incorrect';
             }
         }
+        if (item.skipped) {
+            return 'skipped';
+        }
         return 'default';
     };
 

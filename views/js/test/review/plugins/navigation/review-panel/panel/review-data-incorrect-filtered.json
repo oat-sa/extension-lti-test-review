@@ -34,7 +34,7 @@
               "label": "Example_8_Geo 3",
               "informational": false,
               "skipped": true,
-              "type": "default",
+              "type": "skipped",
               "position": 8,
               "score": 0,
               "maxScore": 0

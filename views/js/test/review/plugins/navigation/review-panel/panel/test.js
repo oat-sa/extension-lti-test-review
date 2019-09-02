@@ -2117,6 +2117,17 @@ define([
                 $item.html(`<h1>${item.label}</h1><p>${id} at #${position}</p>`);
             }
         };
+        const manageButtons = (selector, selected, callback) => {
+            const $selector = $(selector);
+            $selector
+                .on('click', 'button', e => {
+                    $selector.find('button').removeClass('btn-success');
+                    e.currentTarget.classList.add('btn-success');
+                    const control = e.currentTarget.dataset.control;
+                    callback(control);
+                })
+                .find(`[data-control="${selected}"]`).click();
+        };
         assert.expect(3);
 
         assert.equal($container.children().length, 0, 'The container is empty');
@@ -2129,32 +2140,20 @@ define([
                 assert.equal($container.children().length, 1, 'The container contains an element');
                 instance.setActiveItem('item-1');
 
-                const $header = $('#visual-test .header');
-                $header
-                    .on('click', 'button', e => {
-                        $header.find('button').removeClass('btn-success');
-                        e.currentTarget.classList.add('btn-success');
-                        const control = e.currentTarget.dataset.control;
-                        if (control === 'incorrect') {
-                            instance.setData(filterData[instance.getActiveFilter()]);
-                        } else {
-                            instance.setData(data[control]);
-                        }
-                    })
-                    .find('[data-control="correct"]').click();
-
-                const $footer = $('#visual-test .footer');
-                $footer
-                    .on('click', 'button', e => {
-                        $footer.find('button').removeClass('btn-success');
-                        e.currentTarget.classList.add('btn-success');
-                        if (e.currentTarget.dataset.control === 'disable') {
-                            instance.disable();
-                        } else {
-                            instance.enable();
-                        }
-                    })
-                    .find('[data-control="enable"]').click();
+                manageButtons('#visual-test .header .state', 'correct', control => {
+                    if (control === 'incorrect') {
+                        instance.setData(filterData[instance.getActiveFilter()]);
+                    } else {
+                        instance.setData(data[control]);
+                    }
+                });
+                manageButtons('#visual-test .footer', 'enable', control => {
+                    if (control === 'disable') {
+                        instance.disable();
+                    } else {
+                        instance.enable();
+                    }
+                });
 
                 ready();
             })

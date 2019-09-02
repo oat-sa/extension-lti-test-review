@@ -35,6 +35,14 @@ module.exports = function(grunt) {
                         babel : true,
                         include : [
                             'taoReview/review/**/*'
+                        ],
+                        dependencies : [
+                            'taoItems/loader/taoItemsRunner.min',
+                            'taoTests/loader/taoTestsRunner.min',
+                            'taoQtiItem/loader/taoQtiItemRunner.min',
+                            'taoQtiTest/loader/taoQtiTestRunner.min',
+                            'taoQtiTest/loader/testPlugins.min',
+                            'taoQtiTestPreviewer/loader/qtiPreviewer.min'
                         ]
                     }]
                 }

@@ -54,6 +54,7 @@ define([
     const defaults = {
         headerLabel: __('TEST SCORE:'),
         footerLabel: __('TOTAL'),
+        showScore: true,
         filters: [{
             id: 'all',
             label: __('All'),
@@ -150,6 +151,7 @@ define([
      * @param {Object} config
      * @param {String} [config.headerLabel] - Header label
      * @param {String} [config.footerLabel] - Footer label
+     * @param {Boolean} [config.showScore] - Show the score on the review panel. When disabled, the filters will also be.
      * @param {reviewPanelFilter[]} [config.filters] - The list of available filters
      * @param {testMap|null} map
      * @returns {component}

@@ -54,6 +54,7 @@ define([
         label: __('TOTAL'),
         score: '0'
     };
+    const defaultShowScore = true;
     const defaultFilters = [{
         id: 'all',
         label: __('All'),
@@ -141,6 +142,20 @@ define([
             footerLabel: defaultFooter.label,
             header: defaultHeader,
             footer: defaultFooter,
+            showScore: defaultShowScore,
+            filters: defaultFilters
+        }
+    }, {
+        title: 'disabled score',
+        config: {
+            showScore: false,
+        },
+        expected: {
+            headerLabel: defaultHeader.label,
+            footerLabel: defaultFooter.label,
+            header: defaultHeader,
+            footer: defaultFooter,
+            showScore: false,
             filters: defaultFilters
         }
     }, {
@@ -152,6 +167,7 @@ define([
             headerLabel: false,
             footerLabel: defaultFooter.label,
             footer: defaultFooter,
+            showScore: defaultShowScore,
             filters: defaultFilters
         }
     }, {
@@ -163,6 +179,7 @@ define([
             footerLabel: false,
             headerLabel: defaultHeader.label,
             header: defaultHeader,
+            showScore: defaultShowScore,
             filters: defaultFilters
         }
     }, {
@@ -175,6 +192,7 @@ define([
             footerLabel: defaultFooter.label,
             header: defaultHeader,
             footer: defaultFooter,
+            showScore: defaultShowScore,
             filters: false
         }
     }, {
@@ -191,6 +209,7 @@ define([
             footerLabel: defaultFooter.label,
             header: defaultHeader,
             footer: defaultFooter,
+            showScore: defaultShowScore,
             filters: [{
                 id: 'test',
                 label: 'test',

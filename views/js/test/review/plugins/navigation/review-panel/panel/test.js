@@ -148,15 +148,13 @@ define([
     }, {
         title: 'disabled score',
         config: {
-            showScore: false,
+            showScore: false
         },
         expected: {
-            headerLabel: defaultHeader.label,
-            footerLabel: defaultFooter.label,
-            header: defaultHeader,
-            footer: defaultFooter,
+            headerLabel: false,
+            footerLabel: false,
             showScore: false,
-            filters: defaultFilters
+            filters: false
         }
     }, {
         title: 'disabled header',
@@ -300,7 +298,6 @@ define([
             countParts: 2,
             countSections: 3,
             countItems: 9,
-            countFilters: 2,
             items: [
                 {type: 'info', score: '-'},
                 {type: 'correct', score: '2/2'},
@@ -319,6 +316,35 @@ define([
                 label: defaultFilters[1].label,
                 active: false
             }]
+        }
+    }, {
+        title: 'scores disabled',
+        config: {
+            showScore: false
+        },
+        testMap: testMapIncorrect,
+        expected: {
+            header: 0,
+            headerLabel: '',
+            headerScore: '',
+            footer: 0,
+            footerLabel: '',
+            footerScore: '',
+            countParts: 2,
+            countSections: 3,
+            countItems: 9,
+            items: [
+                {type: 'info', score: '-'},
+                {type: 'correct', score: '2/2'},
+                {type: 'incorrect', score: '2/3'},
+                {type: 'correct', score: '2/2'},
+                {type: 'incorrect', score: '0/2'},
+                {type: 'correct', score: '2/2'},
+                {type: 'correct', score: '2/2'},
+                {type: 'correct', score: '2/2'},
+                {type: 'skipped', score: '0'}
+            ],
+            filters: []
         }
     }]).test('render with data ', (data, assert) => {
         const ready = assert.async();

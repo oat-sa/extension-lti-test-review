@@ -283,19 +283,21 @@ define([
              */
             setActiveFilter(filterId) {
                 const {filters} = this.getConfig();
-                const foundFilter = filters.find(filter => filter.id === filterId);
-                if (foundFilter && (!activeFilter || activeFilter.id !== filterId)) {
-                    activeFilter = foundFilter;
+                if (Array.isArray(filters)) {
+                    const foundFilter = filters.find(filter => filter.id === filterId);
+                    if (foundFilter && (!activeFilter || activeFilter.id !== filterId)) {
+                        activeFilter = foundFilter;
 
-                    if (this.is('rendered')) {
-                        selectFilter(filterId);
+                        if (this.is('rendered')) {
+                            selectFilter(filterId);
+                        }
+
+                        /**
+                         * @event filterchange
+                         * @param {String} filterId
+                         */
+                        this.trigger('filterchange', filterId);
                     }
-
-                    /**
-                     * @event filterchange
-                     * @param {String} filterId
-                     */
-                    this.trigger('filterchange', filterId);
                 }
 
                 return this;
@@ -488,6 +490,14 @@ define([
             // auto render on init
             .on('init', function onReviewPanelInit() {
                 const initConfig = this.getConfig();
+
+                // no header nor footer or filters when scores are disabled
+                if (!initConfig.showScore) {
+                    initConfig.headerLabel = false;
+                    initConfig.footerLabel = false;
+                    initConfig.filters = false;
+                }
+
                 const {headerLabel, footerLabel, filters} = initConfig;
 
                 // setup the header

@@ -107,21 +107,64 @@ define([
             testContext: testContext,
             testMap: testMap,
             testResponses: testResponses
-        }
+        },
+        config: {}
     }, {
         title: 'manual load',
         itemIdentifier: 'item-3',
+        config: {
+            itemUri: 'item-3'
+        },
+        initData: {
+            success: true
+        }
+    }, {
+        title: 'read only',
+        itemIdentifier: 'item-3',
+        config: {
+            itemUri: 'item-3',
+            readOnly: true
+        },
+        initData: {
+            success: true
+        }
+    }, {
+        title: 'full page',
+        itemIdentifier: 'item-3',
+        config: {
+            itemUri: 'item-3',
+            fullPage: true
+        },
+        initData: {
+            success: true
+        }
+    }, {
+        title: 'show score',
+        itemIdentifier: 'item-3',
+        config: {
+            itemUri: 'item-3',
+            showScore: true
+        },
+        initData: {
+            success: true
+        }
+    }, {
+        title: 'plugins options',
+        itemIdentifier: 'item-3',
+        config: {
+            itemUri: 'item-3',
+            pluginsOptions: {
+                foo: 'bar'
+            }
+        },
         initData: {
             success: true
         }
     }]).test('render item ', (data, assert) => {
         const ready = assert.async();
         const $container = $('#fixture-render');
-        const config = {
-            itemUri: data.itemIdentifier
-        };
 
-        assert.expect(1);
+        assert.expect(11);
 
         $.mockjax([{
             url: '/init*',
@@ -139,7 +182,7 @@ define([
             }
         }]);
 
-        qtiTestReviewFactory($container, config)
+        qtiTestReviewFactory($container, data.config)
             .on('error', err => {
                 assert.pushResult({
                     result: false,
@@ -147,9 +190,23 @@ define([
                 });
                 ready();
             })
-            .on('ready', runner => {
+            .on('ready', function(runner) {
                 runner.after('renderitem', () => {
                     assert.ok(true, 'The review has been rendered');
+
+                    assert.equal(runner.getOptions().fullPage, data.config.fullPage, 'The full page option is set accordingly');
+                    assert.equal(runner.getOptions().readOnly, data.config.readOnly, 'The read only option is set accordingly');
+                    assert.equal(runner.getOptions().readOnly, data.config.readOnly, 'The read only option is set accordingly');
+                    assert.equal(runner.getOptions().plugins, data.config.pluginsOptions, 'The plugins options are set accordingly');
+
+                    assert.equal(this.is('fullpage'), !!data.config.fullPage, 'The full page state is set accordingly');
+                    assert.equal(this.is('readonly'), !!data.config.readOnly, 'The read only state is set accordingly');
+                    assert.equal(this.is('showscore'), !!data.config.showScore, 'The show score state is set accordingly');
+
+                    assert.equal($container.children().is('.fullpage'), !!data.config.fullPage, 'The full page class is set accordingly');
+                    assert.equal($container.children().is('.readonly'), !!data.config.readOnly, 'The read only class is set accordingly');
+                    assert.equal($container.children().is('.showscore'), !!data.config.showScore, 'The show score class is set accordingly');
+
                     runner.destroy();
                 });
 
@@ -201,6 +258,7 @@ define([
             itemUri: 'item-1',
             fullPage: false,
             readOnly: true,
+            showScore: true,
             plugins: [{
                 module: 'taoReview/review/plugins/navigation/review-panel/plugin',
                 bundle: 'taoReview/loader/qtiReview.min',

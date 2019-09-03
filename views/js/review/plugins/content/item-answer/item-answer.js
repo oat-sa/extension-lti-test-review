@@ -44,6 +44,7 @@ define([
      * @property {String} [scoreText] - The text displayed to introduce the score
      * @property {String} [status] - The status of the item from the list ['correct', 'incorrect', 'skipped', 'informational']
      * @property {String} [score] - The student's score on the item
+     * @property {Boolean} [showScore] - Show the score and the correct responses
      */
 
     /**
@@ -149,6 +150,7 @@ define([
      * @param {String} [config.scoreText] - The text displayed to introduce the score
      * @param {String} [config.status] - The status of the item from the list ['correct', 'incorrect', 'skipped', 'informational']
      * @param {String} [config.score] - The student's score on the item
+     * @param {Boolean} [config.showScore] - Show the score and the correct responses
      * @returns {itemAnswerComponent}
      * @fires ready - When the component is ready to work
      * @fires statuschange - Each time the status is changed, the status being given as parameter

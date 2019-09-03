@@ -1058,10 +1058,41 @@ define([
         const ready = assert.async();
         const $container = $('#visual-test .tool');
         const $item = $('#visual-test .item-content');
-        const $header = $('#visual-test .header');
-        const $footer = $('#visual-test .footer');
-        const config = {};
+        const $status = $('#visual-test .header');
+        const $state = $('#visual-test .footer .state');
+        const $score = $('#visual-test .footer .score');
+        const config = {
+            showScore: true
+        };
         const btnCls = 'btn-success';
+        let instance = null;
+        let componentDisabled = false;
+        let currentStatus = 'correct';
+
+        const setStatus = status => {
+            currentStatus = status;
+            switch (status) {
+                case 'correct':
+                    instance.setScore('5/5');
+                    instance.setCorrect();
+                    break;
+
+                case 'incorrect':
+                    instance.setScore('3/5');
+                    instance.setIncorrect();
+                    break;
+
+                case 'skipped':
+                    instance.setScore('0/5');
+                    instance.setSkipped();
+                    break;
+
+                case 'informational':
+                    instance.setScore('');
+                    instance.setInformational();
+                    break;
+            }
+        };
 
         const monitorClick = ($target, callback) => {
             $target.on('click', '[data-control]', e => {
@@ -1075,57 +1106,58 @@ define([
         };
         const activateFirst = $target => $target.find('[data-control]:first-child').click();
 
-        assert.expect(3);
+        const setup = () => new Promise((resolve, reject) => {
+            Promise.resolve()
+                .then(() => instance && instance.destroy())
+                .then(() => {
+                    instance = itemAnswerFactory($container, config)
+                        .on('ready', () => {
+                            if (componentDisabled) {
+                                instance.disable();
+                            }
+                            setStatus(currentStatus);
+                            resolve();
+                        })
+                        .on('statuschange tabchange', () => {
+                            $item.html(`<h1>Item status: ${instance.getStatus()} / ${instance.getActiveTab()}</h1>`);
+                        })
+                        .on('error', reject);
+                })
+                .catch(reject);
+        });
+
+        assert.expect(2);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
-        const instance = itemAnswerFactory($container, config)
-            .on('init', function () {
-                assert.strictEqual(this, instance, 'The instance has been initialized');
-            })
-            .on('ready', () => {
-                assert.strictEqual($container.children().length, 1, 'The container contains an element');
-
-                monitorClick($header, status => {
-                    switch (status) {
-                        case 'correct':
-                            instance.setScore('5/5');
-                            instance.setCorrect();
-                            break;
-
-                        case 'incorrect':
-                            instance.setScore('3/5');
-                            instance.setIncorrect();
-                            break;
-
-                        case 'skipped':
-                            instance.setScore('0/5');
-                            instance.setSkipped();
-                            break;
-
-                        case 'informational':
-                            instance.setScore('');
-                            instance.setInformational();
-                            break;
-                    }
-                });
-                monitorClick($footer, status => {
+        setup()
+            .then(() => {
+                monitorClick($status, setStatus);
+                monitorClick($state, status => {
                     if (status === 'disable') {
                         instance.disable();
                     } else {
                         instance.enable();
                     }
+                    componentDisabled = instance.is('disabled');
+                });
+                monitorClick($score, status => {
+                    const showScore = status === 'yes';
+                    if (showScore !== config.showScore) {
+                        config.showScore = showScore;
+                        setup();
+                    }
                 });
 
-                activateFirst($header);
-                activateFirst($footer);
+                activateFirst($status);
+                activateFirst($state);
+                activateFirst($score);
 
+                assert.equal($container.children().length, 1, 'The container contains an element');
                 ready();
             })
-            .on('statuschange tabchange', () => {
-                $item.html(`<h1>Item status: ${instance.getStatus()} / ${instance.getActiveTab()}</h1>`);
-            })
-            .on('error', err => {
+            .catch(err => {
+                assert.ok(false, 'The operation should not fail!');
                 assert.pushResult({
                     result: false,
                     message: err

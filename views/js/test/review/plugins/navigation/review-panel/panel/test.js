@@ -334,15 +334,15 @@ define([
             countSections: 3,
             countItems: 9,
             items: [
-                {type: 'info', score: '-'},
-                {type: 'correct', score: '2/2'},
-                {type: 'incorrect', score: '2/3'},
-                {type: 'correct', score: '2/2'},
-                {type: 'incorrect', score: '0/2'},
-                {type: 'correct', score: '2/2'},
-                {type: 'correct', score: '2/2'},
-                {type: 'correct', score: '2/2'},
-                {type: 'skipped', score: '0'}
+                {type: 'info', score: ''},
+                {type: 'default', score: ''},
+                {type: 'default', score: ''},
+                {type: 'default', score: ''},
+                {type: 'default', score: ''},
+                {type: 'default', score: ''},
+                {type: 'default', score: ''},
+                {type: 'default', score: ''},
+                {type: 'skipped', score: ''}
             ],
             filters: []
         }

@@ -257,7 +257,7 @@ define([
              * @fires datachange
              */
             setData(newMap) {
-                data = reviewDataHelper.getReviewPanelMap(newMap);
+                data = reviewDataHelper.getReviewPanelMap(newMap, this.getConfig().showScore);
 
                 /**
                  * @event datachange
@@ -521,6 +521,11 @@ define([
                     activeFilter = filters.find(filter => filter.label);
                 }
 
+                // initialize the test map if supplied
+                if (map) {
+                    component.setData(map);
+                }
+
                 // auto render on init (defer the call to give a chance to the init event to be completed before)
                 _.defer(() => this.render(container));
             })
@@ -620,10 +625,6 @@ define([
         // initialize the component with the provided config
         // defer the call to allow to listen to the init event
         _.defer(() => component.init(config));
-
-        if (map) {
-            component.setData(map);
-        }
 
         return component;
     }

@@ -620,17 +620,21 @@ define([
                         label: 'item',
                         informational: false,
                         skipped: true,
+                        withScore: true,
                         type: 'incorrect',
                         position: 0,
                         score: 0,
                         maxScore: 1
                     }],
+                    withScore: true,
                     score: 0,
                     maxScore: 1
                 }],
+                withScore: true,
                 score: 0,
                 maxScore: 1
             }],
+            withScore: true,
             score: 0,
             maxScore: 1
         };
@@ -836,17 +840,21 @@ define([
                         label: 'item',
                         informational: false,
                         skipped: false,
+                        withScore: true,
                         type: 'correct',
                         position: 0,
                         score: 1,
                         maxScore: 1
                     }],
+                    withScore: true,
                     score: 1,
                     maxScore: 1
                 }],
+                withScore: true,
                 score: 1,
                 maxScore: 1
             }],
+            withScore: true,
             score: 1,
             maxScore: 1
         };
@@ -2197,6 +2205,7 @@ define([
             Promise.resolve()
                 .then(() => instance && instance.destroy())
                 .then(() => {
+                    console.log(currentData)
                     instance = reviewPanelFactory($container, config, currentData)
                         .on('ready', () => {
                             instance.setActiveItem(currentData.jumps.find(item => item.identifier).identifier);
@@ -2220,7 +2229,7 @@ define([
             .then(() => {
                 manageButtons('#visual-test .header .state', 'correct', control => {
                     if (control === 'incorrect') {
-                        currentData = filterData[instance.getActiveFilter()];
+                        currentData = filterData[instance.getActiveFilter() || 'all'];
                     } else {
                         currentData = data[control];
                     }

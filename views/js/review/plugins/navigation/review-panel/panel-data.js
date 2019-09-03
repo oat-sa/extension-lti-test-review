@@ -53,13 +53,14 @@ define([
     /**
      * Gets the type for a particular item
      * @param {mapEntry} item
+     * @param {Boolean} withScore
      * @returns {String}
      */
-    const getItemType = item => {
+    const getItemType = (item, withScore) => {
         if (item.informational) {
             return 'info';
         }
-        if (item.maxScore) {
+        if (withScore && item.maxScore) {
             if (item.score === item.maxScore) {
                 return 'correct';
             } else {
@@ -75,11 +76,15 @@ define([
     /**
      * Extracts data from a mapEntry
      * @param {mapEntry} entry
+     * @param {Boolean} withScore
      * @returns {mapEntry}
      */
-    const extractData = entry => {
+    const extractData = (entry, withScore) => {
         const {id, label, position, informational, skipped, score, maxScore} = entry || {};
-        const data = {id, label, position, score, maxScore};
+        const data = {id, label, position, withScore};
+        if (withScore) {
+            Object.assign(data, {score, maxScore});
+        }
         if ('undefined' !== typeof informational) {
             data.informational = informational;
         }
@@ -93,28 +98,34 @@ define([
         /**
          * Refines the test runner data and build the expected review panel map
          * @param {testMap} testMap
+         * @param {Boolean} withScore
          * @returns {reviewPanelMap}
          */
-        getReviewPanelMap(testMap) {
+        getReviewPanelMap(testMap, withScore = true) {
             const {parts, score, maxScore} = testMap;
             const items = new Map();
 
             // rebuild the map keeping only relevant data, and sorting elements by position
-            return {
-                parts: _.map(parts, part => Object.assign(extractData(part), {
-                    sections: _.map(part.sections, section => Object.assign(extractData(section), {
+            const panelMap = {
+                parts: _.map(parts, part => Object.assign(extractData(part, withScore), {
+                    sections: _.map(part.sections, section => Object.assign(extractData(section, withScore), {
                         items: _.map(section.items, item => {
-                            const reviewItem = extractData(item);
-                            reviewItem.type = getItemType(item);
+                            const reviewItem = extractData(item, withScore);
+                            reviewItem.type = getItemType(item, withScore);
                             items.set(item.id, reviewItem);
                             return reviewItem;
                         }).sort(compareByPosition)
                     })).sort(compareByPosition)
                 })).sort(compareByPosition),
-                items,
-                score,
-                maxScore
+                withScore,
+                items
             };
+
+            if (withScore) {
+                Object.assign(panelMap, {score, maxScore});
+            }
+
+            return panelMap;
         }
     };
 });

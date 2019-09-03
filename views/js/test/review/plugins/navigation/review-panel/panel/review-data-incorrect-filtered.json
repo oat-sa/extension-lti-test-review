@@ -15,6 +15,7 @@
               "label": "example_2_Math",
               "informational": false,
               "skipped": false,
+              "withScore": true,
               "type": "incorrect",
               "position": 2,
               "score": 2,
@@ -25,12 +26,14 @@
               "label": "Example_4_Appearance",
               "informational": false,
               "skipped": false,
+              "withScore": true,
               "type": "incorrect",
               "position": 4,
               "score": 0,
               "maxScore": 2
             }
           ],
+          "withScore": true,
           "score": 6,
           "maxScore": 9
         },
@@ -44,20 +47,24 @@
               "label": "Example_8_Geo 3",
               "informational": false,
               "skipped": true,
+              "withScore": true,
               "type": "skipped",
               "position": 8,
               "score": 0,
               "maxScore": 0
             }
           ],
+          "withScore": true,
           "score": 6,
           "maxScore": 6
         }
       ],
+      "withScore": true,
       "score": 12,
       "maxScore": 15
     }
   ],
+  "withScore": true,
   "score": 12,
   "maxScore": 15
 }

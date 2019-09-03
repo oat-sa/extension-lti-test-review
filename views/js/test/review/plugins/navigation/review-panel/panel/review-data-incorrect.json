@@ -73,13 +73,13 @@
               "label": "Example_4_Appearance",
               "informational": false,
               "skipped": false,
-              "type": "correct",
+              "type": "incorrect",
               "position": 4,
-              "score": 2,
+              "score": 0,
               "maxScore": 2
             }
           ],
-          "score": 8,
+          "score": 6,
           "maxScore": 9
         },
         {
@@ -132,10 +132,10 @@
           "maxScore": 6
         }
       ],
-      "score": 14,
+      "score": 12,
       "maxScore": 15
     }
   ],
-  "score": 14,
+  "score": 12,
   "maxScore": 15
 }

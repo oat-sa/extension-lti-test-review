@@ -2205,7 +2205,6 @@ define([
             Promise.resolve()
                 .then(() => instance && instance.destroy())
                 .then(() => {
-                    console.log(currentData)
                     instance = reviewPanelFactory($container, config, currentData)
                         .on('ready', () => {
                             instance.setActiveItem(currentData.jumps.find(item => item.identifier).identifier);

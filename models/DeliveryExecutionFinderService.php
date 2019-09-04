@@ -38,6 +38,8 @@ class DeliveryExecutionFinderService extends ConfigurableService
     public const SERVICE_ID = 'taoReview/DeliveryExecutionFinderService';
 
     public const LTI_SOURCE_ID = 'lis_result_sourcedid';
+    public const OPTION_SHOW_SCORE = 'custom_show_score';
+    public const OPTION_SHOW_CORRECT = 'custom_show_correct';
 
     /**
      * @param LtiLaunchData $launchData
@@ -62,6 +64,48 @@ class DeliveryExecutionFinderService extends ConfigurableService
         }
 
         return $this->getExecutionServiceProxy()->getDeliveryExecution($deliveryExecutionId);
+    }
+    
+    /**
+     * @param LtiLaunchData $launchData
+     *
+     * @return bool
+     * @throws LtiVariableMissingException
+     */
+    public function getShowScoreOption(LtiLaunchData $launchData): bool
+    {
+        $value = $launchData->hasVariable(self::OPTION_SHOW_SCORE)
+            ? $launchData->getVariable(self::OPTION_SHOW_SCORE)
+            : false;
+        
+        if (is_numeric($value)) {
+            $value = (bool)intval($value);
+        } else if ($value == 'true') {
+            $value = true;
+        }
+
+        return $value;
+    }
+    
+    /**
+     * @param LtiLaunchData $launchData
+     *
+     * @return bool
+     * @throws LtiVariableMissingException
+     */
+    public function getShowCorrectOption(LtiLaunchData $launchData): bool
+    {
+        $value = $launchData->hasVariable(self::OPTION_SHOW_CORRECT)
+            ? $launchData->getVariable(self::OPTION_SHOW_CORRECT)
+            : false;
+        
+        if (is_numeric($value)) {
+            $value = (bool)intval($value);
+        } else if ($value == 'true') {
+            $value = true;
+        }
+
+        return $value;
     }
 
     protected function getLtiResultIdStorage(): LtiResultAliasStorage

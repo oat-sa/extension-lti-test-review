@@ -36,6 +36,7 @@ define([
      * @param {Boolean} [config.fullPage] - Force the review to occupy the full window.
      * @param {Boolean} [config.readOnly] - Do not allow to modify the reviewed item.
      * @param {Boolean} [config.showScore] - Allow to show the score.
+     * @param {Boolean} [config.showCorrect] - Allow to show the correct responses.
      * @param {Function} [template] - An optional template for the component
      * @returns {review}
      */
@@ -69,6 +70,7 @@ define([
                 fullPage: config.fullPage,
                 readOnly: config.readOnly,
                 showScore: config.showScore,
+                showCorrect: config.showCorrect,
                 plugins: config.pluginsOptions
             }
         };
@@ -78,10 +80,11 @@ define([
 
         return runnerComponentFactory(container, testRunnerConfig, template || runnerTpl)
             .on('render', function onComponentInit() {
-                const {fullPage, readOnly, showScore} = this.getConfig().options;
+                const {fullPage, readOnly, showScore, showCorrect} = this.getConfig().options;
                 this.setState('fullpage', fullPage);
                 this.setState('readonly', readOnly);
                 this.setState('showscore', showScore);
+                this.setState('showcorrect', showCorrect);
             })
             .on('ready', function onComponentReady(runner) {
                 runner.on('destroy', () => this.destroy());

@@ -149,6 +149,16 @@ define([
             success: true
         }
     }, {
+        title: 'show correct',
+        itemIdentifier: 'item-3',
+        config: {
+            itemUri: 'item-3',
+            showCorrect: true
+        },
+        initData: {
+            success: true
+        }
+    }, {
         title: 'plugins options',
         itemIdentifier: 'item-3',
         config: {
@@ -164,7 +174,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-render');
 
-        assert.expect(11);
+        assert.expect(13);
 
         $.mockjax([{
             url: '/init*',
@@ -202,10 +212,12 @@ define([
                     assert.equal(this.is('fullpage'), !!data.config.fullPage, 'The full page state is set accordingly');
                     assert.equal(this.is('readonly'), !!data.config.readOnly, 'The read only state is set accordingly');
                     assert.equal(this.is('showscore'), !!data.config.showScore, 'The show score state is set accordingly');
+                    assert.equal(this.is('showcorrect'), !!data.config.showCorrect, 'The show correct state is set accordingly');
 
                     assert.equal($container.children().is('.fullpage'), !!data.config.fullPage, 'The full page class is set accordingly');
                     assert.equal($container.children().is('.readonly'), !!data.config.readOnly, 'The read only class is set accordingly');
                     assert.equal($container.children().is('.showscore'), !!data.config.showScore, 'The show score class is set accordingly');
+                    assert.equal($container.children().is('.showcorrect'), !!data.config.showCorrect, 'The show correct class is set accordingly');
 
                     runner.destroy();
                 });
@@ -259,6 +271,7 @@ define([
             fullPage: false,
             readOnly: true,
             showScore: true,
+            showCorrect: true,
             plugins: [{
                 module: 'taoReview/review/plugins/navigation/review-panel/plugin',
                 bundle: 'taoReview/loader/qtiReview.min',

@@ -108,7 +108,14 @@ define([
             testMap: testMap,
             testResponses: testResponses
         },
-        config: {}
+        config: {},
+        expected: {
+            fullPage: false,
+            readOnly: false,
+            showScore: false,
+            showCorrect: false,
+            plugins: {}
+        }
     }, {
         title: 'manual load',
         itemIdentifier: 'item-3',
@@ -117,6 +124,13 @@ define([
         },
         initData: {
             success: true
+        },
+        expected: {
+            fullPage: false,
+            readOnly: false,
+            showScore: false,
+            showCorrect: false,
+            plugins: {}
         }
     }, {
         title: 'read only',
@@ -128,6 +142,14 @@ define([
         initData: {
             success: true
         }
+        ,
+        expected: {
+            fullPage: false,
+            readOnly: true,
+            showScore: false,
+            showCorrect: false,
+            plugins: {}
+        }
     }, {
         title: 'full page',
         itemIdentifier: 'item-3',
@@ -137,6 +159,13 @@ define([
         },
         initData: {
             success: true
+        },
+        expected: {
+            fullPage: true,
+            readOnly: false,
+            showScore: false,
+            showCorrect: false,
+            plugins: {}
         }
     }, {
         title: 'show score',
@@ -147,6 +176,13 @@ define([
         },
         initData: {
             success: true
+        },
+        expected: {
+            fullPage: false,
+            readOnly: false,
+            showScore: true,
+            showCorrect: false,
+            plugins: {}
         }
     }, {
         title: 'show correct',
@@ -157,6 +193,13 @@ define([
         },
         initData: {
             success: true
+        },
+        expected: {
+            fullPage: false,
+            readOnly: false,
+            showScore: false,
+            showCorrect: true,
+            plugins: {}
         }
     }, {
         title: 'plugins options',
@@ -169,6 +212,15 @@ define([
         },
         initData: {
             success: true
+        },
+        expected: {
+            fullPage: false,
+            readOnly: false,
+            showScore: false,
+            showCorrect: false,
+            plugins: {
+                foo: 'bar'
+            }
         }
     }]).test('render item ', (data, assert) => {
         const ready = assert.async();
@@ -204,20 +256,20 @@ define([
                 runner.after('renderitem', () => {
                     assert.ok(true, 'The review has been rendered');
 
-                    assert.equal(runner.getOptions().fullPage, data.config.fullPage, 'The full page option is set accordingly');
-                    assert.equal(runner.getOptions().readOnly, data.config.readOnly, 'The read only option is set accordingly');
-                    assert.equal(runner.getOptions().readOnly, data.config.readOnly, 'The read only option is set accordingly');
-                    assert.equal(runner.getOptions().plugins, data.config.pluginsOptions, 'The plugins options are set accordingly');
+                    assert.strictEqual(runner.getOptions().fullPage, data.expected.fullPage, 'The full page option is set accordingly');
+                    assert.strictEqual(runner.getOptions().readOnly, data.expected.readOnly, 'The read only option is set accordingly');
+                    assert.strictEqual(runner.getOptions().readOnly, data.expected.readOnly, 'The read only option is set accordingly');
+                    assert.deepEqual(runner.getOptions().plugins, data.expected.plugins, 'The plugins options are set accordingly');
 
-                    assert.equal(this.is('fullpage'), !!data.config.fullPage, 'The full page state is set accordingly');
-                    assert.equal(this.is('readonly'), !!data.config.readOnly, 'The read only state is set accordingly');
-                    assert.equal(this.is('showscore'), !!data.config.showScore, 'The show score state is set accordingly');
-                    assert.equal(this.is('showcorrect'), !!data.config.showCorrect, 'The show correct state is set accordingly');
+                    assert.strictEqual(this.is('fullpage'), data.expected.fullPage, 'The full page state is set accordingly');
+                    assert.strictEqual(this.is('readonly'), data.expected.readOnly, 'The read only state is set accordingly');
+                    assert.strictEqual(this.is('showscore'), data.expected.showScore, 'The show score state is set accordingly');
+                    assert.strictEqual(this.is('showcorrect'), data.expected.showCorrect, 'The show correct state is set accordingly');
 
-                    assert.equal($container.children().is('.fullpage'), !!data.config.fullPage, 'The full page class is set accordingly');
-                    assert.equal($container.children().is('.readonly'), !!data.config.readOnly, 'The read only class is set accordingly');
-                    assert.equal($container.children().is('.showscore'), !!data.config.showScore, 'The show score class is set accordingly');
-                    assert.equal($container.children().is('.showcorrect'), !!data.config.showCorrect, 'The show correct class is set accordingly');
+                    assert.strictEqual($container.children().is('.fullpage'), data.expected.fullPage, 'The full page class is set accordingly');
+                    assert.strictEqual($container.children().is('.readonly'), data.expected.readOnly, 'The read only class is set accordingly');
+                    assert.strictEqual($container.children().is('.showscore'), data.expected.showScore, 'The show score class is set accordingly');
+                    assert.strictEqual($container.children().is('.showcorrect'), data.expected.showCorrect, 'The show correct class is set accordingly');
 
                     runner.destroy();
                 });

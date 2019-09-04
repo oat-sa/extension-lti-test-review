@@ -28,6 +28,22 @@ define([
     'use strict';
 
     /**
+     * Extracts the test runner options from the config
+     * @param {Object} config
+     * @returns {Object}
+     */
+    const extractOptions = config => {
+        const {
+            fullPage = false,
+            readOnly = false,
+            showScore = false,
+            showCorrect = false,
+            pluginsOptions = {}
+        } = config;
+        return {fullPage, readOnly, showScore, showCorrect, plugins: pluginsOptions};
+    };
+
+    /**
      * Builds a component with test runner to review a test
      * @param {jQuery|HTMLElement|String} container - The container in which renders the component
      * @param {Object} [config] - The testRunner options
@@ -66,13 +82,7 @@ define([
                 },
                 plugins: config.plugins || []
             },
-            options: {
-                fullPage: config.fullPage,
-                readOnly: config.readOnly,
-                showScore: config.showScore,
-                showCorrect: config.showCorrect,
-                plugins: config.pluginsOptions
-            }
+            options: extractOptions(config)
         };
 
         //extra context config

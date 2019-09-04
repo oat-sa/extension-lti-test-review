@@ -74,17 +74,7 @@ class DeliveryExecutionFinderService extends ConfigurableService
      */
     public function getShowScoreOption(LtiLaunchData $launchData): bool
     {
-        $value = $launchData->hasVariable(self::OPTION_SHOW_SCORE)
-            ? $launchData->getVariable(self::OPTION_SHOW_SCORE)
-            : false;
-        
-        if (is_numeric($value)) {
-            $value = (bool)intval($value);
-        } else if ($value == 'true') {
-            $value = true;
-        }
-
-        return $value;
+        return $this->getBooleanOption($launchData, self::OPTION_SHOW_SCORE);
     }
     
     /**
@@ -95,10 +85,21 @@ class DeliveryExecutionFinderService extends ConfigurableService
      */
     public function getShowCorrectOption(LtiLaunchData $launchData): bool
     {
-        $value = $launchData->hasVariable(self::OPTION_SHOW_CORRECT)
-            ? $launchData->getVariable(self::OPTION_SHOW_CORRECT)
+        return $this->getBooleanOption($launchData, self::OPTION_SHOW_CORRECT);
+    }
+
+    /**
+     * @param LtiLaunchData $launchData
+     * @param string $option
+     * @return bool
+     * @throws LtiVariableMissingException
+     */
+    protected function getBooleanOption(LtiLaunchData $launchData, string $option): bool
+    {
+        $value = $launchData->hasVariable($option)
+            ? $launchData->getVariable($option)
             : false;
-        
+
         if (is_numeric($value)) {
             $value = (bool)intval($value);
         } else if ($value == 'true') {

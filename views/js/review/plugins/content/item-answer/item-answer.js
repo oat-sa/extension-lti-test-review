@@ -55,6 +55,7 @@ define([
         skippedText: __('No response'),
         scoreText: __('Your Score:'),
         status: 'informational',
+        showScore: true,
         score: ''
     };
 
@@ -175,17 +176,14 @@ define([
              * @returns {itemAnswerComponent}
              */
             setScore(score) {
-                if (!score && 'number' !== typeof score) {
+                if (!score && 'number' !== typeof score || !this.getConfig().showScore) {
                     score = '';
                 }
                 this.getConfig().score = `${score}`;
 
                 if (this.is('rendered')) {
-                    let scoreText = '';
-                    if (score) {
-                        scoreText = `${this.getConfig().scoreText} ${this.getConfig().score}`;
-                    }
-                    controls.$score.text(scoreText);
+                    const scoreLine = this.getConfig().score && `${this.getConfig().scoreText} ${this.getConfig().score}`;
+                    controls.$score.text(scoreLine);
                 }
 
                 return this;

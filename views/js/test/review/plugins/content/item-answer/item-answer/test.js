@@ -442,17 +442,39 @@ define([
 
     QUnit.module('API');
 
-    QUnit.test('score', assert => {
+    QUnit.cases.init([{
+        title: 'showScore enabled',
+        config: {
+            showScore: true,
+            scoreText: 'score:'
+        },
+        score: '5/5',
+        expected: {
+            scoreText: 'score:',
+            score: '5/5',
+            scoreLine: 'score: 5/5'
+        }
+    }, {
+        title: 'showScore disabled',
+        config: {
+            showScore: false,
+            scoreText: 'score:'
+        },
+        score: '5/5',
+        expected: {
+            scoreText: '',
+            score: '',
+            scoreLine: ''
+        }
+    }]).test('score', (data, assert) => {
         const ready = assert.async();
         const $container = $('#fixture-score');
-        const scoreText = 'score:';
-        const score = '5/5';
 
         assert.expect(16);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
-        const instance = itemAnswerFactory($container, {scoreText})
+        const instance = itemAnswerFactory($container, data.config)
             .on('init', function () {
                 assert.strictEqual(this, instance, 'The instance has been initialized');
             })
@@ -470,10 +492,10 @@ define([
 
                 assert.strictEqual($container.find('.item-answer-score').text().trim(), '', 'Not score set yet');
 
-                assert.strictEqual(instance.setScore(score), instance, 'setScore() is fluent');
-                assert.strictEqual(instance.getScore(), score, `Score is set to "${score}"`);
+                assert.strictEqual(instance.setScore(data.score), instance, 'setScore() is fluent');
+                assert.strictEqual(instance.getScore(), data.expected.score, `Score is set to "${data.expected.score}"`);
 
-                assert.strictEqual($container.find('.item-answer-score').text().trim(), `${scoreText} ${score}`, 'The score has been set');
+                assert.strictEqual($container.find('.item-answer-score').text().trim(), data.expected.scoreLine, 'The score has been set');
 
                 instance.setScore('');
                 assert.strictEqual(instance.getScore(), '', 'Score is set to ""');

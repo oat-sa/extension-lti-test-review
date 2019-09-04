@@ -130,19 +130,40 @@ $incorrectColor: blacken($error, .2);
         padding-top: 10px;
     }
 
-    &.correct {
-        .icon {
-            color: $correctColor;
-        }
+    .icon-correct:before {
+        @include icon-result-ok;
+    }
+    .icon-incorrect:before {
+        @include icon-result-nok;
+    }
+    .icon-answered:before {
+        @include icon-radio-checked;
+    }
+    .icon-skipped:before {
+        @include icon-radio;
+    }
+    .icon-informational:before {
+        @include icon-info;
     }
 
-    &.incorrect,
-    &.skipped {
-        .icon {
-            color: $incorrectColor;
+    &:not(.show-correct):not(.show-score) {
+        .item-answer-bar {
+            display: none;
         }
     }
-
+    &.show-correct {
+        &.correct {
+            .icon {
+                color: $correctColor;
+            }
+        }
+        &.incorrect,
+        &.skipped {
+            .icon {
+                color: $incorrectColor;
+            }
+        }
+    }
     &.skipped {
         .item-answer-status {
             text-transform: uppercase;
@@ -172,6 +193,5 @@ $incorrectColor: blacken($error, .2);
                 outline-offset: -$focusActiveSpace;
             }
         }
-        
     }
 }

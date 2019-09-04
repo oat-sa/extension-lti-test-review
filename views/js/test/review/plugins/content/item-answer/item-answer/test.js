@@ -513,15 +513,56 @@ define([
             });
     });
 
-    QUnit.test('status', assert => {
+    QUnit.cases.init([{
+        title: 'default',
+        config: {},
+        expected: {
+            showScore: true,
+            showCorrect: true,
+            hidden: false,
+            iconCorrect: '.icon-correct',
+            iconIncorrect: '.icon-incorrect',
+            iconSkipped: '.icon-incorrect',
+            iconInformational: '.icon-informational',
+        }
+    }, {
+        title: 'correct responses disabled',
+        config: {
+            showCorrect: false
+        },
+        expected: {
+            showScore: true,
+            showCorrect: false,
+            hidden: false,
+            iconCorrect: '.icon-answered',
+            iconIncorrect: '.icon-answered',
+            iconSkipped: '.icon-skipped',
+            iconInformational: '.icon-informational',
+        }
+    }, {
+        title: 'correct responses and score disabled',
+        config: {
+            showScore: false,
+            showCorrect: false
+        },
+        expected: {
+            showScore: false,
+            showCorrect: false,
+            hidden: true,
+            iconCorrect: '.icon-answered',
+            iconIncorrect: '.icon-answered',
+            iconSkipped: '.icon-skipped',
+            iconInformational: '.icon-informational',
+        }
+    }]).test('status ', (data, assert) => {
         const ready = assert.async();
         const $container = $('#fixture-status');
 
-        assert.expect(67);
+        assert.expect(77);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
-        const instance = itemAnswerFactory($container)
+        const instance = itemAnswerFactory($container, data.config)
             .on('init', function () {
                 assert.strictEqual(this, instance, 'The instance has been initialized');
             })
@@ -530,6 +571,8 @@ define([
 
                 assert.strictEqual($container.children().length, 1, 'The container contains an element');
                 assert.strictEqual($container.children().is('.item-answer'), true, 'The container contains the expected element');
+                assert.strictEqual($container.children().is('.show-score'), data.expected.showScore, 'The show score option is reflected');
+                assert.strictEqual($container.children().is('.show-correct'), data.expected.showCorrect, 'The show correct option is reflected');
 
                 assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
                 assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
@@ -537,9 +580,16 @@ define([
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
 
+                assert.strictEqual($container.find('.item-answer-bar').is(':hidden'), data.expected.hidden, 'The bar is hidden as expected');
+                assert.strictEqual($container.find('.item-answer-tabs').is(':hidden'), data.expected.hidden, 'The tabs bar is hidden as expected');
+                assert.strictEqual($container.find('.item-answer-score').is(':hidden'), data.expected.hidden, 'The score bar is hidden as expected');
+                assert.strictEqual($container.find('.item-answer-status').is(':hidden'), false, 'The status bar is visible');
+
                 assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
                 assert.strictEqual(instance.getActiveTab(), 'answer', 'The active tab is "answer"');
                 assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
+
+                assert.strictEqual($container.find('[data-tab-name="answer"] .icon').is(data.expected.iconInformational), true, 'The expected icon is set for the informational status');
 
                 Promise
                     .resolve()
@@ -576,20 +626,31 @@ define([
                         assert.strictEqual($container.children().is('.skipped'), true, 'The component got the state skipped');
                         assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
                         assert.strictEqual($container.find('.item-answer-status').text().trim(), instance.getConfig().skippedText, 'The status area is not empty');
+
+                        assert.strictEqual($container.find('[data-tab-name="answer"] .icon').is(data.expected.iconSkipped), true, 'The expected icon is set for the skipped status');
                     })
                     .then(() => new Promise(resolve => {
-                        instance
-                            .off('.test')
-                            .on('tabchange.test', name => {
-                                assert.strictEqual(name, 'correct', 'The correct tab is active');
-                                resolve();
-                            });
-                        $container.find('[data-tab-name="correct"]').click();
+                        if (data.expected.showCorrect) {
+                            instance
+                                .off('.test')
+                                .on('tabchange.test', name => {
+                                    assert.strictEqual(name, 'correct', 'The correct tab is active');
+                                    resolve();
+                                });
+                            $container.find('[data-tab-name="correct"]').click();
+                        } else {
+                            assert.strictEqual($container.find('[data-tab-name="correct"]').length, 0, 'No correct tab should exist');
+                            resolve();
+                        }
                     }))
                     .then(() => {
                         instance.off('.test');
 
-                        assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
+                        if (data.expected.showCorrect) {
+                            assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
+                        } else {
+                            assert.strictEqual($container.find('.item-answer-status').text().trim(), instance.getConfig().skippedText, 'The status area is not empty');
+                        }
 
                         const promise = Promise.all([
                             new Promise(resolve => {
@@ -621,6 +682,8 @@ define([
                         assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
                         assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
                         assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
+
+                        assert.strictEqual($container.find('[data-tab-name="answer"] .icon').is(data.expected.iconCorrect), true, 'The expected icon is set for the correct status');
                     })
                     .then(() => {
                         instance.off('.test');
@@ -678,6 +741,8 @@ define([
                         assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
                         assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
                         assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
+
+                        assert.strictEqual($container.find('[data-tab-name="answer"] .icon').is(data.expected.iconIncorrect), true, 'The expected icon is set for the incorrect status');
                     })
                     .then(() => {
                         instance.off('.test');
@@ -731,15 +796,47 @@ define([
             });
     });
 
-    QUnit.test('correct', assert => {
+    QUnit.cases.init([{
+        title: 'default',
+        config: {},
+        expected: {
+            showScore: true,
+            showCorrect: true,
+            hidden: false,
+            icon: '.icon-correct'
+        }
+    }, {
+        title: 'correct responses disabled',
+        config: {
+            showCorrect: false
+        },
+        expected: {
+            showScore: true,
+            showCorrect: false,
+            hidden: false,
+            icon: '.icon-answered'
+        }
+    }, {
+        title: 'correct responses and score disabled',
+        config: {
+            showScore: false,
+            showCorrect: false
+        },
+        expected: {
+            showScore: false,
+            showCorrect: false,
+            hidden: true,
+            icon: '.icon-answered'
+        }
+    }]).test('correct ', (data, assert) => {
         const ready = assert.async();
         const $container = $('#fixture-correct');
 
-        assert.expect(27);
+        assert.expect(34);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
-        const instance = itemAnswerFactory($container)
+        const instance = itemAnswerFactory($container, data.config)
             .on('init', function () {
                 assert.strictEqual(this, instance, 'The instance has been initialized');
             })
@@ -748,6 +845,8 @@ define([
 
                 assert.strictEqual($container.children().length, 1, 'The container contains an element');
                 assert.strictEqual($container.children().is('.item-answer'), true, 'The container contains the expected element');
+                assert.strictEqual($container.children().is('.show-score'), data.expected.showScore, 'The show score option is reflected');
+                assert.strictEqual($container.children().is('.show-correct'), data.expected.showCorrect, 'The show correct option is reflected');
 
                 assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
                 assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
@@ -755,6 +854,11 @@ define([
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
                 assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
+
+                assert.strictEqual($container.find('.item-answer-bar').is(':hidden'), data.expected.hidden, 'The bar is hidden as expected');
+                assert.strictEqual($container.find('.item-answer-tabs').is(':hidden'), data.expected.hidden, 'The tabs bar is hidden as expected');
+                assert.strictEqual($container.find('.item-answer-score').is(':hidden'), data.expected.hidden, 'The score bar is hidden as expected');
+                assert.strictEqual($container.find('.item-answer-status').is(':hidden'), false, 'The status bar is visible');
 
                 assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
                 assert.strictEqual(instance.getActiveTab(), 'answer', 'The active tab is "answer"');
@@ -797,6 +901,7 @@ define([
 
                         assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
                         assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
+                        assert.strictEqual($container.find('[data-tab-name="answer"] .icon').is(data.expected.icon), true, 'The expected icon is set');
                     })
                     .catch(err => {
                         assert.pushResult({
@@ -816,15 +921,56 @@ define([
             });
     });
 
-    QUnit.test('incorrect', assert => {
+    QUnit.cases.init([{
+        title: 'default',
+        config: {},
+        expected: {
+            showScore: true,
+            showCorrect: true,
+            hidden: false,
+            icon: '.icon-incorrect',
+            tabs: 2,
+            tabAnswer: 1,
+            tabCorrect: 1
+        }
+    }, {
+        title: 'correct responses disabled',
+        config: {
+            showCorrect: false
+        },
+        expected: {
+            showScore: true,
+            showCorrect: false,
+            hidden: false,
+            icon: '.icon-answered',
+            tabs: 1,
+            tabAnswer: 1,
+            tabCorrect: 0
+        }
+    }, {
+        title: 'correct responses and score disabled',
+        config: {
+            showScore: false,
+            showCorrect: false
+        },
+        expected: {
+            showScore: false,
+            showCorrect: false,
+            hidden: true,
+            icon: '.icon-answered',
+            tabs: 1,
+            tabAnswer: 1,
+            tabCorrect: 0
+        }
+    }]).test('incorrect ', (data, assert) => {
         const ready = assert.async();
         const $container = $('#fixture-incorrect');
 
-        assert.expect(28);
+        assert.expect(35);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
-        const instance = itemAnswerFactory($container)
+        const instance = itemAnswerFactory($container, data.config)
             .on('init', function () {
                 assert.strictEqual(this, instance, 'The instance has been initialized');
             })
@@ -833,6 +979,8 @@ define([
 
                 assert.strictEqual($container.children().length, 1, 'The container contains an element');
                 assert.strictEqual($container.children().is('.item-answer'), true, 'The container contains the expected element');
+                assert.strictEqual($container.children().is('.show-score'), data.expected.showScore, 'The show score option is reflected');
+                assert.strictEqual($container.children().is('.show-correct'), data.expected.showCorrect, 'The show correct option is reflected');
 
                 assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
                 assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
@@ -840,6 +988,11 @@ define([
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
                 assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
+
+                assert.strictEqual($container.find('.item-answer-bar').is(':hidden'), data.expected.hidden, 'The bar is hidden as expected');
+                assert.strictEqual($container.find('.item-answer-tabs').is(':hidden'), data.expected.hidden, 'The tabs bar is hidden as expected');
+                assert.strictEqual($container.find('.item-answer-score').is(':hidden'), data.expected.hidden, 'The score bar is hidden as expected');
+                assert.strictEqual($container.find('.item-answer-status').is(':hidden'), false, 'The status bar is visible');
 
                 assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
                 assert.strictEqual(instance.getActiveTab(), 'answer', 'The active tab is "answer"');
@@ -880,9 +1033,10 @@ define([
                         assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
                         assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
 
-                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 2, 'Two tabs should be present');
-                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
-                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="correct"]').length, 1, 'The tab "correct" is set');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, data.expected.tabs, 'Two tabs should be present');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, data.expected.tabAnswer, 'The tab "answer" is set');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="correct"]').length, data.expected.tabCorrect, 'The tab "correct" is set');
+                        assert.strictEqual($container.find('[data-tab-name="answer"] .icon').is(data.expected.icon), true, 'The expected icon is set');
                     })
                     .catch(err => {
                         assert.pushResult({
@@ -902,16 +1056,57 @@ define([
             });
     });
 
-    QUnit.test('skipped', assert => {
+    QUnit.cases.init([{
+        title: 'default',
+        config: {},
+        expected: {
+            showScore: true,
+            showCorrect: true,
+            hidden: false,
+            icon: '.icon-incorrect',
+            tabs: 2,
+            tabAnswer: 1,
+            tabCorrect: 1
+        }
+    }, {
+        title: 'correct responses disabled',
+        config: {
+            showCorrect: false
+        },
+        expected: {
+            showScore: true,
+            showCorrect: false,
+            hidden: false,
+            icon: '.icon-skipped',
+            tabs: 1,
+            tabAnswer: 1,
+            tabCorrect: 0
+        }
+    }, {
+        title: 'correct responses and score disabled',
+        config: {
+            showScore: false,
+            showCorrect: false
+        },
+        expected: {
+            showScore: false,
+            showCorrect: false,
+            hidden: true,
+            icon: '.icon-skipped',
+            tabs: 1,
+            tabAnswer: 1,
+            tabCorrect: 0
+        }
+    }]).test('skipped ', (data, assert) => {
         const ready = assert.async();
         const $container = $('#fixture-skipped');
         const skippedText = 'skipped item';
 
-        assert.expect(28);
+        assert.expect(35);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
-        const instance = itemAnswerFactory($container, {skippedText})
+        const instance = itemAnswerFactory($container, Object.assign({skippedText}, data.config))
             .on('init', function () {
                 assert.strictEqual(this, instance, 'The instance has been initialized');
             })
@@ -920,6 +1115,8 @@ define([
 
                 assert.strictEqual($container.children().length, 1, 'The container contains an element');
                 assert.strictEqual($container.children().is('.item-answer'), true, 'The container contains the expected element');
+                assert.strictEqual($container.children().is('.show-score'), data.expected.showScore, 'The show score option is reflected');
+                assert.strictEqual($container.children().is('.show-correct'), data.expected.showCorrect, 'The show correct option is reflected');
 
                 assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
                 assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
@@ -927,6 +1124,11 @@ define([
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
                 assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
+
+                assert.strictEqual($container.find('.item-answer-bar').is(':hidden'), data.expected.hidden, 'The bar is hidden as expected');
+                assert.strictEqual($container.find('.item-answer-tabs').is(':hidden'), data.expected.hidden, 'The tabs bar is hidden as expected');
+                assert.strictEqual($container.find('.item-answer-score').is(':hidden'), data.expected.hidden, 'The score bar is hidden as expected');
+                assert.strictEqual($container.find('.item-answer-status').is(':hidden'), false, 'The status bar is visible');
 
                 assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
                 assert.strictEqual(instance.getActiveTab(), 'answer', 'The active tab is "answer"');
@@ -967,9 +1169,10 @@ define([
                         assert.strictEqual($container.children().is('.informational'), false, 'The component did not get the state informational');
                         assert.strictEqual($container.find('.item-answer-status').text().trim(), skippedText, 'The status area is not empty');
 
-                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 2, 'Two tabs should be present');
-                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
-                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="correct"]').length, 1, 'The tab "correct" is set');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, data.expected.tabs, 'Two tabs should be present');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, data.expected.tabAnswer, 'The tab "answer" is set');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="correct"]').length, data.expected.tabCorrect, 'The tab "correct" is set');
+                        assert.strictEqual($container.find('[data-tab-name="answer"] .icon').is(data.expected.icon), true, 'The expected icon is set');
                     })
                     .catch(err => {
                         assert.pushResult({
@@ -989,15 +1192,47 @@ define([
             });
     });
 
-    QUnit.test('informational', assert => {
+    QUnit.cases.init([{
+        title: 'default',
+        config: {},
+        expected: {
+            showScore: true,
+            showCorrect: true,
+            hidden: false,
+            icon: '.icon-informational'
+        }
+    }, {
+        title: 'correct responses disabled',
+        config: {
+            showCorrect: false
+        },
+        expected: {
+            showScore: true,
+            showCorrect: false,
+            hidden: false,
+            icon: '.icon-informational'
+        }
+    }, {
+        title: 'correct responses and score disabled',
+        config: {
+            showScore: false,
+            showCorrect: false
+        },
+        expected: {
+            showScore: false,
+            showCorrect: false,
+            hidden: true,
+            icon: '.icon-informational'
+        }
+    }]).test('informational ', (data, assert) => {
         const ready = assert.async();
         const $container = $('#fixture-informational');
 
-        assert.expect(27);
+        assert.expect(34);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
-        const instance = itemAnswerFactory($container)
+        const instance = itemAnswerFactory($container, data.config)
             .on('init', function () {
                 assert.strictEqual(this, instance, 'The instance has been initialized');
             })
@@ -1006,6 +1241,8 @@ define([
 
                 assert.strictEqual($container.children().length, 1, 'The container contains an element');
                 assert.strictEqual($container.children().is('.item-answer'), true, 'The container contains the expected element');
+                assert.strictEqual($container.children().is('.show-score'), data.expected.showScore, 'The show score option is reflected');
+                assert.strictEqual($container.children().is('.show-correct'), data.expected.showCorrect, 'The show correct option is reflected');
 
                 assert.strictEqual($container.find('.item-answer-bar').length, 1, 'The component has rendered the bar');
                 assert.strictEqual($container.find('.item-answer-tabs').length, 1, 'The component has rendered the tabs area');
@@ -1013,6 +1250,11 @@ define([
                 assert.strictEqual($container.find('.item-answer-score').length, 1, 'The component has rendered the score area');
                 assert.strictEqual($container.find('.item-answer-status').length, 1, 'The component has rendered the status area');
                 assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
+
+                assert.strictEqual($container.find('.item-answer-bar').is(':hidden'), data.expected.hidden, 'The bar is hidden as expected');
+                assert.strictEqual($container.find('.item-answer-tabs').is(':hidden'), data.expected.hidden, 'The tabs bar is hidden as expected');
+                assert.strictEqual($container.find('.item-answer-score').is(':hidden'), data.expected.hidden, 'The score bar is hidden as expected');
+                assert.strictEqual($container.find('.item-answer-status').is(':hidden'), false, 'The status bar is visible');
 
                 assert.strictEqual(instance.getStatus(), 'informational', 'The current status is "informational"');
                 assert.strictEqual(instance.getActiveTab(), 'answer', 'The active tab is "answer"');
@@ -1055,6 +1297,7 @@ define([
 
                         assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
                         assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
+                        assert.strictEqual($container.find('[data-tab-name="answer"] .icon').is(data.expected.icon), true, 'The expected icon is set');
                     })
                     .catch(err => {
                         assert.pushResult({
@@ -1083,8 +1326,10 @@ define([
         const $status = $('#visual-test .header');
         const $state = $('#visual-test .footer .state');
         const $score = $('#visual-test .footer .score');
+        const $correct = $('#visual-test .footer .correct');
         const config = {
-            showScore: true
+            showScore: true,
+            showCorrect: true
         };
         const btnCls = 'btn-success';
         let instance = null;
@@ -1170,10 +1415,18 @@ define([
                         setup();
                     }
                 });
+                monitorClick($correct, status => {
+                    const showCorrect = status === 'yes';
+                    if (showCorrect !== config.showCorrect) {
+                        config.showCorrect = showCorrect;
+                        setup();
+                    }
+                });
 
                 activateFirst($status);
                 activateFirst($state);
                 activateFirst($score);
+                activateFirst($correct);
 
                 assert.equal($container.children().length, 1, 'The container contains an element');
                 ready();

@@ -15,18 +15,15 @@
               "label": "Example_0_Introduction",
               "informational": true,
               "skipped": false,
+              "withScore": false,
               "position": 0,
-              "type": "info",
-              "score": 0,
-              "maxScore": 0
+              "type": "info"
             }
           ],
-          "score": 0,
-          "maxScore": 0
+          "withScore": false
         }
       ],
-      "score": 0,
-      "maxScore": 0
+      "withScore": false
     },
     {
       "id": "QTIExamples",
@@ -43,90 +40,79 @@
               "label": "example_1_TAO",
               "informational": false,
               "skipped": false,
+              "withScore": false,
               "position": 1,
-              "type": "correct",
-              "score": 2,
-              "maxScore": 2
+              "type": "default"
             },
             {
               "id": "item-3",
               "label": "example_2_Math",
               "informational": false,
               "skipped": false,
+              "withScore": false,
               "position": 2,
-              "type": "correct",
-              "score": 2,
-              "maxScore": 2
+              "type": "default"
             },
             {
               "id": "item-4",
               "label": "Example_3_Baudelaire",
               "informational": false,
               "skipped": false,
+              "withScore": false,
               "position": 3,
-              "type": "correct",
-              "score": 3,
-              "maxScore": 3
+              "type": "default"
             },
             {
               "id": "item-5",
               "label": "Example_4_Appearance",
               "informational": false,
               "skipped": false,
+              "withScore": false,
               "position": 4,
-              "type": "correct",
-              "score": 2,
-              "maxScore": 2
+              "type": "default"
             },
             {
               "id": "item-6",
               "label": "Example_5_picasso",
               "informational": false,
               "skipped": false,
+              "withScore": false,
               "position": 5,
-              "type": "correct",
-              "score": 2,
-              "maxScore": 2
+              "type": "default"
             },
             {
               "id": "item-7",
               "label": "Example_6_Geography",
               "informational": false,
               "skipped": false,
+              "withScore": false,
               "position": 6,
-              "type": "correct",
-              "score": 2,
-              "maxScore": 2
+              "type": "default"
             },
             {
               "id": "item-8",
               "label": "Example_7_Geo 2",
               "informational": false,
               "skipped": false,
+              "withScore": false,
               "position": 7,
-              "type": "correct",
-              "score": 2,
-              "maxScore": 2
+              "type": "default"
             },
             {
               "id": "item-9",
               "label": "Example_8_Geo 3",
               "informational": false,
-              "skipped": false,
+              "skipped": true,
+              "withScore": false,
               "position": 8,
-              "type": "correct",
-              "score": 2,
-              "maxScore": 2
+              "type": "skipped"
             }
           ],
-          "score": 17,
-          "maxScore": 17
+          "withScore": false
         }
       ],
-      "score": 17,
-      "maxScore": 17
+      "withScore": false
     }
   ],
-  "score": 17,
-  "maxScore": 17
+  "withScore": false
 }

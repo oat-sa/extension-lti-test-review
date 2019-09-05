@@ -54,6 +54,7 @@ define([
         label: __('TOTAL'),
         score: '0'
     };
+    const defaultShowScore = true;
     const defaultFilters = [{
         id: 'all',
         label: __('All'),
@@ -141,7 +142,19 @@ define([
             footerLabel: defaultFooter.label,
             header: defaultHeader,
             footer: defaultFooter,
+            showScore: defaultShowScore,
             filters: defaultFilters
+        }
+    }, {
+        title: 'disabled score',
+        config: {
+            showScore: false
+        },
+        expected: {
+            headerLabel: false,
+            footerLabel: false,
+            showScore: false,
+            filters: false
         }
     }, {
         title: 'disabled header',
@@ -152,6 +165,7 @@ define([
             headerLabel: false,
             footerLabel: defaultFooter.label,
             footer: defaultFooter,
+            showScore: defaultShowScore,
             filters: defaultFilters
         }
     }, {
@@ -163,6 +177,7 @@ define([
             footerLabel: false,
             headerLabel: defaultHeader.label,
             header: defaultHeader,
+            showScore: defaultShowScore,
             filters: defaultFilters
         }
     }, {
@@ -175,6 +190,7 @@ define([
             footerLabel: defaultFooter.label,
             header: defaultHeader,
             footer: defaultFooter,
+            showScore: defaultShowScore,
             filters: false
         }
     }, {
@@ -191,6 +207,7 @@ define([
             footerLabel: defaultFooter.label,
             header: defaultHeader,
             footer: defaultFooter,
+            showScore: defaultShowScore,
             filters: [{
                 id: 'test',
                 label: 'test',
@@ -207,15 +224,7 @@ define([
         instance
             .after('init', function () {
                 assert.equal(this, instance, 'The instance has been initialized');
-                const config = this.getConfig();
-                if (Array.isArray(config.filters)) {
-                    // remove callbacks to simplify testing
-                    config.filters = config.filters.map(filter => {
-                        const {id, label, title} = filter;
-                        return {id, label, title};
-                    });
-                }
-                assert.deepEqual(config, data.expected, 'The expected config has been built');
+                assert.deepEqual(this.getConfig(), data.expected, 'The expected config has been built');
             })
             .on('ready', () => instance.destroy())
             .on('destroy', () => ready())
@@ -272,18 +281,85 @@ define([
             });
     });
 
-    QUnit.test('render with data', assert => {
-        const ready = assert.async();
-        const $container = $('#fixture-render-data');
-        const config = {
+    QUnit.cases.init([{
+        title: 'scores enabled',
+        config: {
             headerLabel: 'HEADER',
             footerLabel: 'FOOTER'
-        };
+        },
+        testMap: testMapIncorrect,
+        expected: {
+            header: 1,
+            headerLabel: 'HEADER',
+            headerScore: '80%',
+            footer: 1,
+            footerLabel: 'FOOTER',
+            footerScore: '12/15',
+            countParts: 2,
+            countSections: 3,
+            countItems: 9,
+            items: [
+                {type: 'info', score: '-'},
+                {type: 'correct', score: '2/2'},
+                {type: 'incorrect', score: '2/3'},
+                {type: 'correct', score: '2/2'},
+                {type: 'incorrect', score: '0/2'},
+                {type: 'correct', score: '2/2'},
+                {type: 'correct', score: '2/2'},
+                {type: 'correct', score: '2/2'},
+                {type: 'skipped', score: '0'}
+            ],
+            filters: [{
+                label: defaultFilters[0].label,
+                active: true
+            }, {
+                label: defaultFilters[1].label,
+                active: false
+            }]
+        }
+    }, {
+        title: 'scores disabled',
+        config: {
+            showScore: false
+        },
+        testMap: testMapIncorrect,
+        expected: {
+            header: 0,
+            headerLabel: '',
+            headerScore: '',
+            footer: 0,
+            footerLabel: '',
+            footerScore: '',
+            countParts: 2,
+            countSections: 3,
+            countItems: 9,
+            items: [
+                {type: 'info', score: ''},
+                {type: 'default', score: ''},
+                {type: 'default', score: ''},
+                {type: 'default', score: ''},
+                {type: 'default', score: ''},
+                {type: 'default', score: ''},
+                {type: 'default', score: ''},
+                {type: 'default', score: ''},
+                {type: 'skipped', score: ''}
+            ],
+            filters: []
+        }
+    }]).test('render with data ', (data, assert) => {
+        const ready = assert.async();
+        const $container = $('#fixture-render-data');
 
-        assert.expect(37);
+        assert.expect(17 +
+            data.expected.countParts +
+            data.expected.countSections +
+            data.expected.countItems +
+            data.expected.items.length * 2 +
+            data.expected.filters.length * 2
+        );
         assert.equal($container.children().length, 0, 'The container is empty');
 
-        const instance = reviewPanelFactory($container, config, testMapIncorrect)
+        const instance = reviewPanelFactory($container, data.config, data.testMap)
             .on('init', function () {
                 assert.equal(this, instance, 'The instance has been initialized');
             })
@@ -293,15 +369,17 @@ define([
                 assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
                 assert.equal($container.find('.review-panel-content').children().length, 1, 'The content area is not empty');
 
-                assert.equal($container.find('.review-panel-header .review-panel-label').text().trim(), config.headerLabel, 'The header label is rendered');
-                assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '93%', 'The header score is rendered');
+                assert.equal($container.find('.review-panel-header').length, data.expected.header ? 1 : 0, 'The header is rendered');
+                assert.equal($container.find('.review-panel-header .review-panel-label').text().trim(), data.expected.headerLabel, 'The header label is rendered');
+                assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), data.expected.headerScore, 'The header score is rendered');
 
-                assert.equal($container.find('.review-panel-footer .review-panel-label').text().trim(), config.footerLabel, 'The header label is rendered');
-                assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '14/15', 'The header score is rendered');
+                assert.equal($container.find('.review-panel-footer').length, data.expected.footer ? 1 : 0, 'The footer is rendered');
+                assert.equal($container.find('.review-panel-footer .review-panel-label').text().trim(), data.expected.footerLabel, 'The header label is rendered');
+                assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), data.expected.footerScore, 'The header score is rendered');
 
-                assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
-                assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
-                assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
+                assert.equal($container.find('.review-panel-part').length, data.expected.countParts, 'The test parts are rendered');
+                assert.equal($container.find('.review-panel-section').length, data.expected.countSections, 'The test sections are rendered');
+                assert.equal($container.find('.review-panel-item').length, data.expected.countItems, 'The test items are rendered');
 
                 _.forEach(testMapIncorrect.parts, part => {
                     assert.equal(
@@ -327,17 +405,17 @@ define([
                     });
                 });
 
-                assert.equal($container.find('.review-panel-item:nth(0)').is('.item-info'), true, 'The 1st item got the expected icon');
-                assert.equal($container.find('.review-panel-item:nth(2)').is('.item-incorrect'), true, 'The 3rd item got the expected icon');
-                assert.equal($container.find('.review-panel-item:nth(8)').is('.item-default'), true, 'The last item got the expected icon');
-                assert.equal($container.find('.review-panel-item.item-correct').length, 6, 'The other items got the expected icon');
+                data.expected.items.forEach((item, index) => {
+                    assert.equal($container.find(`.review-panel-item:nth(${index})`).is(`.item-${item.type}`), true, `The item #${index} got the expected icon: ${item.type}`);
+                    assert.equal($container.find(`.review-panel-item:nth(${index}) .review-panel-score`).text().trim(), item.score, `The item #${index} got the expected score: ${item.score}`);
+                });
 
-                assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
-                assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
-                assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is active');
-                assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active');
-                assert.equal($container.find('.review-panel-filter:nth(0)').text().trim(), defaultFilters[0].label, 'The first filter is rendered');
-                assert.equal($container.find('.review-panel-filter:nth(1)').text().trim(), defaultFilters[1].label, 'The second filter is rendered');
+                assert.equal($container.find('.review-panel-filter').length, data.expected.filters.length, 'The expected number of filters is renderer');
+                assert.equal($container.find('.review-panel-filter.active').length, data.expected.filters.length ? 1 : 0, 'A filter is active');
+                data.expected.filters.forEach((filter, index) => {
+                    assert.equal($container.find(`.review-panel-filter:nth(${index})`).is('.active'), filter.active, `The filter #${index} got the expected state`);
+                    assert.equal($container.find(`.review-panel-filter:nth(${index})`).text().trim(), filter.label, `The filter #${index} got the expected label`);
+                });
 
                 instance.destroy();
             })
@@ -542,17 +620,21 @@ define([
                         label: 'item',
                         informational: false,
                         skipped: true,
+                        withScore: true,
                         type: 'incorrect',
                         position: 0,
                         score: 0,
                         maxScore: 1
                     }],
+                    withScore: true,
                     score: 0,
                     maxScore: 1
                 }],
+                withScore: true,
                 score: 0,
                 maxScore: 1
             }],
+            withScore: true,
             score: 0,
             maxScore: 1
         };
@@ -758,22 +840,26 @@ define([
                         label: 'item',
                         informational: false,
                         skipped: false,
+                        withScore: true,
                         type: 'correct',
                         position: 0,
                         score: 1,
                         maxScore: 1
                     }],
+                    withScore: true,
                     score: 1,
                     maxScore: 1
                 }],
+                withScore: true,
                 score: 1,
                 maxScore: 1
             }],
+            withScore: true,
             score: 1,
             maxScore: 1
         };
 
-        assert.expect(69);
+        assert.expect(70);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
@@ -865,11 +951,12 @@ define([
 
                         assert.equal($container.find('.review-panel-item:nth(0)').is('.item-info'), true, 'The 1st item got the expected icon');
                         assert.equal($container.find('.review-panel-item:nth(2)').is('.item-incorrect'), true, 'The 3rd item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(8)').is('.item-default'), true, 'The last item got the expected icon');
-                        assert.equal($container.find('.review-panel-item.item-correct').length, 6, 'The other items got the expected icon');
+                        assert.equal($container.find('.review-panel-item:nth(4)').is('.item-incorrect'), true, 'The 3rd item got the expected icon');
+                        assert.equal($container.find('.review-panel-item:nth(8)').is('.item-skipped'), true, 'The last item got the expected icon');
+                        assert.equal($container.find('.review-panel-item.item-correct').length, 5, 'The other items got the expected icon');
 
-                        assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '93%', 'The header score is rendered');
-                        assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '14/15', 'The header score is rendered');
+                        assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '80%', 'The header score is rendered');
+                        assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '12/15', 'The header score is rendered');
 
                         assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
                         assert.equal($container.find('.review-panel-filter:visible').length, 2, 'The filters are displayed');
@@ -2083,7 +2170,9 @@ define([
         const ready = assert.async();
         const $container = $('#visual-test .panel');
         const $item = $('#visual-test .item');
-        const instance = reviewPanelFactory($container, {}, testMapIncorrect);
+        const config = {
+            showScore: true
+        };
         const data = {
             correct: testMapCorrect,
             incorrect: testMapIncorrect
@@ -2092,57 +2181,79 @@ define([
             all: testMapIncorrect,
             incorrect: testMapIncorrectFiltered
         };
+        let instance = null;
+        let componentDisabled = false;
+        let currentData = data.correct;
         const showItem = (id, position) => {
             const item = instance.getData().items.get(id);
             if (item) {
                 $item.html(`<h1>${item.label}</h1><p>${id} at #${position}</p>`);
             }
         };
-        assert.expect(3);
+        const manageButtons = (selector, selected, callback) => {
+            const $selector = $(selector);
+            $selector
+                .on('click', 'button', e => {
+                    $selector.find('button').removeClass('btn-success');
+                    e.currentTarget.classList.add('btn-success');
+                    const control = e.currentTarget.dataset.control;
+                    callback(control);
+                })
+                .find(`[data-control="${selected}"]`).click();
+        };
+        const setup = () => new Promise((resolve, reject) => {
+            Promise.resolve()
+                .then(() => instance && instance.destroy())
+                .then(() => {
+                    instance = reviewPanelFactory($container, config, currentData)
+                        .on('ready', () => {
+                            instance.setActiveItem(currentData.jumps.find(item => item.identifier).identifier);
+                            if (componentDisabled) {
+                                instance.disable();
+                            }
+                            resolve();
+                        })
+                        .after('update', () => showItem(instance.getActiveItem(), instance.getActiveItemPosition()))
+                        .on('itemchange', showItem)
+                        .on('filterchange', filterId => instance.setData(filterData[filterId]))
+                        .on('error', reject);
+                })
+                .catch(reject);
+        });
+        assert.expect(2);
 
         assert.equal($container.children().length, 0, 'The container is empty');
 
-        instance
-            .on('init', function () {
-                assert.equal(this, instance, 'The instance has been initialized');
-            })
-            .on('ready', () => {
+        setup()
+            .then(() => {
+                manageButtons('#visual-test .header .state', 'correct', control => {
+                    if (control === 'incorrect') {
+                        currentData = filterData[instance.getActiveFilter() || 'all'];
+                    } else {
+                        currentData = data[control];
+                    }
+                    instance.setData(currentData);
+                });
+                manageButtons('#visual-test .header .score', 'yes', control => {
+                    const showScore = control === 'yes';
+                    if (showScore !== config.showScore) {
+                        config.showScore = showScore;
+                        setup();
+                    }
+                });
+                manageButtons('#visual-test .footer', 'enable', control => {
+                    if (control === 'disable') {
+                        instance.disable();
+                    } else {
+                        instance.enable();
+                    }
+                    componentDisabled = instance.is('disabled');
+                });
+
                 assert.equal($container.children().length, 1, 'The container contains an element');
-                instance.setActiveItem('item-1');
-
-                const $header = $('#visual-test .header');
-                $header
-                    .on('click', 'button', e => {
-                        $header.find('button').removeClass('btn-success');
-                        e.currentTarget.classList.add('btn-success');
-                        const control = e.currentTarget.dataset.control;
-                        if (control === 'incorrect') {
-                            instance.setData(filterData[instance.getActiveFilter()]);
-                        } else {
-                            instance.setData(data[control]);
-                        }
-                    })
-                    .find('[data-control="correct"]').click();
-
-                const $footer = $('#visual-test .footer');
-                $footer
-                    .on('click', 'button', e => {
-                        $footer.find('button').removeClass('btn-success');
-                        e.currentTarget.classList.add('btn-success');
-                        if (e.currentTarget.dataset.control === 'disable') {
-                            instance.disable();
-                        } else {
-                            instance.enable();
-                        }
-                    })
-                    .find('[data-control="enable"]').click();
-
                 ready();
             })
-            .after('update', () => showItem(instance.getActiveItem(), instance.getActiveItemPosition()))
-            .on('itemchange', showItem)
-            .on('filterchange', filterId => instance.setData(filterData[filterId]))
-            .on('error', err => {
+            .catch(err => {
                 assert.ok(false, 'The operation should not fail!');
                 assert.pushResult({
                     result: false,

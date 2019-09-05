@@ -586,7 +586,8 @@ define([
                 /**
                  * @event ready
                  */
-                this.setState('ready', true)
+                this.setState('show-score', this.getConfig().showScore)
+                    .setState('ready', true)
                     .trigger('ready');
             })
 

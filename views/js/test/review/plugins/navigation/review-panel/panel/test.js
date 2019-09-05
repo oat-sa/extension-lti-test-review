@@ -350,7 +350,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-render-data');
 
-        assert.expect(17 +
+        assert.expect(18 +
             data.expected.countParts +
             data.expected.countSections +
             data.expected.countItems +
@@ -366,6 +366,7 @@ define([
             .on('ready', () => {
                 assert.ok(instance.is('ready'), 'The component is ready');
                 assert.equal($container.children().length, 1, 'The container contains an element');
+                assert.equal($container.children().is('.show-score'), instance.getConfig().showScore, 'The show score option is reflected');
                 assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
                 assert.equal($container.find('.review-panel-content').children().length, 1, 'The content area is not empty');
 

@@ -28,13 +28,31 @@ define([
     'use strict';
 
     /**
+     * Extracts the test runner options from the config
+     * @param {Object} config
+     * @returns {Object}
+     */
+    const extractOptions = config => {
+        const {
+            fullPage = false,
+            readOnly = false,
+            showScore = false,
+            showCorrect = false,
+            pluginsOptions = {}
+        } = config;
+        return {fullPage, readOnly, showScore, showCorrect, plugins: pluginsOptions};
+    };
+
+    /**
      * Builds a component with test runner to review a test
      * @param {jQuery|HTMLElement|String} container - The container in which renders the component
      * @param {Object} [config] - The testRunner options
      * @param {Object[]} [config.plugins] - Additional plugins to load
      * @param {Object[]} [config.pluginsOptions] - Options for the plugins
-     * @param {String} [config.fullPage] - Force the review to occupy the full window.
-     * @param {String} [config.readOnly] - Do not allow to modify the reviewed item.
+     * @param {Boolean} [config.fullPage] - Force the review to occupy the full window.
+     * @param {Boolean} [config.readOnly] - Do not allow to modify the reviewed item.
+     * @param {Boolean} [config.showScore] - Allow to show the score.
+     * @param {Boolean} [config.showCorrect] - Allow to show the correct responses.
      * @param {Function} [template] - An optional template for the component
      * @returns {review}
      */
@@ -64,11 +82,7 @@ define([
                 },
                 plugins: config.plugins || []
             },
-            options: {
-                fullPage: config.fullPage,
-                readOnly: config.readOnly,
-                plugins: config.pluginsOptions
-            }
+            options: extractOptions(config)
         };
 
         //extra context config
@@ -76,9 +90,11 @@ define([
 
         return runnerComponentFactory(container, testRunnerConfig, template || runnerTpl)
             .on('render', function onComponentInit() {
-                const {fullPage, readOnly} = this.getConfig().options;
+                const {fullPage, readOnly, showScore, showCorrect} = this.getConfig().options;
                 this.setState('fullpage', fullPage);
                 this.setState('readonly', readOnly);
+                this.setState('showscore', showScore);
+                this.setState('showcorrect', showCorrect);
             })
             .on('ready', function onComponentReady(runner) {
                 runner.on('destroy', () => this.destroy());

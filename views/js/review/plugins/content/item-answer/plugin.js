@@ -79,10 +79,11 @@ define([
      */
     const setItemState = (name, testRunner) => {
         const itemRunner = testRunner.itemRunner;
+        const {showCorrect} = testRunner.getOptions();
         let response = null;
 
         if (itemRunner) {
-            if (name === 'correct') {
+            if (name === 'correct' && showCorrect) {
                 response = getItemCorrectResponse(testRunner);
             } else if (testRunner.getTestContext()) {
                 response = getItemResponse(testRunner);
@@ -116,7 +117,11 @@ define([
         render() {
             return promiseTimeout(new Promise(resolve => {
                 const testRunner = this.getTestRunner();
-                const itemAnswer = itemAnswerFactory(this.getAreaBroker().getArea('itemTool'));
+                const {showScore, showCorrect} = testRunner.getOptions();
+                const itemAnswer = itemAnswerFactory(
+                    this.getAreaBroker().getArea('itemTool'),
+                    Object.assign({showScore, showCorrect}, this.getConfig()),
+                );
 
                 // control the test runner from the review panel
                 itemAnswer

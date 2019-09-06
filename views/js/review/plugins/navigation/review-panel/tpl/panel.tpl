@@ -7,6 +7,7 @@
     {{/with}}
     </header>
 {{/if}}
+{{#if filters}}
     <ul class="review-panel-filters plain">
     {{#each filters}}
         <li class="review-panel-filter navigable" data-control="{{id}}">
@@ -14,6 +15,7 @@
         </li>
     {{/each}}
     </ul>
+{{/if}}
     <nav class="review-panel-content"></nav>
 {{#if footer}}
     <footer class="review-panel-footer">

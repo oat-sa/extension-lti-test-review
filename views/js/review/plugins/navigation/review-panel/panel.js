@@ -54,6 +54,7 @@ define([
     const defaults = {
         headerLabel: __('TEST SCORE:'),
         footerLabel: __('TOTAL'),
+        showScore: true,
         filters: [{
             id: 'all',
             label: __('All'),
@@ -150,6 +151,7 @@ define([
      * @param {Object} config
      * @param {String} [config.headerLabel] - Header label
      * @param {String} [config.footerLabel] - Footer label
+     * @param {Boolean} [config.showScore] - Show the score on the review panel. When disabled, the filters will also be.
      * @param {reviewPanelFilter[]} [config.filters] - The list of available filters
      * @param {testMap|null} map
      * @returns {component}
@@ -255,7 +257,7 @@ define([
              * @fires datachange
              */
             setData(newMap) {
-                data = reviewDataHelper.getReviewPanelMap(newMap);
+                data = reviewDataHelper.getReviewPanelMap(newMap, this.getConfig().showScore);
 
                 /**
                  * @event datachange
@@ -281,19 +283,21 @@ define([
              */
             setActiveFilter(filterId) {
                 const {filters} = this.getConfig();
-                const foundFilter = filters.find(filter => filter.id === filterId);
-                if (foundFilter && (!activeFilter || activeFilter.id !== filterId)) {
-                    activeFilter = foundFilter;
+                if (Array.isArray(filters)) {
+                    const foundFilter = filters.find(filter => filter.id === filterId);
+                    if (foundFilter && (!activeFilter || activeFilter.id !== filterId)) {
+                        activeFilter = foundFilter;
 
-                    if (this.is('rendered')) {
-                        selectFilter(filterId);
+                        if (this.is('rendered')) {
+                            selectFilter(filterId);
+                        }
+
+                        /**
+                         * @event filterchange
+                         * @param {String} filterId
+                         */
+                        this.trigger('filterchange', filterId);
                     }
-
-                    /**
-                     * @event filterchange
-                     * @param {String} filterId
-                     */
-                    this.trigger('filterchange', filterId);
                 }
 
                 return this;
@@ -486,6 +490,14 @@ define([
             // auto render on init
             .on('init', function onReviewPanelInit() {
                 const initConfig = this.getConfig();
+
+                // no header nor footer or filters when scores are disabled
+                if (!initConfig.showScore) {
+                    initConfig.headerLabel = false;
+                    initConfig.footerLabel = false;
+                    initConfig.filters = false;
+                }
+
                 const {headerLabel, footerLabel, filters} = initConfig;
 
                 // setup the header
@@ -507,6 +519,11 @@ define([
                 // select the first filter if none is active
                 if (!activeFilter && Array.isArray(filters)) {
                     activeFilter = filters.find(filter => filter.label);
+                }
+
+                // initialize the test map if supplied
+                if (map) {
+                    component.setData(map);
                 }
 
                 // auto render on init (defer the call to give a chance to the init event to be completed before)
@@ -569,7 +586,8 @@ define([
                 /**
                  * @event ready
                  */
-                this.setState('ready', true)
+                this.setState('show-score', this.getConfig().showScore)
+                    .setState('ready', true)
                     .trigger('ready');
             })
 
@@ -608,10 +626,6 @@ define([
         // initialize the component with the provided config
         // defer the call to allow to listen to the init event
         _.defer(() => component.init(config));
-
-        if (map) {
-            component.setData(map);
-        }
 
         return component;
     }

@@ -145,11 +145,11 @@
               "index": 4,
               "positionInPart": 3,
               "positionInSection": 3,
-              "score": 2,
+              "score": 0,
               "maxScore": 2
             }
           },
-          "score": 8,
+          "score": 6,
           "maxScore": 9,
           "stats": {
             "questions": 4,
@@ -260,7 +260,7 @@
           }
         }
       },
-      "score": 14,
+      "score": 12,
       "maxScore": 15,
       "stats": {
         "questions": 8,
@@ -272,7 +272,7 @@
       }
     }
   },
-  "score": 14,
+  "score": 12,
   "maxScore": 15,
   "stats": {
     "questions": 8,

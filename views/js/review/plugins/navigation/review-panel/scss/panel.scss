@@ -303,9 +303,14 @@ $incorrectColor: $error;
                 @include icon-info;
             }
         }
+        &.item-skipped {
+            .review-panel-label:before {
+                @include icon-radio;
+            }
+        }
         &.item-default {
             .review-panel-label:before {
-                @include icon-not-evaluated;
+                @include icon-radio-checked;
             }
         }
         &.item-correct {

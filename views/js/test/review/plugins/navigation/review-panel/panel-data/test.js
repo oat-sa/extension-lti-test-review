@@ -24,15 +24,19 @@ define([
     'taoReview/review/plugins/navigation/review-panel/panel-data',
     'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/map-correct.json',
     'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/map-incorrect.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/review-data-correct.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/review-data-incorrect.json'
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/review-data-correct-with-score.json',
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/review-data-incorrect-with-score.json',
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/review-data-correct-without-score.json',
+    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/review-data-incorrect-without-score.json'
 ], function (
     _,
     reviewDataHelper,
     testMapCorrect,
     testMapIncorrect,
-    reviewDataCorrect,
-    reviewDataIncorrect
+    reviewDataCorrectWithScore,
+    reviewDataIncorrectWithScore,
+    reviewDataCorrectWithoutScore,
+    reviewDataIncorrectWithoutScore
 ) {
     'use strict';
 
@@ -55,16 +59,28 @@ define([
     QUnit.module('API');
 
     QUnit.cases.init([{
-        title: 'correct',
+        title: 'correct, score enabled',
         testMap: testMapCorrect,
-        expected: reviewDataCorrect
+        withScore: true,
+        expected: reviewDataCorrectWithScore
     }, {
-        title: 'incorrect',
+        title: 'incorrect, score enabled',
         testMap: testMapIncorrect,
-        expected: reviewDataIncorrect
+        withScore: true,
+        expected: reviewDataIncorrectWithScore
+    }, {
+        title: 'correct, score disabled',
+        testMap: testMapCorrect,
+        withScore: false,
+        expected: reviewDataCorrectWithoutScore
+    }, {
+        title: 'incorrect, score disabled',
+        testMap: testMapIncorrect,
+        withScore: false,
+        expected: reviewDataIncorrectWithoutScore
     }]).test('getReviewPanelMap', (data, assert) => {
-        assert.expect(4);
-        const reviewData = reviewDataHelper.getReviewPanelMap(data.testMap);
+        assert.expect(_.size(data.expected) + 1);
+        const reviewData = reviewDataHelper.getReviewPanelMap(data.testMap, data.withScore);
         assert.equal(reviewData.items instanceof Map, true, 'The items collection is set');
         _.forEach(data.expected, (value, key) => {
             assert.deepEqual(reviewData[key], value, `The method getReviewPanelMap() returns the expected data for the key ${key}`);

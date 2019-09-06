@@ -45,7 +45,7 @@ define([
      * @param {String} fixture
      * @returns {runner}
      */
-    const getTestRunner = fixture => {
+    const getTestRunner = (fixture, config = {}) => {
         runnerFactory.registerProvider('mock', {
             loadAreaBroker() {
                 const $fixture = $(fixture);
@@ -71,7 +71,7 @@ define([
                 this.setTestMap(testMap);
             }
         });
-        return runnerFactory('mock', [reviewPanelPlugin]);
+        return runnerFactory('mock', [reviewPanelPlugin], config);
     };
 
     QUnit.module('Factory');
@@ -526,6 +526,66 @@ define([
                 assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
                 assert.equal($container.find('.review-panel-section').length, 2, 'The test sections are rendered');
                 assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
+            })
+            .then(() => new Promise(resolve => {
+                runner
+                    .on('destroy', resolve)
+                    .destroy();
+            }))
+            .then(() => {
+                assert.equal($container.find('.review-panel').length, 0, 'The component has been removed');
+                assert.equal($container.find('.review-panel-part').length, 0, 'The test parts have been removed');
+                assert.equal($container.find('.review-panel-section').length, 0, 'The test sections have been removed');
+                assert.equal($container.find('.review-panel-item').length, 0, 'The test items have been removed');
+            })
+            .catch(err => {
+                assert.ok(false, `Error in init method: ${err.message}`);
+            })
+            .then(ready);
+    });
+
+    QUnit.cases.init([{
+        title: 'enabled',
+        showScore: true
+    }, {
+        title: 'disabled',
+        showScore: false
+    }]).test('show score ', (data, assert) => {
+        assert.expect(13);
+        const ready = assert.async();
+        const runner = getTestRunner('#fixture-score', {options: {showScore: data.showScore}});
+        const areaBroker = runner.getAreaBroker();
+        const $container = areaBroker.getArea('panel');
+
+        Promise.resolve()
+            .then(() => new Promise(resolve => {
+                runner
+                    .on('ready', resolve)
+                    .on('move', (direction, scope, position) => {
+                        const item = mapHelper.getItemAt(runner.getTestMap(), position);
+                        if (item) {
+                            runner.loadItem(item.id);
+                        }
+                    })
+                    .init();
+            }))
+            .then(() => {
+                const plugin = runner.getPlugin('review-panel');
+                assert.ok(!!plugin, 'The plugin exists');
+                assert.equal(typeof plugin, 'object', 'The plugin is returned');
+                assert.equal($container.find('.review-panel').length, 1, 'The component has been inserted');
+                assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
+                assert.equal($container.find('.review-panel-content').children().length, 1, 'The content area is not empty');
+
+                assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
+                assert.equal($container.find('.review-panel-section').length, 2, 'The test sections are rendered');
+                assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
+
+                if (data.showScore) {
+                    assert.equal($container.find('.review-panel-score').length, 11, 'The score values are rendered');
+                } else {
+                    assert.equal($container.find('.review-panel-score').length, 0, 'No score values are rendered');
+                }
             })
             .then(() => new Promise(resolve => {
                 runner

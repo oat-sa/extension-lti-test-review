@@ -132,4 +132,68 @@ class DeliveryExecutionFinderServiceTest extends TestCase
 
         $this->subject->findDeliveryExecution($launchData);
     }
+
+    /**
+     * @dataProvider optionDataProvider
+     * @param $value
+     * @param $expected
+     * @throws \oat\taoLti\models\classes\LtiVariableMissingException
+     */
+    public function testGetShowScoreOption($value, $expected)
+    {
+        $sourceId = 'v5ba19e6ltos1lmljfv8fgnb07:::S3294476:::29123:::dyJ86SiwwA9';
+
+        $launchData = new LtiLaunchData(
+            [
+                DeliveryExecutionFinderService::LTI_SOURCE_ID => $sourceId,
+                DeliveryExecutionFinderService::OPTION_SHOW_SCORE => $value
+            ],
+            []
+        );
+
+
+        /** @var DeliveryExecution $deliveryExecution */
+        $result = $this->subject->getShowScoreOption($launchData);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @dataProvider optionDataProvider
+     * @param $value
+     * @param $expected
+     * @throws \oat\taoLti\models\classes\LtiVariableMissingException
+     */
+    public function testGetShowCorrectOption($value, $expected)
+    {
+        $sourceId = 'v5ba19e6ltos1lmljfv8fgnb07:::S3294476:::29123:::dyJ86SiwwA9';
+
+        $launchData = new LtiLaunchData(
+            [
+                DeliveryExecutionFinderService::LTI_SOURCE_ID => $sourceId,
+                DeliveryExecutionFinderService::OPTION_SHOW_CORRECT => $value
+            ],
+            []
+        );
+
+
+        /** @var DeliveryExecution $deliveryExecution */
+        $result = $this->subject->getShowCorrectOption($launchData);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function optionDataProvider() {
+        return [
+            ['', false],
+            ['0', false],
+            [0, false],
+            [false, false],
+
+            ['1', true],
+            [1, true],
+            ['true', true],
+            [true, true],
+        ];
+    }
 }

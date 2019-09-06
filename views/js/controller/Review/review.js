@@ -45,14 +45,15 @@ define([
         start() {
 
             const $container = $('.container');
-            const execution = $container.data('execution');
-            const delivery = $container.data('delivery');
+            const {execution, delivery, showScore, showCorrect} = $container.data();
 
             reviewFactory($(".content-wrap", document), {
                 testUri: {
                     resultId: execution,
                     deliveryUri: delivery
                 },
+                showScore,
+                showCorrect,
                 readOnly: true,
                 plugins: [{
                     module: 'taoReview/review/plugins/navigation/review-panel/plugin',

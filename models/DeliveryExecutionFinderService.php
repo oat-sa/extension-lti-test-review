@@ -19,6 +19,7 @@
 
 namespace oat\taoReview\models;
 
+use core_kernel_classes_Resource;
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
 use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
 use oat\oatbox\service\ConfigurableService;
@@ -53,9 +54,16 @@ class DeliveryExecutionFinderService extends ConfigurableService
         $launchDataService = $this->getLaunchDataService();
         $ltiResultIdStorage = $this->getLtiResultIdStorage();
 
-        $resultIdentifier = $launchData->hasVariable(self::LTI_SOURCE_ID)
-            ? $launchData->getVariable(self::LTI_SOURCE_ID)
-            : $launchDataService->findDeliveryExecutionFromLaunchData($launchData);
+        /** @var core_kernel_classes_Resource $execution */
+        $execution = $launchDataService->findDeliveryExecutionFromLaunchData($launchData);
+
+        if ($execution && $execution->exists()) {
+            $resultIdentifier = $execution->getUri();
+        } else {
+            $resultIdentifier = $launchData->hasVariable(self::LTI_SOURCE_ID)
+                ? $launchData->getVariable(self::LTI_SOURCE_ID)
+                : null;
+        }
 
         $deliveryExecutionId = $ltiResultIdStorage->getDeliveryExecutionId($resultIdentifier);
 
@@ -100,13 +108,7 @@ class DeliveryExecutionFinderService extends ConfigurableService
             ? $launchData->getVariable($option)
             : false;
 
-        if (is_numeric($value)) {
-            $value = (bool)intval($value);
-        } else if ($value == 'true') {
-            $value = true;
-        }
-
-        return $value;
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 
     protected function getLtiResultIdStorage(): LtiResultAliasStorage

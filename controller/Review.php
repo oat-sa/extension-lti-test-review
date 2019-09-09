@@ -105,7 +105,7 @@ class Review extends tao_actions_SinglePageModule
         $deliveryExecutionId = $params['serviceCallId'];
         $itemDefinition = $params['itemUri'];
 
-        /** @var DeliveryExecutionManagerService $des */
+        /** @var DeliveryExecutionManagerService $deManagerService */
         $deManagerService = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
         $execution = $deManagerService->getDeliveryExecutionById($deliveryExecutionId);
         $delivery = $execution->getDelivery();
@@ -113,11 +113,21 @@ class Review extends tao_actions_SinglePageModule
         $itemPreviewer = new ItemPreviewer();
         $itemPreviewer->setServiceLocator($this->getServiceLocator());
 
-        $response['content'] = $itemPreviewer->setItemDefinition($itemDefinition)
+        $itemPreviewer
+            ->setItemDefinition($itemDefinition)
             ->setUserLanguage($this->getUserLanguage($deliveryExecutionId, $delivery->getUri()))
-            ->setDelivery($delivery)
-            ->loadCompiledItemData();
+            ->setDelivery($delivery);
 
+        $itemData = $itemPreviewer->loadCompiledItemData();
+
+        if (!empty($itemData['data']['responses'])) {
+            $itemData['data']['responses'] = array_merge_recursive(...[
+                $itemData['data']['responses'],
+                $itemPreviewer->loadCompiledItemVariables()
+            ]);
+        }
+
+        $response['content'] = $itemData;
         $response['baseUrl'] = $itemPreviewer->getBaseUrl();
         $response['success'] = true;
 

@@ -109,9 +109,11 @@ class DeliveryExecutionFinderService extends ConfigurableService
             : false;
 
         if (is_numeric($value)) {
-            $value = (bool)intval($value);
-        } else if ($value == 'true') {
+            $value = (bool)(int)$value;
+        } else if ($value === 'true') {
             $value = true;
+        } else {
+            $value = false;
         }
 
         return $value;

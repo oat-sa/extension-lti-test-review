@@ -31,6 +31,7 @@ use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiService;
 use oat\taoLti\models\classes\LtiVariableMissingException;
+use oat\taoLti\models\classes\TaoLtiSession;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
@@ -46,6 +47,15 @@ class Review extends tao_actions_SinglePageModule
 {
     use OntologyAwareTrait;
 
+    /** @var TaoLtiSession */
+    private $ltiSession;
+
+    public function __construct() {
+        parent::__construct();
+
+        $this->ltiSession = LtiService::singleton()->getLtiSession();
+    }
+
     /**
      * @throws InvalidServiceManagerException
      * @throws LtiException
@@ -56,7 +66,7 @@ class Review extends tao_actions_SinglePageModule
      */
     public function index(): void
     {
-        $launchData = LtiService::singleton()->getLtiSession()->getLaunchData();
+        $launchData = $this->ltiSession->getLaunchData();
 
         /** @var DeliveryExecutionFinderService $finder */
         $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
@@ -87,7 +97,11 @@ class Review extends tao_actions_SinglePageModule
         $params = $this->getPsrRequest()->getQueryParams();
 
         if (isset($params['serviceCallId'])) {
-            $data = $dataBuilder->create()->build($params['serviceCallId']);
+
+            /** @var DeliveryExecutionFinderService $finder */
+            $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
+
+            $data = $dataBuilder->create()->build($params['serviceCallId'], $finder->getShowScoreOption($this->ltiSession->getLaunchData()));
         }
 
         $this->returnJson($data ?? []);
@@ -120,7 +134,12 @@ class Review extends tao_actions_SinglePageModule
 
         $itemData = $itemPreviewer->loadCompiledItemData();
 
-        if (!empty($itemData['data']['responses'])) {
+        /** @var DeliveryExecutionFinderService $finder */
+        $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
+
+        if (!empty($itemData['data']['responses'])
+            && $finder->getShowCorrectOption($this->ltiSession->getLaunchData())
+        ) {
             $itemData['data']['responses'] = array_merge_recursive(...[
                 $itemData['data']['responses'],
                 $itemPreviewer->loadCompiledItemVariables()

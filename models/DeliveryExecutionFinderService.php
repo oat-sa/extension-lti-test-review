@@ -108,15 +108,7 @@ class DeliveryExecutionFinderService extends ConfigurableService
             ? $launchData->getVariable($option)
             : false;
 
-        if (is_numeric($value)) {
-            $value = (bool)(int)$value;
-        } else if ($value === 'true') {
-            $value = true;
-        } else {
-            $value = false;
-        }
-
-        return $value;
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 
     protected function getLtiResultIdStorage(): LtiResultAliasStorage

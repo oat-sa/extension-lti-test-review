@@ -97,7 +97,11 @@ class Review extends tao_actions_SinglePageModule
         $params = $this->getPsrRequest()->getQueryParams();
 
         if (isset($params['serviceCallId'])) {
-            $data = $dataBuilder->create()->build($params['serviceCallId']);
+
+            /** @var DeliveryExecutionFinderService $finder */
+            $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
+
+            $data = $dataBuilder->create()->build($params['serviceCallId'], $finder->getShowScoreOption($this->ltiSession->getLaunchData()));
         }
 
         $this->returnJson($data ?? []);

@@ -120,7 +120,12 @@ class Review extends tao_actions_SinglePageModule
 
         $itemData = $itemPreviewer->loadCompiledItemData();
 
-        $itemData['data']['responses'] = $itemPreviewer->loadCompiledItemVariables();
+        if (!empty($itemData['data']['responses'])) {
+            $itemData['data']['responses'] = array_merge_recursive(...[
+                $itemData['data']['responses'],
+                $itemPreviewer->loadCompiledItemVariables()
+            ]);
+        }
 
         $response['content'] = $itemData;
         $response['baseUrl'] = $itemPreviewer->getBaseUrl();

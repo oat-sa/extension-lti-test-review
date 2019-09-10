@@ -1,5 +1,5 @@
 {
-  "name": "oat-sa/extension-tao-review",
+  "name": "oat-sa/extension-lti-test-review",
   "description": "Extension for reviewing passed tests, with the display of actual and correct answers.",
   "type": "tao-extension",
   "authors": [
@@ -16,7 +16,7 @@
     "GPL-2.0-only"
   ],
   "extra": {
-    "tao-extension-name": "taoReview"
+    "tao-extension-name": "ltiTestReview"
   },
   "minimum-stability": "dev",
   "require": {

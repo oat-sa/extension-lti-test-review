@@ -21,13 +21,13 @@
  */
 define([
     'lodash',
-    'taoReview/review/plugins/navigation/review-panel/panel-data',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/map-correct.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/map-incorrect.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/review-data-correct-with-score.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/review-data-incorrect-with-score.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/review-data-correct-without-score.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel-data/review-data-incorrect-without-score.json'
+    'ltiTestReview/review/plugins/navigation/review-panel/panel-data',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel-data/map-correct.json',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel-data/map-incorrect.json',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel-data/review-data-correct-with-score.json',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel-data/review-data-incorrect-with-score.json',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel-data/review-data-correct-without-score.json',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel-data/review-data-incorrect-without-score.json'
 ], function (
     _,
     reviewDataHelper,

@@ -17,7 +17,7 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  */
 
-namespace oat\taoReview\models;
+namespace oat\ltiTestReview\models;
 
 use core_kernel_classes_Resource;
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
@@ -32,11 +32,11 @@ use oat\taoLti\models\classes\LtiVariableMissingException;
 
 /**
  * Find delivery execution
- * @package oat\taoReview\models
+ * @package oat\ltiTestReview\models
  */
 class DeliveryExecutionFinderService extends ConfigurableService
 {
-    public const SERVICE_ID = 'taoReview/DeliveryExecutionFinderService';
+    public const SERVICE_ID = 'ltiTestReview/DeliveryExecutionFinderService';
 
     public const LTI_SOURCE_ID = 'lis_result_sourcedid';
     public const OPTION_SHOW_SCORE = 'custom_show_score';

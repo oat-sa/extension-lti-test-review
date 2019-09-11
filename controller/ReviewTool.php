@@ -17,7 +17,7 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  */
 
-namespace oat\taoReview\controller;
+namespace oat\ltiTestReview\controller;
 
 use oat\taoLti\controller\ToolModule;
 use oat\taoLti\models\classes\LtiException;
@@ -25,7 +25,7 @@ use oat\taoLti\models\classes\LtiMessages\LtiErrorMessage;
 
 /**
  * ReviewTool controller for managing LTI calls, used as entry point for LTI call and do redirect to proper application controller
- * @package oat\taoReview\controller
+ * @package oat\ltiTestReview\controller
  */
 class ReviewTool extends ToolModule
 {

@@ -31,8 +31,8 @@ define([
     'taoQtiTest/runner/ui/toolbox/toolbox',
     'taoQtiItem/runner/qtiItemRunner',
     'taoQtiTest/runner/config/assetManager',
-    'taoReview/review/services/navigator',
-    'tpl!taoReview/review/provider/tpl/qtiTestReviewProvider'
+    'ltiTestReview/review/services/navigator',
+    'tpl!ltiTestReview/review/provider/tpl/qtiTestReviewProvider'
 ], function (
     $,
     _,

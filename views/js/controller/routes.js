@@ -2,7 +2,7 @@ define({
     'Review' : {
         'actions' : {
             'index' : [
-                'taoReview/controller/Review/review'
+                'ltiTestReview/controller/Review/review'
             ]
         }
     }

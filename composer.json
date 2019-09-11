@@ -22,8 +22,8 @@
   },
   "autoload": {
     "psr-4": {
-      "oat\\taoReview\\": "",
-      "oat\\taoReview\\models\\": "models/"
+      "oat\\ltiTestReview\\": "",
+      "oat\\ltiTestReview\\models\\": "models/"
     }
   }
 }

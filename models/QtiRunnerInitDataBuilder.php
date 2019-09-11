@@ -18,7 +18,7 @@
  *
  */
 
-namespace oat\taoReview\models;
+namespace oat\ltiTestReview\models;
 
 use common_Exception;
 use oat\generis\model\OntologyAwareTrait;

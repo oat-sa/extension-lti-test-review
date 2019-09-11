@@ -26,7 +26,7 @@ define([
     'core/promiseQueue',
     'core/request',
     'core/communicator',
-    'taoReview/review/config/qtiTestReviewConfig'
+    'ltiTestReview/review/config/qtiTestReviewConfig'
 ], function (_, promiseQueue, coreRequest, communicatorFactory, configFactory) {
     'use strict';
 

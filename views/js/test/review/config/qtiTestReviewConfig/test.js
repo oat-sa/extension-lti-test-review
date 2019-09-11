@@ -22,7 +22,7 @@
 define([
     'lodash',
     'util/url',
-    'taoReview/review/config/qtiTestReviewConfig'
+    'ltiTestReview/review/config/qtiTestReviewConfig'
 ], function (_, urlUtil, reviewConfig) {
     'use strict';
 

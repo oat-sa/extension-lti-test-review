@@ -25,9 +25,9 @@ define([
     'taoTests/runner/runner',
     'taoTests/runner/areaBroker',
     'taoQtiTest/runner/helpers/map',
-    'taoReview/review/plugins/navigation/review-panel/plugin',
-    'tpl!taoReview/test/review/plugins/navigation/review-panel/plugin/layout',
-    'json!taoReview/test/review/plugins/navigation/review-panel/plugin/map.json'
+    'ltiTestReview/review/plugins/navigation/review-panel/plugin',
+    'tpl!ltiTestReview/test/review/plugins/navigation/review-panel/plugin/layout',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/plugin/map.json'
 ], function (
     $,
     _,

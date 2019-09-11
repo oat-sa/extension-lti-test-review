@@ -22,8 +22,8 @@ define([
     'lodash',
     'i18n',
     'ui/component',
-    'tpl!taoReview/review/plugins/navigation/next-prev/tpl/buttons',
-    'css!taoReview/review/plugins/navigation/next-prev/css/buttons'
+    'tpl!ltiTestReview/review/plugins/navigation/next-prev/tpl/buttons',
+    'css!ltiTestReview/review/plugins/navigation/next-prev/css/buttons'
 ], function (_, __, componentFactory, buttonsTpl) {
     'use strict';
 

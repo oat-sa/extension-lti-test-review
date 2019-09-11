@@ -1,3 +1,3 @@
 <?php
 
-return new \oat\taoReview\models\DeliveryExecutionFinderService();
+return new \oat\ltiTestReview\models\DeliveryExecutionFinderService();

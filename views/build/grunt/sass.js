@@ -26,9 +26,9 @@ module.exports = function (grunt) {
     let sass = grunt.config('sass') || {};
     let watch = grunt.config('watch') || {};
     let notify = grunt.config('notify') || {};
-    let root = grunt.option('root') + '/taoReview/views/';
+    let root = grunt.option('root') + '/ltiTestReview/views/';
 
-    sass.taoreview = {
+    sass.ltitestreview = {
         options : {},
         files : [{
             expand: true,
@@ -39,15 +39,15 @@ module.exports = function (grunt) {
         }]
     };
 
-    watch.taoreviewsass = {
+    watch.ltitestreviewsass = {
         files : [root + 'scss/**/*.scss'],
-        tasks : ['sass:taoreview', 'notify:taoreviewsass'],
+        tasks : ['sass:ltitestreview', 'notify:ltitestreviewsass'],
         options : {
             debounceDelay : 1000
         }
     };
 
-    notify.taoreviewsass = {
+    notify.ltitestreviewsass = {
         options: {
             title: 'Grunt SASS',
             message: 'SASS files compiled to CSS'
@@ -59,5 +59,5 @@ module.exports = function (grunt) {
     grunt.config('notify', notify);
 
     // Register an alias for main build
-    grunt.registerTask('taoreviewsass', ['sass:taoreview']);
+    grunt.registerTask('ltitestreviewsass', ['sass:ltitestreview']);
 };

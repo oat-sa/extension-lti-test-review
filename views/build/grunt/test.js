@@ -6,8 +6,8 @@ module.exports = function(grunt) {
     var testUrl     = 'http://127.0.0.1:' + grunt.option('testPort');
     var root        = grunt.option('root');
 
-    var testRunners = root + '/taoReview/views/js/test/**/test.html';
-    var testFiles = root + '/taoReview/views/js/test/**/test.js';
+    var testRunners = root + '/ltiTestReview/views/js/test/**/test.html';
+    var testFiles = root + '/ltiTestReview/views/js/test/**/test.js';
 
     //extract unit tests
     var extractTests = function extractTests(){
@@ -19,7 +19,7 @@ module.exports = function(grunt) {
     /**
      * tests to run
      */
-    qunit.taoreview = {
+    qunit.ltitestreview = {
         options : {
             console : true,
             urls : extractTests()
@@ -27,9 +27,9 @@ module.exports = function(grunt) {
     };
 
 
-    watch.taoreview = {
+    watch.ltitestreview = {
         files : [testRunners, testFiles],
-        tasks : ['qunit:taoreview'],
+        tasks : ['qunit:ltitestreview'],
         options : {
             debounceDelay : 10000
         }
@@ -39,5 +39,5 @@ module.exports = function(grunt) {
     grunt.config('watch', watch);
 
     // bundle task
-    grunt.registerTask('taoreviewtest', ['qunit:taoreview']);
+    grunt.registerTask('ltitestreviewtest', ['qunit:ltitestreview']);
 };

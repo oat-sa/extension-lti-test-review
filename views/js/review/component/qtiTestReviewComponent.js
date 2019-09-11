@@ -21,9 +21,9 @@
 define([
     'context',
     'taoTests/runner/runnerComponent',
-    'tpl!taoReview/review/component/tpl/qtiTestReviewComponent',
-    'css!taoReview/review/component/css/qtiTestReviewComponent',
-    'css!taoReview/review/provider/css/qtiTestReviewProvider'
+    'tpl!ltiTestReview/review/component/tpl/qtiTestReviewComponent',
+    'css!ltiTestReview/review/component/css/qtiTestReviewComponent',
+    'css!ltiTestReview/review/provider/css/qtiTestReviewProvider'
 ], function (context, runnerComponentFactory, runnerTpl) {
     'use strict';
 
@@ -64,14 +64,14 @@ define([
             providers: {
                 runner: {
                     id: 'qtiTestReviewProvider',
-                    module: 'taoReview/review/provider/qtiTestReviewProvider',
-                    bundle: 'taoReview/loader/qtiReview.min',
+                    module: 'ltiTestReview/review/provider/qtiTestReviewProvider',
+                    bundle: 'ltiTestReview/loader/qtiReview.min',
                     category: 'runner'
                 },
                 proxy: {
                     id: 'qtiTestReviewProxy',
-                    module: 'taoReview/review/proxy/qtiTestReviewProxy',
-                    bundle: 'taoReview/loader/qtiReview.min',
+                    module: 'ltiTestReview/review/proxy/qtiTestReviewProxy',
+                    bundle: 'ltiTestReview/loader/qtiReview.min',
                     category: 'proxy'
                 },
                 communicator: {

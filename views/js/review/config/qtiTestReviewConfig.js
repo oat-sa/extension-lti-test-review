@@ -36,7 +36,7 @@ define([
     const _defaults = {
         bootstrap: {
             serviceController: 'Review',
-            serviceExtension: 'taoReview'
+            serviceExtension: 'ltiTestReview'
         }
     };
 

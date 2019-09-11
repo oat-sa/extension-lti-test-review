@@ -18,7 +18,7 @@
  *
  */
 
-namespace oat\taoReview\models;
+namespace oat\ltiTestReview\models;
 
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDeliveryRdf\model\DeliveryContainerService;
@@ -29,7 +29,7 @@ use oat\taoResultServer\models\classes\ResultServerService;
 
 class QtiRunnerInitDataBuilderFactory extends ConfigurableService
 {
-    public const SERVICE_ID = 'taoReview/QtiRunnerInitDataBuilderFactory';
+    public const SERVICE_ID = 'ltiTestReview/QtiRunnerInitDataBuilderFactory';
 
     public function create(): QtiRunnerInitDataBuilder
     {

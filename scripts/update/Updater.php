@@ -17,7 +17,7 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  */
 
-namespace oat\taoReview\scripts\update;
+namespace oat\ltiTestReview\scripts\update;
 
 use common_Exception;
 use common_ext_ExtensionUpdater;
@@ -25,15 +25,15 @@ use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\accessControl\func\AclProxy;
 use oat\tao\model\user\TaoRoles;
 use oat\taoLti\models\classes\LtiRoles;
-use oat\taoReview\controller\Review;
-use oat\taoReview\controller\ReviewTool;
-use oat\taoReview\models\DeliveryExecutionFinderService;
-use oat\taoReview\models\QtiRunnerInitDataBuilderFactory;
-use oat\taoReview\models\QtiRunnerMapBuilderFactory;
+use oat\ltiTestReview\controller\Review;
+use oat\ltiTestReview\controller\ReviewTool;
+use oat\ltiTestReview\models\DeliveryExecutionFinderService;
+use oat\ltiTestReview\models\QtiRunnerInitDataBuilderFactory;
+use oat\ltiTestReview\models\QtiRunnerMapBuilderFactory;
 
 /**
  * Class Updater for updating the extension
- * @package oat\taoReview\scripts\update
+ * @package oat\ltiTestReview\scripts\update
  */
 class Updater extends common_ext_ExtensionUpdater
 {
@@ -48,7 +48,7 @@ class Updater extends common_ext_ExtensionUpdater
         if ($this->isVersion('0.1.0')) {
 
             AclProxy::applyRule(new AccessRule(AccessRule::GRANT,
-                'http://www.tao.lu/Ontologies/generis.rdf#taoReviewManager', ['ext' => 'taoReview']));
+                'http://www.tao.lu/Ontologies/generis.rdf#ltiTestReviewManager', ['ext' => 'ltiTestReview']));
             AclProxy::applyRule(new AccessRule(AccessRule::GRANT, TaoRoles::ANONYMOUS, ReviewTool::class));
             AclProxy::applyRule(new AccessRule(AccessRule::GRANT, LtiRoles::CONTEXT_LEARNER, Review::class));
 

@@ -25,7 +25,7 @@ define([
     'util/url',
     'core/communicator',
     'taoTests/runner/proxy',
-    'taoReview/review/proxy/qtiTestReviewProxy',
+    'ltiTestReview/review/proxy/qtiTestReviewProxy',
     'lib/jquery.mockjax/jquery.mockjax'
 ], function ($, _, urlUtil, communicatorFactory, proxyFactory, testProxy) {
     'use strict';

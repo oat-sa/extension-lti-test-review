@@ -1,3 +1,3 @@
 <?php
 
-return new \oat\taoReview\models\QtiRunnerInitDataBuilderFactory();
+return new \oat\ltiTestReview\models\QtiRunnerInitDataBuilderFactory();

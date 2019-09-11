@@ -22,7 +22,7 @@
 define([
     'jquery',
     'lodash',
-    'taoReview/review/plugins/content/item-answer/item-answer'
+    'ltiTestReview/review/plugins/content/item-answer/item-answer'
 ], function (
     $,
     _,

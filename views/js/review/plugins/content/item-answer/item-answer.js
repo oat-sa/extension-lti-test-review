@@ -24,9 +24,9 @@ define([
     'ui/component',
     'ui/tabs',
     'util/capitalize',
-    'tpl!taoReview/review/plugins/content/item-answer/tpl/item-answer',
-    'tpl!taoReview/review/plugins/content/item-answer/tpl/answer-tabs',
-    'css!taoReview/review/plugins/content/item-answer/css/item-answer'
+    'tpl!ltiTestReview/review/plugins/content/item-answer/tpl/item-answer',
+    'tpl!ltiTestReview/review/plugins/content/item-answer/tpl/answer-tabs',
+    'css!ltiTestReview/review/plugins/content/item-answer/css/item-answer'
 ], function (
     _,
     __,

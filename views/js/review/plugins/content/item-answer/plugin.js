@@ -24,7 +24,7 @@ define([
     'taoTests/runner/plugin',
     'taoQtiTest/runner/helpers/currentItem',
     'taoQtiTest/runner/helpers/map',
-    'taoReview/review/plugins/content/item-answer/item-answer'
+    'ltiTestReview/review/plugins/content/item-answer/item-answer'
 ], function (
     _,
     promiseTimeout,

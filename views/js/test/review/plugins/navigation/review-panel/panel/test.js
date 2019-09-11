@@ -23,13 +23,13 @@ define([
     'jquery',
     'lodash',
     'i18n',
-    'taoReview/review/plugins/navigation/review-panel/panel',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel/map-correct.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel/map-incorrect.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel/map-incorrect-filtered.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data-correct.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data-incorrect.json',
-    'json!taoReview/test/review/plugins/navigation/review-panel/panel/review-data-incorrect-filtered.json'
+    'ltiTestReview/review/plugins/navigation/review-panel/panel',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel/map-correct.json',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel/map-incorrect.json',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel/map-incorrect-filtered.json',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel/review-data-correct.json',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel/review-data-incorrect.json',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel/review-data-incorrect-filtered.json'
 ], function (
     $,
     _,

@@ -17,7 +17,7 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  */
 
-namespace oat\taoReview\test\unit\model;
+namespace oat\ltiTestReview\test\unit\model;
 
 use core_kernel_classes_Resource;
 use oat\generis\test\TestCase;
@@ -28,7 +28,7 @@ use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiLaunchData;
-use oat\taoReview\models\DeliveryExecutionFinderService;
+use oat\ltiTestReview\models\DeliveryExecutionFinderService;
 use PHPUnit_Framework_MockObject_MockObject;
 
 class DeliveryExecutionFinderServiceTest extends TestCase

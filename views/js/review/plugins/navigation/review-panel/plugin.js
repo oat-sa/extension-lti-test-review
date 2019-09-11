@@ -21,8 +21,8 @@
 define([
     'core/promiseTimeout',
     'taoTests/runner/plugin',
-    'taoReview/review/services/navigation-data',
-    'taoReview/review/plugins/navigation/review-panel/panel'
+    'ltiTestReview/review/services/navigation-data',
+    'ltiTestReview/review/plugins/navigation/review-panel/panel'
 ], function (
     promiseTimeout,
     pluginFactory,

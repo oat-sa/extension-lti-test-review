@@ -19,7 +19,7 @@
  *
  */
 
-namespace oat\taoReview\controller;
+namespace oat\ltiTestReview\controller;
 
 use common_Exception;
 use common_exception_Error;
@@ -35,13 +35,13 @@ use oat\taoLti\models\classes\TaoLtiSession;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
-use oat\taoReview\models\DeliveryExecutionFinderService;
-use oat\taoReview\models\QtiRunnerInitDataBuilderFactory;
+use oat\ltiTestReview\models\DeliveryExecutionFinderService;
+use oat\ltiTestReview\models\QtiRunnerInitDataBuilderFactory;
 use tao_actions_SinglePageModule;
 
 /**
  * Review controller class thar provides data for js-application
- * @package oat\taoReview\controller
+ * @package oat\ltiTestReview\controller
  */
 class Review extends tao_actions_SinglePageModule
 {

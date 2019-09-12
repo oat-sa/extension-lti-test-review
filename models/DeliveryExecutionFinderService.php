@@ -39,8 +39,10 @@ class DeliveryExecutionFinderService extends ConfigurableService
     public const SERVICE_ID = 'ltiTestReview/DeliveryExecutionFinderService';
 
     public const LTI_SOURCE_ID = 'lis_result_sourcedid';
-    public const OPTION_SHOW_SCORE = 'custom_show_score';
-    public const OPTION_SHOW_CORRECT = 'custom_show_correct';
+    public const OPTION_SHOW_SCORE = 'show_score';
+    public const OPTION_SHOW_CORRECT = 'show_correct';
+    public const LTI_SHOW_SCORE = 'custom_show_score';
+    public const LTI_SHOW_CORRECT = 'custom_show_correct';
 
     /**
      * @param LtiLaunchData $launchData
@@ -82,7 +84,7 @@ class DeliveryExecutionFinderService extends ConfigurableService
      */
     public function getShowScoreOption(LtiLaunchData $launchData): bool
     {
-        return $this->getBooleanOption($launchData, self::OPTION_SHOW_SCORE);
+        return $this->getBooleanOption($launchData, self::LTI_SHOW_SCORE, self::OPTION_SHOW_SCORE);
     }
     
     /**
@@ -93,21 +95,24 @@ class DeliveryExecutionFinderService extends ConfigurableService
      */
     public function getShowCorrectOption(LtiLaunchData $launchData): bool
     {
-        return $this->getBooleanOption($launchData, self::OPTION_SHOW_CORRECT);
+        return $this->getBooleanOption($launchData, self::LTI_SHOW_CORRECT, self::OPTION_SHOW_CORRECT);
     }
 
     /**
      * @param LtiLaunchData $launchData
+     * @param string $variable
      * @param string $option
      * @return bool
      * @throws LtiVariableMissingException
      */
-    protected function getBooleanOption(LtiLaunchData $launchData, string $option): bool
+    protected function getBooleanOption(LtiLaunchData $launchData, string $variable, string $option): bool
     {
-        $value = $launchData->hasVariable($option)
-            ? $launchData->getVariable($option)
+        $default = $this->hasOption($option)
+            ? $this->getOption($option)
             : false;
-
+        $value = $launchData->hasVariable($variable)
+            ? $launchData->getVariable($variable)
+            : $default;
         return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 

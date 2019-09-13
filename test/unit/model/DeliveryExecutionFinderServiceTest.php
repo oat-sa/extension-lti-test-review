@@ -143,16 +143,27 @@ class DeliveryExecutionFinderServiceTest extends TestCase
     {
         $sourceId = 'v5ba19e6ltos1lmljfv8fgnb07:::S3294476:::29123:::dyJ86SiwwA9';
 
+        // check option passed through LTI
         $launchData = new LtiLaunchData(
             [
                 DeliveryExecutionFinderService::LTI_SOURCE_ID => $sourceId,
-                DeliveryExecutionFinderService::OPTION_SHOW_SCORE => $value
+                DeliveryExecutionFinderService::LTI_SHOW_SCORE => $value
             ],
             []
         );
 
+        $result = $this->subject->getShowScoreOption($launchData);
 
-        /** @var DeliveryExecution $deliveryExecution */
+        $this->assertEquals($expected, $result);
+
+        // check default option value
+        $launchData = new LtiLaunchData(
+            [DeliveryExecutionFinderService::LTI_SOURCE_ID => $sourceId],
+            []
+        );
+
+        $this->subject->setOption(DeliveryExecutionFinderService::OPTION_SHOW_SCORE, $value);
+
         $result = $this->subject->getShowScoreOption($launchData);
 
         $this->assertEquals($expected, $result);
@@ -168,16 +179,27 @@ class DeliveryExecutionFinderServiceTest extends TestCase
     {
         $sourceId = 'v5ba19e6ltos1lmljfv8fgnb07:::S3294476:::29123:::dyJ86SiwwA9';
 
+        // check option passed through LTI
         $launchData = new LtiLaunchData(
             [
                 DeliveryExecutionFinderService::LTI_SOURCE_ID => $sourceId,
-                DeliveryExecutionFinderService::OPTION_SHOW_CORRECT => $value
+                DeliveryExecutionFinderService::LTI_SHOW_CORRECT => $value
             ],
             []
         );
 
+        $result = $this->subject->getShowCorrectOption($launchData);
 
-        /** @var DeliveryExecution $deliveryExecution */
+        $this->assertEquals($expected, $result);
+
+        // check default option value
+        $launchData = new LtiLaunchData(
+            [DeliveryExecutionFinderService::LTI_SOURCE_ID => $sourceId],
+            []
+        );
+
+        $this->subject->setOption(DeliveryExecutionFinderService::OPTION_SHOW_CORRECT, $value);
+
         $result = $this->subject->getShowCorrectOption($launchData);
 
         $this->assertEquals($expected, $result);

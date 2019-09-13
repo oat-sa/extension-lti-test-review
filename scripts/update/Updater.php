@@ -69,5 +69,17 @@ class Updater extends common_ext_ExtensionUpdater
         }
 
         $this->skip('0.6.0', '1.11.0');
+
+        if ($this->isVersion('1.11.0')) {
+
+            $serviceManager = $this->getServiceManager();
+
+            $serviceManager->register(DeliveryExecutionFinderService::SERVICE_ID, new DeliveryExecutionFinderService([
+                DeliveryExecutionFinderService::OPTION_SHOW_CORRECT => false,
+                DeliveryExecutionFinderService::OPTION_SHOW_SCORE => false
+            ]));
+
+            $this->setVersion('1.12.0');
+        }
     }
 }

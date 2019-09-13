@@ -22,18 +22,18 @@
 define([
     'jquery',
     'lodash',
-    'taoReview/review/component/qtiTestReviewComponent',
-    'taoReview/review/plugins/navigation/next-prev/plugin',
-    'json!taoReview/test/mocks/item-1.json',
-    'json!taoReview/test/mocks/item-2.json',
-    'json!taoReview/test/mocks/item-3.json',
-    'json!taoReview/test/mocks/item-4.json',
-    'json!taoReview/test/mocks/testData.json',
-    'json!taoReview/test/mocks/testContext.json',
-    'json!taoReview/test/mocks/testMap.json',
-    'json!taoReview/test/mocks/testResponses.json',
+    'ltiTestReview/review/component/qtiTestReviewComponent',
+    'ltiTestReview/review/plugins/navigation/next-prev/plugin',
+    'json!ltiTestReview/test/mocks/item-1.json',
+    'json!ltiTestReview/test/mocks/item-2.json',
+    'json!ltiTestReview/test/mocks/item-3.json',
+    'json!ltiTestReview/test/mocks/item-4.json',
+    'json!ltiTestReview/test/mocks/testData.json',
+    'json!ltiTestReview/test/mocks/testContext.json',
+    'json!ltiTestReview/test/mocks/testMap.json',
+    'json!ltiTestReview/test/mocks/testResponses.json',
     'lib/jquery.mockjax/jquery.mockjax',
-    'css!taoReview/review/provider/css/qtiTestReviewProvider'
+    'css!ltiTestReview/review/provider/css/qtiTestReviewProvider'
 ], function (
     $,
     _,
@@ -53,8 +53,8 @@ define([
     const componentConfig = {
         serviceCallId: 'foo',
         plugins: [{
-            module: 'taoReview/review/plugins/navigation/next-prev/plugin',
-            bundle: 'taoReview/loader/qtiReview.min',
+            module: 'ltiTestReview/review/plugins/navigation/next-prev/plugin',
+            bundle: 'ltiTestReview/loader/qtiReview.min',
             category: 'navigation'
         }]
     };

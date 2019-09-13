@@ -17,8 +17,9 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  */
 
-namespace oat\taoReview\models;
+namespace oat\ltiTestReview\models;
 
+use core_kernel_classes_Resource;
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
 use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
 use oat\oatbox\service\ConfigurableService;
@@ -31,13 +32,17 @@ use oat\taoLti\models\classes\LtiVariableMissingException;
 
 /**
  * Find delivery execution
- * @package oat\taoReview\models
+ * @package oat\ltiTestReview\models
  */
 class DeliveryExecutionFinderService extends ConfigurableService
 {
-    public const SERVICE_ID = 'taoReview/DeliveryExecutionFinderService';
+    public const SERVICE_ID = 'ltiTestReview/DeliveryExecutionFinderService';
 
     public const LTI_SOURCE_ID = 'lis_result_sourcedid';
+    public const OPTION_SHOW_SCORE = 'show_score';
+    public const OPTION_SHOW_CORRECT = 'show_correct';
+    public const LTI_SHOW_SCORE = 'custom_show_score';
+    public const LTI_SHOW_CORRECT = 'custom_show_correct';
 
     /**
      * @param LtiLaunchData $launchData
@@ -51,9 +56,16 @@ class DeliveryExecutionFinderService extends ConfigurableService
         $launchDataService = $this->getLaunchDataService();
         $ltiResultIdStorage = $this->getLtiResultIdStorage();
 
-        $resultIdentifier = $launchData->hasVariable(self::LTI_SOURCE_ID)
-            ? $launchData->getVariable(self::LTI_SOURCE_ID)
-            : $launchDataService->findDeliveryExecutionFromLaunchData($launchData);
+        /** @var core_kernel_classes_Resource $execution */
+        $execution = $launchDataService->findDeliveryExecutionFromLaunchData($launchData);
+
+        if ($execution && $execution->exists()) {
+            $resultIdentifier = $execution->getUri();
+        } else {
+            $resultIdentifier = $launchData->hasVariable(self::LTI_SOURCE_ID)
+                ? $launchData->getVariable(self::LTI_SOURCE_ID)
+                : null;
+        }
 
         $deliveryExecutionId = $ltiResultIdStorage->getDeliveryExecutionId($resultIdentifier);
 
@@ -62,6 +74,46 @@ class DeliveryExecutionFinderService extends ConfigurableService
         }
 
         return $this->getExecutionServiceProxy()->getDeliveryExecution($deliveryExecutionId);
+    }
+    
+    /**
+     * @param LtiLaunchData $launchData
+     *
+     * @return bool
+     * @throws LtiVariableMissingException
+     */
+    public function getShowScoreOption(LtiLaunchData $launchData): bool
+    {
+        return $this->getBooleanOption($launchData, self::LTI_SHOW_SCORE, self::OPTION_SHOW_SCORE);
+    }
+    
+    /**
+     * @param LtiLaunchData $launchData
+     *
+     * @return bool
+     * @throws LtiVariableMissingException
+     */
+    public function getShowCorrectOption(LtiLaunchData $launchData): bool
+    {
+        return $this->getBooleanOption($launchData, self::LTI_SHOW_CORRECT, self::OPTION_SHOW_CORRECT);
+    }
+
+    /**
+     * @param LtiLaunchData $launchData
+     * @param string $variable
+     * @param string $option
+     * @return bool
+     * @throws LtiVariableMissingException
+     */
+    protected function getBooleanOption(LtiLaunchData $launchData, string $variable, string $option): bool
+    {
+        $default = $this->hasOption($option)
+            ? $this->getOption($option)
+            : false;
+        $value = $launchData->hasVariable($variable)
+            ? $launchData->getVariable($variable)
+            : $default;
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 
     protected function getLtiResultIdStorage(): LtiResultAliasStorage

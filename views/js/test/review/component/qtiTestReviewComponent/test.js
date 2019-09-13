@@ -22,15 +22,15 @@
 define([
     'jquery',
     'lodash',
-    'taoReview/review/component/qtiTestReviewComponent',
-    'json!taoReview/test/mocks/item-1.json',
-    'json!taoReview/test/mocks/item-2.json',
-    'json!taoReview/test/mocks/item-3.json',
-    'json!taoReview/test/mocks/item-4.json',
-    'json!taoReview/test/mocks/testData.json',
-    'json!taoReview/test/mocks/testContext.json',
-    'json!taoReview/test/mocks/testMap.json',
-    'json!taoReview/test/mocks/testResponses.json',
+    'ltiTestReview/review/component/qtiTestReviewComponent',
+    'json!ltiTestReview/test/mocks/item-1.json',
+    'json!ltiTestReview/test/mocks/item-2.json',
+    'json!ltiTestReview/test/mocks/item-3.json',
+    'json!ltiTestReview/test/mocks/item-4.json',
+    'json!ltiTestReview/test/mocks/testData.json',
+    'json!ltiTestReview/test/mocks/testContext.json',
+    'json!ltiTestReview/test/mocks/testMap.json',
+    'json!ltiTestReview/test/mocks/testResponses.json',
     'lib/jquery.mockjax/jquery.mockjax'
 ], function (
     $,
@@ -107,21 +107,126 @@ define([
             testContext: testContext,
             testMap: testMap,
             testResponses: testResponses
+        },
+        config: {},
+        expected: {
+            fullPage: false,
+            readOnly: false,
+            showScore: false,
+            showCorrect: false,
+            plugins: {}
         }
     }, {
         title: 'manual load',
         itemIdentifier: 'item-3',
+        config: {
+            itemUri: 'item-3'
+        },
         initData: {
             success: true
+        },
+        expected: {
+            fullPage: false,
+            readOnly: false,
+            showScore: false,
+            showCorrect: false,
+            plugins: {}
+        }
+    }, {
+        title: 'read only',
+        itemIdentifier: 'item-3',
+        config: {
+            itemUri: 'item-3',
+            readOnly: true
+        },
+        initData: {
+            success: true
+        }
+        ,
+        expected: {
+            fullPage: false,
+            readOnly: true,
+            showScore: false,
+            showCorrect: false,
+            plugins: {}
+        }
+    }, {
+        title: 'full page',
+        itemIdentifier: 'item-3',
+        config: {
+            itemUri: 'item-3',
+            fullPage: true
+        },
+        initData: {
+            success: true
+        },
+        expected: {
+            fullPage: true,
+            readOnly: false,
+            showScore: false,
+            showCorrect: false,
+            plugins: {}
+        }
+    }, {
+        title: 'show score',
+        itemIdentifier: 'item-3',
+        config: {
+            itemUri: 'item-3',
+            showScore: true
+        },
+        initData: {
+            success: true
+        },
+        expected: {
+            fullPage: false,
+            readOnly: false,
+            showScore: true,
+            showCorrect: false,
+            plugins: {}
+        }
+    }, {
+        title: 'show correct',
+        itemIdentifier: 'item-3',
+        config: {
+            itemUri: 'item-3',
+            showCorrect: true
+        },
+        initData: {
+            success: true
+        },
+        expected: {
+            fullPage: false,
+            readOnly: false,
+            showScore: false,
+            showCorrect: true,
+            plugins: {}
+        }
+    }, {
+        title: 'plugins options',
+        itemIdentifier: 'item-3',
+        config: {
+            itemUri: 'item-3',
+            pluginsOptions: {
+                foo: 'bar'
+            }
+        },
+        initData: {
+            success: true
+        },
+        expected: {
+            fullPage: false,
+            readOnly: false,
+            showScore: false,
+            showCorrect: false,
+            plugins: {
+                foo: 'bar'
+            }
         }
     }]).test('render item ', (data, assert) => {
         const ready = assert.async();
         const $container = $('#fixture-render');
-        const config = {
-            itemUri: data.itemIdentifier
-        };
 
-        assert.expect(1);
+        assert.expect(13);
 
         $.mockjax([{
             url: '/init*',
@@ -139,7 +244,7 @@ define([
             }
         }]);
 
-        qtiTestReviewFactory($container, config)
+        qtiTestReviewFactory($container, data.config)
             .on('error', err => {
                 assert.pushResult({
                     result: false,
@@ -147,9 +252,25 @@ define([
                 });
                 ready();
             })
-            .on('ready', runner => {
+            .on('ready', function(runner) {
                 runner.after('renderitem', () => {
                     assert.ok(true, 'The review has been rendered');
+
+                    assert.strictEqual(runner.getOptions().fullPage, data.expected.fullPage, 'The full page option is set accordingly');
+                    assert.strictEqual(runner.getOptions().readOnly, data.expected.readOnly, 'The read only option is set accordingly');
+                    assert.strictEqual(runner.getOptions().readOnly, data.expected.readOnly, 'The read only option is set accordingly');
+                    assert.deepEqual(runner.getOptions().plugins, data.expected.plugins, 'The plugins options are set accordingly');
+
+                    assert.strictEqual(this.is('fullpage'), data.expected.fullPage, 'The full page state is set accordingly');
+                    assert.strictEqual(this.is('readonly'), data.expected.readOnly, 'The read only state is set accordingly');
+                    assert.strictEqual(this.is('showscore'), data.expected.showScore, 'The show score state is set accordingly');
+                    assert.strictEqual(this.is('showcorrect'), data.expected.showCorrect, 'The show correct state is set accordingly');
+
+                    assert.strictEqual($container.children().is('.fullpage'), data.expected.fullPage, 'The full page class is set accordingly');
+                    assert.strictEqual($container.children().is('.readonly'), data.expected.readOnly, 'The read only class is set accordingly');
+                    assert.strictEqual($container.children().is('.showscore'), data.expected.showScore, 'The show score class is set accordingly');
+                    assert.strictEqual($container.children().is('.showcorrect'), data.expected.showCorrect, 'The show correct class is set accordingly');
+
                     runner.destroy();
                 });
 
@@ -201,17 +322,19 @@ define([
             itemUri: 'item-1',
             fullPage: false,
             readOnly: true,
+            showScore: true,
+            showCorrect: true,
             plugins: [{
-                module: 'taoReview/review/plugins/navigation/review-panel/plugin',
-                bundle: 'taoReview/loader/qtiReview.min',
+                module: 'ltiTestReview/review/plugins/navigation/review-panel/plugin',
+                bundle: 'ltiTestReview/loader/qtiReview.min',
                 category: 'navigation'
             }, {
-                module: 'taoReview/review/plugins/navigation/next-prev/plugin',
-                bundle: 'taoReview/loader/qtiReview.min',
+                module: 'ltiTestReview/review/plugins/navigation/next-prev/plugin',
+                bundle: 'ltiTestReview/loader/qtiReview.min',
                 category: 'navigation'
             }, {
-                module: 'taoReview/review/plugins/content/item-answer/plugin',
-                bundle: 'taoReview/loader/qtiReview.min',
+                module: 'ltiTestReview/review/plugins/content/item-answer/plugin',
+                bundle: 'ltiTestReview/loader/qtiReview.min',
                 category: 'content'
             }]
         };

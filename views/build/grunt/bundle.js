@@ -25,16 +25,16 @@ module.exports = function(grunt) {
 
     grunt.config.merge({
         bundle : {
-            taoreview : {
+            ltitestreview : {
                 options : {
-                    extension : 'taoReview',
+                    extension : 'ltiTestReview',
                     outputDir : 'loader',
                     dependencies : ['taoItems', 'taoQtiItem', 'taoTests', 'taoQtiTest', 'taoQtiTestPreviewer'],
                     bundles : [{
                         name : 'qtiReview',
                         babel : true,
                         include : [
-                            'taoReview/review/**/*'
+                            'ltiTestReview/review/**/*'
                         ],
                         dependencies : [
                             'taoItems/loader/taoItemsRunner.min',
@@ -51,5 +51,5 @@ module.exports = function(grunt) {
     });
 
     // bundle task
-    grunt.registerTask('taoreviewbundle', ['bundle:taoreview']);
+    grunt.registerTask('ltitestreviewbundle', ['bundle:ltitestreview']);
 };

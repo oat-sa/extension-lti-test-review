@@ -1,16 +1,16 @@
-# Extension taoReview
+# Extension ltiTestReview
 
 Extension for reviewing passed tests, with the display of actual and correct answers, as well as the number of points for each answer.
 
 ### Usage
 
-Run `composer require "oat-sa/extension-tao-review"` for including the code to the project and install extension using extension manager or with CLI `php tao/scripts/installExtension.php taoReview`. 
+Run `composer require "oat-sa/extension-lti-test-review"` for including the code to the project and install extension using extension manager or with CLI `php tao/scripts/installExtension.php ltiTestReview`. 
 
 ### LTI calls
 
 To run review of specific delivery execution use the next endpoint:
 ```
-https://YOUR_DOMAIN/taoReview/ReviewTool/launch?execution=YOUR_DELIVERY_EXECUTION_URI
+https://YOUR_DOMAIN/ltiTestReview/ReviewTool/launch?execution=YOUR_DELIVERY_EXECUTION_URI
 ```
 
-Endpoint without `execution` parameter (`https://YOUR_DOMAIN/taoReview/ReviewTool/launch`) will use `lis_result_sourcedid` field from lauch data to determine delivery execution.
+Endpoint without `execution` parameter (`https://YOUR_DOMAIN/ltiTestReview/ReviewTool/launch`) will use `lis_result_sourcedid` field from lauch data to determine delivery execution.

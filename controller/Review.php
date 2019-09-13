@@ -19,7 +19,7 @@
  *
  */
 
-namespace oat\taoReview\controller;
+namespace oat\ltiTestReview\controller;
 
 use common_Exception;
 use common_exception_Error;
@@ -31,20 +31,30 @@ use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiService;
 use oat\taoLti\models\classes\LtiVariableMissingException;
+use oat\taoLti\models\classes\TaoLtiSession;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
-use oat\taoReview\models\DeliveryExecutionFinderService;
-use oat\taoReview\models\QtiRunnerInitDataBuilderFactory;
+use oat\ltiTestReview\models\DeliveryExecutionFinderService;
+use oat\ltiTestReview\models\QtiRunnerInitDataBuilderFactory;
 use tao_actions_SinglePageModule;
 
 /**
  * Review controller class thar provides data for js-application
- * @package oat\taoReview\controller
+ * @package oat\ltiTestReview\controller
  */
 class Review extends tao_actions_SinglePageModule
 {
     use OntologyAwareTrait;
+
+    /** @var TaoLtiSession */
+    private $ltiSession;
+
+    public function __construct() {
+        parent::__construct();
+
+        $this->ltiSession = LtiService::singleton()->getLtiSession();
+    }
 
     /**
      * @throws InvalidServiceManagerException
@@ -56,7 +66,7 @@ class Review extends tao_actions_SinglePageModule
      */
     public function index(): void
     {
-        $launchData = LtiService::singleton()->getLtiSession()->getLaunchData();
+        $launchData = $this->ltiSession->getLaunchData();
 
         /** @var DeliveryExecutionFinderService $finder */
         $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
@@ -67,6 +77,8 @@ class Review extends tao_actions_SinglePageModule
         $data = [
             'execution' => $execution->getUri(),
             'delivery'  => $delivery->getUri(),
+            'show-score' => $finder->getShowScoreOption($launchData),
+            'show-correct' => $finder->getShowCorrectOption($launchData)
         ];
 
         $this->composeView('delegated-view', $data, 'pages/index.tpl', 'tao');
@@ -85,7 +97,11 @@ class Review extends tao_actions_SinglePageModule
         $params = $this->getPsrRequest()->getQueryParams();
 
         if (isset($params['serviceCallId'])) {
-            $data = $dataBuilder->create()->build($params['serviceCallId']);
+
+            /** @var DeliveryExecutionFinderService $finder */
+            $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
+
+            $data = $dataBuilder->create()->build($params['serviceCallId'], $finder->getShowScoreOption($this->ltiSession->getLaunchData()));
         }
 
         $this->returnJson($data ?? []);
@@ -103,7 +119,7 @@ class Review extends tao_actions_SinglePageModule
         $deliveryExecutionId = $params['serviceCallId'];
         $itemDefinition = $params['itemUri'];
 
-        /** @var DeliveryExecutionManagerService $des */
+        /** @var DeliveryExecutionManagerService $deManagerService */
         $deManagerService = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
         $execution = $deManagerService->getDeliveryExecutionById($deliveryExecutionId);
         $delivery = $execution->getDelivery();
@@ -111,11 +127,26 @@ class Review extends tao_actions_SinglePageModule
         $itemPreviewer = new ItemPreviewer();
         $itemPreviewer->setServiceLocator($this->getServiceLocator());
 
-        $response['content'] = $itemPreviewer->setItemDefinition($itemDefinition)
+        $itemPreviewer
+            ->setItemDefinition($itemDefinition)
             ->setUserLanguage($this->getUserLanguage($deliveryExecutionId, $delivery->getUri()))
-            ->setDelivery($delivery)
-            ->loadCompiledItemData();
+            ->setDelivery($delivery);
 
+        $itemData = $itemPreviewer->loadCompiledItemData();
+
+        /** @var DeliveryExecutionFinderService $finder */
+        $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
+
+        if (!empty($itemData['data']['responses'])
+            && $finder->getShowCorrectOption($this->ltiSession->getLaunchData())
+        ) {
+            $itemData['data']['responses'] = array_merge_recursive(...[
+                $itemData['data']['responses'],
+                $itemPreviewer->loadCompiledItemVariables()
+            ]);
+        }
+
+        $response['content'] = $itemData;
         $response['baseUrl'] = $itemPreviewer->getBaseUrl();
         $response['success'] = true;
 

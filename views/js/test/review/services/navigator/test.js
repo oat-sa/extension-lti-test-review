@@ -20,10 +20,10 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 define([
-    'taoReview/review/services/navigator',
-    'json!taoReview/test/review/services/navigator/testMap.json',
-    'json!taoReview/test/review/services/navigator/testMapFiltered.json',
-    'json!taoReview/test/review/services/navigator/testContexts.json'
+    'ltiTestReview/review/services/navigator',
+    'json!ltiTestReview/test/review/services/navigator/testMap.json',
+    'json!ltiTestReview/test/review/services/navigator/testMapFiltered.json',
+    'json!ltiTestReview/test/review/services/navigator/testContexts.json'
 ], function (testNavigator, testMap, testMapFiltered, testContexts) {
     'use strict';
 

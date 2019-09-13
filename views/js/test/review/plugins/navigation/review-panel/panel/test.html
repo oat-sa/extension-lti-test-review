@@ -26,7 +26,7 @@
                 });
 
                 //load the test
-                require(['taoReview/test/review/plugins/navigation/review-panel/panel/test'], function () {
+                require(['ltiTestReview/test/review/plugins/navigation/review-panel/panel/test'], function () {
 
                     //Tests loaded, run tests
                     QUnit.start();
@@ -50,6 +50,9 @@
                 line-height: 40px;
                 flex: 0 0 auto;
                 text-align: center;
+            }
+            #visual-test .controls  {
+                margin: 0 20px;
             }
             #visual-test .content {
                 background-color: white;
@@ -90,8 +93,14 @@
         </div>
         <div id="visual-test">
             <div class="header">
-                <button class="small" data-control="correct">Correct</button>
-                <button class="small" data-control="incorrect">Incorrect</button>
+                <span class="controls state">
+                    <button class="small" data-control="correct">Correct</button>
+                    <button class="small" data-control="incorrect">Incorrect</button>
+                </span>
+                <span class="controls score">
+                    <button class="small" data-control="yes">Show scores</button>
+                    <button class="small" data-control="no">Hide scores</button>
+                </span>
             </div>
             <div class="content">
                 <aside class="panel"></aside>

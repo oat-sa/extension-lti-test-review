@@ -24,9 +24,9 @@ define([
     'ui/component',
     'ui/tabs',
     'util/capitalize',
-    'tpl!taoReview/review/plugins/content/item-answer/tpl/item-answer',
-    'tpl!taoReview/review/plugins/content/item-answer/tpl/answer-tabs',
-    'css!taoReview/review/plugins/content/item-answer/css/item-answer'
+    'tpl!ltiTestReview/review/plugins/content/item-answer/tpl/item-answer',
+    'tpl!ltiTestReview/review/plugins/content/item-answer/tpl/answer-tabs',
+    'css!ltiTestReview/review/plugins/content/item-answer/css/item-answer'
 ], function (
     _,
     __,
@@ -44,6 +44,8 @@ define([
      * @property {String} [scoreText] - The text displayed to introduce the score
      * @property {String} [status] - The status of the item from the list ['correct', 'incorrect', 'skipped', 'informational']
      * @property {String} [score] - The student's score on the item
+     * @property {Boolean} [showScore] - Show the score
+     * @property {Boolean} [showCorrect] - Show the correct responses
      */
 
     /**
@@ -54,6 +56,8 @@ define([
         skippedText: __('No response'),
         scoreText: __('Your Score:'),
         status: 'informational',
+        showScore: true,
+        showCorrect: true,
         score: ''
     };
 
@@ -73,7 +77,7 @@ define([
     const answerCorrectTab = {
         name: 'answer',
         label: __('Your response'),
-        icon: 'result-ok',
+        icon: 'correct',
         cls: 'correct'
     };
 
@@ -84,8 +88,30 @@ define([
     const answerIncorrectTab = {
         name: 'answer',
         label: __('Your response'),
-        icon: 'result-nok',
+        icon: 'incorrect',
         cls: 'incorrect'
+    };
+
+    /**
+     * Defines the tab containing answered student response
+     * @type {tabConfig}
+     */
+    const answeredTab = {
+        name: 'answer',
+        label: __('Your response'),
+        icon: 'answered',
+        cls: 'answered'
+    };
+
+    /**
+     * Defines the tab containing skipped student response
+     * @type {tabConfig}
+     */
+    const skippedTab = {
+        name: 'answer',
+        label: __('Your response'),
+        icon: 'skipped',
+        cls: 'skipped'
     };
 
     /**
@@ -95,7 +121,7 @@ define([
     const informationalTab = {
         name: 'answer',
         label: __('Informational item'),
-        icon: 'info',
+        icon: 'informational',
         cls: 'informational'
     };
 
@@ -104,19 +130,32 @@ define([
      * @type {Object}
      */
     const tabsSets = {
+        answered: [answeredTab],
+        skipped: [skippedTab],
         correct: [answerCorrectTab],
         incorrect: [answerIncorrectTab, correctTab],
         informational: [informationalTab]
     };
 
     /**
-     * Defines tabs by status
+     * Defines tabs by status with correct responses enabled
      * @type {Object}
      */
-    const tabsByStatus = {
+    const tabsByStatusWithCorrect = {
         correct: tabsSets.correct,
         incorrect: tabsSets.incorrect,
         skipped: tabsSets.incorrect,
+        informational: tabsSets.informational
+    };
+
+    /**
+     * Defines tabs by status with correct responses disabled
+     * @type {Object}
+     */
+    const tabsByStatusWithoutCorrect = {
+        correct: tabsSets.answered,
+        incorrect: tabsSets.answered,
+        skipped: tabsSets.skipped,
         informational: tabsSets.informational
     };
 
@@ -149,6 +188,8 @@ define([
      * @param {String} [config.scoreText] - The text displayed to introduce the score
      * @param {String} [config.status] - The status of the item from the list ['correct', 'incorrect', 'skipped', 'informational']
      * @param {String} [config.score] - The student's score on the item
+     * @param {Boolean} [config.showScore] - Show the score
+     * @param {Boolean} [config.showCorrect] - Show the correct responses
      * @returns {itemAnswerComponent}
      * @fires ready - When the component is ready to work
      * @fires statuschange - Each time the status is changed, the status being given as parameter
@@ -173,17 +214,14 @@ define([
              * @returns {itemAnswerComponent}
              */
             setScore(score) {
-                if (!score && 'number' !== typeof score) {
+                if (!score && 'number' !== typeof score || !this.getConfig().showScore) {
                     score = '';
                 }
                 this.getConfig().score = `${score}`;
 
                 if (this.is('rendered')) {
-                    let scoreText = '';
-                    if (score) {
-                        scoreText = `${this.getConfig().scoreText} ${this.getConfig().score}`;
-                    }
-                    controls.$score.text(scoreText);
+                    const scoreLine = this.getConfig().score && `${this.getConfig().scoreText} ${this.getConfig().score}`;
+                    controls.$score.text(scoreLine);
                 }
 
                 return this;
@@ -305,6 +343,7 @@ define([
                     $status: this.getElement().find('.item-answer-status')
                 };
 
+                const tabsByStatus = this.getConfig().showCorrect ? tabsByStatusWithCorrect : tabsByStatusWithoutCorrect;
                 let tabs = tabsByStatus[this.getStatus()];
                 const tabsComponent = tabsFactory(controls.$tabs, {activeTab, tabs})
                     .setTemplate(answerTabsTpl)
@@ -333,6 +372,8 @@ define([
                     });
 
                 this
+                    .setState('show-score', this.getConfig().showScore)
+                    .setState('show-correct', this.getConfig().showCorrect)
                     .on('statuschange', (status, change) => {
                         if (change && tabs !== tabsByStatus[status]) {
                             tabs = tabsByStatus[status];

@@ -29,7 +29,7 @@ define([
     'core/promiseTimeout',
     'taoTests/runner/plugin',
     'taoQtiTest/runner/helpers/map',
-    'taoReview/review/plugins/navigation/next-prev/buttons'
+    'ltiTestReview/review/plugins/navigation/next-prev/buttons'
 ], function (
     _,
     shortcut,

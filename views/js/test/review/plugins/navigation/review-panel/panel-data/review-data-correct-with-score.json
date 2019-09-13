@@ -15,16 +15,19 @@
               "label": "Example_0_Introduction",
               "informational": true,
               "skipped": false,
+              "withScore": true,
               "position": 0,
               "type": "info",
               "score": 0,
               "maxScore": 0
             }
           ],
+          "withScore": true,
           "score": 0,
           "maxScore": 0
         }
       ],
+      "withScore": true,
       "score": 0,
       "maxScore": 0
     },
@@ -43,9 +46,10 @@
               "label": "example_1_TAO",
               "informational": false,
               "skipped": false,
+              "withScore": true,
               "position": 1,
-              "type": "incorrect",
-              "score": 1,
+              "type": "correct",
+              "score": 2,
               "maxScore": 2
             },
             {
@@ -53,9 +57,10 @@
               "label": "example_2_Math",
               "informational": false,
               "skipped": false,
+              "withScore": true,
               "position": 2,
-              "type": "incorrect",
-              "score": 0,
+              "type": "correct",
+              "score": 2,
               "maxScore": 2
             },
             {
@@ -63,9 +68,10 @@
               "label": "Example_3_Baudelaire",
               "informational": false,
               "skipped": false,
+              "withScore": true,
               "position": 3,
-              "type": "incorrect",
-              "score": 2,
+              "type": "correct",
+              "score": 3,
               "maxScore": 3
             },
             {
@@ -73,6 +79,7 @@
               "label": "Example_4_Appearance",
               "informational": false,
               "skipped": false,
+              "withScore": true,
               "position": 4,
               "type": "correct",
               "score": 2,
@@ -83,9 +90,10 @@
               "label": "Example_5_picasso",
               "informational": false,
               "skipped": false,
+              "withScore": true,
               "position": 5,
-              "type": "incorrect",
-              "score": 1,
+              "type": "correct",
+              "score": 2,
               "maxScore": 2
             },
             {
@@ -93,6 +101,7 @@
               "label": "Example_6_Geography",
               "informational": false,
               "skipped": false,
+              "withScore": true,
               "position": 6,
               "type": "correct",
               "score": 2,
@@ -103,6 +112,7 @@
               "label": "Example_7_Geo 2",
               "informational": false,
               "skipped": false,
+              "withScore": true,
               "position": 7,
               "type": "correct",
               "score": 2,
@@ -113,20 +123,24 @@
               "label": "Example_8_Geo 3",
               "informational": false,
               "skipped": false,
+              "withScore": true,
               "position": 8,
               "type": "correct",
               "score": 2,
               "maxScore": 2
             }
           ],
-          "score": 12,
+          "withScore": true,
+          "score": 17,
           "maxScore": 17
         }
       ],
-      "score": 12,
+      "withScore": true,
+      "score": 17,
       "maxScore": 17
     }
   ],
-  "score": 12,
+  "withScore": true,
+  "score": 17,
   "maxScore": 17
 }

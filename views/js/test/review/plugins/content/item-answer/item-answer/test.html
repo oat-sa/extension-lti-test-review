@@ -26,7 +26,7 @@
                 });
 
                 //load the test
-                require(['taoReview/test/review/plugins/content/item-answer/item-answer/test'], function () {
+                require(['ltiTestReview/test/review/plugins/content/item-answer/item-answer/test'], function () {
 
                     //Tests loaded, run tests
                     QUnit.start();
@@ -50,6 +50,9 @@
                 line-height: 40px;
                 flex: 0 0 auto;
                 text-align: center;
+            }
+            #visual-test .controls  {
+                margin: 0 20px;
             }
             #visual-test .content {
                 background-color: white;
@@ -105,8 +108,18 @@
                 </section>
             </div>
             <div class="footer">
-                <button class="small" data-control="enable">Enable</button>
-                <button class="small" data-control="disable">Disable</button>
+                <span class="controls state">
+                    <button class="small" data-control="enable">Enable</button>
+                    <button class="small" data-control="disable">Disable</button>
+                </span>
+                <span class="controls score">
+                    <button class="small" data-control="yes">Show scores</button>
+                    <button class="small" data-control="no">Hide scores</button>
+                </span>
+                <span class="controls correct">
+                    <button class="small" data-control="yes">Show response</button>
+                    <button class="small" data-control="no">Hide responses</button>
+                </span>
             </div>
         </div>
     </body>

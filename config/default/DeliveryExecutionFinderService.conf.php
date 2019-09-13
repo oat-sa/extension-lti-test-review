@@ -1,3 +1,6 @@
 <?php
 
-return new \oat\taoReview\models\DeliveryExecutionFinderService();
+return new \oat\ltiTestReview\models\DeliveryExecutionFinderService([
+    'show_score' => false,
+    'show_correct' => false
+]);

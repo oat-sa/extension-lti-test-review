@@ -19,7 +19,7 @@ define([
     'jquery',
     'ui/feedback',
     'core/logger',
-    'taoReview/review/component/qtiTestReviewComponent'
+    'ltiTestReview/review/component/qtiTestReviewComponent'
 ], function (
     $,
     feedback,
@@ -31,10 +31,10 @@ define([
     /**
      * Create a dedicated logger
      */
-    const logger = loggerFactory('taoReview/controller');
+    const logger = loggerFactory('ltiTestReview/controller');
 
     /**
-     * Controls the taoReview delivery page
+     * Controls the ltiTestReview delivery page
      *
      * @type {Object}
      */
@@ -45,26 +45,27 @@ define([
         start() {
 
             const $container = $('.container');
-            const execution = $container.data('execution');
-            const delivery = $container.data('delivery');
+            const {execution, delivery, showScore, showCorrect} = $container.data();
 
             reviewFactory($(".content-wrap", document), {
                 testUri: {
                     resultId: execution,
                     deliveryUri: delivery
                 },
+                showScore,
+                showCorrect,
                 readOnly: true,
                 plugins: [{
-                    module: 'taoReview/review/plugins/navigation/review-panel/plugin',
-                    bundle: 'taoReview/loader/qtiReview.min',
+                    module: 'ltiTestReview/review/plugins/navigation/review-panel/plugin',
+                    bundle: 'ltiTestReview/loader/qtiReview.min',
                     category: 'navigation'
                 }, {
-                    module: 'taoReview/review/plugins/navigation/next-prev/plugin',
-                    bundle: 'taoReview/loader/qtiReview.min',
+                    module: 'ltiTestReview/review/plugins/navigation/next-prev/plugin',
+                    bundle: 'ltiTestReview/loader/qtiReview.min',
                     category: 'navigation'
                 }, {
-                    module: 'taoReview/review/plugins/content/item-answer/plugin',
-                    bundle: 'taoReview/loader/qtiReview.min',
+                    module: 'ltiTestReview/review/plugins/content/item-answer/plugin',
+                    bundle: 'ltiTestReview/loader/qtiReview.min',
                     category: 'content'
                 }]
             })

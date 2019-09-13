@@ -20,26 +20,27 @@
 use oat\tao\model\accessControl\func\AccessRule;
 use oat\tao\model\user\TaoRoles;
 use oat\taoLti\models\classes\LtiRoles;
-use oat\taoReview\controller\Review;
-use oat\taoReview\controller\ReviewTool;
-use oat\taoReview\scripts\update\Updater;
+use oat\ltiTestReview\controller\Review;
+use oat\ltiTestReview\controller\ReviewTool;
+use oat\ltiTestReview\scripts\update\Updater;
 
 return [
-    'name' => 'taoReview',
-    'label' => 'Review',
+    'name' => 'ltiTestReview',
+    'label' => 'Test Review',
     'description' => 'Extension for reviewing passed tests, with the display of actual and correct answers.',
     'license' => 'GPL-2.0',
-    'version' => '1.6.1',
+    'version' => '1.12.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => [
         'tao' => '>=38.6.0',
         'taoLti' => '>=10.1.0',
         'ltiDeliveryProvider' => '>=9.2.0',
         'taoQtiTest' => '>=34.6.0',
+        'taoQtiTestPreviewer' => '>=2.8.0'
     ],
-    'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#taoReviewManager',
+    'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#ltiTestReviewManager',
     'acl' => [
-        [AccessRule::GRANT, 'http://www.tao.lu/Ontologies/generis.rdf#taoReviewManager', ['ext' => 'taoReview']],
+        [AccessRule::GRANT, 'http://www.tao.lu/Ontologies/generis.rdf#ltiTestReviewManager', ['ext' => 'ltiTestReview']],
         [AccessRule::GRANT, TaoRoles::ANONYMOUS, ReviewTool::class],
         [AccessRule::GRANT, LtiRoles::CONTEXT_LEARNER, Review::class],
     ],
@@ -49,10 +50,10 @@ return [
     'uninstall' => [],
     'update' => Updater::class,
     'routes' => [
-        '/taoReview' => 'oat\\taoReview\\controller',
+        '/ltiTestReview' => 'oat\\ltiTestReview\\controller',
     ],
     'constants' => [
         'DIR_VIEWS' => __DIR__ . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR,
-        'BASE_URL' => ROOT_URL . 'taoReview/',
+        'BASE_URL' => ROOT_URL . 'ltiTestReview/',
     ],
 ];

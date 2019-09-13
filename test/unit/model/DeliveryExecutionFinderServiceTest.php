@@ -17,7 +17,7 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  */
 
-namespace oat\taoReview\test\unit\model;
+namespace oat\ltiTestReview\test\unit\model;
 
 use core_kernel_classes_Resource;
 use oat\generis\test\TestCase;
@@ -28,7 +28,7 @@ use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiLaunchData;
-use oat\taoReview\models\DeliveryExecutionFinderService;
+use oat\ltiTestReview\models\DeliveryExecutionFinderService;
 use PHPUnit_Framework_MockObject_MockObject;
 
 class DeliveryExecutionFinderServiceTest extends TestCase
@@ -131,5 +131,91 @@ class DeliveryExecutionFinderServiceTest extends TestCase
         $this->expectException(LtiInvalidLaunchDataException::class);
 
         $this->subject->findDeliveryExecution($launchData);
+    }
+
+    /**
+     * @dataProvider optionDataProvider
+     * @param $value
+     * @param $expected
+     * @throws \oat\taoLti\models\classes\LtiVariableMissingException
+     */
+    public function testGetShowScoreOption($value, $expected)
+    {
+        $sourceId = 'v5ba19e6ltos1lmljfv8fgnb07:::S3294476:::29123:::dyJ86SiwwA9';
+
+        // check option passed through LTI
+        $launchData = new LtiLaunchData(
+            [
+                DeliveryExecutionFinderService::LTI_SOURCE_ID => $sourceId,
+                DeliveryExecutionFinderService::LTI_SHOW_SCORE => $value
+            ],
+            []
+        );
+
+        $result = $this->subject->getShowScoreOption($launchData);
+
+        $this->assertEquals($expected, $result);
+
+        // check default option value
+        $launchData = new LtiLaunchData(
+            [DeliveryExecutionFinderService::LTI_SOURCE_ID => $sourceId],
+            []
+        );
+
+        $this->subject->setOption(DeliveryExecutionFinderService::OPTION_SHOW_SCORE, $value);
+
+        $result = $this->subject->getShowScoreOption($launchData);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @dataProvider optionDataProvider
+     * @param $value
+     * @param $expected
+     * @throws \oat\taoLti\models\classes\LtiVariableMissingException
+     */
+    public function testGetShowCorrectOption($value, $expected)
+    {
+        $sourceId = 'v5ba19e6ltos1lmljfv8fgnb07:::S3294476:::29123:::dyJ86SiwwA9';
+
+        // check option passed through LTI
+        $launchData = new LtiLaunchData(
+            [
+                DeliveryExecutionFinderService::LTI_SOURCE_ID => $sourceId,
+                DeliveryExecutionFinderService::LTI_SHOW_CORRECT => $value
+            ],
+            []
+        );
+
+        $result = $this->subject->getShowCorrectOption($launchData);
+
+        $this->assertEquals($expected, $result);
+
+        // check default option value
+        $launchData = new LtiLaunchData(
+            [DeliveryExecutionFinderService::LTI_SOURCE_ID => $sourceId],
+            []
+        );
+
+        $this->subject->setOption(DeliveryExecutionFinderService::OPTION_SHOW_CORRECT, $value);
+
+        $result = $this->subject->getShowCorrectOption($launchData);
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function optionDataProvider() {
+        return [
+            ['', false],
+            ['0', false],
+            [0, false],
+            [false, false],
+
+            ['1', true],
+            [1, true],
+            ['true', true],
+            [true, true],
+        ];
     }
 }

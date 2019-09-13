@@ -21,15 +21,15 @@
  */
 define([
     'lodash',
-    'taoReview/review/services/navigation-data',
-    'json!taoReview/test/review/services/navigation-data/map-correct.json',
-    'json!taoReview/test/review/services/navigation-data/map-incorrect.json',
-    'json!taoReview/test/review/services/navigation-data/computed-map-correct.json',
-    'json!taoReview/test/review/services/navigation-data/computed-map-incorrect.json',
-    'json!taoReview/test/review/services/navigation-data/filtered-map-correct-correct.json',
-    'json!taoReview/test/review/services/navigation-data/filtered-map-correct-incorrect.json',
-    'json!taoReview/test/review/services/navigation-data/filtered-map-incorrect-correct.json',
-    'json!taoReview/test/review/services/navigation-data/filtered-map-incorrect-incorrect.json'
+    'ltiTestReview/review/services/navigation-data',
+    'json!ltiTestReview/test/review/services/navigation-data/map-correct.json',
+    'json!ltiTestReview/test/review/services/navigation-data/map-incorrect.json',
+    'json!ltiTestReview/test/review/services/navigation-data/computed-map-correct.json',
+    'json!ltiTestReview/test/review/services/navigation-data/computed-map-incorrect.json',
+    'json!ltiTestReview/test/review/services/navigation-data/filtered-map-correct-correct.json',
+    'json!ltiTestReview/test/review/services/navigation-data/filtered-map-correct-incorrect.json',
+    'json!ltiTestReview/test/review/services/navigation-data/filtered-map-incorrect-correct.json',
+    'json!ltiTestReview/test/review/services/navigation-data/filtered-map-incorrect-incorrect.json'
 ], function (
     _,
     navigationDataFactory,

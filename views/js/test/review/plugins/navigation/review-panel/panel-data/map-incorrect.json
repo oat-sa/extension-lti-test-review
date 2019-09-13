@@ -107,11 +107,11 @@
                 "x-tao-option-calculator"
               ],
               "informational": false,
-              "skipped": false,
+              "skipped": true,
               "index": 8,
               "positionInPart": 7,
               "positionInSection": 7,
-              "score": 2,
+              "score": 0,
               "maxScore": 2
             },
             "item-4": {
@@ -175,7 +175,7 @@
               "maxScore": 2
             }
           },
-          "score": 12,
+          "score": 10,
           "maxScore": 17,
           "stats": {
             "questions": 8,
@@ -187,7 +187,7 @@
           }
         }
       },
-      "score": 12,
+      "score": 10,
       "maxScore": 17,
       "stats": {
         "questions": 8,
@@ -253,7 +253,7 @@
       }
     }
   },
-  "score": 12,
+  "score": 10,
   "maxScore": 17,
   "stats": {
     "questions": 8,

@@ -23,7 +23,7 @@ define([
     'jquery',
     'lodash',
     'i18n',
-    'taoReview/review/plugins/navigation/next-prev/buttons',
+    'ltiTestReview/review/plugins/navigation/next-prev/buttons',
 ], function (
     $,
     _,

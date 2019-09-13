@@ -18,7 +18,7 @@
  *
  */
 
-namespace oat\taoReview\models;
+namespace oat\ltiTestReview\models;
 
 use common_Exception;
 use oat\generis\model\OntologyAwareTrait;
@@ -77,16 +77,16 @@ class QtiRunnerInitDataBuilder
 
     /**
      * @param string $deliveryExecutionId
+     * @param bool   $withScores
      *
      * @return array
      * @throws common_Exception
      */
-    public function build($deliveryExecutionId)
+    public function build($deliveryExecutionId, $withScores = false)
     {
         $serviceContext = $this->getServiceContext($deliveryExecutionId);
 
-        $itemsData = $this->getItemsData($deliveryExecutionId);
-
+        $itemsData = $this->getItemsData($deliveryExecutionId, $withScores);
         $testMap = $this->getTestMap($serviceContext, $itemsData);
 
         $firstItem = array_shift($this->itemsData);
@@ -105,7 +105,7 @@ class QtiRunnerInitDataBuilder
         return $init;
     }
 
-    protected function getItemsData(string $deliveryExecutionId)
+    protected function getItemsData(string $deliveryExecutionId, $fetchScores = false)
     {
         $deliveryExecution = $this->deliveryExecutionService->getDeliveryExecutionById($deliveryExecutionId);
         $delivery = $deliveryExecution->getDelivery();
@@ -125,29 +125,28 @@ class QtiRunnerInitDataBuilder
 
         foreach ($variables as $variable) {
 
-            $score = $maxScore = 0.0;
-
-            $outcome = array_filter($variable[taoResultServer_models_classes_OutcomeVariable::class], static function ($key) {
-                return in_array($key, [static::OUTCOME_VAR_SCORE, static::OUTCOME_VAR_MAXSCORE], true);
-            }, ARRAY_FILTER_USE_KEY);
-
-            if (isset($outcome[static::OUTCOME_VAR_SCORE])) {
-                /** @var taoResultServer_models_classes_OutcomeVariable $var */
-                $var = $outcome[static::OUTCOME_VAR_SCORE]['var'];
-                $score = (float)$var->getValue();
-            }
-
-            if (isset($outcome[static::OUTCOME_VAR_MAXSCORE])) {
-                $var = $outcome[static::OUTCOME_VAR_MAXSCORE]['var'];
-                $maxScore = (float)$var->getValue();
-            }
-
             $returnValue[$variable['internalIdentifier']] = [
                 'identifier' => $variable['internalIdentifier'],
                 'state' => json_decode($variable['state'], true),
-                'score' => $score,
-                'maxScore' => $maxScore,
             ];
+
+            if ($fetchScores) {
+                $outcome = array_filter($variable[taoResultServer_models_classes_OutcomeVariable::class],
+                    static function ($key) {
+                        return in_array($key, [static::OUTCOME_VAR_SCORE, static::OUTCOME_VAR_MAXSCORE], true);
+                    }, ARRAY_FILTER_USE_KEY);
+
+                if (isset($outcome[static::OUTCOME_VAR_SCORE])) {
+                    /** @var taoResultServer_models_classes_OutcomeVariable $var */
+                    $var = $outcome[static::OUTCOME_VAR_SCORE]['var'];
+                    $returnValue[$variable['internalIdentifier']]['score'] = (float)$var->getValue();
+                }
+
+                if (isset($outcome[static::OUTCOME_VAR_MAXSCORE])) {
+                    $var = $outcome[static::OUTCOME_VAR_MAXSCORE]['var'];
+                    $returnValue[$variable['internalIdentifier']]['maxScore'] = (float)$var->getValue();
+                }
+            }
         }
 
         return $returnValue;

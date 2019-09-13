@@ -21,11 +21,27 @@
 define([
     'context',
     'taoTests/runner/runnerComponent',
-    'tpl!taoReview/review/component/tpl/qtiTestReviewComponent',
-    'css!taoReview/review/component/css/qtiTestReviewComponent',
-    'css!taoReview/review/provider/css/qtiTestReviewProvider'
+    'tpl!ltiTestReview/review/component/tpl/qtiTestReviewComponent',
+    'css!ltiTestReview/review/component/css/qtiTestReviewComponent',
+    'css!ltiTestReview/review/provider/css/qtiTestReviewProvider'
 ], function (context, runnerComponentFactory, runnerTpl) {
     'use strict';
+
+    /**
+     * Extracts the test runner options from the config
+     * @param {Object} config
+     * @returns {Object}
+     */
+    const extractOptions = config => {
+        const {
+            fullPage = false,
+            readOnly = false,
+            showScore = false,
+            showCorrect = false,
+            pluginsOptions = {}
+        } = config;
+        return {fullPage, readOnly, showScore, showCorrect, plugins: pluginsOptions};
+    };
 
     /**
      * Builds a component with test runner to review a test
@@ -33,8 +49,10 @@ define([
      * @param {Object} [config] - The testRunner options
      * @param {Object[]} [config.plugins] - Additional plugins to load
      * @param {Object[]} [config.pluginsOptions] - Options for the plugins
-     * @param {String} [config.fullPage] - Force the review to occupy the full window.
-     * @param {String} [config.readOnly] - Do not allow to modify the reviewed item.
+     * @param {Boolean} [config.fullPage] - Force the review to occupy the full window.
+     * @param {Boolean} [config.readOnly] - Do not allow to modify the reviewed item.
+     * @param {Boolean} [config.showScore] - Allow to show the score.
+     * @param {Boolean} [config.showCorrect] - Allow to show the correct responses.
      * @param {Function} [template] - An optional template for the component
      * @returns {review}
      */
@@ -46,14 +64,14 @@ define([
             providers: {
                 runner: {
                     id: 'qtiTestReviewProvider',
-                    module: 'taoReview/review/provider/qtiTestReviewProvider',
-                    bundle: 'taoReview/loader/qtiReview.min',
+                    module: 'ltiTestReview/review/provider/qtiTestReviewProvider',
+                    bundle: 'ltiTestReview/loader/qtiReview.min',
                     category: 'runner'
                 },
                 proxy: {
                     id: 'qtiTestReviewProxy',
-                    module: 'taoReview/review/proxy/qtiTestReviewProxy',
-                    bundle: 'taoReview/loader/qtiReview.min',
+                    module: 'ltiTestReview/review/proxy/qtiTestReviewProxy',
+                    bundle: 'ltiTestReview/loader/qtiReview.min',
                     category: 'proxy'
                 },
                 communicator: {
@@ -64,11 +82,7 @@ define([
                 },
                 plugins: config.plugins || []
             },
-            options: {
-                fullPage: config.fullPage,
-                readOnly: config.readOnly,
-                plugins: config.pluginsOptions
-            }
+            options: extractOptions(config)
         };
 
         //extra context config
@@ -76,9 +90,11 @@ define([
 
         return runnerComponentFactory(container, testRunnerConfig, template || runnerTpl)
             .on('render', function onComponentInit() {
-                const {fullPage, readOnly} = this.getConfig().options;
+                const {fullPage, readOnly, showScore, showCorrect} = this.getConfig().options;
                 this.setState('fullpage', fullPage);
                 this.setState('readonly', readOnly);
+                this.setState('showscore', showScore);
+                this.setState('showcorrect', showCorrect);
             })
             .on('ready', function onComponentReady(runner) {
                 runner.on('destroy', () => this.destroy());

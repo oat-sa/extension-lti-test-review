@@ -146,11 +146,9 @@ class Review extends tao_actions_SinglePageModule
             ]);
 
             // make sure the responses data are compliant to QTI definition
-            $responsesData = array_filter($responsesData, static function ($key) use ($responsesData) {
-                return array_key_exists('qtiClass', $responsesData) && array_key_exists('serial', $responsesData);
+            $itemData['data']['responses'] = array_filter($responsesData, static function ($key) use ($responsesData) {
+                return array_key_exists('qtiClass', $responsesData[$key]) && array_key_exists('serial', $responsesData[$key]);
             }, ARRAY_FILTER_USE_KEY);
-
-            $itemData['data']['responses'] = $responsesData;
         }
 
         $response['content'] = $itemData;

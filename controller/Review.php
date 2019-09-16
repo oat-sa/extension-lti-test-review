@@ -140,10 +140,17 @@ class Review extends tao_actions_SinglePageModule
         if (!empty($itemData['data']['responses'])
             && $finder->getShowCorrectOption($this->ltiSession->getLaunchData())
         ) {
-            $itemData['data']['responses'] = array_merge_recursive(...[
+            $responsesData = array_merge_recursive(...[
                 $itemData['data']['responses'],
                 $itemPreviewer->loadCompiledItemVariables()
             ]);
+
+            // make sure the responses data are compliant to QTI definition
+            $responsesData = array_filter($responsesData, static function ($key) use ($responsesData) {
+                return array_key_exists('qtiClass', $responsesData) && array_key_exists('serial', $responsesData);
+            }, ARRAY_FILTER_USE_KEY);
+
+            $itemData['data']['responses'] = $responsesData;
         }
 
         $response['content'] = $itemData;

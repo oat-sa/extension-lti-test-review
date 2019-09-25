@@ -27,6 +27,7 @@ use common_exception_NotFound;
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
 use oat\oatbox\service\exception\InvalidServiceManagerException;
+use oat\tao\model\mvc\DefaultUrlService;
 use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiService;
@@ -73,6 +74,10 @@ class Review extends tao_actions_SinglePageModule
 
         $execution = $finder->findDeliveryExecution($launchData);
         $delivery = $execution->getDelivery();
+
+        /* @var $urlRouteService DefaultUrlService */
+        $urlRouteService = $this->getServiceLocator()->get(DefaultUrlService::SERVICE_ID);
+        $this->setData('logout', $urlRouteService->getLogoutUrl());
 
         $data = [
             'execution' => $execution->getUri(),

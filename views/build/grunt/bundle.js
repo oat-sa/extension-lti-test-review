@@ -31,7 +31,7 @@ module.exports = function(grunt) {
                     outputDir : 'loader',
                     dependencies : ['taoItems', 'taoQtiItem', 'taoTests', 'taoQtiTest', 'taoQtiTestPreviewer'],
                     bundles : [{
-                        name : 'qtiReview',
+                        name : 'ltiTestReview',
                         babel : true,
                         include : [
                             'ltiTestReview/review/**/*'

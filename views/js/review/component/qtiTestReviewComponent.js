@@ -65,13 +65,13 @@ define([
                 runner: {
                     id: 'qtiTestReviewProvider',
                     module: 'ltiTestReview/review/provider/qtiTestReviewProvider',
-                    bundle: 'ltiTestReview/loader/qtiReview.min',
+                    bundle: 'ltiTestReview/loader/ltiTestReview.min',
                     category: 'runner'
                 },
                 proxy: {
                     id: 'qtiTestReviewProxy',
                     module: 'ltiTestReview/review/proxy/qtiTestReviewProxy',
-                    bundle: 'ltiTestReview/loader/qtiReview.min',
+                    bundle: 'ltiTestReview/loader/ltiTestReview.min',
                     category: 'proxy'
                 },
                 communicator: {

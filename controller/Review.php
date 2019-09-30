@@ -82,8 +82,8 @@ class Review extends tao_actions_SinglePageModule
         $data = [
             'execution' => $execution->getUri(),
             'delivery'  => $delivery->getUri(),
-            'show-score' => $finder->getShowScoreOption($launchData),
-            'show-correct' => $finder->getShowCorrectOption($launchData)
+            'show-score' => (int)$finder->getShowScoreOption($launchData),
+            'show-correct' => (int)$finder->getShowCorrectOption($launchData)
         ];
 
         $this->composeView('delegated-view', $data, 'pages/index.tpl', 'tao');

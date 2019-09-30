@@ -326,15 +326,15 @@ define([
             showCorrect: true,
             plugins: [{
                 module: 'ltiTestReview/review/plugins/navigation/review-panel/plugin',
-                bundle: 'ltiTestReview/loader/qtiReview.min',
+                bundle: 'ltiTestReview/loader/ltiTestReview.min',
                 category: 'navigation'
             }, {
                 module: 'ltiTestReview/review/plugins/navigation/next-prev/plugin',
-                bundle: 'ltiTestReview/loader/qtiReview.min',
+                bundle: 'ltiTestReview/loader/ltiTestReview.min',
                 category: 'navigation'
             }, {
                 module: 'ltiTestReview/review/plugins/content/item-answer/plugin',
-                bundle: 'ltiTestReview/loader/qtiReview.min',
+                bundle: 'ltiTestReview/loader/ltiTestReview.min',
                 category: 'content'
             }]
         };

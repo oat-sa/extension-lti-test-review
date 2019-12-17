@@ -80,7 +80,7 @@ class Review extends tao_actions_SinglePageModule
         $this->setData('logout', $urlRouteService->getLogoutUrl());
 
         $data = [
-            'execution' => $execution->getUri(),
+            'execution' => $execution->getIdentifier(),
             'delivery'  => $delivery->getUri(),
             'show-score' => (int)$finder->getShowScoreOption($launchData),
             'show-correct' => (int)$finder->getShowCorrectOption($launchData)

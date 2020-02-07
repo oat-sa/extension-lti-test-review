@@ -178,12 +178,7 @@ class QtiRunnerInitDataBuilder
                     $itemId = $item->getIdentifier();
                     $state = $itemsStates[$itemId]['state'] ?? [];
 
-                    $answers = 0;
-                    if (count($state)) {
-                        foreach ($state as $response) {
-                            $answers += count($response['response']['list']['identifier'] ?? []);
-                        }
-                    }
+                    $answers = $this->getResponseCountFromState($state);
 
                     $isInformational = empty($state);
                     $isSkipped = !$isInformational && empty($answers);
@@ -267,5 +262,30 @@ class QtiRunnerInitDataBuilder
         $testId = $this->deliveryContainerService->getTestDefinition($deliveryExecution);
 
         return $this->qtiRunnerService->getServiceContext($testId, $compilation, $deliveryExecutionId);
+    }
+
+    /**
+     * @param array $state
+     * @return int
+     */
+    private function getResponseCountFromState(array $state): int
+    {
+        $answers = 0;
+        if (count($state)) {
+            foreach ($state as $response) {
+                $responseCount = 0;
+
+                if (!empty($response['response']['base'])) {
+                    $responseCount = 1;
+                }
+                elseif (!empty($response['response']['list'])) {
+                    $responseCount = count(array_merge([], ...array_values($response['response']['list'])));
+                }
+
+                $answers += $responseCount;
+            }
+        }
+
+        return $answers;
     }
 }

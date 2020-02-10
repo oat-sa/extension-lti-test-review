@@ -178,10 +178,10 @@ class QtiRunnerInitDataBuilder
                     $itemId = $item->getIdentifier();
                     $state = $itemsStates[$itemId]['state'] ?? [];
 
-                    $answers = $this->getResponseCountFromState($state);
+                    $responsesCount = $this->getResponseCountsFromState($state);
 
                     $isInformational = empty($state);
-                    $isSkipped = !$isInformational && empty($answers);
+                    $isSkipped = !$isInformational && empty($responsesCount);
 
                     $items[$itemId] = [
                         'id' => $itemId,
@@ -265,27 +265,23 @@ class QtiRunnerInitDataBuilder
     }
 
     /**
-     * @param array $state
+     * @param array $itemState
      * @return int
      */
-    private function getResponseCountFromState(array $state): int
+    private function getResponseCountsFromState(array $itemState): int
     {
-        $answers = 0;
-        if (count($state)) {
-            foreach ($state as $response) {
-                $responseCount = 0;
-
+        $responsesCount = 0;
+        if (!empty($itemState))  {
+            foreach ($itemState as $response) {
                 if (!empty($response['response']['base'])) {
-                    $responseCount = 1;
+                    $responsesCount += 1;
                 }
                 elseif (!empty($response['response']['list'])) {
-                    $responseCount = count(array_merge([], ...array_values($response['response']['list'])));
+                    $responsesCount += count(array_merge(...array_values($response['response']['list'])));
                 }
-
-                $answers += $responseCount;
             }
         }
 
-        return $answers;
+        return $responsesCount;
     }
 }

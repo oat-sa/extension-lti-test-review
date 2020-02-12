@@ -181,7 +181,7 @@ class QtiRunnerInitDataBuilder
                     $responsesCount = $this->getResponseCountsFromState($state);
 
                     $isInformational = empty($state);
-                    $isSkipped = !$isInformational && empty($responsesCount);
+                    $isSkipped = !$isInformational && ($responsesCount === 0);
 
                     $items[$itemId] = [
                         'id' => $itemId,
@@ -264,10 +264,6 @@ class QtiRunnerInitDataBuilder
         return $this->qtiRunnerService->getServiceContext($testId, $compilation, $deliveryExecutionId);
     }
 
-    /**
-     * @param array $itemState
-     * @return int
-     */
     private function getResponseCountsFromState(array $itemState): int
     {
         $responsesCount = 0;

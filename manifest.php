@@ -29,7 +29,7 @@ return [
     'label' => 'Test Review',
     'description' => 'Extension for reviewing passed tests, with the display of actual and correct answers.',
     'license' => 'GPL-2.0',
-    'version' => '1.14.3',
+    'version' => '1.15.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => [
         'tao' => '>=38.6.0',
@@ -37,7 +37,8 @@ return [
         'ltiDeliveryProvider' => '>=9.2.0',
         'taoQtiTest' => '>=34.6.0',
         'taoQtiTestPreviewer' => '>=2.8.0',
-        'taoProctoring' => '>=17.3.1'
+        'taoProctoring' => '>=17.3.1',
+        'ltiProctoring' => '>=6.0.0',
     ],
     'managementRole' => 'http://www.tao.lu/Ontologies/generis.rdf#ltiTestReviewManager',
     'acl' => [

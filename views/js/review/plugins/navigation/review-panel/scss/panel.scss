@@ -49,6 +49,7 @@ $itemBackgroundHover: lighten($lightBlueGrey, 3);
 $itemBackgroundActive: lighten($lightBlueGrey, 5);
 
 $defaultIconColor: $grey;
+$correctColor: $success;
 $incorrectColor: $error;
 
 @mixin review-panel-line-layout($justify) {
@@ -316,6 +317,7 @@ $incorrectColor: $error;
         &.item-correct {
             .review-panel-label:before {
                 @include icon-result-ok;
+                color: $correctColor;
             }
         }
         &.item-incorrect {

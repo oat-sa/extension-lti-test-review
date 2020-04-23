@@ -190,8 +190,8 @@ class QtiRunnerInitDataBuilder
                         'categories' => [],
                         'informational' => $isInformational,
                         'skipped' => $isSkipped,
-                        'score' => $itemsStates[$itemId]['score'],
-                        'maxScore' => $itemsStates[$itemId]['maxScore']
+                        'score' => $itemsStates[$itemId]['score'] ?? null,
+                        'maxScore' => $itemsStates[$itemId]['maxScore'] ?? null
                     ];
 
                     $this->fillItemsData($itemId, $item->getHref(), $itemData['data']);

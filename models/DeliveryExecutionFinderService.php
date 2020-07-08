@@ -24,8 +24,8 @@ use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
 use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
 use oat\oatbox\service\ConfigurableService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecutionService;
 use oat\taoDelivery\model\execution\ServiceProxy as ExecutionServiceProxy;
-use oat\taoDelivery\model\execution\Service as ExecutionService;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiLaunchData;
 use oat\taoLti\models\classes\LtiVariableMissingException;
@@ -75,7 +75,7 @@ class DeliveryExecutionFinderService extends ConfigurableService
 
         return $this->getExecutionServiceProxy()->getDeliveryExecution($deliveryExecutionId);
     }
-    
+
     /**
      * @param LtiLaunchData $launchData
      *
@@ -86,7 +86,7 @@ class DeliveryExecutionFinderService extends ConfigurableService
     {
         return $this->getBooleanOption($launchData, self::LTI_SHOW_SCORE, self::OPTION_SHOW_SCORE);
     }
-    
+
     /**
      * @param LtiLaunchData $launchData
      *
@@ -118,16 +118,19 @@ class DeliveryExecutionFinderService extends ConfigurableService
 
     protected function getLtiResultIdStorage(): LtiResultAliasStorage
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getServiceLocator()->get(LtiResultAliasStorage::SERVICE_ID);
     }
 
     protected function getLaunchDataService(): LtiLaunchDataService
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getServiceLocator()->get(LtiLaunchDataService::SERVICE_ID);
     }
 
-    protected function getExecutionServiceProxy(): ExecutionService
+    protected function getExecutionServiceProxy(): DeliveryExecutionService
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getServiceLocator()->get(ExecutionServiceProxy::SERVICE_ID);
     }
 }

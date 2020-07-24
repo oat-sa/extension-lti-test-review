@@ -24,6 +24,7 @@ namespace oat\ltiTestReview\controller;
 use common_Exception;
 use common_exception_Error;
 use common_exception_NotFound;
+use core_kernel_users_GenerisUser;
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
 use oat\tao\model\http\HttpJsonResponseTrait;
@@ -109,7 +110,7 @@ class Review extends tao_actions_SinglePageModule
             $data = $dataBuilder->create()->build($params['serviceCallId'], $finder->getShowScoreOption($this->ltiSession->getLaunchData()));
         }
 
-        $this->setSuccessJsonResponse($data ?? []);
+        $this->returnJson($data ?? []);
     }
 
     /**
@@ -127,15 +128,14 @@ class Review extends tao_actions_SinglePageModule
         /** @var DeliveryExecutionManagerService $deManagerService */
         $deManagerService = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
         $execution = $deManagerService->getDeliveryExecutionById($deliveryExecutionId);
-        $delivery = $execution->getDelivery();
 
         $itemPreviewer = new ItemPreviewer();
         $itemPreviewer->setServiceLocator($this->getServiceLocator());
 
         $itemPreviewer
             ->setItemDefinition($itemDefinition)
-            ->setUserLanguage($this->getUserLanguage($deliveryExecutionId, $delivery->getUri()))
-            ->setDelivery($delivery);
+            ->setUserLanguage($this->getUserLanguage($deliveryExecutionId))
+            ->setDelivery($execution->getDelivery());
 
         $itemData = $itemPreviewer->loadCompiledItemData();
 
@@ -165,24 +165,23 @@ class Review extends tao_actions_SinglePageModule
         $response['baseUrl'] = $itemPreviewer->getBaseUrl();
         $response['success'] = true;
 
-        $this->setSuccessJsonResponse($response);
+        $this->returnJson($response);
     }
 
     /**
      * @param string $resultId
-     * @param string $deliveryUri
      *
      * @return string
      * @throws common_exception_Error
      */
-    protected function getUserLanguage($resultId, $deliveryUri)
+    protected function getUserLanguage($resultId)
     {
         /** @var ResultServerService $resultServerService */
         $resultServerService = $this->getServiceLocator()->get(ResultServerService::SERVICE_ID);
         /** @var \taoResultServer_models_classes_ReadableResultStorage $implementation */
-        $implementation = $resultServerService->getResultStorage($deliveryUri);
+        $implementation = $resultServerService->getResultStorage();
 
-        $testTaker = new \core_kernel_users_GenerisUser($this->getResource($implementation->getTestTaker($resultId)));
+        $testTaker = new core_kernel_users_GenerisUser($this->getResource($implementation->getTestTaker($resultId)));
         $lang = $testTaker->getPropertyValues(GenerisRdf::PROPERTY_USER_DEFLG);
 
         return empty($lang) ? DEFAULT_LANG : (string)current($lang);

@@ -29,23 +29,23 @@ use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiLaunchData;
 use oat\ltiTestReview\models\DeliveryExecutionFinderService;
-use PHPUnit_Framework_MockObject_MockObject;
+use oat\taoLti\models\classes\LtiVariableMissingException;
 
 class DeliveryExecutionFinderServiceTest extends TestCase
 {
-    /** @var LtiResultAliasStorage|PHPUnit_Framework_MockObject_MockObject */
+    /** @var LtiResultAliasStorage */
     private $ltiResultAliasStorage;
 
-    /** @var LtiLaunchDataService|PHPUnit_Framework_MockObject_MockObject */
+    /** @var LtiLaunchDataService */
     private $ltiLaunchDataService;
 
-    /** @var ServiceProxy|PHPUnit_Framework_MockObject_MockObject */
+    /** @var ServiceProxy */
     private $executionServiceProxy;
 
     /** @var DeliveryExecutionFinderService */
     private $subject;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -71,8 +71,8 @@ class DeliveryExecutionFinderServiceTest extends TestCase
             ['execution' => $executionId]
         );
 
-        /** @var DeliveryExecutionInterface|PHPUnit_Framework_MockObject_MockObject $implementation */
-        $implementation = $this->getMock(DeliveryExecutionInterface::class);
+        /** @var DeliveryExecutionInterface $implementation */
+        $implementation = $this->createMock(DeliveryExecutionInterface::class);
         $implementation->method('getIdentifier')
             ->willReturn($executionId);
 
@@ -85,7 +85,6 @@ class DeliveryExecutionFinderServiceTest extends TestCase
         $this->executionServiceProxy->method('getDeliveryExecution')
             ->willReturn(new DeliveryExecution($implementation));
 
-        /** @var DeliveryExecution $deliveryExecution */
         $deliveryExecution = $this->subject->findDeliveryExecution($launchData);
 
         $this->assertEquals($executionId, $deliveryExecution->getIdentifier());
@@ -101,8 +100,8 @@ class DeliveryExecutionFinderServiceTest extends TestCase
             []
         );
 
-        /** @var DeliveryExecutionInterface|PHPUnit_Framework_MockObject_MockObject $implementation */
-        $implementation = $this->getMock(DeliveryExecutionInterface::class);
+        /** @var DeliveryExecutionInterface $implementation */
+        $implementation = $this->createMock(DeliveryExecutionInterface::class);
         $implementation->method('getIdentifier')
             ->willReturn($executionId);
 
@@ -112,7 +111,6 @@ class DeliveryExecutionFinderServiceTest extends TestCase
         $this->executionServiceProxy->method('getDeliveryExecution')
             ->willReturn(new DeliveryExecution($implementation));
 
-        /** @var DeliveryExecution $deliveryExecution */
         $deliveryExecution = $this->subject->findDeliveryExecution($launchData);
 
         $this->assertEquals($executionId, $deliveryExecution->getIdentifier());
@@ -137,7 +135,7 @@ class DeliveryExecutionFinderServiceTest extends TestCase
      * @dataProvider optionDataProvider
      * @param $value
      * @param $expected
-     * @throws \oat\taoLti\models\classes\LtiVariableMissingException
+     * @throws LtiVariableMissingException
      */
     public function testGetShowScoreOption($value, $expected)
     {
@@ -173,7 +171,7 @@ class DeliveryExecutionFinderServiceTest extends TestCase
      * @dataProvider optionDataProvider
      * @param $value
      * @param $expected
-     * @throws \oat\taoLti\models\classes\LtiVariableMissingException
+     * @throws LtiVariableMissingException
      */
     public function testGetShowCorrectOption($value, $expected)
     {

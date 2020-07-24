@@ -24,9 +24,10 @@ namespace oat\ltiTestReview\controller;
 use common_Exception;
 use common_exception_Error;
 use common_exception_NotFound;
+use core_kernel_users_GenerisUser;
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
-use oat\oatbox\service\exception\InvalidServiceManagerException;
+use oat\tao\model\http\HttpJsonResponseTrait;
 use oat\tao\model\mvc\DefaultUrlService;
 use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
@@ -47,6 +48,7 @@ use tao_actions_SinglePageModule;
 class Review extends tao_actions_SinglePageModule
 {
     use OntologyAwareTrait;
+    use HttpJsonResponseTrait;
 
     /** @var TaoLtiSession */
     private $ltiSession;
@@ -58,7 +60,6 @@ class Review extends tao_actions_SinglePageModule
     }
 
     /**
-     * @throws InvalidServiceManagerException
      * @throws LtiException
      * @throws LtiInvalidLaunchDataException
      * @throws LtiVariableMissingException
@@ -127,15 +128,14 @@ class Review extends tao_actions_SinglePageModule
         /** @var DeliveryExecutionManagerService $deManagerService */
         $deManagerService = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
         $execution = $deManagerService->getDeliveryExecutionById($deliveryExecutionId);
-        $delivery = $execution->getDelivery();
 
         $itemPreviewer = new ItemPreviewer();
         $itemPreviewer->setServiceLocator($this->getServiceLocator());
 
         $itemPreviewer
             ->setItemDefinition($itemDefinition)
-            ->setUserLanguage($this->getUserLanguage($deliveryExecutionId, $delivery->getUri()))
-            ->setDelivery($delivery);
+            ->setUserLanguage($this->getUserLanguage($deliveryExecutionId))
+            ->setDelivery($execution->getDelivery());
 
         $itemData = $itemPreviewer->loadCompiledItemData();
 
@@ -151,9 +151,14 @@ class Review extends tao_actions_SinglePageModule
             ]);
 
             // make sure the responses data are compliant to QTI definition
-            $itemData['data']['responses'] = array_filter($responsesData, static function ($key) use ($responsesData) {
-                return array_key_exists('qtiClass', $responsesData[$key]) && array_key_exists('serial', $responsesData[$key]);
-            }, ARRAY_FILTER_USE_KEY);
+            $itemData['data']['responses'] = array_filter(
+                $responsesData,
+                static function (array $dataEntry): bool {
+                    return array_key_exists('qtiClass', $dataEntry)
+                        && array_key_exists('serial', $dataEntry)
+                        && $dataEntry['qtiClass'] !== 'modalFeedback';
+                }
+            );
         }
 
         $response['content'] = $itemData;
@@ -165,19 +170,18 @@ class Review extends tao_actions_SinglePageModule
 
     /**
      * @param string $resultId
-     * @param string $deliveryUri
      *
      * @return string
      * @throws common_exception_Error
      */
-    protected function getUserLanguage($resultId, $deliveryUri)
+    protected function getUserLanguage($resultId)
     {
         /** @var ResultServerService $resultServerService */
         $resultServerService = $this->getServiceLocator()->get(ResultServerService::SERVICE_ID);
         /** @var \taoResultServer_models_classes_ReadableResultStorage $implementation */
-        $implementation = $resultServerService->getResultStorage($deliveryUri);
+        $implementation = $resultServerService->getResultStorage();
 
-        $testTaker = new \core_kernel_users_GenerisUser($this->getResource($implementation->getTestTaker($resultId)));
+        $testTaker = new core_kernel_users_GenerisUser($this->getResource($implementation->getTestTaker($resultId)));
         $lang = $testTaker->getPropertyValues(GenerisRdf::PROPERTY_USER_DEFLG);
 
         return empty($lang) ? DEFAULT_LANG : (string)current($lang);

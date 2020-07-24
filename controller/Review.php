@@ -26,7 +26,7 @@ use common_exception_Error;
 use common_exception_NotFound;
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
-use oat\oatbox\service\exception\InvalidServiceManagerException;
+use oat\tao\model\http\HttpJsonResponseTrait;
 use oat\tao\model\mvc\DefaultUrlService;
 use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
@@ -47,6 +47,7 @@ use tao_actions_SinglePageModule;
 class Review extends tao_actions_SinglePageModule
 {
     use OntologyAwareTrait;
+    use HttpJsonResponseTrait;
 
     /** @var TaoLtiSession */
     private $ltiSession;
@@ -58,7 +59,6 @@ class Review extends tao_actions_SinglePageModule
     }
 
     /**
-     * @throws InvalidServiceManagerException
      * @throws LtiException
      * @throws LtiInvalidLaunchDataException
      * @throws LtiVariableMissingException
@@ -109,7 +109,7 @@ class Review extends tao_actions_SinglePageModule
             $data = $dataBuilder->create()->build($params['serviceCallId'], $finder->getShowScoreOption($this->ltiSession->getLaunchData()));
         }
 
-        $this->returnJson($data ?? []);
+        $this->setSuccessJsonResponse($data ?? []);
     }
 
     /**
@@ -151,18 +151,21 @@ class Review extends tao_actions_SinglePageModule
             ]);
 
             // make sure the responses data are compliant to QTI definition
-            $itemData['data']['responses'] = array_filter($responsesData, static function ($key) use ($responsesData) {
-                return array_key_exists('qtiClass', $responsesData[$key])
-                    && array_key_exists('serial', $responsesData[$key])
-                    && $responsesData[$key]['qtiClass'] !== 'modalFeedback';
-            }, ARRAY_FILTER_USE_KEY);
+            $itemData['data']['responses'] = array_filter(
+                $responsesData,
+                static function (array $dataEntry): bool {
+                    return array_key_exists('qtiClass', $dataEntry)
+                        && array_key_exists('serial', $dataEntry)
+                        && $dataEntry['qtiClass'] !== 'modalFeedback';
+                }
+            );
         }
 
         $response['content'] = $itemData;
         $response['baseUrl'] = $itemPreviewer->getBaseUrl();
         $response['success'] = true;
 
-        $this->returnJson($response);
+        $this->setSuccessJsonResponse($response);
     }
 
     /**

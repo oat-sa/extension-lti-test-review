@@ -162,8 +162,8 @@ define([
             'The updated context contains the correct section id'
         );
         assert.equal(updatedContext.testPartId, 'testPart-2', 'The updated context contains the correct test part id');
-        assert.equal(updatedContext.isLinear, true, 'The updated context contains the correct isLinear option');
-        assert.equal(updatedContext.itemAnswered, true, 'The item has been answered since the test part is linear');
+        assert.equal(updatedContext.isLinear, false, 'The updated context contains the correct isLinear option');
+        assert.equal(updatedContext.itemAnswered, false, 'The item is not answered since the test part is not linear');
     });
 
     QUnit.test('is moving to the next item over timed sections', assert => {
@@ -220,7 +220,7 @@ define([
             'The updated context contains the correct item identifier'
         );
         assert.equal(updatedContext.itemPosition, 1, 'The updated context contains the correct item position');
-        assert.equal(updatedContext.itemAnswered, true, 'The item has already been answered');
+        assert.equal(updatedContext.itemAnswered, false, 'The item has already been answered');
         assert.equal(
             updatedContext.sectionId,
             'assessmentSection-1',

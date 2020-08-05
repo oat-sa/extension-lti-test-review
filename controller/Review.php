@@ -27,6 +27,8 @@ use common_exception_NotFound;
 use core_kernel_users_GenerisUser;
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
+use oat\ltiTestReview\models\DeliveryExecutionFinderService;
+use oat\ltiTestReview\models\QtiRunnerInitDataBuilderFactory;
 use oat\tao\model\http\HttpJsonResponseTrait;
 use oat\tao\model\mvc\DefaultUrlService;
 use oat\taoLti\models\classes\LtiException;
@@ -37,8 +39,6 @@ use oat\taoLti\models\classes\TaoLtiSession;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
-use oat\ltiTestReview\models\DeliveryExecutionFinderService;
-use oat\ltiTestReview\models\QtiRunnerInitDataBuilderFactory;
 use tao_actions_SinglePageModule;
 
 /**
@@ -95,8 +95,6 @@ class Review extends tao_actions_SinglePageModule
      */
     public function init(): void
     {
-        $this->validateCsrf();
-
         /** @var QtiRunnerInitDataBuilderFactory $dataBuilder */
         $dataBuilder = $this->getServiceLocator()->get(QtiRunnerInitDataBuilderFactory::SERVICE_ID);
 
@@ -118,8 +116,6 @@ class Review extends tao_actions_SinglePageModule
      */
     public function getItem(): void
     {
-        $this->validateCsrf();
-
         $params = $this->getPsrRequest()->getQueryParams();
 
         $deliveryExecutionId = $params['serviceCallId'];

@@ -69,8 +69,6 @@ define([
 
     QUnit.cases.init([{
         title: 'success',
-        sendToken: '1234',
-        receiveToken: '4567',
         response: {
             success: true
         },
@@ -78,8 +76,6 @@ define([
         success: true
     }, {
         title: 'failing data',
-        sendToken: '1234',
-        receiveToken: '4567',
         response: {
             errorCode: 1,
             errorMessage: 'oops',
@@ -89,8 +85,6 @@ define([
         success: false
     }, {
         title: 'failing request',
-        sendToken: '1234',
-        receiveToken: '4567',
         response: 'error',
         ajaxSuccess: false,
         success: false
@@ -115,9 +109,6 @@ define([
         $.mockjax({
             url: '/*',
             status: caseData.ajaxSuccess ? 200 : 500,
-            headers: {
-                'X-CSRF-Token': caseData.receiveToken
-            },
             responseText: caseData.response,
             response(settings) {
                 assert.equal(settings.url, expectedUrl, 'The proxy has called the right service');
@@ -126,11 +117,12 @@ define([
 
         const proxy = proxyFactory('testProxy', initConfig);
         const tokenHandler = proxy.getTokenHandler();
+        const tokenValue = 'test';
 
         proxy
             .install()
             .then(() => tokenHandler.clearStore())
-            .then(() => proxy.getTokenHandler().setToken(caseData.sendToken))
+            .then(() => proxy.getTokenHandler().setToken(tokenValue))
             .then(() => {
                 proxy.on('init', (promise, config) => {
                     assert.ok(true, 'The proxy has fired the "init" event');
@@ -155,7 +147,7 @@ define([
                 assert.ok(!caseData.success, `The proxy has thrown an error! #${err}`);
             })
             .then(() => proxy.getTokenHandler().getToken().then(token => {
-                assert.equal(token, caseData.receiveToken, 'The proxy must update the security token');
+                assert.equal(token, tokenValue, 'The proxy must not use the security token');
             }))
             .then(ready);
     });
@@ -349,8 +341,6 @@ define([
     QUnit.cases.init([{
         title: 'success',
         uri: 'http://tao.dev/mockItemDefinition#123',
-        sendToken: '1234',
-        receiveToken: '4567',
         response: {
             itemData: {
                 interactions: [{}]
@@ -365,8 +355,6 @@ define([
     }, {
         title: 'failing data',
         uri: 'http://tao.dev/mockItemDefinition#123',
-        sendToken: '1234',
-        receiveToken: '4567',
         response: {
             errorCode: 1,
             errorMessage: 'oops',
@@ -377,8 +365,6 @@ define([
     }, {
         title: 'failing request',
         uri: 'http://tao.dev/mockItemDefinition#123',
-        sendToken: '1234',
-        receiveToken: '4567',
         response: 'error',
         ajaxSuccess: false,
         success: false
@@ -404,9 +390,6 @@ define([
         $.mockjax([{
             url: '/init*',
             status: 200,
-            headers: {
-                'X-CSRF-Token': caseData.receiveToken
-            },
             responseText: {
                 success: true
             }
@@ -424,11 +407,12 @@ define([
 
         const proxy = proxyFactory('testProxy', initConfig);
         const tokenHandler = proxy.getTokenHandler();
+        const tokenValue = 'test';
 
         proxy
             .install()
             .then(() => tokenHandler.clearStore())
-            .then(() => proxy.getTokenHandler().setToken(caseData.sendToken))
+            .then(() => proxy.getTokenHandler().setToken(tokenValue))
             .then(() => proxy.getItem(caseData.uri))
             .then(() => {
                 assert.ok(false, 'The proxy must be initialized');
@@ -461,7 +445,7 @@ define([
                 assert.ok(!caseData.success, `The proxy has thrown an error! #${err}`);
             })
             .then(() => proxy.getTokenHandler().getToken().then(token => {
-                assert.equal(token, caseData.receiveToken, 'The proxy must update the security token');
+                assert.equal(token, tokenValue, 'The proxy must not use the security token');
             }))
             .then(ready);
     });

@@ -17,19 +17,19 @@
  * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
  */
 
-use oat\tao\model\accessControl\func\AccessRule;
-use oat\tao\model\user\TaoRoles;
-use oat\taoLti\models\classes\LtiRoles;
 use oat\ltiTestReview\controller\Review;
 use oat\ltiTestReview\controller\ReviewTool;
 use oat\ltiTestReview\scripts\update\Updater;
+use oat\tao\model\accessControl\func\AccessRule;
+use oat\tao\model\user\TaoRoles;
+use oat\taoLti\models\classes\LtiRoles;
 
 return [
     'name' => 'ltiTestReview',
     'label' => 'Test Review',
     'description' => 'Extension for reviewing passed tests, with the display of actual and correct answers.',
     'license' => 'GPL-2.0',
-    'version' => '1.16.2',
+    'version' => '1.17.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => [
         'tao' => '>=38.6.0',

@@ -1,0 +1,66 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TAO 3.4.0-sprint117\n"
+"PO-Revision-Date: 2020-09-22T16:02:17\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: ja-JP\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: ja-JP\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+
+msgid "All"
+msgstr ""
+
+msgid "Correct response"
+msgstr ""
+
+msgid "Go to the next item"
+msgstr ""
+
+msgid "Go to the previous item"
+msgstr ""
+
+msgid "Incorrect"
+msgstr ""
+
+msgid "Informational item"
+msgstr ""
+
+msgid "Jump to:"
+msgstr ""
+
+msgid "Navigation"
+msgstr ""
+
+msgid "Next"
+msgstr ""
+
+msgid "No response"
+msgstr ""
+
+msgid "Question"
+msgstr ""
+
+msgid "Show all items"
+msgstr ""
+
+msgid "Show incorrect items only"
+msgstr ""
+
+msgid "TEST SCORE:"
+msgstr ""
+
+msgid "TOTAL"
+msgstr ""
+
+msgid "Your response"
+msgstr ""
+
+msgid "Your Score:"
+msgstr ""
+

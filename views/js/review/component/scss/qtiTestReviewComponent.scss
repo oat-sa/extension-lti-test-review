@@ -39,11 +39,11 @@
         }
     }
 
-    //&.readonly {
-    //    .qti-item::before {
-    //        content: ' ';
-    //        // high number because of the surrounding that already contains such big values
-    //        @include previewer-overlay(100000);
-    //    }
-    //}
+    &.readonly {
+        .qti-item::before {
+            content: ' ';
+            // high number because of the surrounding that already contains such big values
+            @include previewer-overlay(100000);
+        }
+    }
 }

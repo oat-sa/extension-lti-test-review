@@ -145,8 +145,17 @@ define([
                         } else {
                             itemAnswer.setIncorrect();
                         }
+
+                        const contentArea = testRunner.getAreaBroker().getContentArea();
                         // remove all tabindex's inside item for right navigation
-                        testRunner.getAreaBroker().getContentArea().find('[tabindex]').attr('tabindex', -1);
+                        contentArea.find('[tabindex]').attr('tabindex', -1);
+
+                        // allow to scroll textarea
+                        contentArea.find('textarea').attr('disabled', 'disabled');
+                        const textareaItems = contentArea.find('textarea').closest('.qti-item');
+                        const readonlyClassName = `readonly-${Math.random().toString(36).substring(2)}`;
+                        $('head').append(`<style>.${readonlyClassName}:before{display:none !important;}</style>`);
+                        textareaItems.addClass(readonlyClassName);
                     })
                     .on(`plugin-show.${this.getName()}`, () => itemAnswer.show())
                     .on(`plugin-hide.${this.getName()}`, () => itemAnswer.hide())

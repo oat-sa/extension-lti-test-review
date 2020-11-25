@@ -150,12 +150,9 @@ define([
                         // remove all tabindex's inside item for right navigation
                         contentArea.find('[tabindex]').attr('tabindex', -1);
 
-                        // allow to scroll textarea
+                        // allow to scroll textarea, disable to avoid useless editing
+                        contentArea.find('textarea').closest('.qti-item').addClass('textarea');
                         contentArea.find('textarea').attr('disabled', 'disabled');
-                        const textareaItems = contentArea.find('textarea').closest('.qti-item');
-                        const readonlyClassName = `readonly-${Math.random().toString(36).substring(2)}`;
-                        $('head').append(`<style>.${readonlyClassName}:before{display:none !important;}</style>`);
-                        textareaItems.addClass(readonlyClassName);
                     })
                     .on(`plugin-show.${this.getName()}`, () => itemAnswer.show())
                     .on(`plugin-hide.${this.getName()}`, () => itemAnswer.hide())

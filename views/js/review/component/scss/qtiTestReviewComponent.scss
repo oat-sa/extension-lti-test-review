@@ -45,5 +45,9 @@
             // high number because of the surrounding that already contains such big values
             @include previewer-overlay(100000);
         }
+        .qti-item.textarea::before {
+            // access scroll/focus to textarea
+            display: none;
+        }
     }
 }

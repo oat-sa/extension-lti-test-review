@@ -145,8 +145,14 @@ define([
                         } else {
                             itemAnswer.setIncorrect();
                         }
+
+                        const contentArea = testRunner.getAreaBroker().getContentArea();
                         // remove all tabindex's inside item for right navigation
-                        testRunner.getAreaBroker().getContentArea().find('[tabindex]').attr('tabindex', -1);
+                        contentArea.find('[tabindex]').attr('tabindex', -1);
+
+                        // allow to scroll textarea, disable to avoid useless editing
+                        contentArea.find('textarea').closest('.qti-item').addClass('textarea');
+                        contentArea.find('textarea').attr('disabled', 'disabled');
                     })
                     .on(`plugin-show.${this.getName()}`, () => itemAnswer.show())
                     .on(`plugin-hide.${this.getName()}`, () => itemAnswer.hide())

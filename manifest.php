@@ -29,12 +29,13 @@ return [
     'label' => 'Test Review',
     'description' => 'Extension for reviewing passed tests, with the display of actual and correct answers.',
     'license' => 'GPL-2.0',
-    'version' => '1.17.1',
+    'version' => '1.18.0',
     'author' => 'Open Assessment Technologies SA',
     'requires' => [
         'tao' => '>=38.6.0',
         'taoLti' => '>=10.1.0',
         'ltiDeliveryProvider' => '>=9.2.0',
+        'taoQtiItem' => '>=15.18.0',
         'taoQtiTest' => '>=34.6.0',
         'taoQtiTestPreviewer' => '>=2.8.0'
     ],

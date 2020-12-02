@@ -35,6 +35,7 @@ return [
         'tao' => '>=38.6.0',
         'taoLti' => '>=10.1.0',
         'ltiDeliveryProvider' => '>=9.2.0',
+        'taoProctoring' => '>=17.2.0',
         'taoQtiItem' => '>=15.18.0',
         'taoQtiTest' => '>=34.6.0',
         'taoQtiTestPreviewer' => '>=2.8.0'

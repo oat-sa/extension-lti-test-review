@@ -46,7 +46,7 @@ define([
         let response = null;
 
         if (context) {
-            const {itemIdentifier} = context;
+            const { itemIdentifier } = context;
             const responses = dataHolder.get('testResponses');
             response = responses[itemIdentifier];
         }
@@ -63,8 +63,8 @@ define([
         const declarations = itemHelper.getDeclarations(testRunner);
         const response = {};
         _.forEach(declarations, declaration => {
-            const {attributes} = declaration;
-            const {identifier, baseType, cardinality} = attributes || {};
+            const { attributes } = declaration;
+            const { identifier, baseType, cardinality } = attributes || {};
             response[identifier] = {
                 response: itemHelper.toResponse(declaration.correctResponse, baseType, cardinality)
             };
@@ -79,7 +79,7 @@ define([
      */
     const setItemState = (name, testRunner) => {
         const itemRunner = testRunner.itemRunner;
-        const {showCorrect} = testRunner.getOptions();
+        const { showCorrect } = testRunner.getOptions();
         let response = null;
 
         if (itemRunner) {
@@ -117,10 +117,11 @@ define([
         render() {
             return promiseTimeout(new Promise(resolve => {
                 const testRunner = this.getTestRunner();
-                const {showScore, showCorrect} = testRunner.getOptions();
+                const areaBroker = this.getAreaBroker();
+                const { showScore, showCorrect } = testRunner.getOptions();
                 const itemAnswer = itemAnswerFactory(
-                    this.getAreaBroker().getArea('itemTool'),
-                    Object.assign({showScore, showCorrect}, this.getConfig()),
+                    areaBroker.getArea('itemTool'),
+                    Object.assign({ showScore, showCorrect }, this.getConfig())
                 );
 
                 // control the test runner from the review panel
@@ -146,13 +147,8 @@ define([
                             itemAnswer.setIncorrect();
                         }
 
-                        const contentArea = testRunner.getAreaBroker().getContentArea();
                         // remove all tabindex's inside item for right navigation
-                        contentArea.find('[tabindex]').attr('tabindex', -1);
-
-                        // allow to scroll textarea, disable to avoid useless editing
-                        contentArea.find('textarea').closest('.qti-item').addClass('textarea');
-                        contentArea.find('textarea').attr('disabled', 'disabled');
+                        areaBroker.getContentArea().find('[tabindex]').attr('tabindex', -1);
                     })
                     .on(`plugin-show.${this.getName()}`, () => itemAnswer.show())
                     .on(`plugin-hide.${this.getName()}`, () => itemAnswer.hide())

@@ -86,7 +86,7 @@ define([
                 return result;
             };
 
-            const {plugins} = this.getConfig().options || {};
+            const { plugins } = this.getConfig().options || {};
             if (plugins) {
                 _.forEach(this.getPlugins(), plugin => {
                     if (_.isPlainObject(plugin) && _.isFunction(plugin.setConfig)) {
@@ -117,7 +117,7 @@ define([
                 panel: $('.test-sidebar-left .panel-box', $layout),
                 header: $('.top-action-bar .tools-box', $layout),
                 context: $('.top-action-bar .navi-box-list', $layout),
-                sidebar: $('.test-sidebar-left', $layout),
+                sidebar: $('.test-sidebar-left', $layout)
             });
         },
 
@@ -126,8 +126,8 @@ define([
          * @returns {proxy}
          */
         loadProxy() {
-            const {proxyProvider, serviceCallId, bootstrap, timeout} = this.getConfig();
-            return proxyFactory(proxyProvider || 'qtiTestReviewProxy', {serviceCallId, bootstrap, timeout});
+            const { proxyProvider, serviceCallId, bootstrap, timeout } = this.getConfig();
+            return proxyFactory(proxyProvider || 'qtiTestReviewProxy', { serviceCallId, bootstrap, timeout });
         },
 
         /**
@@ -157,21 +157,21 @@ define([
             // first and second tab will show block and navigate to panel or content
             const createJumplinks = (container) => {
                 container.on('click', (e) => {
-                    if (e.target.classList.contains('jumplink')){
+                    if (e.target.classList.contains('jumplink')) {
                         e.preventDefault();
                         e.target.blur();
                         const where = e.target.dataset.area;
-                        areaBroker.getArea(where).find(":not(.hidden)[tabindex]").first().focus();
+                        areaBroker.getArea(where).find(':not(.hidden)[tabindex]').first().focus();
                     }
                 });
                 container.on('focusin', (e) => {
-                    if (e.target.classList.contains('jumplink')){
+                    if (e.target.classList.contains('jumplink')) {
                         const where = e.target.dataset.area;
                         areaBroker.getArea(where).addClass('focused');
                     }
                 });
                 container.on('focusout', (e) => {
-                    if (e.target.classList.contains('jumplink')){
+                    if (e.target.classList.contains('jumplink')) {
                         const where = e.target.dataset.area;
                         areaBroker.getArea(where).removeClass('focused');
                     }
@@ -287,20 +287,21 @@ define([
             return new Promise((resolve, reject) => {
                 itemData.content = itemData.content || {};
 
+                const view = 'reviewRenderer';
                 const assetManager = this.assetManager;
                 assetManager.setData('baseUrl', itemData.baseUrl);
                 assetManager.setData('itemIdentifier', itemIdentifier);
                 assetManager.setData('assets', itemData.content.assets);
 
-                this.itemRunner = qtiItemRunner(itemData.content.type, itemData.content.data, {assetManager})
+                this.itemRunner = qtiItemRunner(itemData.content.type, itemData.content.data, { assetManager, view })
                     .on('warning', err => this.trigger('warning', err))
                     .on('error', err => {
                         this.trigger('enablenav');
                         reject(err);
                     })
                     .on('init', function onItemRunnerInit() {
-                        const {state, portableElements} = itemData;
-                        this.render(areaBroker.getContentArea(), {state, portableElements});
+                        const { state, portableElements } = itemData;
+                        this.render(areaBroker.getContentArea(), { state, portableElements });
                     })
                     .on('render', function onItemRunnerRender() {
                         this.on('responsechange', changeState);

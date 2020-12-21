@@ -38,4 +38,13 @@
             height: 100vh;
         }
     }
+
+    &.readonly {
+        // Make sure the overlay is not displayed, as this is not needed by the review mode.
+        // The alternative renderers for the interactions should prevent the user changes.
+        .qti-item::before {
+            content: none;
+            display: none;
+        }
+    }
 }

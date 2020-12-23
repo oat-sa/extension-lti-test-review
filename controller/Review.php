@@ -107,7 +107,10 @@ class Review extends tao_actions_SinglePageModule
         try {
             if (!empty($params['serviceCallId'])) {
                 $finder = $this->getDeliveryExecutionFinderService();
-                $this->checkPermissions($finder->findDeliveryExecution($this->ltiSession->getLaunchData()));
+                $execution = $this->getDeliveryExecutionManagerService()->getDeliveryExecutionById(
+                    $params['serviceCallId']
+                );
+                $this->checkPermissions($execution);
                 $data = $dataBuilder->create()->build(
                     $params['serviceCallId'],
                     $finder->getShowScoreOption($this->ltiSession->getLaunchData())
@@ -134,9 +137,7 @@ class Review extends tao_actions_SinglePageModule
             $deliveryExecutionId = $params['serviceCallId'];
             $itemDefinition = $params['itemUri'];
 
-            /** @var DeliveryExecutionManagerService $deManagerService */
-            $deManagerService = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
-            $execution = $deManagerService->getDeliveryExecutionById($deliveryExecutionId);
+            $execution = $this->getDeliveryExecutionManagerService()->getDeliveryExecutionById($deliveryExecutionId);
 
             $this->checkPermissions($execution);
 
@@ -213,13 +214,23 @@ class Review extends tao_actions_SinglePageModule
      */
     protected function checkPermissions(DeliveryExecution $execution): void
     {
+        if (!$execution) {
+            throw new \common_exception_NotFound();
+        }
         if ($execution->getUserIdentifier() !== $this->ltiSession->getUser()->getIdentifier()) {
-            throw new common_exception_Unauthorized($execution->getUserIdentifier());
+            throw new \common_exception_Unauthorized($execution->getUserIdentifier());
         }
     }
 
     private function getDeliveryExecutionFinderService(): DeliveryExecutionFinderService
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
+    }
+
+    private function getDeliveryExecutionManagerService(): DeliveryExecutionManagerService
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
     }
 }

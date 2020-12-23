@@ -105,9 +105,8 @@ class Review extends tao_actions_SinglePageModule
         $params = $this->getPsrRequest()->getQueryParams();
 
         try {
-            if (isset($params['serviceCallId'])) {
-                /** @var DeliveryExecutionFinderService $finder */
-                $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
+            if (!empty($params['serviceCallId'])) {
+                $finder = $this->getDeliveryExecutionFinderService();
                 $this->checkPermissions($finder->findDeliveryExecution($this->ltiSession->getLaunchData()));
                 $data = $dataBuilder->create()->build(
                     $params['serviceCallId'],
@@ -212,10 +211,15 @@ class Review extends tao_actions_SinglePageModule
      * @throws common_exception_NotFound
      * @throws common_exception_Unauthorized
      */
-    protected function checkPermissions(DeliveryExecution $execution)
+    protected function checkPermissions(DeliveryExecution $execution): void
     {
         if ($execution->getUserIdentifier() !== $this->ltiSession->getUser()->getIdentifier()) {
-            throw new common_exception_Unauthorized();
+            throw new common_exception_Unauthorized($execution->getUserIdentifier());
         }
+    }
+
+    private function getDeliveryExecutionFinderService(): DeliveryExecutionFinderService
+    {
+        return $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
     }
 }

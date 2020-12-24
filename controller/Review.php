@@ -33,7 +33,6 @@ use oat\ltiTestReview\models\DeliveryExecutionFinderService;
 use oat\ltiTestReview\models\QtiRunnerInitDataBuilderFactory;
 use oat\tao\model\http\HttpJsonResponseTrait;
 use oat\tao\model\mvc\DefaultUrlService;
-use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiService;
@@ -107,10 +106,7 @@ class Review extends tao_actions_SinglePageModule
         try {
             if (!empty($params['serviceCallId'])) {
                 $finder = $this->getDeliveryExecutionFinderService();
-                $execution = $this->getDeliveryExecutionManagerService()->getDeliveryExecutionById(
-                    $params['serviceCallId']
-                );
-                $this->checkPermissions($execution);
+                $this->checkPermissions($params['serviceCallId']);
                 $data = $dataBuilder->create()->build(
                     $params['serviceCallId'],
                     $finder->getShowScoreOption($this->ltiSession->getLaunchData())
@@ -139,7 +135,7 @@ class Review extends tao_actions_SinglePageModule
 
             $execution = $this->getDeliveryExecutionManagerService()->getDeliveryExecutionById($deliveryExecutionId);
 
-            $this->checkPermissions($execution);
+            $this->checkPermissions($deliveryExecutionId);
 
             $itemPreviewer = new ItemPreviewer();
             $itemPreviewer->setServiceLocator($this->getServiceLocator());
@@ -208,17 +204,20 @@ class Review extends tao_actions_SinglePageModule
     }
 
     /**
-     * @param DeliveryExecution $execution
-     * @throws common_exception_NotFound
+     * @param string $serviceCallId
      * @throws common_exception_Unauthorized
      */
-    protected function checkPermissions(DeliveryExecution $execution): void
+    protected function checkPermissions(string $serviceCallId): void
     {
-        if (!$execution) {
-            throw new \common_exception_NotFound();
+        try {
+            $execution = $this->getDeliveryExecutionFinderService()->findDeliveryExecution(
+                $this->ltiSession->getLaunchData()
+            );
+        } catch (\common_Exception $e) {
+            throw new \common_exception_Unauthorized($e->getMessage());
         }
-        if ($execution->getUserIdentifier() !== $this->ltiSession->getUser()->getIdentifier()) {
-            throw new \common_exception_Unauthorized($execution->getUserIdentifier());
+        if ($serviceCallId !== $execution->getIdentifier()) {
+            throw new \common_exception_Unauthorized($serviceCallId);
         }
     }
 

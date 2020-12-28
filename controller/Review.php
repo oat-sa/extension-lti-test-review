@@ -207,10 +207,6 @@ class Review extends tao_actions_SinglePageModule
         return empty($lang) ? DEFAULT_LANG : (string)current($lang);
     }
 
-    /**
-     * @param string $serviceCallId
-     * @throws common_exception_Unauthorized
-     */
     protected function checkPermissions(string $serviceCallId): void
     {
         try {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,6 +25,7 @@ namespace oat\ltiTestReview\controller;
 use common_Exception;
 use common_exception_Error;
 use common_exception_NotFound;
+use common_exception_Unauthorized;
 use core_kernel_users_GenerisUser;
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
@@ -40,6 +42,7 @@ use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
 use tao_actions_SinglePageModule;
+use common_exception_ClientException;
 
 /**
  * Review controller class thar provides data for js-application
@@ -53,7 +56,8 @@ class Review extends tao_actions_SinglePageModule
     /** @var TaoLtiSession */
     private $ltiSession;
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
 
         $this->ltiSession = LtiService::singleton()->getLtiSession();
@@ -100,15 +104,25 @@ class Review extends tao_actions_SinglePageModule
 
         $params = $this->getPsrRequest()->getQueryParams();
 
-        if (isset($params['serviceCallId'])) {
-
-            /** @var DeliveryExecutionFinderService $finder */
-            $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
-
-            $data = $dataBuilder->create()->build($params['serviceCallId'], $finder->getShowScoreOption($this->ltiSession->getLaunchData()));
+        try {
+            $data = [];
+            if (!empty($params['serviceCallId'])) {
+                $finder = $this->getDeliveryExecutionFinderService();
+                $this->checkPermissions($params['serviceCallId']);
+                $data = $dataBuilder->create()->build(
+                    $params['serviceCallId'],
+                    $finder->getShowScoreOption($this->ltiSession->getLaunchData())
+                );
+            }
+            $this->returnJson($data);
+        } catch (common_exception_ClientException $e) {
+            $this->logError($e->getMessage());
+            $this->returnJson([
+                                  'success' => false,
+                                  'type' => 'error',
+                                  'message' => $e->getUserMessage()
+                              ]);
         }
-
-        $this->returnJson($data ?? []);
     }
 
     /**
@@ -116,52 +130,62 @@ class Review extends tao_actions_SinglePageModule
      */
     public function getItem(): void
     {
-        $params = $this->getPsrRequest()->getQueryParams();
+        try {
+            $params = $this->getPsrRequest()->getQueryParams();
 
-        $deliveryExecutionId = $params['serviceCallId'];
-        $itemDefinition = $params['itemUri'];
+            $deliveryExecutionId = $params['serviceCallId'];
+            $itemDefinition = $params['itemUri'];
 
-        /** @var DeliveryExecutionManagerService $deManagerService */
-        $deManagerService = $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
-        $execution = $deManagerService->getDeliveryExecutionById($deliveryExecutionId);
+            $execution = $this->getDeliveryExecutionManagerService()->getDeliveryExecutionById($deliveryExecutionId);
 
-        $itemPreviewer = new ItemPreviewer();
-        $itemPreviewer->setServiceLocator($this->getServiceLocator());
+            $this->checkPermissions($deliveryExecutionId);
 
-        $itemPreviewer
-            ->setItemDefinition($itemDefinition)
-            ->setUserLanguage($this->getUserLanguage($deliveryExecutionId))
-            ->setDelivery($execution->getDelivery());
+            $itemPreviewer = new ItemPreviewer();
+            $itemPreviewer->setServiceLocator($this->getServiceLocator());
 
-        $itemData = $itemPreviewer->loadCompiledItemData();
+            $itemPreviewer
+                ->setItemDefinition($itemDefinition)
+                ->setUserLanguage($this->getUserLanguage($deliveryExecutionId))
+                ->setDelivery($execution->getDelivery());
 
-        /** @var DeliveryExecutionFinderService $finder */
-        $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
+            $itemData = $itemPreviewer->loadCompiledItemData();
 
-        if (!empty($itemData['data']['responses'])
-            && $finder->getShowCorrectOption($this->ltiSession->getLaunchData())
-        ) {
-            $responsesData = array_merge_recursive(...[
-                $itemData['data']['responses'],
-                $itemPreviewer->loadCompiledItemVariables()
-            ]);
+            /** @var DeliveryExecutionFinderService $finder */
+            $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
 
-            // make sure the responses data are compliant to QTI definition
-            $itemData['data']['responses'] = array_filter(
-                $responsesData,
-                static function (array $dataEntry): bool {
-                    return array_key_exists('qtiClass', $dataEntry)
-                        && array_key_exists('serial', $dataEntry)
-                        && $dataEntry['qtiClass'] !== 'modalFeedback';
-                }
-            );
+            if (
+                !empty($itemData['data']['responses'])
+                && $finder->getShowCorrectOption($this->ltiSession->getLaunchData())
+            ) {
+                $responsesData = array_merge_recursive(...[
+                                                              $itemData['data']['responses'],
+                                                              $itemPreviewer->loadCompiledItemVariables()
+                                                          ]);
+
+                // make sure the responses data are compliant to QTI definition
+                $itemData['data']['responses'] = array_filter(
+                    $responsesData,
+                    static function (array $dataEntry): bool {
+                        return array_key_exists('qtiClass', $dataEntry)
+                            && array_key_exists('serial', $dataEntry)
+                            && $dataEntry['qtiClass'] !== 'modalFeedback';
+                    }
+                );
+            }
+
+            $response['content'] = $itemData;
+            $response['baseUrl'] = $itemPreviewer->getBaseUrl();
+            $response['success'] = true;
+
+            $this->returnJson($response);
+        } catch (common_exception_ClientException $e) {
+            $this->logError($e->getMessage());
+            $this->returnJson([
+                                  'success' => false,
+                                  'type' => 'error',
+                                  'message' => $e->getUserMessage()
+                              ]);
         }
-
-        $response['content'] = $itemData;
-        $response['baseUrl'] = $itemPreviewer->getBaseUrl();
-        $response['success'] = true;
-
-        $this->returnJson($response);
     }
 
     /**
@@ -183,4 +207,29 @@ class Review extends tao_actions_SinglePageModule
         return empty($lang) ? DEFAULT_LANG : (string)current($lang);
     }
 
+    protected function checkPermissions(string $serviceCallId): void
+    {
+        try {
+            $execution = $this->getDeliveryExecutionFinderService()->findDeliveryExecution(
+                $this->ltiSession->getLaunchData()
+            );
+        } catch (common_Exception $e) {
+            throw new common_exception_Unauthorized($e->getMessage());
+        }
+        if ($serviceCallId !== $execution->getIdentifier()) {
+            throw new common_exception_Unauthorized($serviceCallId);
+        }
+    }
+
+    private function getDeliveryExecutionFinderService(): DeliveryExecutionFinderService
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
+    }
+
+    private function getDeliveryExecutionManagerService(): DeliveryExecutionManagerService
+    {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+        return $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
+    }
 }

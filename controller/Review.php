@@ -104,6 +104,7 @@ class Review extends tao_actions_SinglePageModule
         $params = $this->getPsrRequest()->getQueryParams();
 
         try {
+            $data = [];
             if (!empty($params['serviceCallId'])) {
                 $finder = $this->getDeliveryExecutionFinderService();
                 $this->checkPermissions($params['serviceCallId']);
@@ -112,7 +113,7 @@ class Review extends tao_actions_SinglePageModule
                     $finder->getShowScoreOption($this->ltiSession->getLaunchData())
                 );
             }
-            $this->returnJson($data ?? []);
+            $this->returnJson($data);
         } catch (\common_Exception $e) {
             \common_Logger::e($e->getMessage());
             $this->returnJson([

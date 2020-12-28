@@ -113,7 +113,8 @@ class Review extends tao_actions_SinglePageModule
                 );
             }
             $this->returnJson($data ?? []);
-        } catch (\common_exception_ClientException $e) {
+        } catch (\common_Exception $e) {
+            \common_Logger::e($e->getMessage());
             $this->returnJson([
                 'success' => false,
                 'type' => 'error',
@@ -176,6 +177,7 @@ class Review extends tao_actions_SinglePageModule
 
             $this->returnJson($response);
         } catch (\common_Exception $e) {
+            \common_Logger::e($e->getMessage());
             $this->returnJson([
                 'success' => false,
                 'type' => 'error',

@@ -42,6 +42,7 @@ use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
 use tao_actions_SinglePageModule;
+use common_exception_ClientException;
 
 /**
  * Review controller class thar provides data for js-application
@@ -114,8 +115,8 @@ class Review extends tao_actions_SinglePageModule
                 );
             }
             $this->returnJson($data);
-        } catch (\common_Exception $e) {
-            \common_Logger::e($e->getMessage());
+        } catch (common_exception_ClientException $e) {
+            $this->logError($e->getMessage());
             $this->returnJson([
                 'success' => false,
                 'type' => 'error',
@@ -177,8 +178,8 @@ class Review extends tao_actions_SinglePageModule
             $response['success'] = true;
 
             $this->returnJson($response);
-        } catch (\common_Exception $e) {
-            \common_Logger::e($e->getMessage());
+        } catch (common_exception_ClientException $e) {
+            $this->logError($e->getMessage());
             $this->returnJson([
                 'success' => false,
                 'type' => 'error',
@@ -216,11 +217,11 @@ class Review extends tao_actions_SinglePageModule
             $execution = $this->getDeliveryExecutionFinderService()->findDeliveryExecution(
                 $this->ltiSession->getLaunchData()
             );
-        } catch (\common_Exception $e) {
-            throw new \common_exception_Unauthorized($e->getMessage());
+        } catch (common_Exception $e) {
+            throw new common_exception_Unauthorized($e->getMessage());
         }
         if ($serviceCallId !== $execution->getIdentifier()) {
-            throw new \common_exception_Unauthorized($serviceCallId);
+            throw new common_exception_Unauthorized($serviceCallId);
         }
     }
 

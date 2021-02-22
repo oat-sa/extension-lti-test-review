@@ -18,7 +18,18 @@
   },
   "minimum-stability": "dev",
   "require": {
-    "oat-sa/oatbox-extension-installer": "~1.1||dev-master"
+    "oat-sa/oatbox-extension-installer": "~1.1||dev-master",
+    "oat-sa/extension-tao-ltideliveryprovider" : ">=12.0.0",
+    "oat-sa/generis" : ">=14.0.0",
+    "oat-sa/tao-core" : ">=47.0.0",
+    "oat-sa/extension-tao-delivery" : ">=15.0.0",
+    "oat-sa/extension-tao-lti" : ">=12.0.0",
+    "oat-sa/extension-tao-delivery-rdf" : ">=14.0.0",
+    "oat-sa/extension-lti-outcomeui" : ">=1.0.0",
+    "oat-sa/extension-tao-proctoring" : ">=20.0.0",
+    "oat-sa/extension-tao-testqti" : ">=41.0.0",
+    "oat-sa/extension-tao-outcome" : ">=13.0.0",
+    "oat-sa/extension-tao-testqti-previewer" : ">=3.0.0"
   },
   "autoload": {
     "psr-4": {

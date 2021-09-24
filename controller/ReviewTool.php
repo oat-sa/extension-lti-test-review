@@ -22,6 +22,7 @@ namespace oat\ltiTestReview\controller;
 use oat\taoLti\controller\ToolModule;
 use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiMessages\LtiErrorMessage;
+use oat\taoLti\models\classes\LtiService;
 
 /**
  * ReviewTool controller for managing LTI calls, used as entry point for LTI call and do redirect to proper application controller
@@ -44,5 +45,13 @@ class ReviewTool extends ToolModule
                 LtiErrorMessage::ERROR_UNAUTHORIZED
             );
         }
+    }
+
+    public function launch1p3(): void
+    {
+        $message = $this->getValidatedLtiMessagePayload();
+
+        LtiService::singleton()->startLti1p3Session($message);
+        $this->forward('run', null, null, $_GET);
     }
 }

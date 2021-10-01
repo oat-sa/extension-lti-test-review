@@ -25,7 +25,6 @@
     "oat-sa/extension-tao-delivery" : ">=15.0.0",
     "oat-sa/extension-tao-lti" : ">=13.2.0",
     "oat-sa/extension-tao-delivery-rdf" : ">=14.0.0",
-    "oat-sa/extension-lti-outcomeui" : ">=1.0.0",
     "oat-sa/extension-tao-proctoring" : ">=20.0.0",
     "oat-sa/extension-tao-testqti" : ">=41.0.0",
     "oat-sa/extension-tao-outcome" : ">=13.0.0",

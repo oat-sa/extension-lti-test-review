@@ -23,6 +23,7 @@
 namespace oat\ltiTestReview\controller;
 
 use common_Exception;
+use common_exception_ClientException;
 use common_exception_Error;
 use common_exception_NotFound;
 use common_exception_Unauthorized;
@@ -42,7 +43,6 @@ use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
 use tao_actions_SinglePageModule;
-use common_exception_ClientException;
 
 /**
  * Review controller class thar provides data for js-application
@@ -69,15 +69,26 @@ class Review extends tao_actions_SinglePageModule
      * @throws LtiVariableMissingException
      * @throws common_exception_Error
      * @throws common_exception_NotFound
+     * @throws common_Exception
      */
     public function index(): void
     {
         $launchData = $this->ltiSession->getLaunchData();
+        $finder = $this->getDeliveryExecutionFinderService();
+        $deliveryId = $this->getDeliveryId();
 
-        /** @var DeliveryExecutionFinderService $finder */
-        $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
-
-        $execution = $finder->findDeliveryExecution($launchData);
+        if ($deliveryId === null) {
+            $execution = $finder->findDeliveryExecution($launchData);
+        } else {
+            $execution = $finder->findByUserAndDelivery($launchData, $deliveryId);
+            if ($execution === null) {
+                $this->returnError(
+                    __('Available delivery executions for review does not exists'),
+                    true,
+                    404
+                );
+            }
+        }
         $delivery = $execution->getDelivery();
 
         /* @var $urlRouteService DefaultUrlService */
@@ -86,9 +97,9 @@ class Review extends tao_actions_SinglePageModule
 
         $data = [
             'execution' => $execution->getIdentifier(),
-            'delivery'  => $delivery->getUri(),
-            'show-score' => (int)$finder->getShowScoreOption($launchData),
-            'show-correct' => (int)$finder->getShowCorrectOption($launchData)
+            'delivery' => $delivery->getUri(),
+            'show-score' => (int) $finder->getShowScoreOption($launchData),
+            'show-correct' => (int) $finder->getShowCorrectOption($launchData)
         ];
 
         $this->composeView('delegated-view', $data, 'pages/index.tpl', 'tao');
@@ -231,5 +242,10 @@ class Review extends tao_actions_SinglePageModule
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
+    }
+
+    private function getDeliveryId(): ?string
+    {
+        return $this->getPsrRequest()->getQueryParams()['delivery'] ?? null;
     }
 }

@@ -77,6 +77,26 @@ class DeliveryExecutionFinderService extends ConfigurableService
     }
 
     /**
+     * @throws LtiVariableMissingException
+     * @throws \common_exception_Error
+     */
+    public function findByUserAndDelivery(LtiLaunchData $ltiLaunchData, string $deliveryId): ?DeliveryExecution
+    {
+        $deliveryExecutionService = $this->getExecutionServiceProxy();
+        $deliveryResource = new core_kernel_classes_Resource($deliveryId);
+        $userDeliveryExecutions = $deliveryExecutionService->getUserExecutions(
+            $deliveryResource,
+            $ltiLaunchData->getUserID()
+        );
+
+        if (count($userDeliveryExecutions) > 0) {
+            return end($userDeliveryExecutions);
+        }
+
+        return null;
+    }
+
+    /**
      * @param LtiLaunchData $launchData
      *
      * @return bool

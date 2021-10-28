@@ -30,6 +30,7 @@ use common_exception_Unauthorized;
 use core_kernel_users_GenerisUser;
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
+use oat\ltiDeliveryProvider\model\execution\LtiDeliveryExecutionService;
 use oat\ltiTestReview\models\DeliveryExecutionFinderService;
 use oat\ltiTestReview\models\QtiRunnerInitDataBuilderFactory;
 use oat\tao\model\http\HttpJsonResponseTrait;
@@ -80,7 +81,7 @@ class Review extends tao_actions_SinglePageModule
         if ($deliveryId === null) {
             $execution = $finder->findDeliveryExecution($launchData);
         } else {
-            $execution = $finder->findByUserAndDelivery($launchData, $deliveryId);
+            $execution = $finder->findLastExecutionByUserAndDelivery($launchData, $deliveryId);
             if ($execution === null) {
                 $this->returnError(
                     __('Available delivery executions for review does not exists'),
@@ -218,18 +219,28 @@ class Review extends tao_actions_SinglePageModule
         return empty($lang) ? DEFAULT_LANG : (string)current($lang);
     }
 
+    /**
+     * @throws LtiVariableMissingException
+     * @throws common_exception_Unauthorized
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     */
     protected function checkPermissions(string $serviceCallId): void
     {
-        try {
-            $execution = $this->getDeliveryExecutionFinderService()->findDeliveryExecution(
-                $this->ltiSession->getLaunchData()
-            );
-        } catch (common_Exception $e) {
-            throw new common_exception_Unauthorized($e->getMessage());
+        $execution = $this->getDeliveryExecutionManagerService()->getDeliveryExecutionById($serviceCallId);
+        $linkedDeliveryExecutions = $this->getDeliveryExecutionService()->getLinkedDeliveryExecutions(
+            $execution->getDelivery(),
+            $this->ltiSession->getLtiLinkResource(),
+            $this->ltiSession->getUserUri()
+        );
+
+        foreach ($linkedDeliveryExecutions as $deliveryExecution) {
+            if ($deliveryExecution->getIdentifier() === $serviceCallId) {
+                return;
+            }
         }
-        if ($serviceCallId !== $execution->getIdentifier()) {
-            throw new common_exception_Unauthorized($serviceCallId);
-        }
+
+        throw new common_exception_Unauthorized($serviceCallId);
     }
 
     private function getDeliveryExecutionFinderService(): DeliveryExecutionFinderService
@@ -247,5 +258,10 @@ class Review extends tao_actions_SinglePageModule
     private function getDeliveryId(): ?string
     {
         return $this->getPsrRequest()->getQueryParams()['delivery'] ?? null;
+    }
+
+    private function getDeliveryExecutionService(): LtiDeliveryExecutionService
+    {
+        return $this->getPsrContainer()->get(LtiDeliveryExecutionService::class);
     }
 }

@@ -20,6 +20,7 @@
 namespace oat\ltiTestReview\models;
 
 use core_kernel_classes_Resource;
+use oat\dtms\DateTime;
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
 use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
 use oat\oatbox\service\ConfigurableService;
@@ -80,8 +81,10 @@ class DeliveryExecutionFinderService extends ConfigurableService
      * @throws LtiVariableMissingException
      * @throws \common_exception_Error
      */
-    public function findByUserAndDelivery(LtiLaunchData $ltiLaunchData, string $deliveryId): ?DeliveryExecution
-    {
+    public function findLastExecutionByUserAndDelivery(
+        LtiLaunchData $ltiLaunchData,
+        string $deliveryId
+    ): ?DeliveryExecution {
         $deliveryExecutionService = $this->getExecutionServiceProxy();
         $deliveryResource = new core_kernel_classes_Resource($deliveryId);
         $userDeliveryExecutions = $deliveryExecutionService->getUserExecutions(
@@ -90,6 +93,13 @@ class DeliveryExecutionFinderService extends ConfigurableService
         );
 
         if (count($userDeliveryExecutions) > 0) {
+            usort(
+                $userDeliveryExecutions,
+                static function (DeliveryExecution $executionA, DeliveryExecution $executionB) {
+                    return new DateTime($executionA->getStartTime()) <=> new DateTime($executionB->getStartTime());
+                }
+            );
+
             return end($userDeliveryExecutions);
         }
 

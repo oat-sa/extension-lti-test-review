@@ -123,7 +123,7 @@ class DeliveryExecutionFinderServiceTest extends TestCase
 
         $this->executionServiceProxy->method('getUserExecutions')->willReturn([]);
         $launchData = new LtiLaunchData([LtiLaunchData::USER_ID => $userId], []);
-        $deliveryExecution = $this->subject->findByUserAndDelivery($launchData, $deliveryId);
+        $deliveryExecution = $this->subject->findLastExecutionByUserAndDelivery($launchData, $deliveryId);
 
         self::assertNull($deliveryExecution);
     }
@@ -137,7 +137,7 @@ class DeliveryExecutionFinderServiceTest extends TestCase
 
         $this->executionServiceProxy->method('getUserExecutions')->willReturn([new DeliveryExecution($implementation)]);
         $launchData = new LtiLaunchData([LtiLaunchData::USER_ID => $userId], []);
-        $deliveryExecution = $this->subject->findByUserAndDelivery($launchData, $deliveryId);
+        $deliveryExecution = $this->subject->findLastExecutionByUserAndDelivery($launchData, $deliveryId);
 
         self::assertNotNull($deliveryExecution);
         $this->assertInstanceOf(DeliveryExecution::class, $deliveryExecution);

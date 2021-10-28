@@ -23,12 +23,12 @@ use core_kernel_classes_Resource;
 use oat\generis\test\TestCase;
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
 use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
+use oat\ltiTestReview\models\DeliveryExecutionFinderService;
 use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
 use oat\taoDelivery\model\execution\ServiceProxy;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiLaunchData;
-use oat\ltiTestReview\models\DeliveryExecutionFinderService;
 use oat\taoLti\models\classes\LtiVariableMissingException;
 
 class DeliveryExecutionFinderServiceTest extends TestCase
@@ -114,6 +114,33 @@ class DeliveryExecutionFinderServiceTest extends TestCase
         $deliveryExecution = $this->subject->findDeliveryExecution($launchData);
 
         $this->assertEquals($executionId, $deliveryExecution->getIdentifier());
+    }
+
+    public function testNotFoundDeliveryExecutionByUserAndDelivery(): void
+    {
+        $userId = 'test_user_id';
+        $deliveryId = 'http://backoffice.docker.localhost/ontologies/tao.rdf#i617822471ea2d126631ac77e4b86e48';
+
+        $this->executionServiceProxy->method('getUserExecutions')->willReturn([]);
+        $launchData = new LtiLaunchData([LtiLaunchData::USER_ID => $userId], []);
+        $deliveryExecution = $this->subject->findByUserAndDelivery($launchData, $deliveryId);
+
+        self::assertNull($deliveryExecution);
+    }
+
+    public function testFindDeliveryExecutionByUserAndDelivery(): void
+    {
+        $userId = 'test_user_id';
+        $deliveryId = 'http://backoffice.docker.localhost/ontologies/tao.rdf#i617822471ea2d126631ac77e4b86e48';
+
+        $implementation = $this->createMock(DeliveryExecutionInterface::class);
+
+        $this->executionServiceProxy->method('getUserExecutions')->willReturn([new DeliveryExecution($implementation)]);
+        $launchData = new LtiLaunchData([LtiLaunchData::USER_ID => $userId], []);
+        $deliveryExecution = $this->subject->findByUserAndDelivery($launchData, $deliveryId);
+
+        self::assertNotNull($deliveryExecution);
+        $this->assertInstanceOf(DeliveryExecution::class, $deliveryExecution);
     }
 
     public function testNotFoundDeliveryExecution()

@@ -127,10 +127,14 @@ class Review extends tao_actions_SinglePageModule
                     $finder->getShowScoreOption($this->ltiSession->getLaunchData())
                 );
             }
-            $this->setSuccessJsonResponse($data);
+            $this->returnJson($data);
         } catch (common_exception_ClientException $e) {
             $this->logError($e->getMessage());
-            $this->setErrorJsonResponse($e->getUserMessage(), $e->getCode());
+            $this->returnJson([
+                'success' => false,
+                'type' => 'error',
+                'message' => $e->getUserMessage()
+            ]);
         }
     }
 

@@ -25,6 +25,7 @@ namespace oat\ltiTestReview\controller;
 use common_Exception;
 use common_exception_ClientException;
 use common_exception_Error;
+use common_exception_InconsistentData;
 use common_exception_NotFound;
 use common_exception_Unauthorized;
 use core_kernel_users_GenerisUser;
@@ -45,6 +46,7 @@ use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
 use tao_actions_SinglePageModule;
+use taoResultServer_models_classes_ReadableResultStorage;
 
 /**
  * Review controller class thar provides data for js-application
@@ -142,7 +144,7 @@ class Review extends tao_actions_SinglePageModule
      * Provides the definition data and the state for a particular item
      *
      * @throws LtiVariableMissingException
-     * @throws \common_exception_InconsistentData
+     * @throws common_exception_InconsistentData
      * @throws common_Exception
      * @throws common_exception_Error
      * @throws common_exception_NotFound
@@ -213,7 +215,7 @@ class Review extends tao_actions_SinglePageModule
     {
         /** @var ResultServerService $resultServerService */
         $resultServerService = $this->getServiceLocator()->get(ResultServerService::SERVICE_ID);
-        /** @var \taoResultServer_models_classes_ReadableResultStorage $implementation */
+        /** @var taoResultServer_models_classes_ReadableResultStorage $implementation */
         $implementation = $resultServerService->getResultStorage();
 
         $testTaker = new core_kernel_users_GenerisUser($this->getResource($implementation->getTestTaker($resultId)));

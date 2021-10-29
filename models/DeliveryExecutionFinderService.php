@@ -19,6 +19,8 @@
 
 namespace oat\ltiTestReview\models;
 
+use common_exception_Error;
+use common_exception_NotFound;
 use core_kernel_classes_Resource;
 use oat\dtms\DateTime;
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
@@ -30,6 +32,7 @@ use oat\taoDelivery\model\execution\ServiceProxy as ExecutionServiceProxy;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiLaunchData;
 use oat\taoLti\models\classes\LtiVariableMissingException;
+use tao_helpers_Date;
 
 /**
  * Find delivery execution
@@ -79,7 +82,8 @@ class DeliveryExecutionFinderService extends ConfigurableService
 
     /**
      * @throws LtiVariableMissingException
-     * @throws \common_exception_Error
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
      */
     public function findLastExecutionByUserAndDelivery(
         LtiLaunchData $ltiLaunchData,
@@ -96,7 +100,11 @@ class DeliveryExecutionFinderService extends ConfigurableService
             usort(
                 $userDeliveryExecutions,
                 static function (DeliveryExecution $executionA, DeliveryExecution $executionB) {
-                    return new DateTime($executionA->getStartTime()) <=> new DateTime($executionB->getStartTime());
+                    $startStampA = tao_helpers_Date::getTimeStamp($executionA->getStartTime(),true);
+                    $startStampB = tao_helpers_Date::getTimeStamp($executionB->getStartTime(),true);
+
+                    return (float) $startStampA <=> (float) $startStampB;
+
                 }
             );
 

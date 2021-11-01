@@ -122,8 +122,7 @@ class DeliveryExecutionFinderServiceTest extends TestCase
         $deliveryId = 'http://backoffice.docker.localhost/ontologies/tao.rdf#i617822471ea2d126631ac77e4b86e48';
 
         $this->executionServiceProxy->method('getUserExecutions')->willReturn([]);
-        $launchData = new LtiLaunchData([LtiLaunchData::USER_ID => $userId], []);
-        $deliveryExecution = $this->subject->findLastExecutionByUserAndDelivery($launchData, $deliveryId);
+        $deliveryExecution = $this->subject->findLastExecutionByUserAndDelivery($userId, $deliveryId);
 
         self::assertNull($deliveryExecution);
     }
@@ -136,8 +135,7 @@ class DeliveryExecutionFinderServiceTest extends TestCase
         $implementation = $this->createMock(DeliveryExecutionInterface::class);
 
         $this->executionServiceProxy->method('getUserExecutions')->willReturn([new DeliveryExecution($implementation)]);
-        $launchData = new LtiLaunchData([LtiLaunchData::USER_ID => $userId], []);
-        $deliveryExecution = $this->subject->findLastExecutionByUserAndDelivery($launchData, $deliveryId);
+        $deliveryExecution = $this->subject->findLastExecutionByUserAndDelivery($userId, $deliveryId);
 
         self::assertNotNull($deliveryExecution);
         $this->assertInstanceOf(DeliveryExecution::class, $deliveryExecution);

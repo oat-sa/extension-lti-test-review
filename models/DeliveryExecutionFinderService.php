@@ -22,7 +22,6 @@ namespace oat\ltiTestReview\models;
 use common_exception_Error;
 use common_exception_NotFound;
 use core_kernel_classes_Resource;
-use oat\dtms\DateTime;
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
 use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
 use oat\oatbox\service\ConfigurableService;
@@ -81,20 +80,14 @@ class DeliveryExecutionFinderService extends ConfigurableService
     }
 
     /**
-     * @throws LtiVariableMissingException
      * @throws common_exception_Error
      * @throws common_exception_NotFound
      */
-    public function findLastExecutionByUserAndDelivery(
-        LtiLaunchData $ltiLaunchData,
-        string $deliveryId
-    ): ?DeliveryExecution {
+    public function findLastExecutionByUserAndDelivery(string $userId, string $deliveryId): ?DeliveryExecution
+    {
         $deliveryExecutionService = $this->getExecutionServiceProxy();
         $deliveryResource = new core_kernel_classes_Resource($deliveryId);
-        $userDeliveryExecutions = $deliveryExecutionService->getUserExecutions(
-            $deliveryResource,
-            $ltiLaunchData->getUserID()
-        );
+        $userDeliveryExecutions = $deliveryExecutionService->getUserExecutions($deliveryResource, $userId);
 
         if (count($userDeliveryExecutions) > 0) {
             usort(

@@ -38,6 +38,7 @@ use oat\tao\model\mvc\DefaultUrlService;
 use oat\taoLti\models\classes\LtiClientException;
 use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
+use oat\taoLti\models\classes\LtiLaunchData;
 use oat\taoLti\models\classes\LtiMessages\LtiErrorMessage;
 use oat\taoLti\models\classes\LtiService;
 use oat\taoLti\models\classes\LtiVariableMissingException;
@@ -56,6 +57,8 @@ class Review extends tao_actions_SinglePageModule
 {
     use OntologyAwareTrait;
     use HttpJsonResponseTrait;
+
+    private const LTI_1P3_VERSION = '1.3.0';
 
     /** @var TaoLtiSession */
     private $ltiSession;
@@ -88,7 +91,9 @@ class Review extends tao_actions_SinglePageModule
         if ($deliveryId === null) {
             $execution = $finder->findDeliveryExecution($launchData);
         } else {
-            $execution = $finder->findLastExecutionByUserAndDelivery($launchData, $deliveryId);
+            $userId = $this->getUserId();
+            $execution = $finder->findLastExecutionByUserAndDelivery($userId, $deliveryId);
+
             if ($execution === null) {
                 throw new LtiClientException(
                     __('Available delivery executions for review does not exists'),
@@ -225,13 +230,16 @@ class Review extends tao_actions_SinglePageModule
     }
 
     /**
+     * @throws LtiVariableMissingException
+     * @throws common_exception_NotFound
      * @throws common_exception_Unauthorized
      */
     protected function checkPermissions(string $serviceCallId): void
     {
         $execution = $this->getDeliveryExecutionManagerService()->getDeliveryExecutionById($serviceCallId);
+        $userId = $this->getUserId();
 
-        if ($execution->getIdentifier() !== $serviceCallId) {
+        if ($execution->getUserIdentifier() !== $userId) {
             throw new common_exception_Unauthorized($serviceCallId);
         }
     }
@@ -259,5 +267,20 @@ class Review extends tao_actions_SinglePageModule
     private function getDeliveryId(): ?string
     {
         return $this->getPsrRequest()->getQueryParams()['delivery'] ?? null;
+    }
+
+    /**
+     * @throws LtiVariableMissingException
+     */
+    public function getUserId(): string
+    {
+        $userId = $this->ltiSession->getUserUri();
+        if (
+            $this->ltiSession->getLaunchData()->getVariable(LtiLaunchData::LTI_VERSION) === self::LTI_1P3_VERSION
+        ) {
+            $userId = $this->ltiSession->getLaunchData()->getLtiForUserId();
+        }
+
+        return $userId;
     }
 }

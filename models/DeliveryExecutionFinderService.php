@@ -93,8 +93,8 @@ class DeliveryExecutionFinderService extends ConfigurableService
             usort(
                 $userDeliveryExecutions,
                 static function (DeliveryExecution $executionA, DeliveryExecution $executionB) {
-                    $startStampA = tao_helpers_Date::getTimeStamp($executionA->getStartTime(),true);
-                    $startStampB = tao_helpers_Date::getTimeStamp($executionB->getStartTime(),true);
+                    $startStampA = tao_helpers_Date::getTimeStamp($executionA->getStartTime(), true);
+                    $startStampB = tao_helpers_Date::getTimeStamp($executionB->getStartTime(), true);
 
                     return (float) $startStampA <=> (float) $startStampB;
 

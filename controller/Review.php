@@ -272,7 +272,7 @@ class Review extends tao_actions_SinglePageModule
     /**
      * @throws LtiVariableMissingException
      */
-    public function getUserId(): string
+    private function getUserId(): string
     {
         $userId = $this->ltiSession->getUserUri();
         if (

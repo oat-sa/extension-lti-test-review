@@ -31,6 +31,7 @@ use common_exception_Unauthorized;
 use core_kernel_users_GenerisUser;
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use oat\ltiTestReview\models\DeliveryExecutionFinderService;
 use oat\ltiTestReview\models\QtiRunnerInitDataBuilderFactory;
 use oat\tao\model\http\HttpJsonResponseTrait;
@@ -274,13 +275,11 @@ class Review extends tao_actions_SinglePageModule
      */
     private function getUserId(): string
     {
-        $userId = $this->ltiSession->getUserUri();
-        if (
-            $this->ltiSession->getLaunchData()->getVariable(LtiLaunchData::LTI_VERSION) === self::LTI_1P3_VERSION
-        ) {
-            $userId = $this->ltiSession->getLaunchData()->getLtiForUserId();
+        $messageType = $this->ltiSession->getLaunchData()->getVariable(LtiLaunchData::LTI_MESSAGE_TYPE);
+        if ($messageType === LtiMessageInterface::LTI_MESSAGE_TYPE_SUBMISSION_REVIEW_REQUEST) {
+            return $this->ltiSession->getLaunchData()->getLtiForUserId();
         }
 
-        return $userId;
+        return $this->ltiSession->getUserUri();
     }
 }

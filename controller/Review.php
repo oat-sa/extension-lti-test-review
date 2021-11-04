@@ -59,8 +59,6 @@ class Review extends tao_actions_SinglePageModule
     use OntologyAwareTrait;
     use HttpJsonResponseTrait;
 
-    private const LTI_1P3_VERSION = '1.3.0';
-
     /** @var TaoLtiSession */
     private $ltiSession;
 

@@ -85,11 +85,9 @@ class Review extends tao_actions_SinglePageModule
     {
         $launchData = $this->ltiSession->getLaunchData();
         $finder = $this->getDeliveryExecutionFinderService();
-        $deliveryId = $this->getDeliveryId();
 
-        if ($deliveryId === null) {
-            $execution = $finder->findDeliveryExecution($launchData);
-        } else {
+        if ($this->isSubmissionReviewRequestMessageProvided()) {
+            $deliveryId = $this->getDeliveryId();
             $userId = $this->getUserId();
             $execution = $finder->findLastExecutionByUserAndDelivery($userId, $deliveryId);
 
@@ -99,6 +97,8 @@ class Review extends tao_actions_SinglePageModule
                     LtiErrorMessage::ERROR_INVALID_PARAMETER
                 );
             }
+        } else {
+            $execution = $finder->findDeliveryExecution($launchData);
         }
         $delivery = $execution->getDelivery();
 
@@ -263,9 +263,18 @@ class Review extends tao_actions_SinglePageModule
         return $this->getPsrContainer()->get(QtiRunnerInitDataBuilderFactory::SERVICE_ID);
     }
 
-    private function getDeliveryId(): ?string
+    /**
+     * @throws LtiClientException
+     */
+    private function getDeliveryId(): string
     {
-        return $this->getPsrRequest()->getQueryParams()['delivery'] ?? null;
+        $deliveryId = $this->getPsrRequest()->getQueryParams()['delivery'] ?? null;
+        if ($deliveryId !== null) {
+            return $deliveryId;
+        }
+
+        throw new LtiClientException(__('Delivery id not provided'), LtiErrorMessage::ERROR_MISSING_PARAMETER);
+
     }
 
     /**
@@ -273,11 +282,20 @@ class Review extends tao_actions_SinglePageModule
      */
     private function getUserId(): string
     {
-        $messageType = $this->ltiSession->getLaunchData()->getVariable(LtiLaunchData::LTI_MESSAGE_TYPE);
-        if ($messageType === LtiMessageInterface::LTI_MESSAGE_TYPE_SUBMISSION_REVIEW_REQUEST) {
+        if ($this->isSubmissionReviewRequestMessageProvided()) {
             return $this->ltiSession->getLaunchData()->getLtiForUserId();
         }
 
         return $this->ltiSession->getUserUri();
+    }
+
+    /**
+     * @throws LtiVariableMissingException
+     */
+    private function isSubmissionReviewRequestMessageProvided(): bool
+    {
+        $messageType = $this->ltiSession->getLaunchData()->getVariable(LtiLaunchData::LTI_MESSAGE_TYPE);
+
+        return $messageType === LtiMessageInterface::LTI_MESSAGE_TYPE_SUBMISSION_REVIEW_REQUEST;
     }
 }

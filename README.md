@@ -25,6 +25,7 @@ User id should be provided by usage `for_user` claim
 
 ```json
 {
+  "https://purl.imsglobal.org/spec/lti/claim/message_type": "LtiSubmissionReviewRequest"
   "https://purl.imsglobal.org/spec/lti/claim/for_user": {
     "user_id": "<string>"
   }

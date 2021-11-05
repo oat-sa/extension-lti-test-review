@@ -19,6 +19,9 @@
 
 namespace oat\ltiTestReview\controller;
 
+use ActionEnforcingException;
+use common_exception_Error;
+use InterruptedActionException;
 use oat\taoLti\controller\ToolModule;
 use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiMessages\LtiErrorMessage;
@@ -32,13 +35,13 @@ class ReviewTool extends ToolModule
 {
     /**
      * @throws LtiException
-     * @throws \InterruptedActionException
-     * @throws \common_exception_Error
+     * @throws InterruptedActionException
+     * @throws common_exception_Error
      */
-    public function run()
+    public function run(): void
     {
         if ($this->hasAccess(Review::class, 'index')) {
-            $this->redirect(_url('index', 'Review'));
+            $this->redirect(_url('index', 'Review', null, $_GET));
         } else {
             throw new LtiException(
                 'You are not authorized to access this resource',
@@ -47,6 +50,11 @@ class ReviewTool extends ToolModule
         }
     }
 
+    /**
+     * @throws common_exception_Error
+     * @throws ActionEnforcingException
+     * @throws InterruptedActionException
+     */
     public function launch1p3(): void
     {
         $message = $this->getValidatedLtiMessagePayload();

@@ -19,6 +19,8 @@
 
 namespace oat\ltiTestReview\models;
 
+use common_exception_Error;
+use common_exception_NotFound;
 use core_kernel_classes_Resource;
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
 use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
@@ -29,6 +31,7 @@ use oat\taoDelivery\model\execution\ServiceProxy as ExecutionServiceProxy;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiLaunchData;
 use oat\taoLti\models\classes\LtiVariableMissingException;
+use tao_helpers_Date;
 
 /**
  * Find delivery execution
@@ -74,6 +77,34 @@ class DeliveryExecutionFinderService extends ConfigurableService
         }
 
         return $this->getExecutionServiceProxy()->getDeliveryExecution($deliveryExecutionId);
+    }
+
+    /**
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
+     */
+    public function findLastExecutionByUserAndDelivery(string $userId, string $deliveryId): ?DeliveryExecution
+    {
+        $deliveryExecutionService = $this->getExecutionServiceProxy();
+        $deliveryResource = new core_kernel_classes_Resource($deliveryId);
+        $userDeliveryExecutions = $deliveryExecutionService->getUserExecutions($deliveryResource, $userId);
+
+        if (count($userDeliveryExecutions) > 0) {
+            usort(
+                $userDeliveryExecutions,
+                static function (DeliveryExecution $executionA, DeliveryExecution $executionB) {
+                    $startStampA = tao_helpers_Date::getTimeStamp($executionA->getStartTime(), true);
+                    $startStampB = tao_helpers_Date::getTimeStamp($executionB->getStartTime(), true);
+
+                    return (float) $startStampA <=> (float) $startStampB;
+
+                }
+            );
+
+            return end($userDeliveryExecutions);
+        }
+
+        return null;
     }
 
     /**

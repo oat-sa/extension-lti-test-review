@@ -13,7 +13,39 @@ To run review of specific delivery execution use the next endpoint:
 https://YOUR_DOMAIN/ltiTestReview/ReviewTool/launch?execution=YOUR_DELIVERY_EXECUTION_URI
 ```
 
-Endpoint without `execution` parameter (`https://YOUR_DOMAIN/ltiTestReview/ReviewTool/launch`) will use `lis_result_sourcedid` field from lauch data to determine delivery execution.
+Endpoint without `execution` parameter (`https://YOUR_DOMAIN/ltiTestReview/ReviewTool/launch`) will use `lis_result_sourcedid` field from launch data to determine delivery execution.
+
+To run review of the latest delivery execution for user use next endpoint:
+
+```
+https://YOUR_DOMAIN/ltiTestReview/ReviewTool/launch1p3?delivery=YOUR_DELIVERY_URI
+```
+
+User id should be provided by usage `for_user` claim
+
+```json
+{
+  "https://purl.imsglobal.org/spec/lti/claim/message_type": "LtiSubmissionReviewRequest"
+  "https://purl.imsglobal.org/spec/lti/claim/for_user": {
+    "user_id": "<string>"
+  }
+}
+```
+As backward compatibility this endpoint allows run exact delivery execution,
+which id must be provided in custom claim set. 
+
+```
+https://YOUR_DOMAIN/ltiTestReview/ReviewTool/launch1p3
+```
+```json
+{
+  "https://purl.imsglobal.org/spec/lti/claim/custom": {
+    "execution": "<deliery_excution_id>"
+  }
+}
+```
+
+
 
 ### LTI options
 

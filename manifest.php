@@ -35,7 +35,9 @@ return [
         [AccessRule::GRANT, 'http://www.tao.lu/Ontologies/generis.rdf#ltiTestReviewManager', ['ext' => 'ltiTestReview']],
         [AccessRule::GRANT, TaoRoles::ANONYMOUS, ReviewTool::class],
         [AccessRule::GRANT, LtiRoles::CONTEXT_LEARNER, Review::class],
-        [AccessRule::GRANT, LtiRoles::CONTEXT_LTI1P3_LEARNER, Review::class]
+        [AccessRule::GRANT, LtiRoles::CONTEXT_LTI1P3_LEARNER, Review::class],
+        [AccessRule::GRANT, LtiRoles::CONTEXT_LTI1P3_INSTRUCTOR, Review::class],
+        [AccessRule::GRANT, LtiRoles::CONTEXT_LTI1P3_MENTOR, Review::class]
     ],
     'install' => [
         'php' => [],

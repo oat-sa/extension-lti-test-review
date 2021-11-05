@@ -23,18 +23,24 @@
 namespace oat\ltiTestReview\controller;
 
 use common_Exception;
+use common_exception_ClientException;
 use common_exception_Error;
+use common_exception_InconsistentData;
 use common_exception_NotFound;
 use common_exception_Unauthorized;
 use core_kernel_users_GenerisUser;
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
+use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use oat\ltiTestReview\models\DeliveryExecutionFinderService;
 use oat\ltiTestReview\models\QtiRunnerInitDataBuilderFactory;
 use oat\tao\model\http\HttpJsonResponseTrait;
 use oat\tao\model\mvc\DefaultUrlService;
+use oat\taoLti\models\classes\LtiClientException;
 use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
+use oat\taoLti\models\classes\LtiLaunchData;
+use oat\taoLti\models\classes\LtiMessages\LtiErrorMessage;
 use oat\taoLti\models\classes\LtiService;
 use oat\taoLti\models\classes\LtiVariableMissingException;
 use oat\taoLti\models\classes\TaoLtiSession;
@@ -42,7 +48,7 @@ use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
 use tao_actions_SinglePageModule;
-use common_exception_ClientException;
+use taoResultServer_models_classes_ReadableResultStorage;
 
 /**
  * Review controller class thar provides data for js-application
@@ -56,6 +62,10 @@ class Review extends tao_actions_SinglePageModule
     /** @var TaoLtiSession */
     private $ltiSession;
 
+    /**
+     * @throws LtiException
+     * @throws common_exception_Error
+     */
     public function __construct()
     {
         parent::__construct();
@@ -69,26 +79,37 @@ class Review extends tao_actions_SinglePageModule
      * @throws LtiVariableMissingException
      * @throws common_exception_Error
      * @throws common_exception_NotFound
+     * @throws common_Exception
      */
     public function index(): void
     {
         $launchData = $this->ltiSession->getLaunchData();
+        $finder = $this->getDeliveryExecutionFinderService();
 
-        /** @var DeliveryExecutionFinderService $finder */
-        $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
+        if ($this->isSubmissionReviewRequestMessageProvided()) {
+            $deliveryId = $this->getDeliveryId();
+            $userId = $this->getUserId();
+            $execution = $finder->findLastExecutionByUserAndDelivery($userId, $deliveryId);
 
-        $execution = $finder->findDeliveryExecution($launchData);
+            if ($execution === null) {
+                throw new LtiClientException(
+                    __('Available delivery executions for review does not exists'),
+                    LtiErrorMessage::ERROR_INVALID_PARAMETER
+                );
+            }
+        } else {
+            $execution = $finder->findDeliveryExecution($launchData);
+        }
         $delivery = $execution->getDelivery();
 
-        /* @var $urlRouteService DefaultUrlService */
-        $urlRouteService = $this->getServiceLocator()->get(DefaultUrlService::SERVICE_ID);
+        $urlRouteService = $this->getDefaultUrlService();
         $this->setData('logout', $urlRouteService->getLogoutUrl());
 
         $data = [
             'execution' => $execution->getIdentifier(),
-            'delivery'  => $delivery->getUri(),
-            'show-score' => (int)$finder->getShowScoreOption($launchData),
-            'show-correct' => (int)$finder->getShowCorrectOption($launchData)
+            'delivery' => $delivery->getUri(),
+            'show-score' => (int) $finder->getShowScoreOption($launchData),
+            'show-correct' => (int) $finder->getShowCorrectOption($launchData)
         ];
 
         $this->composeView('delegated-view', $data, 'pages/index.tpl', 'tao');
@@ -99,9 +120,7 @@ class Review extends tao_actions_SinglePageModule
      */
     public function init(): void
     {
-        /** @var QtiRunnerInitDataBuilderFactory $dataBuilder */
-        $dataBuilder = $this->getServiceLocator()->get(QtiRunnerInitDataBuilderFactory::SERVICE_ID);
-
+        $dataBuilder = $this->getQtiRunnerInitDataBuilderFactory();
         $params = $this->getPsrRequest()->getQueryParams();
 
         try {
@@ -127,6 +146,12 @@ class Review extends tao_actions_SinglePageModule
 
     /**
      * Provides the definition data and the state for a particular item
+     *
+     * @throws LtiVariableMissingException
+     * @throws common_exception_InconsistentData
+     * @throws common_Exception
+     * @throws common_exception_Error
+     * @throws common_exception_NotFound
      */
     public function getItem(): void
     {
@@ -150,8 +175,7 @@ class Review extends tao_actions_SinglePageModule
 
             $itemData = $itemPreviewer->loadCompiledItemData();
 
-            /** @var DeliveryExecutionFinderService $finder */
-            $finder = $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
+            $finder = $this->getDeliveryExecutionFinderService();
 
             if (
                 !empty($itemData['data']['responses'])
@@ -189,47 +213,89 @@ class Review extends tao_actions_SinglePageModule
     }
 
     /**
-     * @param string $resultId
-     *
-     * @return string
      * @throws common_exception_Error
      */
-    protected function getUserLanguage($resultId)
+    protected function getUserLanguage(string $resultId): string
     {
         /** @var ResultServerService $resultServerService */
         $resultServerService = $this->getServiceLocator()->get(ResultServerService::SERVICE_ID);
-        /** @var \taoResultServer_models_classes_ReadableResultStorage $implementation */
+        /** @var taoResultServer_models_classes_ReadableResultStorage $implementation */
         $implementation = $resultServerService->getResultStorage();
 
         $testTaker = new core_kernel_users_GenerisUser($this->getResource($implementation->getTestTaker($resultId)));
         $lang = $testTaker->getPropertyValues(GenerisRdf::PROPERTY_USER_DEFLG);
 
-        return empty($lang) ? DEFAULT_LANG : (string)current($lang);
+        return empty($lang) ? DEFAULT_LANG : (string) current($lang);
     }
 
+    /**
+     * @throws LtiVariableMissingException
+     * @throws common_exception_NotFound
+     * @throws common_exception_Unauthorized
+     */
     protected function checkPermissions(string $serviceCallId): void
     {
-        try {
-            $execution = $this->getDeliveryExecutionFinderService()->findDeliveryExecution(
-                $this->ltiSession->getLaunchData()
-            );
-        } catch (common_Exception $e) {
-            throw new common_exception_Unauthorized($e->getMessage());
-        }
-        if ($serviceCallId !== $execution->getIdentifier()) {
+        $execution = $this->getDeliveryExecutionManagerService()->getDeliveryExecutionById($serviceCallId);
+        $userId = $this->getUserId();
+
+        if ($execution->getUserIdentifier() !== $userId) {
             throw new common_exception_Unauthorized($serviceCallId);
         }
     }
 
     private function getDeliveryExecutionFinderService(): DeliveryExecutionFinderService
     {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getServiceLocator()->get(DeliveryExecutionFinderService::SERVICE_ID);
+        return $this->getPsrContainer()->get(DeliveryExecutionFinderService::SERVICE_ID);
     }
 
     private function getDeliveryExecutionManagerService(): DeliveryExecutionManagerService
     {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getServiceLocator()->get(DeliveryExecutionManagerService::SERVICE_ID);
+        return $this->getPsrContainer()->get(DeliveryExecutionManagerService::SERVICE_ID);
+    }
+
+    private function getDefaultUrlService(): DefaultUrlService
+    {
+        return $this->getPsrContainer()->get(DefaultUrlService::SERVICE_ID);
+    }
+
+    private function getQtiRunnerInitDataBuilderFactory(): QtiRunnerInitDataBuilderFactory
+    {
+        return $this->getPsrContainer()->get(QtiRunnerInitDataBuilderFactory::SERVICE_ID);
+    }
+
+    /**
+     * @throws LtiClientException
+     */
+    private function getDeliveryId(): string
+    {
+        $deliveryId = $this->getPsrRequest()->getQueryParams()['delivery'] ?? null;
+        if ($deliveryId !== null) {
+            return $deliveryId;
+        }
+
+        throw new LtiClientException(__('Delivery id not provided'), LtiErrorMessage::ERROR_MISSING_PARAMETER);
+
+    }
+
+    /**
+     * @throws LtiVariableMissingException
+     */
+    private function getUserId(): string
+    {
+        if ($this->isSubmissionReviewRequestMessageProvided()) {
+            return $this->ltiSession->getLaunchData()->getLtiForUserId();
+        }
+
+        return $this->ltiSession->getUserUri();
+    }
+
+    /**
+     * @throws LtiVariableMissingException
+     */
+    private function isSubmissionReviewRequestMessageProvided(): bool
+    {
+        $messageType = $this->ltiSession->getLaunchData()->getVariable(LtiLaunchData::LTI_MESSAGE_TYPE);
+
+        return $messageType === LtiMessageInterface::LTI_MESSAGE_TYPE_SUBMISSION_REVIEW_REQUEST;
     }
 }

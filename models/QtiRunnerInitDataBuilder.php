@@ -21,6 +21,7 @@
 namespace oat\ltiTestReview\models;
 
 use common_Exception;
+use common_exception_Error;
 use oat\generis\model\OntologyAwareTrait;
 use oat\taoDeliveryRdf\model\DeliveryContainerService;
 use oat\taoOutcomeUi\helper\ResponseVariableFormatter;
@@ -228,9 +229,17 @@ class QtiRunnerInitDataBuilder
         ];
     }
 
-    protected function getResultVariables($resultId, $filterSubmission, $filterTypes = array())
+    /**
+     * @throws common_exception_Error
+     * @throws common_Exception
+     */
+    protected function getResultVariables($resultId, $filterSubmission, $filterTypes = []): array
     {
-        $variables = $this->resultService->getStructuredVariables($resultId, $filterSubmission, array_merge($filterTypes, [\taoResultServer_models_classes_ResponseVariable::class]));
+        $variables = $this->resultService->getStructuredVariables(
+            $resultId,
+            $filterSubmission,
+            array_merge($filterTypes, [\taoResultServer_models_classes_ResponseVariable::class])
+        );
         $displayedVariables = $this->resultService->filterStructuredVariables($variables, $filterTypes);
 
         $responses = ResponseVariableFormatter::formatStructuredVariablesToItemState($variables);

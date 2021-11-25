@@ -236,13 +236,9 @@ class QtiRunnerInitDataBuilder
         $responses = ResponseVariableFormatter::formatStructuredVariablesToItemState($variables);
         $excludedVariables = array_flip(['numAttempts', 'duration']);
 
-        foreach ($displayedVariables as &$item) {
-            if (!isset($item['uri'])) {
-                continue;
-            }
-            $itemUri = $item['uri'];
-            $item['state'] = isset($responses[$itemUri][$item['attempt']])
-                ? json_encode(array_diff_key($responses[$itemUri][$item['attempt']], $excludedVariables))
+        foreach ($displayedVariables as $itemKey => &$item) {
+            $item['state'] = isset($responses[$itemKey][$item['attempt']])
+                ? json_encode(array_diff_key($responses[$itemKey][$item['attempt']], $excludedVariables))
                 : null;
         }
 

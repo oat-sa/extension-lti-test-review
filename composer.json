@@ -29,7 +29,7 @@
     "oat-sa/extension-tao-testqti" : ">=41.0.0",
     "oat-sa/extension-tao-outcome" : ">=13.0.0",
     "oat-sa/extension-tao-testqti-previewer" : ">=3.0.0",
-    "oat-sa/extension-tao-outcomeui": "dev-bug/TR-1909/incorect-answers-represented-in-review as 100.0.0"
+    "oat-sa/extension-tao-outcomeui": ">=11.0.0"
   },
   "autoload": {
     "psr-4": {

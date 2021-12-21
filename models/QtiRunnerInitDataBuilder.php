@@ -242,7 +242,7 @@ class QtiRunnerInitDataBuilder
         );
         $displayedVariables = $this->resultService->filterStructuredVariables($variables, $filterTypes);
 
-        $responses = ResponseVariableFormatter::formatStructuredVariablesToItemState($variables);
+        $responses = ResponseVariableFormatter::formatStructuredVariablesToItemState($variables, [], true);
         $excludedVariables = array_flip(['numAttempts', 'duration']);
 
         foreach ($displayedVariables as $itemKey => &$item) {

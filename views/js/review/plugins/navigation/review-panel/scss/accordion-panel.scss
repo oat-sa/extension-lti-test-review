@@ -74,7 +74,7 @@ $incorrectColor: $error;
     }
 }
 
-.review-panel {
+.accordion-review-panel {
     @include disableSelect();
     color: $panelColor;
     position: relative;
@@ -328,4 +328,3 @@ $incorrectColor: $error;
         }
     }
 }
-

@@ -26,9 +26,13 @@ define([
     'ui/autoscroll',
     'ui/component',
     'ltiTestReview/review/plugins/navigation/review-panel/panel-data',
-    'tpl!ltiTestReview/review/plugins/navigation/review-panel/tpl/panel',
-    'tpl!ltiTestReview/review/plugins/navigation/review-panel/tpl/list',
-    'css!ltiTestReview/review/plugins/navigation/review-panel/css/panel.css'
+    'tpl!ltiTestReview/review/plugins/navigation/review-panel/tpl/accordionPanel',
+    'tpl!ltiTestReview/review/plugins/navigation/review-panel/tpl/accordionList',
+    'tpl!ltiTestReview/review/plugins/navigation/review-panel/tpl/fizzyPanel',
+    'tpl!ltiTestReview/review/plugins/navigation/review-panel/tpl/stepOverview',
+    'css!ltiTestReview/review/plugins/navigation/review-panel/css/accordion-panel.css',
+    'css!ltiTestReview/review/plugins/navigation/review-panel/css/fizzy-panel.css',
+    'css!ltiTestReview/review/plugins/navigation/review-panel/css/step-overview.css'
 ], function (
     $,
     _,
@@ -37,8 +41,10 @@ define([
     autoscroll,
     componentFactory,
     reviewDataHelper,
-    panelTpl,
-    listTpl
+    accordionPanelTpl,
+    accordionListTpl,
+    fizzyPanelTpl,
+    stepOverviewTpl
 ) {
     'use strict';
 
@@ -51,7 +57,7 @@ define([
      * Some default config
      * @type {Object}
      */
-    const defaults = {
+    const accordionDefaults = {
         headerLabel: __('TEST SCORE:'),
         footerLabel: __('TOTAL'),
         showScore: true,
@@ -70,7 +76,7 @@ define([
      * CSS classes involved in the review panel
      * @type {Object}
      */
-    const cssClasses = {
+    const accordionCssClasses = {
         collapsible: 'collapsible',
         expanded: 'expanded',
         active: 'active'
@@ -80,13 +86,14 @@ define([
      * CSS selectors that match some particular elements
      * @type {Object}
      */
-    const cssSelectors = {
-        collapsible: `.${cssClasses.collapsible}`,
-        collapsibleLabel: `.${cssClasses.collapsible} > .review-panel-label`,
-        expanded: `.${cssClasses.expanded}`,
-        active: `.${cssClasses.active}`,
+    const accordionCssSelectors = {
+        collapsible: `.${accordionCssClasses.collapsible}`,
+        collapsibleLabel: `.${accordionCssClasses.collapsible} > .review-panel-label`,
+        expanded: `.${accordionCssClasses.expanded}`,
+        active: `.${accordionCssClasses.active}`,
         navigable: '.navigable',
         control: '[data-control]',
+        controlById: (id) => `[data-control="${id}"]`,
         content: '.review-panel-content',
         filtersContainer: '.review-panel-filters',
         filter: '.review-panel-filter',
@@ -96,20 +103,44 @@ define([
         score: '.review-panel-score'
     };
 
-    /**
-     * Finds an element by its control identifier
-     * @param {jQuery} $container
-     * @param {String} id
-     * @returns {jQuery}
+      /**
+     * Some default config
+     * @type {Object}
      */
-    const findControl = ($container, id) => $container.find(`[data-control="${id}"]`);
+    const fizzyDefaults = {
+        headerTitle: __('Test review'),
+        headerLabel: __('Total score:'),
+        footerLabel: __('Total'),
+        showScore: true
+    };
 
     /**
-     * Finds every expanded collapsible element within the provided target
-     * @param {jQuery} $target
-     * @returns {jQuery}
+     * CSS classes involved in the review panel
+     * @type {Object}
      */
-    const findExpanded = $target => $target.find(cssSelectors.collapsible + cssSelectors.expanded);
+    const fizzyCssClasses = {
+        keyfocused: 'step-overview-item-focus',
+        active: 'step-overview-item-active'
+    };
+
+    /**
+     * CSS selectors that match some particular elements
+     * @type {Object}
+     */
+    const fizzyCssSelectors = {
+        control: '[data-id]',
+        controlById: (id) => `[data-id="${id}"]`,
+        item: '.step-overview-item',
+        active: `.${fizzyCssClasses.active}`,
+        keyfocused: `.${fizzyCssClasses.keyfocused}`,
+        navigable: '.step-overview-btn',
+        itemById: (id) => `.step-overview-item[data-id="${id}"]`,
+        navigableById: (id) => `.step-overview-btn[data-id="${id}"]`,
+        content: '.review-panel-content',
+        header: '.review-panel-header',
+        footer: '.review-panel-footer',
+        score: '.review-panel-score'
+    };
 
     /**
      * Builds a review panel, that will show the test data with score.
@@ -164,12 +195,46 @@ define([
      * @fires datachange When the panel data has changed
      * @fires itemchange When an item is selected by the user (either a click on item or a filter)
      */
-    function reviewPanelFactory(container, config = {}, map = null) {
+    function accordionReviewPanelFactory(container, config = {}, map = null) {
         let component;
+        let panelTpl;
+        let listTpl;
+        let defaults;
+        let cssSelectors;
+        let cssClasses;
         let controls = null;
         let activeFilter = null;
         let activeItem = null;
         let data = null;
+
+        if (config.isFizzyLayout) {
+            panelTpl = fizzyPanelTpl;
+            listTpl = stepOverviewTpl;
+            cssSelectors = fizzyCssSelectors;
+            cssClasses = fizzyCssClasses;
+            defaults = fizzyDefaults;
+        } else {
+            panelTpl = accordionPanelTpl;
+            listTpl = accordionListTpl;
+            cssSelectors = accordionCssSelectors;
+            cssClasses = accordionCssClasses;
+            defaults = accordionDefaults;
+        }
+
+        /**
+         * Finds an element by its control identifier
+         * @param {jQuery} $container
+         * @param {String} id
+         * @returns {jQuery}
+         */
+        const findControl = ($container, id) => $container.find(cssSelectors.controlById(id));
+
+        /**
+         * Finds every expanded collapsible element within the provided target
+         * @param {jQuery} $target
+         * @returns {jQuery}
+         */
+        const findExpanded = $target => $target.find(cssSelectors.collapsible + cssSelectors.expanded);
 
         /**
          * Selects the active filter
@@ -202,6 +267,33 @@ define([
 
                 // finally make sure the item is visible
                 autoscroll($target, controls.$content);
+            }
+
+            if (config.isFizzyLayout) {
+                controls.$content.find(cssSelectors.navigable)
+                    .removeAttr('aria-current');
+                const $ariaTarget = controls.$content.find(cssSelectors.navigableById(itemId));
+                if ($ariaTarget.length) {
+                    $ariaTarget.attr('aria-current', 'location');
+                }
+            }
+        };
+
+        /**
+         * Example implementation of 'tabfocus' styling
+         * @param {jQuery|null}  $target
+         */
+        const setFocusStyle = $target => {
+            if (!config.isFizzyLayout) {
+                return;
+            }
+
+            controls.$content
+                .find(cssSelectors.keyfocused)
+                .removeClass(cssClasses.keyfocused);
+
+            if ($target && $target.length) {
+                $target.addClass(cssClasses.keyfocused);
             }
         };
 
@@ -257,7 +349,7 @@ define([
              * @fires datachange
              */
             setData(newMap) {
-                data = reviewDataHelper.getReviewPanelMap(newMap, this.getConfig().showScore);
+                data = reviewDataHelper.getReviewPanelMap(newMap, this.getConfig().showScore, this.getConfig().displaySectionTitles);
 
                 /**
                  * @event datachange
@@ -282,6 +374,10 @@ define([
              * @returns {reviewPanel}
              */
             setActiveFilter(filterId) {
+                if (config.isFizzyLayout) {
+                    return this;
+                }
+
                 const {filters} = this.getConfig();
                 if (Array.isArray(filters)) {
                     const foundFilter = filters.find(filter => filter.id === filterId);
@@ -349,6 +445,10 @@ define([
              * @fires expand for each expanded block
              */
             expand(id) {
+                if (config.isFizzyLayout) {
+                    return this;
+                }
+
                 if (this.is('rendered')) {
                     const $target = findControl(controls.$content, id);
 
@@ -390,6 +490,10 @@ define([
              * @fires collapse for each collapsed block
              */
             collapse(id = null) {
+                if (config.isFizzyLayout) {
+                    return this;
+                }
+
                 if (this.is('rendered')) {
                     let $expanded = null;
 
@@ -429,6 +533,10 @@ define([
              * @fires collapse for each collapsed block
              */
             toggle(id) {
+                if (config.isFizzyLayout) {
+                    return this;
+                }
+
                 if (this.is('rendered')) {
                     const $target = findControl(controls.$content, id);
                     if ($target.length) {
@@ -491,6 +599,10 @@ define([
             .on('init', function onReviewPanelInit() {
                 const initConfig = this.getConfig();
 
+                if (config.isFizzyLayout) {
+                    initConfig.filters = null;
+                }
+
                 // no header nor footer or filters when scores are disabled
                 if (!initConfig.showScore) {
                     initConfig.headerLabel = false;
@@ -535,8 +647,8 @@ define([
                 controls = {
                     $headerScore: this.getElement().find(`${cssSelectors.header} ${cssSelectors.score}`),
                     $footerScore: this.getElement().find(`${cssSelectors.footer} ${cssSelectors.score}`),
-                    $filtersContainer: this.getElement().find(cssSelectors.filtersContainer),
-                    $filters: this.getElement().find(cssSelectors.filter),
+                    $filtersContainer: cssSelectors.filtersContainer ? this.getElement().find(cssSelectors.filtersContainer) : null,
+                    $filters: cssSelectors.filter ? this.getElement().find(cssSelectors.filter): null,
                     $content: this.getElement().find(cssSelectors.content),
                 };
 
@@ -545,19 +657,31 @@ define([
                         e.preventDefault();
                         e.currentTarget.click();
                     }
+                    //Simple example of 'tabfocus' detection
+                    if (e.key === 'Tab') {
+                        setFocusStyle(null);
+                    }
+                });
+                //Simple example of 'tabfocus' detection
+                this.getElement().on('keyup', cssSelectors.navigable, e => {
+                    if (e.key === 'Tab') {
+                        setFocusStyle($(e.target));
+                    }
                 });
 
                 // change filter on click
-                controls.$filtersContainer.on('click', cssSelectors.filter, e => {
-                    if (!this.is('disabled')) {
-                        this.setActiveFilter(e.currentTarget.dataset.control);
-                    }
-                });
+                if (controls.$filtersContainer) {
+                    controls.$filtersContainer.on('click', cssSelectors.filter, e => {
+                        if (!this.is('disabled')) {
+                            this.setActiveFilter(e.currentTarget.dataset.control || e.currentTarget.dataset.id);
+                        }
+                    });
+                }
 
                 // expand/collapse blocks on click
                 controls.$content.on('click', cssSelectors.collapsibleLabel, e => {
                     if (!this.is('disabled')) {
-                        this.toggle(e.currentTarget.parentElement.dataset.control);
+                        this.toggle(e.currentTarget.parentElement.dataset.control || e.currentTarget.dataset.id);
                     }
                 });
 
@@ -565,7 +689,7 @@ define([
                 controls.$content.on('click', cssSelectors.item, e => {
                     if (!this.is('disabled')) {
                         const currentId = activeItem && activeItem.id;
-                        this.setActiveItem(e.currentTarget.dataset.control);
+                        this.setActiveItem(e.currentTarget.dataset.control || e.currentTarget.dataset.id);
                         if (activeItem && activeItem.id !== currentId) {
                             itemChange();
                         }
@@ -630,5 +754,5 @@ define([
         return component;
     }
 
-    return reviewPanelFactory;
+    return accordionReviewPanelFactory;
 });

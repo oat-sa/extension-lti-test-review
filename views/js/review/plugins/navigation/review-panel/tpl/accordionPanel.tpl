@@ -1,4 +1,4 @@
-<div class="review-panel">
+<div class="review-panel accordion-review-panel">
 {{#if header}}
     <header class="review-panel-header">
     {{#with header}}

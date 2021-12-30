@@ -22,12 +22,14 @@ define([
     'core/promiseTimeout',
     'taoTests/runner/plugin',
     'ltiTestReview/review/services/navigation-data',
-    'ltiTestReview/review/plugins/navigation/review-panel/panel'
+    'ltiTestReview/review/plugins/navigation/review-panel/accordionPanel',
+    'ltiTestReview/review/plugins/navigation/review-panel/fizzyPanel'
 ], function (
     promiseTimeout,
     pluginFactory,
     navigationDataServiceFactory,
-    reviewPanelFactory
+    accordionReviewPanelFactory,
+    fizzyReviewPanelFactory,
 ) {
     'use strict';
 
@@ -68,15 +70,20 @@ define([
 
         /**
          * Called during the runner's render phase
+         * @returns {Promise}
          */
         render() {
             return promiseTimeout(new Promise(resolve => {
+                const isFizzyLayout = true; //TODO: add a setting where needed
+                const displaySectionTitles = true; //TODO: add a setting where needed
+                const reviewPanelFactory = isFizzyLayout ? fizzyReviewPanelFactory : accordionReviewPanelFactory;
+
                 const testRunner = this.getTestRunner();
                 const navigationDataService = navigationDataServiceFactory(testRunner.getTestMap());
-                const {showScore} = testRunner.getOptions();
+                const { showScore } = testRunner.getOptions();
                 const reviewPanel = reviewPanelFactory(
                     this.getAreaBroker().getPanelArea(),
-                    Object.assign({showScore}, this.getConfig()),
+                    Object.assign({showScore, displaySectionTitles}, this.getConfig()),
                     navigationDataService.getMap()
                 );
 

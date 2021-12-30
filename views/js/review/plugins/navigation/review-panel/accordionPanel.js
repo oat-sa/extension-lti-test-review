@@ -18,7 +18,7 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-define([
+ define([
     'jquery',
     'lodash',
     'i18n',
@@ -26,9 +26,9 @@ define([
     'ui/autoscroll',
     'ui/component',
     'ltiTestReview/review/plugins/navigation/review-panel/panel-data',
-    'tpl!ltiTestReview/review/plugins/navigation/review-panel/tpl/panel',
-    'tpl!ltiTestReview/review/plugins/navigation/review-panel/tpl/list',
-    'css!ltiTestReview/review/plugins/navigation/review-panel/css/panel.css'
+    'tpl!ltiTestReview/review/plugins/navigation/review-panel/tpl/accordionPanel',
+    'tpl!ltiTestReview/review/plugins/navigation/review-panel/tpl/accordionList',
+    'css!ltiTestReview/review/plugins/navigation/review-panel/css/accordionPanel.css'
 ], function (
     $,
     _,
@@ -164,7 +164,7 @@ define([
      * @fires datachange When the panel data has changed
      * @fires itemchange When an item is selected by the user (either a click on item or a filter)
      */
-    function reviewPanelFactory(container, config = {}, map = null) {
+    function accordionReviewPanelFactory(container, config = {}, map = null) {
         let component;
         let controls = null;
         let activeFilter = null;
@@ -257,7 +257,7 @@ define([
              * @fires datachange
              */
             setData(newMap) {
-                data = reviewDataHelper.getReviewPanelMap(newMap, this.getConfig().showScore);
+                data = reviewDataHelper.getAccordionReviewPanelMap(newMap, this.getConfig().showScore);
 
                 /**
                  * @event datachange
@@ -630,5 +630,5 @@ define([
         return component;
     }
 
-    return reviewPanelFactory;
+    return accordionReviewPanelFactory;
 });

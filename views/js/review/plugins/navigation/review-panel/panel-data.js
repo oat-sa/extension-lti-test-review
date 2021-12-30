@@ -20,8 +20,9 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 define([
-    'lodash'
-], function (_) {
+    'lodash',
+    'i18n'
+], function (_, __) {
     'use strict';
 
     /**
@@ -61,6 +62,7 @@ define([
             return 'info';
         }
         if (withScore && item.maxScore) {
+            //if item was never visited, item.score=null. So it will be 'incorrect', not 'skipped'. Is it intentional?
             if (item.score === item.maxScore) {
                 return 'correct';
             } else {
@@ -94,36 +96,109 @@ define([
         return data;
     };
 
+    /**
+    * Refines the test runner data and build the expected review panel map
+    * @param {testMap} testMap
+    * @param {Boolean} withScore
+    * @returns {reviewPanelMap}
+    */
+    const getAccordionReviewPanelMap = (testMap, withScore = true) => {
+        const { parts, score, maxScore } = testMap;
+        const items = new Map();
+
+        // rebuild the map keeping only relevant data, and sorting elements by position
+        const panelMap = {
+            parts: _.map(parts, part => Object.assign(extractData(part, withScore), {
+                sections: _.map(part.sections, section => Object.assign(extractData(section, withScore), {
+                    items: _.map(section.items, item => {
+                        const reviewItem = extractData(item, withScore);
+                        reviewItem.type = getItemType(item, withScore);
+                        items.set(item.id, reviewItem);
+                        return reviewItem;
+                    }).sort(compareByPosition)
+                })).sort(compareByPosition)
+            })).sort(compareByPosition),
+            withScore,
+            items
+        };
+
+        if (withScore) {
+            Object.assign(panelMap, { score, maxScore });
+        }
+
+        return panelMap;
+    };
+
     return {
+        getAccordionReviewPanelMap,
+
         /**
          * Refines the test runner data and build the expected review panel map
          * @param {testMap} testMap
          * @param {Boolean} withScore
+         * @param {Boolean} displaySectionTitles
          * @returns {reviewPanelMap}
          */
-        getReviewPanelMap(testMap, withScore = true) {
-            const {parts, score, maxScore} = testMap;
-            const items = new Map();
+        getFizzyReviewPanelMap(testMap, withScore = true, displaySectionTitles = true) {
+            const panelMap = getAccordionReviewPanelMap(testMap, withScore);
+            let numberInTest = 1;
+            let sections = [];
 
-            // rebuild the map keeping only relevant data, and sorting elements by position
-            const panelMap = {
-                parts: _.map(parts, part => Object.assign(extractData(part, withScore), {
-                    sections: _.map(part.sections, section => Object.assign(extractData(section, withScore), {
-                        items: _.map(section.items, item => {
-                            const reviewItem = extractData(item, withScore);
-                            reviewItem.type = getItemType(item, withScore);
-                            items.set(item.id, reviewItem);
-                            return reviewItem;
-                        }).sort(compareByPosition)
-                    })).sort(compareByPosition)
-                })).sort(compareByPosition),
-                withScore,
-                items
-            };
+            panelMap.parts.forEach((part) => {
+                part.sections.forEach((section) => {
+                    sections.push(section);
+                    section.items.forEach((reviewItem) => {
+                        const status = reviewItem.type;
 
-            if (withScore) {
-                Object.assign(panelMap, {score, maxScore});
-            }
+                        // {
+                        //     "id": "item-13",
+                        //     "label": "E2E items 4 - ending",
+                        //     "position": 9,
+                        //     "withScore": 1,
+                        //     "score": 0,
+                        //     "maxScore": 0,
+                        //     "informational": true,
+                        //     "skipped": false,
+                        //     "type": "info"
+                        // }
+                        //==>
+                        // {
+                        //     "id": "item-13", //for panel controller & key for component
+                        //     "position": 9, //for panel controller
+                        //     "ariaLabel": "Question 10",
+                        //     "label": 10,
+                        //     "icon": 'info'/null,
+                        //     "type": 'answered'/'viewed'/'unseen',
+                        //     "scoreType": 'correct'/'incorrect'/null
+
+                        if (status !== 'info') {
+                            reviewItem.label = numberInTest;
+                            numberInTest++;
+                        }
+
+                        reviewItem.icon = status === 'info' ? 'info' : null;
+
+                        reviewItem.ariaLabel = status === 'info' ? __('Informational') : __('Question %s', reviewItem.label);
+
+                        reviewItem.type = null;
+                        if (status !== 'info' && status !== 'skipped') {
+                            reviewItem.type = 'answered';
+                        } else {
+                            reviewItem.type = 'viewed';
+                        }
+
+                        reviewItem.scoreType = null;
+                        if (status === 'correct') {
+                            reviewItem.scoreType = 'correct';
+                        } else if (status === 'incorrect') {
+                            reviewItem.scoreType = 'incorrect';
+                        }
+                    });
+                });
+            });
+
+            panelMap.sections = sections; //flatten 'parts-sections-items' to 'sections-items'
+            panelMap.displaySectionTitles = displaySectionTitles;
 
             return panelMap;
         }

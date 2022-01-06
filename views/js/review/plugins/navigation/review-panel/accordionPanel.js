@@ -28,7 +28,7 @@
     'ltiTestReview/review/plugins/navigation/review-panel/panel-data',
     'tpl!ltiTestReview/review/plugins/navigation/review-panel/tpl/accordionPanel',
     'tpl!ltiTestReview/review/plugins/navigation/review-panel/tpl/accordionList',
-    'css!ltiTestReview/review/plugins/navigation/review-panel/css/accordionPanel.css'
+    'css!ltiTestReview/review/plugins/navigation/review-panel/css/accordion-panel.css'
 ], function (
     $,
     _,

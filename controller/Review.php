@@ -28,6 +28,7 @@ use common_exception_Error;
 use common_exception_InconsistentData;
 use common_exception_NotFound;
 use common_exception_Unauthorized;
+use common_ext_ExtensionsManager;
 use core_kernel_users_GenerisUser;
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
@@ -86,6 +87,8 @@ class Review extends tao_actions_SinglePageModule
         $launchData = $this->ltiSession->getLaunchData();
         $finder = $this->getDeliveryExecutionFinderService();
 
+        $testRunnerPluginsConfig = $this->getTestRunnerPluginsConfig();
+
         if ($this->isSubmissionReviewRequestMessageProvided()) {
             $deliveryId = $this->getDeliveryId();
             $userId = $this->getUserId();
@@ -109,7 +112,9 @@ class Review extends tao_actions_SinglePageModule
             'execution' => $execution->getIdentifier(),
             'delivery' => $delivery->getUri(),
             'show-score' => (int) $finder->getShowScoreOption($launchData),
-            'show-correct' => (int) $finder->getShowCorrectOption($launchData)
+            'show-correct' => (int) $finder->getShowCorrectOption($launchData),
+            'display-section-titles' => (int) $testRunnerPluginsConfig['review']['displaySectionTitles'] || true,
+            'review-layout' => $testRunnerPluginsConfig['review']['reviewLayout']
         ];
 
         $this->composeView('delegated-view', $data, 'pages/index.tpl', 'tao');
@@ -297,5 +302,14 @@ class Review extends tao_actions_SinglePageModule
         $messageType = $this->ltiSession->getLaunchData()->getVariable(LtiLaunchData::LTI_MESSAGE_TYPE);
 
         return $messageType === LtiMessageInterface::LTI_MESSAGE_TYPE_SUBMISSION_REVIEW_REQUEST;
+    }
+
+    private function getTestRunnerPluginsConfig(): array
+    {
+        //\common_ext_ExtensionsManager::singleton()
+        $extensionsManager = $this->getServiceLocator()->get(common_ext_ExtensionsManager::SERVICE_ID);
+        $extension = $extensionsManager->getExtensionById('taoQtiTest');
+        $config = $extension->getConfig('testRunner');
+        return $config['plugins'];
     }
 }

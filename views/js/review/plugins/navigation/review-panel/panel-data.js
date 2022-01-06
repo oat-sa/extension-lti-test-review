@@ -61,16 +61,16 @@ define([
         if (item.informational) {
             return 'info';
         }
+        //if item was never visited, item.score=null. So it will be 'incorrect', not 'skipped'. Is it intentional?
+        if (item.skipped || item.score === null) {
+            return 'skipped';
+        }
         if (withScore && item.maxScore) {
-            //if item was never visited, item.score=null. So it will be 'incorrect', not 'skipped'. Is it intentional?
             if (item.score === item.maxScore) {
                 return 'correct';
             } else {
                 return 'incorrect';
             }
-        }
-        if (item.skipped) {
-            return 'skipped';
         }
         return 'default';
     };

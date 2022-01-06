@@ -181,7 +181,7 @@ class QtiRunnerInitDataBuilder
 
                     $responsesCount = $this->getResponseCountsFromState($state);
 
-                    $isInformational = empty($state);
+                    $isInformational = $this->isItemInformational($item);
                     $isSkipped = !$isInformational && ($responsesCount === 0);
 
                     $items[$itemId] = [
@@ -227,6 +227,21 @@ class QtiRunnerInitDataBuilder
             'itemRef' => $itemRef,
             'itemData' => $itemData,
         ];
+    }
+
+    /**
+     * @param AssessmentSectionRef $itemRef
+     * @return Boolean
+     */
+    private function isItemInformational($itemRef)
+    {
+        $categories = $itemRef->getCategories()->getArrayCopy();
+
+        $hasInformationalCategory = in_array('x-tao-itemusage-informational', $categories, true);
+
+        $hasNoResponseDeclarations = method_exists($itemRef, 'getResponseDeclarations') && 0 == count($itemRef->getResponseDeclarations());
+
+        return $hasInformationalCategory || $hasNoResponseDeclarations;
     }
 
     /**

@@ -13,33 +13,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 Open Assessment Technologies SA ;
- */
-/**
- * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
+ * Copyright (c) 2021-22 Open Assessment Technologies SA ;
  */
 define([
     'jquery',
     'lodash',
     'i18n',
-    'ui/hider',
-    'ui/autoscroll',
     'ui/component',
+    'ui/itemButtonList',
     'ltiTestReview/review/plugins/navigation/review-panel/panel-data',
-    'ltiTestReview/review/plugins/navigation/review-panel/stepOverview',
     'tpl!ltiTestReview/review/plugins/navigation/review-panel/tpl/fizzyPanel',
     'tpl!ltiTestReview/review/plugins/navigation/review-panel/tpl/fizzyList',
-    'css!ltiTestReview/review/plugins/navigation/review-panel/css/fizzy-panel.css',
-    'css!ltiTestReview/review/plugins/navigation/review-panel/css/step-overview.css'
+    'css!ltiTestReview/review/plugins/navigation/review-panel/css/fizzy-panel.css'
 ], function (
     $,
     _,
     __,
-    hider,
-    autoscroll,
     componentFactory,
+    itemButtonListFactory,
     reviewDataHelper,
-    stepOverviewFactory,
     panelTpl,
     listTpl
 ) {
@@ -53,7 +45,8 @@ define([
         headerTitle: __('Test review'),
         headerLabel: __('Total score:'),
         footerLabel: __('Total'),
-        showScore: true
+        showScore: false,
+        showCorrect: false
     };
 
     /**
@@ -81,7 +74,7 @@ define([
         header: '.review-panel-header',
         footer: '.review-panel-footer',
         score: '.review-panel-score',
-        stepOverviewContainer: '.review-panel-items'
+        itemButtonListContainer: '.review-panel-items'
     };
 
     /**
@@ -124,8 +117,9 @@ define([
      * @param {Object} config
      * @param {String} [config.headerLabel] - Header label
      * @param {String} [config.footerLabel] - Footer label
-     * @param {Boolean} [config.showScore] - Show the score on the review panel. When disabled, the filters will also be.
-     * @param {testMap|null} map
+     * @param {Boolean} [config.showScore] - Show the score header/footers in the review panel
+     * @param {Boolean} [config.showCorrect] - Show correct/incorrect badges on item buttons
+     * @param {testMap|null} testMap
      * @returns {component}
      * @fires ready - When the component is ready to work
      * @fires update When the navigation panel has been updated
@@ -133,9 +127,9 @@ define([
      * @fires datachange When the panel data has changed
      * @fires itemchange When an item is selected by the user (either a click on item or a filter)
      */
-    function fizzyReviewPanelFactory(container, config = {}, map = null) {
+    function fizzyReviewPanelFactory(container, config = {}, testMap = null) {
         let component;
-        let stepOverviewComponents = [];
+        let itemButtonListComponents = [];
         let controls = null;
         let activeItem = null;
         let data = null;
@@ -145,7 +139,7 @@ define([
          * @param {String} itemId
          */
         const selectItem = itemId => {
-            stepOverviewComponents.forEach(c => c.setActiveItem(itemId));
+            itemButtonListComponents.forEach(c => c.setActiveItem(itemId));
         };
 
         /**
@@ -185,16 +179,16 @@ define([
         };
 
         //at the moment this component doesn't support data update, so just recreate it if testMap has changed
-        const renderStepOverviewComponents = () => {
-            stepOverviewComponents.forEach(c => c.destroy());
-            stepOverviewComponents = [];
+        const renderItemButtonListComponents = () => {
+            itemButtonListComponents.forEach(c => c.destroy());
+            itemButtonListComponents = [];
 
             if (component.is('rendered')) {
-                controls.$content.find(cssSelectors.stepOverviewContainer).each((index, stepOverviewContainerElem) => {
-                    const stepOverviewComponent = stepOverviewFactory({ items: data.sections[index].items })
-                        .render(stepOverviewContainerElem)
+                controls.$content.find(cssSelectors.itemButtonListContainer).each((index, itemButtonListContainerElem) => {
+                    const itemButtonListComponent = itemButtonListFactory({ items: data.sections[index].items })
+                        .render(itemButtonListContainerElem)
                         .on('click', onItemClick);
-                    stepOverviewComponents.push(stepOverviewComponent);
+                    itemButtonListComponents.push(itemButtonListComponent);
                 });
             }
         };
@@ -219,7 +213,11 @@ define([
              * @fires datachange
              */
             setData(newMap) {
-                data = reviewDataHelper.getFizzyReviewPanelMap(newMap, this.getConfig().showScore, this.getConfig().displaySectionTitles);
+                console.log('fizzy setData', this.getConfig());
+                const { showScore, showCorrect, displaySectionTitles } = this.getConfig();
+
+                // Modify the testMap items, adding properties for the fizzy display
+                data = reviewDataHelper.getFizzyReviewPanelMap(newMap, showScore, showCorrect, displaySectionTitles);
 
                 /**
                  * @event datachange
@@ -283,7 +281,7 @@ define([
 
                     controls.$content.html(listTpl(data));
 
-                    renderStepOverviewComponents();
+                    renderItemButtonListComponents();
 
                     /**
                      * @event update
@@ -313,7 +311,7 @@ define([
                     initConfig.footerLabel = false;
                 }
 
-                const {headerLabel, footerLabel} = initConfig;
+                const { headerLabel, footerLabel } = initConfig;
 
                 // setup the header
                 if (headerLabel) {
@@ -332,8 +330,8 @@ define([
                 }
 
                 // initialize the test map if supplied
-                if (map) {
-                    component.setData(map);
+                if (testMap) {
+                    component.setData(testMap);
                 }
 
                 // auto render on init (defer the call to give a chance to the init event to be completed before)
@@ -373,17 +371,18 @@ define([
                 /**
                  * @event ready
                  */
+                // is show-score state useful?
                 this.setState('show-score', this.getConfig().showScore)
                     .setState('ready', true)
                     .trigger('ready');
             })
 
-            // reflect enable/disabled state
+            // reflect enabled/disabled panel state in buttons
             .on('enable', () => {
-                stepOverviewComponents.forEach(c => c.enable());
+                itemButtonListComponents.forEach(c => c.enable());
             })
             .on('disable', () => {
-                stepOverviewComponents.forEach(c => c.disable());
+                itemButtonListComponents.forEach(c => c.disable());
             })
 
             // make sure the active item remain selected and visible when updating the display
@@ -405,8 +404,9 @@ define([
 
             // free resources on dispose
             .on('destroy', function onReviewPanelDestroy() {
-                stepOverviewComponents.forEach(c => c.destroy());
-                stepOverviewComponents = [];
+                itemButtonListComponents.forEach(c => c.destroy());
+                itemButtonListComponents = [];
+                controls = null;
             });
 
         // initialize the component with the provided config

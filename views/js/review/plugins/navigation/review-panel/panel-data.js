@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 Open Assessment Technologies SA ;
+ * Copyright (c) 2019-22 Open Assessment Technologies SA ;
  */
 /**
  * Helper that will build the dataset for the review panel in the expected format
@@ -82,10 +82,10 @@ define([
      * @returns {mapEntry}
      */
     const extractData = (entry, withScore) => {
-        const {id, label, position, informational, skipped, score, maxScore} = entry || {};
-        const data = {id, label, position, withScore};
+        const { id, label, position, informational, skipped, score, maxScore } = entry || {};
+        const data = { id, label, position, withScore };
         if (withScore) {
-            Object.assign(data, {score, maxScore});
+            Object.assign(data, { score, maxScore });
         }
         if ('undefined' !== typeof informational) {
             data.informational = informational;
@@ -139,43 +139,25 @@ define([
          * @param {Boolean} displaySectionTitles
          * @returns {reviewPanelMap}
          */
-        getFizzyReviewPanelMap(testMap, withScore = true, displaySectionTitles = true) {
+        getFizzyReviewPanelMap(testMap, withScore = true, showCorrect = false, displaySectionTitles = true) {
             const panelMap = getAccordionReviewPanelMap(testMap, withScore);
-            let numberInTest = 1;
+            let nonInformationalCount = 0;
             let sections = [];
 
             panelMap.parts.forEach((part) => {
                 part.sections.forEach((section) => {
                     sections.push(section);
                     section.items.forEach((reviewItem) => {
+                        // Modify 'label' for itemButtonList items
                         const status = reviewItem.type;
 
-                        // {
-                        //     "id": "item-13",
-                        //     "label": "E2E items 4 - ending",
-                        //     "position": 9,
-                        //     "withScore": 1,
-                        //     "score": 0,
-                        //     "maxScore": 0,
-                        //     "informational": true,
-                        //     "skipped": false,
-                        //     "type": "info"
-                        // }
-                        //==>
-                        // {
-                        //     "id": "item-13", //for panel controller & key for component
-                        //     "position": 9, //for panel controller
-                        //     "ariaLabel": "Question 10",
-                        //     "label": 10,
-                        //     "icon": 'info'/null,
-                        //     "type": 'answered'/'viewed'/'unseen',
-                        //     "scoreType": 'correct'/'incorrect'/null
-
-                        if (status !== 'info') {
-                            reviewItem.label = numberInTest;
-                            numberInTest++;
+                        if (status === 'info') {
+                            reviewItem.label = __('Informational');
+                        } else {
+                            reviewItem.label = ++nonInformationalCount;
                         }
 
+                        // Add properties 'icon', 'ariaLabel', 'type', 'scoreType' for itemButtonList items
                         reviewItem.icon = status === 'info' ? 'info' : null;
 
                         reviewItem.ariaLabel = status === 'info' ? __('Informational') : __('Question %s', reviewItem.label);
@@ -188,16 +170,18 @@ define([
                         }
 
                         reviewItem.scoreType = null;
-                        if (status === 'correct') {
-                            reviewItem.scoreType = 'correct';
-                        } else if (status === 'incorrect') {
-                            reviewItem.scoreType = 'incorrect';
+                        if (showCorrect) {
+                            if (status === 'correct') {
+                                reviewItem.scoreType = 'correct';
+                            } else if (status === 'incorrect') {
+                                reviewItem.scoreType = 'incorrect';
+                            }
                         }
                     });
                 });
             });
 
-            panelMap.sections = sections; //flatten 'parts-sections-items' to 'sections-items'
+            panelMap.sections = sections; // flatten 'parts-sections-items' to 'sections-items'
             panelMap.displaySectionTitles = displaySectionTitles;
 
             return panelMap;

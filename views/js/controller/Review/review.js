@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2015-2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2015-22 (original work) Open Assessment Technologies SA ;
  */
 define([
     'jquery',
@@ -45,15 +45,17 @@ define([
         start() {
 
             const $container = $('.container');
-            const {execution, delivery, showScore, showCorrect} = $container.data();
+            const { execution, delivery, showScore, showCorrect, displaySectionTitles, reviewLayout } = $container.data();
 
             reviewFactory($(".content-wrap", document), {
                 testUri: {
                     resultId: execution,
                     deliveryUri: delivery
                 },
-                showScore,
-                showCorrect,
+                showScore: !!showScore,
+                showCorrect: !!showCorrect,
+                displaySectionTitles: !!displaySectionTitles,
+                reviewLayout,
                 readOnly: true,
                 plugins: [{
                     module: 'ltiTestReview/review/plugins/navigation/review-panel/plugin',

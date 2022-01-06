@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA ;
+ * Copyright (c) 2019-22 (original work) Open Assessment Technologies SA ;
  */
 /**
  * @author Hanna Dzmitryieva <hanna@taotesting.com>
@@ -38,9 +38,11 @@ define([
             readOnly = false,
             showScore = false,
             showCorrect = false,
+            displaySectionTitles = true,
+            reviewLayout = 'default',
             pluginsOptions = {}
         } = config;
-        return {fullPage, readOnly, showScore, showCorrect, plugins: pluginsOptions};
+        return {fullPage, readOnly, showScore, showCorrect, displaySectionTitles, reviewLayout, plugins: pluginsOptions};
     };
 
     /**
@@ -53,6 +55,8 @@ define([
      * @param {Boolean} [config.readOnly] - Do not allow to modify the reviewed item.
      * @param {Boolean} [config.showScore] - Allow to show the score.
      * @param {Boolean} [config.showCorrect] - Allow to show the correct responses.
+     * @param {Boolean} [config.displaySectionTitles] - Allow to show the section titles
+     * @param {String} [config.reviewLayout] - Name of the panel layout to render
      * @param {Function} [template] - An optional template for the component
      * @returns {review}
      */

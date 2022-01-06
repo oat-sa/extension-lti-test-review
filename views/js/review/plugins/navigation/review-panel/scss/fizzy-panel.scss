@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 Open Assessment Technologies SA ;
+ * Copyright (c) 2021-22 Open Assessment Technologies SA ;
  */
 @import "inc/bootstrap";
 
@@ -33,22 +33,6 @@ $separatorColor: whiten($grey, 0.4);
     justify-content: $justify;
 }
 
-@mixin review-panel-item-layout($justify:space-between) {
-    @include review-panel-line-layout($justify);
-    .review-panel-label {
-        flex: 1 1 auto;
-        width: calc(100% - #{$scoreWidth});
-        text-align: left;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .review-panel-score {
-        flex: 0 0 auto;
-        width: $scoreWidth;
-        text-align: right;
-    }
-}
-
 .review-panel.fizzy {
     @include disableSelect();
     color: $panelColor;
@@ -61,6 +45,7 @@ $separatorColor: whiten($grey, 0.4);
     height: 100%;
     padding: 0 $panelMargin;
 
+    // can appear at panel top, bottom, and section titles
     .review-panel-label {
         display: block;
         white-space: nowrap;
@@ -70,40 +55,44 @@ $separatorColor: whiten($grey, 0.4);
         white-space: nowrap;
     }
 
-    .review-panel-title {
-        @include font-size(20);
-        font-weight: bold;
-        border-bottom: 0.1rem solid $separatorColor;
-        margin: 2rem $sidePadding 0 $sidePadding;
-        padding: 0.4rem 0 0.8rem 0;
+    .review-panel-header {
+        .review-panel-title {
+            font-size: 2rem;
+            font-weight: bold;
+            border-bottom: 1px solid $separatorColor;
+            margin: 2rem $sidePadding 0 $sidePadding;
+            padding: 0.4rem 0 0.8rem 0;
+        }
+        .review-panel-score-header {
+            @include review-panel-line-layout(space-between);
+            padding: 0.7rem $sidePadding;
+            color: $headerColor;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
     }
 
-    .review-panel-score-header {
-        @include review-panel-line-layout(space-between);
-        padding: 0.7rem $sidePadding;
-        color: $headerColor;
-        font-size: 1.5rem;
-        font-weight: bold;
+    .review-panel-content {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        .review-panel-sections {
+            padding-bottom: 4rem;
+            .review-panel-label {
+                font-size: 1.6rem;
+                margin: 1.5rem $sidePadding 1rem $sidePadding;
+                display: block;
+            }
+        }
     }
 
     .review-panel-footer {
         @include review-panel-line-layout(space-between);
-        padding: 0.5rem $sidePadding 0 $sidePadding;
+        padding: 0.8rem $sidePadding 0 $sidePadding;
         color: $footerColor;
         font-size: 1.4rem;
         font-weight: bold;
-    }
-
-    .review-panel-content {
-        flex: 0 1 auto;
-        overflow-y: auto;
-    }
-
-    .review-panel-sections {
         .review-panel-label {
-            margin: 1.3rem $sidePadding 1rem $sidePadding;
-            display: block;
-            @include font-size(15);
+            padding: 0
         }
     }
 }

@@ -74,7 +74,7 @@ $incorrectColor: $error;
     }
 }
 
-.review-panel {
+.review-panel.accordion {
     @include disableSelect();
     color: $panelColor;
     position: relative;

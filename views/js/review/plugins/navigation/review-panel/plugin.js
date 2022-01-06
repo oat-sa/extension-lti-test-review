@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 Open Assessment Technologies SA ;
+ * Copyright (c) 2019-22 Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
@@ -74,16 +74,26 @@ define([
          */
         render() {
             return promiseTimeout(new Promise(resolve => {
-                const isFizzyLayout = true; //TODO: add a setting where needed
-                const displaySectionTitles = true; //TODO: add a setting where needed
-                const reviewPanelFactory = isFizzyLayout ? fizzyReviewPanelFactory : accordionReviewPanelFactory;
-
                 const testRunner = this.getTestRunner();
                 const navigationDataService = navigationDataServiceFactory(testRunner.getTestMap());
-                const { showScore } = testRunner.getOptions();
+
+                const { showScore, showCorrect, displaySectionTitles, reviewLayout } = testRunner.getOptions();
+
+                const reviewPanelFactory = reviewLayout === 'fizzy' ? fizzyReviewPanelFactory : accordionReviewPanelFactory;
+
+                const reviewPanelConfig = Object.assign(
+                    {
+                        showScore,
+                        showCorrect,
+                        displaySectionTitles,
+                        reviewLayout
+                    },
+                    this.getConfig()
+                )
+
                 const reviewPanel = reviewPanelFactory(
                     this.getAreaBroker().getPanelArea(),
-                    Object.assign({showScore, displaySectionTitles}, this.getConfig()),
+                    reviewPanelConfig,
                     navigationDataService.getMap()
                 );
 

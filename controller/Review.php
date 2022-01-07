@@ -306,7 +306,6 @@ class Review extends tao_actions_SinglePageModule
 
     private function getTestRunnerPluginsConfig(): array
     {
-        //\common_ext_ExtensionsManager::singleton()
         $extensionsManager = $this->getServiceLocator()->get(common_ext_ExtensionsManager::SERVICE_ID);
         $extension = $extensionsManager->getExtensionById('taoQtiTest');
         $config = $extension->getConfig('testRunner');

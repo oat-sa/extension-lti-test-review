@@ -213,7 +213,6 @@ define([
              * @fires datachange
              */
             setData(newMap) {
-                console.log('fizzy setData', this.getConfig());
                 const { showScore, showCorrect, displaySectionTitles } = this.getConfig();
 
                 // Modify the testMap items, adding properties for the fizzy display

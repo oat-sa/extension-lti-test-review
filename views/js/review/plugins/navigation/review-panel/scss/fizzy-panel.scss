@@ -76,7 +76,8 @@ $separatorColor: whiten($grey, 0.4);
         flex: 1 1 auto;
         overflow-y: auto;
         .review-panel-sections {
-            padding-bottom: 4rem;
+            padding: 0 0 4rem 0;
+            list-style: none;
             .review-panel-label {
                 font-size: 1.6rem;
                 margin: 1.5rem $sidePadding 1rem $sidePadding;

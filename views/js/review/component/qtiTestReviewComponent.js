@@ -55,7 +55,7 @@ define([
      * @param {Boolean} [config.readOnly] - Do not allow to modify the reviewed item.
      * @param {Boolean} [config.showScore] - Allow to show the score.
      * @param {Boolean} [config.showCorrect] - Allow to show the correct responses.
-     * @param {Boolean} [config.displaySectionTitles] - Allow to show the section titles
+     * @param {Boolean} [config.displaySectionTitles] - Allow to hide the section titles
      * @param {String} [config.reviewLayout] - Name of the panel layout to render
      * @param {Function} [template] - An optional template for the component
      * @returns {review}

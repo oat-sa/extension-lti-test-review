@@ -217,7 +217,8 @@ define([
                 const { showScore, showCorrect, displaySectionTitles } = this.getConfig();
 
                 // Modify the testMap items, adding properties for the fizzy display
-                data = reviewDataHelper.getFizzyReviewPanelMap(newMap, showScore, showCorrect, displaySectionTitles);
+                data = reviewDataHelper.getFizzyReviewPanelMap(newMap, showScore, showCorrect);
+                data.displaySectionTitles = displaySectionTitles;
 
                 /**
                  * @event datachange

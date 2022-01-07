@@ -139,14 +139,13 @@ define([
          * @param {Boolean} displaySectionTitles
          * @returns {reviewPanelMap}
          */
-        getFizzyReviewPanelMap(testMap, withScore = true, showCorrect = false, displaySectionTitles = true) {
+        getFizzyReviewPanelMap(testMap, withScore = true, showCorrect = false) {
             const panelMap = getAccordionReviewPanelMap(testMap, withScore);
             let nonInformationalCount = 0;
             let sections = [];
 
             panelMap.parts.forEach((part) => {
                 part.sections.forEach((section) => {
-                    sections.push(section);
                     section.items.forEach((reviewItem) => {
                         // Modify 'label' for itemButtonList items
                         const status = reviewItem.type;
@@ -154,7 +153,7 @@ define([
                         if (status === 'info') {
                             reviewItem.label = __('Informational');
                         } else {
-                            reviewItem.label = ++nonInformationalCount;
+                            reviewItem.label = `${++nonInformationalCount}`;
                         }
 
                         // Add properties 'icon', 'ariaLabel', 'type', 'scoreType' for itemButtonList items
@@ -178,11 +177,11 @@ define([
                             }
                         }
                     });
+                    sections.push(section);
                 });
             });
 
             panelMap.sections = sections; // flatten 'parts-sections-items' to 'sections-items'
-            panelMap.displaySectionTitles = displaySectionTitles;
 
             return panelMap;
         }

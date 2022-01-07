@@ -12,14 +12,17 @@
           "items": [
             {
               "id": "item-1",
-              "label": "Example_0_Introduction",
+              "label": "Informational",
               "informational": true,
               "skipped": false,
               "withScore": true,
               "position": 0,
-              "type": "info",
+              "type": "viewed",
               "score": 0,
-              "maxScore": 0
+              "maxScore": 0,
+              "ariaLabel": "Informational",
+              "icon": "info",
+              "scoreType": null
             }
           ],
           "withScore": true,
@@ -43,91 +46,115 @@
           "items": [
             {
               "id": "item-2",
-              "label": "example_1_TAO",
+              "label": "1",
               "informational": false,
               "skipped": false,
               "withScore": true,
               "position": 1,
-              "type": "incorrect",
+              "type": "answered",
               "score": 1,
-              "maxScore": 2
+              "maxScore": 2,
+              "ariaLabel": "Question 1",
+              "icon": null,
+              "scoreType": "incorrect"
             },
             {
               "id": "item-3",
-              "label": "example_2_Math",
+              "label": "2",
               "informational": false,
               "skipped": false,
               "withScore": true,
               "position": 2,
-              "type": "incorrect",
+              "type": "answered",
               "score": 0,
-              "maxScore": 2
+              "maxScore": 2,
+              "ariaLabel": "Question 2",
+              "icon": null,
+              "scoreType": "incorrect"
             },
             {
               "id": "item-4",
-              "label": "Example_3_Baudelaire",
+              "label": "3",
               "informational": false,
               "skipped": false,
               "withScore": true,
               "position": 3,
-              "type": "incorrect",
+              "type": "answered",
               "score": 2,
-              "maxScore": 3
+              "maxScore": 3,
+              "ariaLabel": "Question 3",
+              "icon": null,
+              "scoreType": "incorrect"
             },
             {
               "id": "item-5",
-              "label": "Example_4_Appearance",
+              "label": "4",
               "informational": false,
               "skipped": false,
               "withScore": true,
               "position": 4,
-              "type": "correct",
+              "type": "answered",
               "score": 2,
-              "maxScore": 2
+              "maxScore": 2,
+              "ariaLabel": "Question 4",
+              "icon": null,
+              "scoreType": "correct"
             },
             {
               "id": "item-6",
-              "label": "Example_5_picasso",
+              "label": "5",
               "informational": false,
               "skipped": false,
               "withScore": true,
               "position": 5,
-              "type": "incorrect",
+              "type": "answered",
               "score": 1,
-              "maxScore": 2
+              "maxScore": 2,
+              "ariaLabel": "Question 5",
+              "icon": null,
+              "scoreType": "incorrect"
             },
             {
               "id": "item-7",
-              "label": "Example_6_Geography",
+              "label": "6",
               "informational": false,
               "skipped": false,
               "withScore": true,
               "position": 6,
-              "type": "correct",
+              "type": "answered",
               "score": 2,
-              "maxScore": 2
+              "maxScore": 2,
+              "ariaLabel": "Question 6",
+              "icon": null,
+              "scoreType": "correct"
             },
             {
               "id": "item-8",
-              "label": "Example_7_Geo 2",
+              "label": "7",
               "informational": false,
               "skipped": false,
               "withScore": true,
               "position": 7,
-              "type": "correct",
+              "type": "answered",
               "score": 2,
-              "maxScore": 2
+              "maxScore": 2,
+              "ariaLabel": "Question 7",
+              "icon": null,
+              "scoreType": "correct"
             },
             {
               "id": "item-9",
-              "label": "Example_8_Geo 3",
+              "label": "8",
               "informational": false,
               "skipped": true,
               "withScore": true,
               "position": 8,
-              "type": "skipped",
+              "type": "viewed",
               "score": 0,
-              "maxScore": 2
+              "maxScore": 2,
+              "ariaLabel": "Question 8",
+              "icon": null,
+              "scoreType": null
             }
           ],
           "withScore": true,

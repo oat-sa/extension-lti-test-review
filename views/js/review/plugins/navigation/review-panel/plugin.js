@@ -85,8 +85,7 @@ define([
                     {
                         showScore,
                         showCorrect,
-                        displaySectionTitles,
-                        reviewLayout
+                        displaySectionTitles
                     },
                     this.getConfig()
                 )

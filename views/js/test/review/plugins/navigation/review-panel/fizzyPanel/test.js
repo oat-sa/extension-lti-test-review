@@ -370,7 +370,6 @@ define([
                 });
 
                 data.expected.items.forEach((item, index) => {
-                    console.log(index, $container.find(`.buttonlist-item:nth(${index})`));
                     assert.equal($container.find(`.buttonlist-item:nth(${index})`).hasClass(item.type), true, `The item #${index} got the expected class: ${item.type}`);
                 });
 

@@ -16,7 +16,6 @@
  * Copyright (c) 2021-22 Open Assessment Technologies SA ;
  */
 define([
-    'jquery',
     'lodash',
     'i18n',
     'ui/component',
@@ -26,7 +25,6 @@ define([
     'tpl!ltiTestReview/review/plugins/navigation/review-panel/tpl/fizzyList',
     'css!ltiTestReview/review/plugins/navigation/review-panel/css/fizzy-panel.css'
 ], function (
-    $,
     _,
     __,
     componentFactory,
@@ -50,23 +48,12 @@ define([
     };
 
     /**
-     * CSS classes involved in the review panel
-     * @type {Object}
-     */
-    const cssClasses = {
-        active: 'step-overview-item-active',
-    };
-
-    /**
      * CSS selectors that match some particular elements
      * @type {Object}
      */
     const cssSelectors = {
-        //step-overview
-        active: `.${cssClasses.active}`,
-        navigable: '.step-overview-btn',
-        itemById: (id) => `.step-overview-item[data-id="${id}"]`,
-        navigableById: (id) => `.step-overview-btn[data-id="${id}"]`,
+        //item-buttonlist
+        navigable: '.item-buttonlist-btn',
         //panel
         content: '.review-panel-content',
         header: '.review-panel-header',
@@ -117,6 +104,7 @@ define([
      * @param {String} [config.footerLabel] - Footer label
      * @param {Boolean} [config.showScore] - Show the score header/footers in the review panel
      * @param {Boolean} [config.showCorrect] - Show correct/incorrect badges on item buttons
+     * @param {Boolean} [config.displaySectionTitles] - Show section titles
      * @param {testMap|null} testMap
      * @returns {component}
      * @fires ready - When the component is ready to work

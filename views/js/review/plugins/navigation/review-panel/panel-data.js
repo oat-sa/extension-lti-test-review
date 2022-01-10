@@ -135,8 +135,8 @@ define([
         /**
          * Refines the test runner data and build the expected review panel map
          * @param {testMap} testMap
-         * @param {Boolean} withScore
-         * @param {Boolean} displaySectionTitles
+         * @param {Boolean} [withScore=true]
+         * @param {Boolean} [showCorrect=false]
          * @returns {reviewPanelMap}
          */
         getFizzyReviewPanelMap(testMap, withScore = true, showCorrect = false) {

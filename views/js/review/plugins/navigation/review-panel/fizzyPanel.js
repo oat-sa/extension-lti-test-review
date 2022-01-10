@@ -54,7 +54,6 @@ define([
      * @type {Object}
      */
     const cssClasses = {
-        keyfocused: 'step-overview-item-focus',
         active: 'step-overview-item-active',
     };
 
@@ -65,7 +64,6 @@ define([
     const cssSelectors = {
         //step-overview
         active: `.${cssClasses.active}`,
-        keyfocused: `.${cssClasses.keyfocused}`,
         navigable: '.step-overview-btn',
         itemById: (id) => `.step-overview-item[data-id="${id}"]`,
         navigableById: (id) => `.step-overview-btn[data-id="${id}"]`,
@@ -140,20 +138,6 @@ define([
          */
         const selectItem = itemId => {
             itemButtonListComponents.forEach(c => c.setActiveItem(itemId));
-        };
-
-        /**
-         * Example implementation of 'tabfocus' styling
-         * @param {jQuery|null}  $target
-         */
-        const setFocusStyle = $target => {
-            controls.$content
-                .find(cssSelectors.keyfocused)
-                .removeClass(cssClasses.keyfocused);
-
-            if ($target && $target.length) {
-                $target.addClass(cssClasses.keyfocused);
-            }
         };
 
         /**
@@ -345,18 +329,6 @@ define([
                     $footerScore: this.getElement().find(`${cssSelectors.footer} ${cssSelectors.score}`),
                     $content: this.getElement().find(cssSelectors.content),
                 };
-
-                //Simple example of 'tabfocus' detection
-                this.getElement().on('keydown', cssSelectors.navigable, e => {
-                    if (e.key === 'Tab') {
-                        setFocusStyle(null);
-                    }
-                });
-                this.getElement().on('keyup', cssSelectors.navigable, e => {
-                    if (e.key === 'Tab') {
-                        setFocusStyle($(e.target));
-                    }
-                });
 
                 this.update();
 

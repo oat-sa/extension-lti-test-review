@@ -289,7 +289,7 @@ define([
             .on('init', function onReviewPanelInit() {
                 const initConfig = this.getConfig();
 
-                // no header nor footer or filters when scores are disabled
+                // no header nor footer when scores are disabled
                 if (!initConfig.showScore) {
                     initConfig.headerLabel = false;
                     initConfig.footerLabel = false;

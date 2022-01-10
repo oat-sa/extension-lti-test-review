@@ -149,12 +149,12 @@
               "skipped": true,
               "withScore": true,
               "position": 8,
-              "type": "viewed",
+              "type": "answered",
               "score": 0,
               "maxScore": 2,
               "ariaLabel": "Question 8",
               "icon": null,
-              "scoreType": null
+              "scoreType": "incorrect"
             }
           ],
           "withScore": true,

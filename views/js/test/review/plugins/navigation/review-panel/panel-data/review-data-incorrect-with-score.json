@@ -125,7 +125,7 @@
               "skipped": true,
               "withScore": true,
               "position": 8,
-              "type": "skipped",
+              "type": "incorrect",
               "score": 0,
               "maxScore": 2
             }

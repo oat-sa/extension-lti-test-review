@@ -18,7 +18,7 @@
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
- define([
+define([
     'jquery',
     'lodash',
     'i18n',

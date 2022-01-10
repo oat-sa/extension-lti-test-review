@@ -622,7 +622,7 @@ define([
                         informational: false,
                         skipped: true,
                         withScore: true,
-                        type: 'skipped',
+                        type: 'incorrect',
                         position: 0,
                         score: 0,
                         maxScore: 1

@@ -113,7 +113,7 @@ class Review extends tao_actions_SinglePageModule
             'delivery' => $delivery->getUri(),
             'show-score' => (int) $finder->getShowScoreOption($launchData),
             'show-correct' => (int) $finder->getShowCorrectOption($launchData),
-            'display-section-titles' => (int) $testRunnerPluginsConfig['review']['displaySectionTitles'] || true,
+            'display-section-titles' => (int) $testRunnerPluginsConfig['review']['displaySectionTitles'],
             'review-layout' => $testRunnerPluginsConfig['review']['reviewLayout']
         ];
 

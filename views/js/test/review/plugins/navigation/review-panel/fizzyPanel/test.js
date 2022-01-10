@@ -235,333 +235,194 @@ define([
             });
     });
 
-    // QUnit.test('render default', assert => {
-    //     const ready = assert.async();
-    //     const $container = $('#fixture-render');
+    QUnit.test('render default', assert => {
+        const ready = assert.async();
+        const $container = $('#fixture-render');
 
-    //     assert.expect(16);
-    //     assert.equal($container.children().length, 0, 'The container is empty');
+        assert.expect(7);
+        assert.equal($container.children().length, 0, 'The container is empty');
 
-    //     const instance = reviewPanelFactory($container)
-    //         .on('init', function () {
-    //             assert.equal(this, instance, 'The instance has been initialized');
-    //         })
-    //         .on('ready', () => {
-    //             assert.ok(instance.is('ready'), 'The component is ready');
-    //             assert.equal($container.children().length, 1, 'The container contains an element');
-    //             assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
-    //             assert.equal($container.find('.review-panel-content').children().length, 0, 'The content area is empty');
+        const instance = reviewPanelFactory($container)
+            .on('init', function () {
+                assert.equal(this, instance, 'The instance has been initialized');
+            })
+            .on('ready', () => {
+                assert.ok(instance.is('ready'), 'The component is ready');
+                assert.equal($container.children().length, 1, 'The container contains an element');
+                assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
+                assert.equal($container.find('.review-panel-content').children().length, 0, 'The content area is empty');
 
-    //             assert.equal($container.find('.review-panel-header .review-panel-label').text().trim(), defaultHeader.label, 'The header label is rendered');
-    //             assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), defaultHeader.score, 'The header score is rendered');
+                assert.equal($container.find('.review-panel-title').text().trim(), defaultHeaderTitle, 'The header title is rendered');
 
-    //             assert.equal($container.find('.review-panel-footer .review-panel-label').text().trim(), defaultFooter.label, 'The header label is rendered');
-    //             assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), defaultFooter.score, 'The header score is rendered');
+                instance.destroy();
+            })
+            .on('destroy', () => ready())
+            .on('error', err => {
+                assert.ok(false, 'The operation should not fail!');
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+                ready();
+            });
+    });
 
-    //             assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
-    //             assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
-    //             assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is active');
-    //             assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active');
-    //             assert.equal($container.find('.review-panel-filter:nth(0)').text().trim(), defaultFilters[0].label, 'The first filter is rendered');
-    //             assert.equal($container.find('.review-panel-filter:nth(1)').text().trim(), defaultFilters[1].label, 'The second filter is rendered');
+    QUnit.cases.init([{
+        title: 'scores enabled',
+        config: {
+            showScore: true,
+            showCorrect: true,
+            displaySectionTitles: true,
+            headerLabel: 'HEADER',
+            footerLabel: 'FOOTER'
+        },
+        testMap: testMapIncorrect,
+        expected: {
+            header: 1,
+            headerLabel: 'HEADER',
+            headerScore: '80%',
+            footer: 1,
+            footerLabel: 'FOOTER',
+            footerScore: '12/15',
+            countSections: 3,
+            countItems: 9,
+            items: [
+                {type: 'viewed'},
+                {type: 'correct'},
+                {type: 'incorrect'},
+                {type: 'correct'},
+                {type: 'incorrect'},
+                {type: 'correct'},
+                {type: 'correct'},
+                {type: 'correct'},
+                {type: 'viewed'}
+            ]
+        }
+    }, {
+        title: 'scores disabled',
+        config: {
+            displaySectionTitles: true
+        },
+        testMap: testMapIncorrect,
+        expected: {
+            header: 0,
+            headerLabel: '',
+            headerScore: '',
+            footer: 0,
+            footerLabel: '',
+            footerScore: '',
+            countSections: 3,
+            countItems: 9,
+            items: [
+                {type: 'viewed'},
+                {type: 'answered'},
+                {type: 'answered'},
+                {type: 'answered'},
+                {type: 'answered'},
+                {type: 'answered'},
+                {type: 'answered'},
+                {type: 'answered'},
+                {type: 'viewed'}
+            ]
+        }
+    }]).test('render with data ', (data, assert) => {
+        const ready = assert.async();
+        const $container = $('#fixture-render-data');
 
-    //             instance.destroy();
-    //         })
-    //         .on('destroy', () => ready())
-    //         .on('error', err => {
-    //             assert.ok(false, 'The operation should not fail!');
-    //             assert.pushResult({
-    //                 result: false,
-    //                 message: err
-    //             });
-    //             ready();
-    //         });
-    // });
+        assert.expect(27);
+        assert.equal($container.children().length, 0, 'The container is empty');
 
-    // QUnit.cases.init([{
-    //     title: 'scores enabled',
-    //     config: {
-    //         headerLabel: 'HEADER',
-    //         footerLabel: 'FOOTER'
-    //     },
-    //     testMap: testMapIncorrect,
-    //     expected: {
-    //         header: 1,
-    //         headerLabel: 'HEADER',
-    //         headerScore: '80%',
-    //         footer: 1,
-    //         footerLabel: 'FOOTER',
-    //         footerScore: '12/15',
-    //         countParts: 2,
-    //         countSections: 3,
-    //         countItems: 9,
-    //         items: [
-    //             {type: 'info', score: '-'},
-    //             {type: 'correct', score: '2/2'},
-    //             {type: 'incorrect', score: '2/3'},
-    //             {type: 'correct', score: '2/2'},
-    //             {type: 'incorrect', score: '0/2'},
-    //             {type: 'correct', score: '2/2'},
-    //             {type: 'correct', score: '2/2'},
-    //             {type: 'correct', score: '2/2'},
-    //             {type: 'skipped', score: '0'}
-    //         ],
-    //         filters: [{
-    //             label: defaultFilters[0].label,
-    //             active: true
-    //         }, {
-    //             label: defaultFilters[1].label,
-    //             active: false
-    //         }]
-    //     }
-    // }, {
-    //     title: 'scores disabled',
-    //     config: {
-    //         showScore: false
-    //     },
-    //     testMap: testMapIncorrect,
-    //     expected: {
-    //         header: 0,
-    //         headerLabel: '',
-    //         headerScore: '',
-    //         footer: 0,
-    //         footerLabel: '',
-    //         footerScore: '',
-    //         countParts: 2,
-    //         countSections: 3,
-    //         countItems: 9,
-    //         items: [
-    //             {type: 'info', score: ''},
-    //             {type: 'default', score: ''},
-    //             {type: 'default', score: ''},
-    //             {type: 'default', score: ''},
-    //             {type: 'default', score: ''},
-    //             {type: 'default', score: ''},
-    //             {type: 'default', score: ''},
-    //             {type: 'default', score: ''},
-    //             {type: 'skipped', score: ''}
-    //         ],
-    //         filters: []
-    //     }
-    // }]).test('render with data ', (data, assert) => {
-    //     const ready = assert.async();
-    //     const $container = $('#fixture-render-data');
+        const instance = reviewPanelFactory($container, data.config, data.testMap)
+            .on('init', function () {
+                assert.equal(this, instance, 'The instance has been initialized');
+            })
+            .on('ready', () => {
+                assert.ok(instance.is('ready'), 'The component is ready');
+                assert.equal($container.children().length, 1, 'The container contains an element');
+                assert.equal($container.children().is('.show-score'), instance.getConfig().showScore, 'The show score option is reflected');
+                assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
+                assert.equal($container.find('.review-panel-content').children().length, 1, 'The content area is not empty');
 
-    //     assert.expect(18 +
-    //         data.expected.countParts +
-    //         data.expected.countSections +
-    //         data.expected.countItems +
-    //         data.expected.items.length * 2 +
-    //         data.expected.filters.length * 2
-    //     );
-    //     assert.equal($container.children().length, 0, 'The container is empty');
+                assert.equal($container.find('.review-panel-score-header').length, data.expected.header ? 1 : 0, 'The header is rendered');
+                assert.equal($container.find('.review-panel-score-header .review-panel-label').text().trim(), data.expected.headerLabel, 'The header label is rendered');
+                assert.equal($container.find('.review-panel-score-header .review-panel-score').text().trim(), data.expected.headerScore, 'The header score is rendered');
 
-    //     const instance = reviewPanelFactory($container, data.config, data.testMap)
-    //         .on('init', function () {
-    //             assert.equal(this, instance, 'The instance has been initialized');
-    //         })
-    //         .on('ready', () => {
-    //             assert.ok(instance.is('ready'), 'The component is ready');
-    //             assert.equal($container.children().length, 1, 'The container contains an element');
-    //             assert.equal($container.children().is('.show-score'), instance.getConfig().showScore, 'The show score option is reflected');
-    //             assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
-    //             assert.equal($container.find('.review-panel-content').children().length, 1, 'The content area is not empty');
+                assert.equal($container.find('.review-panel-footer').length, data.expected.footer ? 1 : 0, 'The footer is rendered');
+                assert.equal($container.find('.review-panel-footer .review-panel-label').text().trim(), data.expected.footerLabel, 'The header label is rendered');
+                assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), data.expected.footerScore, 'The header score is rendered');
 
-    //             assert.equal($container.find('.review-panel-header').length, data.expected.header ? 1 : 0, 'The header is rendered');
-    //             assert.equal($container.find('.review-panel-header .review-panel-label').text().trim(), data.expected.headerLabel, 'The header label is rendered');
-    //             assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), data.expected.headerScore, 'The header score is rendered');
+                assert.equal($container.find('.review-panel-section').length, data.expected.countSections, 'The test sections are rendered');
+                assert.equal($container.find('.buttonlist-item').length, data.expected.countItems, 'The test items are rendered');
 
-    //             assert.equal($container.find('.review-panel-footer').length, data.expected.footer ? 1 : 0, 'The footer is rendered');
-    //             assert.equal($container.find('.review-panel-footer .review-panel-label').text().trim(), data.expected.footerLabel, 'The header label is rendered');
-    //             assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), data.expected.footerScore, 'The header score is rendered');
+                const testMapSectionsFlat = [];
+                Object.values(testMapIncorrect.parts).forEach(part => {
+                    Object.values(part.sections).forEach(section => {
+                        testMapSectionsFlat.push(section);
+                    });
+                });
 
-    //             assert.equal($container.find('.review-panel-part').length, data.expected.countParts, 'The test parts are rendered');
-    //             assert.equal($container.find('.review-panel-section').length, data.expected.countSections, 'The test sections are rendered');
-    //             assert.equal($container.find('.review-panel-item').length, data.expected.countItems, 'The test items are rendered');
+                testMapSectionsFlat.forEach((section, i) => {
+                    assert.equal(
+                        $container.find('.review-panel-section .review-panel-text').eq(i).text().trim(),
+                        section.label,
+                        `The test section "${section.label}" exists`
+                    );
+                });
 
-    //             _.forEach(testMapIncorrect.parts, part => {
-    //                 assert.equal(
-    //                     $container.find(`[data-control="${part.id}"] > .review-panel-label`).text().trim(),
-    //                     part.label,
-    //                     `The test part "${part.id}" got the expected label`
-    //                 );
+                data.expected.items.forEach((item, index) => {
+                    console.log(index, $container.find(`.buttonlist-item:nth(${index})`));
+                    assert.equal($container.find(`.buttonlist-item:nth(${index})`).hasClass(item.type), true, `The item #${index} got the expected class: ${item.type}`);
+                });
 
-    //                 _.forEach(part.sections, section => {
-    //                     assert.equal(
-    //                         $container.find(`[data-control="${section.id}"] > .review-panel-label`).text().trim(),
-    //                         section.label,
-    //                         `The test section "${section.id}" got the expected label`
-    //                     );
+                instance.destroy();
+            })
+            .on('destroy', () => ready())
+            .on('error', err => {
+                assert.ok(false, 'The operation should not fail!');
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+                ready();
+            });
+    });
 
-    //                     _.forEach(section.items, item => {
-    //                         assert.equal(
-    //                             $container.find(`[data-control="${item.id}"] > .review-panel-label`).text().trim(),
-    //                             item.label,
-    //                             `The test item "${item.id}" got the expected label`
-    //                         );
-    //                     });
-    //                 });
-    //             });
+    QUnit.test('destroy', assert => {
+        const ready = assert.async();
+        const $container = $('#fixture-destroy');
 
-    //             data.expected.items.forEach((item, index) => {
-    //                 assert.equal($container.find(`.review-panel-item:nth(${index})`).is(`.item-${item.type}`), true, `The item #${index} got the expected icon: ${item.type}`);
-    //                 assert.equal($container.find(`.review-panel-item:nth(${index}) .review-panel-score`).text().trim(), item.score, `The item #${index} got the expected score: ${item.score}`);
-    //             });
+        assert.expect(8);
 
-    //             assert.equal($container.find('.review-panel-filter').length, data.expected.filters.length, 'The expected number of filters is renderer');
-    //             assert.equal($container.find('.review-panel-filter.active').length, data.expected.filters.length ? 1 : 0, 'A filter is active');
-    //             data.expected.filters.forEach((filter, index) => {
-    //                 assert.equal($container.find(`.review-panel-filter:nth(${index})`).is('.active'), filter.active, `The filter #${index} got the expected state`);
-    //                 assert.equal($container.find(`.review-panel-filter:nth(${index})`).text().trim(), filter.label, `The filter #${index} got the expected label`);
-    //             });
+        assert.equal($container.children().length, 0, 'The container is empty');
 
-    //             instance.destroy();
-    //         })
-    //         .on('destroy', () => ready())
-    //         .on('error', err => {
-    //             assert.ok(false, 'The operation should not fail!');
-    //             assert.pushResult({
-    //                 result: false,
-    //                 message: err
-    //             });
-    //             ready();
-    //         });
-    // });
+        const instance = reviewPanelFactory($container, {}, testMapCorrect)
+            .on('init', function () {
+                assert.equal(this, instance, 'The instance has been initialized');
+            })
+            .on('ready', () => {
+                assert.ok(instance.is('ready'), 'The component is ready');
+                assert.equal($container.children().length, 1, 'The container contains an element');
+                assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
+                assert.equal($container.find('.review-panel-content').children().length, 1, 'The content area is not empty');
 
-    // QUnit.test('destroy', assert => {
-    //     const ready = assert.async();
-    //     const $container = $('#fixture-destroy');
-
-    //     assert.expect(10);
-
-    //     assert.equal($container.children().length, 0, 'The container is empty');
-
-    //     const instance = reviewPanelFactory($container, {}, testMapCorrect)
-    //         .on('init', function () {
-    //             assert.equal(this, instance, 'The instance has been initialized');
-    //         })
-    //         .on('ready', () => {
-    //             assert.ok(instance.is('ready'), 'The component is ready');
-    //             assert.equal($container.children().length, 1, 'The container contains an element');
-    //             assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
-    //             assert.equal($container.find('.review-panel-content').children().length, 1, 'The content area is not empty');
-    //             assert.equal($container.find('.review-panel-header').length, 1, 'The header area is rendered');
-    //             assert.equal($container.find('.review-panel-footer').length, 1, 'The footer area is rendered');
-
-    //             instance.destroy();
-    //         })
-    //         .after('destroy', () => {
-    //             assert.equal($container.children().length, 0, 'The container is now empty');
-    //             assert.ok(!instance.is('ready'), 'The component is not ready anymore');
-    //             ready();
-    //         })
-    //         .on('error', err => {
-    //             assert.ok(false, 'The operation should not fail!');
-    //             assert.pushResult({
-    //                 result: false,
-    //                 message: err
-    //             });
-    //             ready();
-    //         });
-    // });
+                instance.destroy();
+            })
+            .after('destroy', () => {
+                assert.equal($container.children().length, 0, 'The container is now empty');
+                assert.ok(!instance.is('ready'), 'The component is not ready anymore');
+                ready();
+            })
+            .on('error', err => {
+                assert.ok(false, 'The operation should not fail!');
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+                ready();
+            });
+    });
 
     // QUnit.module('API');
-
-    // QUnit.test('filter', assert => {
-    //     const ready = assert.async();
-    //     const $container = $('#fixture-filter');
-
-    //     assert.expect(22);
-
-    //     assert.equal($container.children().length, 0, 'The container is empty');
-
-    //     const instance = reviewPanelFactory($container, {filters: defaultFilters})
-    //         .on('init', function () {
-    //             assert.equal(this, instance, 'The instance has been initialized');
-    //             assert.equal(instance.getActiveFilter(), 'all', 'The "All" filter is activated by default');
-    //         })
-    //         .on('ready', () => {
-    //             assert.ok(instance.is('ready'), 'The component is ready');
-    //             assert.equal($container.children().length, 1, 'The container contains an element');
-
-    //             assert.equal(instance.getActiveFilter(), 'all', 'The "All" filter is activated by default');
-
-    //             assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
-    //             assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
-    //             assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is active');
-    //             assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active');
-
-    //             Promise
-    //                 .resolve()
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('filterchange.test', filterId => {
-    //                             assert.equal(filterId, 'incorrect', 'The filterchange event is triggered with the expected parameter');
-    //                             resolve();
-    //                         });
-
-    //                     assert.equal(instance.setActiveFilter('incorrect'), instance, 'setActiveFilter is fluent');
-    //                     assert.equal(instance.getActiveFilter(), 'incorrect', 'The "Incorrect" filter is now activated');
-
-    //                     assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), false, 'The first filter is not active anymore');
-    //                     assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), true, 'The second filter is now active');
-    //                 }))
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('filterchange.test', () => {
-    //                             assert.ok(false, 'The filterchange event should not be triggered');
-    //                         });
-    //                     instance.setActiveFilter('incorrect');
-    //                     window.setTimeout(resolve, 300);
-    //                 }))
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('filterchange.test', filterId => {
-    //                             assert.equal(filterId, 'all', 'The filterchange event is triggered with the expected parameter');
-    //                             resolve();
-    //                         });
-
-    //                     $container.find('.review-panel-filter:nth(0)').click();
-
-    //                     assert.equal(instance.getActiveFilter(), 'all', 'The "All" filter is now activated');
-    //                     assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is now active');
-    //                     assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active anymore');
-    //                 }))
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('filterchange.test', () => {
-    //                             assert.ok(false, 'The filterchange event should not be triggered');
-    //                         });
-    //                     $container.find('.review-panel-filter:nth(0)').click();
-    //                     window.setTimeout(resolve, 300);
-    //                 }))
-    //                 .catch(err => {
-    //                     assert.pushResult({
-    //                         result: false,
-    //                         message: err
-    //                     });
-    //                 })
-    //                 .then(() => instance.destroy());
-    //         })
-    //         .after('destroy', () => {
-    //             assert.equal($container.children().length, 0, 'The container is now empty');
-    //             assert.ok(!instance.is('ready'), 'The component is not ready anymore');
-    //             ready();
-    //         })
-    //         .on('error', err => {
-    //             assert.ok(false, 'The operation should not fail!');
-    //             assert.pushResult({
-    //                 result: false,
-    //                 message: err
-    //             });
-    //             ready();
-    //         });
-    //     assert.equal(instance.getActiveFilter(), null, 'No filter is activated yet');
-    // });
 
     // QUnit.test('data with correct responses', assert => {
     //     const ready = assert.async();
@@ -1299,106 +1160,6 @@ define([
     //                     $container.find('[data-control="item-1"]').click();
     //                     window.setTimeout(resolve, 300);
     //                 }))
-    //                 .catch(err => {
-    //                     assert.pushResult({
-    //                         result: false,
-    //                         message: err
-    //                     });
-    //                 })
-    //                 .then(() => instance.destroy());
-    //         })
-    //         .after('destroy', () => {
-    //             assert.equal($container.children().length, 0, 'The container is now empty');
-    //             assert.ok(!instance.is('ready'), 'The component is not ready anymore');
-    //             ready();
-    //         })
-    //         .on('error', err => {
-    //             assert.ok(false, 'The operation should not fail!');
-    //             assert.pushResult({
-    //                 result: false,
-    //                 message: err
-    //             });
-    //             ready();
-    //         });
-    // });
-
-    // QUnit.test('active item filter', assert => {
-    //     const ready = assert.async();
-    //     const $container = $('#fixture-item-change');
-
-    //     assert.expect(23);
-
-    //     assert.equal($container.children().length, 0, 'The container is empty');
-
-    //     const instance = reviewPanelFactory($container, {}, testMapIncorrect)
-    //         .on('init', function () {
-    //             assert.equal(this, instance, 'The instance has been initialized');
-    //         })
-    //         .on('ready', () => {
-    //             assert.ok(instance.is('ready'), 'The component is ready');
-    //             assert.equal($container.children().length, 1, 'The container contains an element');
-
-    //             assert.equal(instance.getActiveFilter(), 'all', 'The "All" filter is activated by default');
-
-    //             Promise
-    //                 .resolve()
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('active.test', id => {
-    //                             assert.equal(id, 'item-1', `The active event is triggered for ${id}`);
-    //                             resolve();
-    //                         })
-    //                         .setActiveItem('item-1');
-    //                 }))
-    //                 .then(() => {
-    //                     instance.off('.test');
-    //                     const promises = [
-    //                         new Promise(resolve => {
-    //                             instance.on('active.test', id => {
-    //                                 assert.equal(id, 'item-3', `The active event is triggered for ${id}`);
-    //                                 resolve();
-    //                             });
-    //                         }),
-    //                         new Promise(resolve => {
-    //                             instance.on('itemchange.test', (id, position) => {
-    //                                 assert.equal(id, 'item-3', `The itemchange event is triggered for ${id}`);
-    //                                 assert.equal(position, 2, `The itemchange event is triggered for position ${position}`);
-    //                                 resolve();
-    //                             });
-    //                         }),
-    //                         new Promise(resolve => {
-    //                             instance.on('datachange.test', data => {
-    //                                 assert.ok(true, 'The datachange event is emitted');
-    //                                 assert.deepEqual(data.parts, reviewDataIncorrectFiltered.parts, 'The event data contains: parts');
-    //                                 assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
-    //                                 assert.deepEqual(data.score, reviewDataIncorrectFiltered.score, 'The event data contains: score');
-    //                                 assert.deepEqual(data.maxScore, reviewDataIncorrectFiltered.maxScore, 'The event data contains: maxScore');
-    //                                 resolve();
-    //                             });
-    //                         }),
-    //                         new Promise(resolve => {
-    //                             instance.on('update.test', data => {
-    //                                 assert.ok(true, 'The update event is emitted');
-    //                                 assert.deepEqual(data.parts, reviewDataIncorrectFiltered.parts, 'The event data contains: parts');
-    //                                 assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
-    //                                 assert.deepEqual(data.score, reviewDataIncorrectFiltered.score, 'The event data contains: score');
-    //                                 assert.deepEqual(data.maxScore, reviewDataIncorrectFiltered.maxScore, 'The event data contains: maxScore');
-    //                                 resolve();
-    //                             });
-    //                         }),
-    //                         new Promise(resolve => {
-    //                             instance.on('filterchange.test', filterId => {
-    //                                 assert.equal(filterId, 'incorrect', 'The filterchange event is triggered with the expected parameter');
-    //                                 instance.setData(testMapIncorrectFiltered);
-    //                                 resolve();
-    //                             });
-    //                         })
-    //                     ];
-    //                     instance.setActiveFilter('incorrect');
-    //                     assert.equal(instance.getActiveFilter(), 'incorrect', 'The "Incorrect" filter is now activated');
-    //                     return Promise.all(promises);
-    //                 })
     //                 .catch(err => {
     //                     assert.pushResult({
     //                         result: false,

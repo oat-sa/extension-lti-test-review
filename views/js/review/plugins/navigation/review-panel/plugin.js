@@ -88,7 +88,7 @@ define([
                         displaySectionTitles
                     },
                     this.getConfig()
-                )
+                );
 
                 const reviewPanel = reviewPanelFactory(
                     this.getAreaBroker().getPanelArea(),

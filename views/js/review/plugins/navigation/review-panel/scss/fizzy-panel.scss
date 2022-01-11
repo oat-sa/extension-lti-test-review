@@ -34,7 +34,6 @@ $separatorColor: whiten($grey, 0.4);
 }
 
 .review-panel.fizzy {
-    @include disableSelect();
     color: $panelColor;
     position: relative;
     display: flex;

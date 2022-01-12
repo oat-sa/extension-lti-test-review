@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2019-22 (original work) Open Assessment Technologies SA;
  *
  *
  */
@@ -60,6 +60,17 @@ class Review extends tao_actions_SinglePageModule
     use OntologyAwareTrait;
     use HttpJsonResponseTrait;
 
+    public const OPTION_REVIEW_LAYOUT = 'reviewLayout';
+    public const OPTION_DISPLAY_SECTION_TITLES = 'displaySectionTitles';
+    public const LTI_REVIEW_LAYOUT = 'custom_review_layout';
+    public const LTI_DISPLAY_SECTION_TITLES = 'custom_section_titles';
+
+    // keys: exposed LTI custom_review_layout params => values: internal names
+    public const REVIEW_LAYOUTS_MAP = [
+        'default' => 'default',
+        'simple' => 'fizzy'
+    ];
+
     /** @var TaoLtiSession */
     private $ltiSession;
 
@@ -87,8 +98,6 @@ class Review extends tao_actions_SinglePageModule
         $launchData = $this->ltiSession->getLaunchData();
         $finder = $this->getDeliveryExecutionFinderService();
 
-        $testRunnerPluginsConfig = $this->getTestRunnerPluginsConfig();
-
         if ($this->isSubmissionReviewRequestMessageProvided()) {
             $deliveryId = $this->getDeliveryId();
             $userId = $this->getUserId();
@@ -113,8 +122,8 @@ class Review extends tao_actions_SinglePageModule
             'delivery' => $delivery->getUri(),
             'show-score' => (int) $finder->getShowScoreOption($launchData),
             'show-correct' => (int) $finder->getShowCorrectOption($launchData),
-            'display-section-titles' => (int) $testRunnerPluginsConfig['review']['displaySectionTitles'],
-            'review-layout' => $testRunnerPluginsConfig['review']['reviewLayout']
+            'display-section-titles' => (int) $this->getDisplaySectionTitlesOption($launchData),
+            'review-layout' => $this->getReviewLayoutOption($launchData)
         ];
 
         $this->composeView('delegated-view', $data, 'pages/index.tpl', 'tao');
@@ -310,5 +319,45 @@ class Review extends tao_actions_SinglePageModule
         $extension = $extensionsManager->getExtensionById('taoQtiTest');
         $config = $extension->getConfig('testRunner');
         return $config['plugins'];
+    }
+
+    private function getDisplaySectionTitlesOption($launchData): bool
+    {
+        $testRunnerPluginsConfig = $this->getTestRunnerPluginsConfig();
+        $testRunnerSectionTitles = $testRunnerPluginsConfig['review'][self::OPTION_DISPLAY_SECTION_TITLES];
+
+        $ltiParamSectionTitles = $launchData->hasVariable(self::LTI_DISPLAY_SECTION_TITLES)
+            ? $launchData->getVariable(self::LTI_DISPLAY_SECTION_TITLES)
+            : null;
+
+        // $sectionTitles priority: LTI param > taoQtiTest config > true
+        $sectionTitles = true;
+        if (isset($testRunnerSectionTitles)) {
+            $sectionTitles = $testRunnerSectionTitles;
+        }
+        if (isset($ltiParamSectionTitles)) {
+            $sectionTitles = $ltiParamSectionTitles;
+        }
+        return filter_var($sectionTitles, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    private function getReviewLayoutOption($launchData): string
+    {
+        $testRunnerPluginsConfig = $this->getTestRunnerPluginsConfig();
+        $testRunnerReviewLayout = $testRunnerPluginsConfig['review'][self::OPTION_REVIEW_LAYOUT];
+
+        $ltiParamReviewLayout = $launchData->hasVariable(self::LTI_REVIEW_LAYOUT)
+            ? $launchData->getVariable(self::LTI_REVIEW_LAYOUT)
+            : null;
+
+        // $reviewLayout priority: LTI param > taoQtiTest config > 'default'
+        $reviewLayout = 'default';
+        if (!empty($testRunnerReviewLayout)) {
+            $reviewLayout = $testRunnerReviewLayout;
+        }
+        if (!empty($ltiParamReviewLayout) && array_key_exists($ltiParamReviewLayout, self::REVIEW_LAYOUTS_MAP)) {
+            $reviewLayout = self::REVIEW_LAYOUTS_MAP[$ltiParamReviewLayout];
+        }
+        return $reviewLayout;
     }
 }

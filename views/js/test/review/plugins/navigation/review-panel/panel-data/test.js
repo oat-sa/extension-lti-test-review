@@ -27,11 +27,7 @@ define([
     'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel-data/review-data-correct-with-score.json',
     'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel-data/review-data-incorrect-with-score.json',
     'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel-data/review-data-correct-without-score.json',
-    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel-data/review-data-incorrect-without-score.json',
-    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel-data/review-data-extended-correct-with-score.json',
-    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel-data/review-data-extended-incorrect-with-score.json',
-    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel-data/review-data-extended-correct-without-score.json',
-    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel-data/review-data-extended-incorrect-without-score.json'
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel-data/review-data-incorrect-without-score.json'
 ], function (
     _,
     reviewDataHelper,
@@ -40,11 +36,7 @@ define([
     reviewDataCorrectWithScore,
     reviewDataIncorrectWithScore,
     reviewDataCorrectWithoutScore,
-    reviewDataIncorrectWithoutScore,
-    reviewDataExtendedCorrectWithScore,
-    reviewDataExtendedIncorrectWithScore,
-    reviewDataExtendedCorrectWithoutScore,
-    reviewDataExtendedIncorrectWithoutScore
+    reviewDataIncorrectWithoutScore
 ) {
     'use strict';
 
@@ -58,8 +50,7 @@ define([
     });
 
     QUnit.cases.init([
-        {title: 'getAccordionReviewPanelMap'},
-        {title: 'getFizzyReviewPanelMap'}
+        {title: 'getReviewPanelMap'}
     ]).test('helper API', (data, assert) => {
         assert.expect(1);
         assert.equal(typeof reviewDataHelper[data.title], 'function', `The helper exposes a "${data.title}" function`);
@@ -87,42 +78,12 @@ define([
         testMap: testMapIncorrect,
         withScore: false,
         expected: reviewDataIncorrectWithoutScore
-    }]).test('getAccordionReviewPanelMap', (data, assert) => {
+    }]).test('getReviewPanelMap', (data, assert) => {
         assert.expect(_.size(data.expected) + 1);
-        const reviewData = reviewDataHelper.getAccordionReviewPanelMap(data.testMap, data.withScore);
+        const reviewData = reviewDataHelper.getReviewPanelMap(data.testMap, data.withScore);
         assert.equal(reviewData.items instanceof Map, true, 'The items collection is set');
         _.forEach(data.expected, (value, key) => {
-            assert.deepEqual(reviewData[key], value, `The method getAccordionReviewPanelMap() returns the expected data for the key ${key}`);
+            assert.deepEqual(reviewData[key], value, `The method getReviewPanelMap() returns the expected data for the key ${key}`);
         });
     });
-
-    QUnit.cases.init([{
-        title: 'correct, score enabled',
-        testMap: testMapCorrect,
-        withScore: true,
-        expected: reviewDataExtendedCorrectWithScore
-    }, {
-        title: 'incorrect, score enabled',
-        testMap: testMapIncorrect,
-        withScore: true,
-        expected: reviewDataExtendedIncorrectWithScore
-    }, {
-        title: 'correct, score disabled',
-        testMap: testMapCorrect,
-        withScore: false,
-        expected: reviewDataExtendedCorrectWithoutScore
-    }, {
-        title: 'incorrect, score disabled',
-        testMap: testMapIncorrect,
-        withScore: false,
-        expected: reviewDataExtendedIncorrectWithoutScore
-    }]).test('getFizzyReviewPanelMap', (data, assert) => {
-        assert.expect(_.size(data.expected) + 1);
-        const reviewData = reviewDataHelper.getFizzyReviewPanelMap(data.testMap, data.withScore, true);
-        assert.equal(reviewData.items instanceof Map, true, 'The items collection is set');
-        _.forEach(data.expected, (value, key) => {
-            assert.deepEqual(reviewData[key], value, `The method getFizzyReviewPanelMap() returns the expected data for the key ${key}`);
-        });
-    });
-
 });

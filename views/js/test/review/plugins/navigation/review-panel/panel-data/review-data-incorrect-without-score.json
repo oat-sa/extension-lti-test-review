@@ -17,7 +17,12 @@
               "skipped": false,
               "withScore": false,
               "position": 0,
-              "type": "info"
+              "type": "info",
+              "ariaLabel": "Informational item",
+              "icon": "info",
+              "numericLabel": "",
+              "scoreType": null,
+              "status": "viewed"
             }
           ],
           "withScore": false
@@ -42,7 +47,12 @@
               "skipped": false,
               "withScore": false,
               "position": 1,
-              "type": "default"
+              "type": "default",
+              "ariaLabel": "Question 1",
+              "icon": null,
+              "numericLabel": "1",
+              "scoreType": null,
+              "status": "answered"
             },
             {
               "id": "item-3",
@@ -51,7 +61,12 @@
               "skipped": false,
               "withScore": false,
               "position": 2,
-              "type": "default"
+              "type": "default",
+              "ariaLabel": "Question 2",
+              "icon": null,
+              "numericLabel": "2",
+              "scoreType": null,
+              "status": "answered"
             },
             {
               "id": "item-4",
@@ -60,7 +75,12 @@
               "skipped": false,
               "withScore": false,
               "position": 3,
-              "type": "default"
+              "type": "default",
+              "ariaLabel": "Question 3",
+              "icon": null,
+              "numericLabel": "3",
+              "scoreType": null,
+              "status": "answered"
             },
             {
               "id": "item-5",
@@ -69,7 +89,12 @@
               "skipped": false,
               "withScore": false,
               "position": 4,
-              "type": "default"
+              "type": "default",
+              "ariaLabel": "Question 4",
+              "icon": null,
+              "numericLabel": "4",
+              "scoreType": null,
+              "status": "answered"
             },
             {
               "id": "item-6",
@@ -78,7 +103,12 @@
               "skipped": false,
               "withScore": false,
               "position": 5,
-              "type": "default"
+              "type": "default",
+              "ariaLabel": "Question 5",
+              "icon": null,
+              "numericLabel": "5",
+              "scoreType": null,
+              "status": "answered"
             },
             {
               "id": "item-7",
@@ -87,7 +117,12 @@
               "skipped": false,
               "withScore": false,
               "position": 6,
-              "type": "default"
+              "type": "default",
+              "ariaLabel": "Question 6",
+              "icon": null,
+              "numericLabel": "6",
+              "scoreType": null,
+              "status": "answered"
             },
             {
               "id": "item-8",
@@ -96,7 +131,12 @@
               "skipped": false,
               "withScore": false,
               "position": 7,
-              "type": "default"
+              "type": "default",
+              "ariaLabel": "Question 7",
+              "icon": null,
+              "numericLabel": "7",
+              "scoreType": null,
+              "status": "answered"
             },
             {
               "id": "item-9",
@@ -105,7 +145,12 @@
               "skipped": true,
               "withScore": false,
               "position": 8,
-              "type": "skipped"
+              "type": "skipped",
+              "ariaLabel": "Question 8",
+              "icon": null,
+              "numericLabel": "8",
+              "scoreType": null,
+              "status": "viewed"
             }
           ],
           "withScore": false

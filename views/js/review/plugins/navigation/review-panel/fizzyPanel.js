@@ -142,9 +142,9 @@ define([
 
         const onItemClick = (e) => {
             if (!component.is('disabled')) {
-                const currentId = activeItem && activeItem.id;
+                const currentId = component.getActiveItem();
                 component.setActiveItem(e.id);
-                if (activeItem && activeItem.id !== currentId) {
+                if (component.getActiveItem() !== currentId) {
                     itemChange();
                 }
             }
@@ -188,8 +188,10 @@ define([
                 const { showScore, displaySectionTitles } = this.getConfig();
 
                 // Modify the testMap items, adding properties for the fizzy display
-                data = reviewDataHelper.getFizzyReviewPanelMap(newMap, showScore);
+                data = reviewDataHelper.getReviewPanelMap(newMap, showScore);
                 data.displaySectionTitles = displaySectionTitles;
+                // unpack Map
+                data.sections = Array.from(data.sections.values());
 
                 /**
                  * @event datachange

@@ -97,88 +97,98 @@ define([
     };
 
     /**
-    * Refines the test runner data and build the expected review panel map
-    * @param {testMap} testMap
-    * @param {Boolean} withScore
-    * @returns {reviewPanelMap}
-    */
-    const getAccordionReviewPanelMap = (testMap, withScore = true) => {
-        const { parts, score, maxScore } = testMap;
-        const items = new Map();
+     * @typedef {Object} ReviewItem
+     * @property {String} id - item id
+     * @property {Number} position - 0-based list index
+     * @property {String} label - displayed text
+     * @property {String} numericLabel - displayed number (alternative to label)
+     * @property {String} ariaLabel
+     * @property {Number} score - the item's current score
+     * @property {Number} maxScore - the item's max possible score
+     * @property {Boolean} informational
+     * @property {Boolean} skipped
+     * @property {String} type - 'correct'/'incorrect'/'info'/'skipped'/'default'
+     * @property {String} status - 'answered'/'viewed'
+     * @property {String} scoreType - 'correct'/'incorrect'/null
+     * @property {String} icon - 'info' or null
+     */
+    /**
+     * Adds missing properties to a reviewItem, to support fizzyPanel UI
+     * @param {mapEntry} - item, will be mutated
+     * @returns {ReviewItem}
+     */
+    const extendReviewItemScope = (entry, numericLabel) => {
+        const reviewItem = Object.assign({}, entry);
+        const type = reviewItem.type;
 
-        // rebuild the map keeping only relevant data, and sorting elements by position
-        const panelMap = {
-            parts: _.map(parts, part => Object.assign(extractData(part, withScore), {
-                sections: _.map(part.sections, section => Object.assign(extractData(section, withScore), {
-                    items: _.map(section.items, item => {
-                        const reviewItem = extractData(item, withScore);
-                        reviewItem.type = getItemType(item, withScore);
-                        items.set(item.id, reviewItem);
-                        return reviewItem;
-                    }).sort(compareByPosition)
-                })).sort(compareByPosition)
-            })).sort(compareByPosition),
-            withScore,
-            items
-        };
+        // Add properties 'numericLabel', 'icon', 'ariaLabel', 'scoreType', 'status'
+        reviewItem.numericLabel = type === 'info' ? '' : `${numericLabel}`;
 
-        if (withScore) {
-            Object.assign(panelMap, { score, maxScore });
+        reviewItem.icon = type === 'info' ? 'info' : null;
+
+        reviewItem.ariaLabel = type === 'info' ? __('Informational item') : __('Question %s', reviewItem.numericLabel);
+
+        reviewItem.scoreType = null;
+        if (type === 'correct') {
+            reviewItem.scoreType = 'correct';
+        } else if (type === 'incorrect') {
+            reviewItem.scoreType = 'incorrect';
         }
 
-        return panelMap;
+        if (type !== 'info' && type !== 'skipped') {
+            reviewItem.status = 'answered';
+        } else {
+            reviewItem.status = 'viewed';
+        }
+
+        return reviewItem;
     };
 
     return {
-        getAccordionReviewPanelMap,
-
         /**
-         * Refines the test runner data and build the expected review panel map
-         * @param {testMap} testMap
-         * @param {Boolean} [withScore=true]
-         * @returns {reviewPanelMap}
-         */
-        getFizzyReviewPanelMap(testMap, withScore = true) {
-            const panelMap = getAccordionReviewPanelMap(testMap, withScore);
+        * Refines the test runner data and builds the expected review panel map
+        * @param {testMap} testMap
+        * @param {Boolean} [withScore=true]
+        * @returns {reviewPanelMap}
+        */
+        getReviewPanelMap(testMap, withScore = true) {
+            const { parts, score, maxScore } = testMap;
+            const items = new Map();
+            const sections = new Map();
             let nonInformationalCount = 0;
-            let sections = [];
 
-            panelMap.parts.forEach((part) => {
-                part.sections.forEach((section) => {
-                    section.items.forEach((reviewItem) => {
-                        const status = reviewItem.type;
+            // rebuild the map keeping only relevant data, and sorting elements by position
+            const panelMap = {
+                parts: _.map(parts, part => Object.assign(extractData(part, withScore), {
+                    sections: _.map(part.sections, section => {
+                        const reviewSection = Object.assign(extractData(section, withScore), {
+                            // must sort items by position before treating data, so we can assign accurate numericLabels
+                            items: _.chain(section.items)
+                                .sortBy('position')
+                                .map(item => {
+                                    let reviewItem = extractData(item, withScore);
+                                    reviewItem.type = getItemType(item, withScore);
+                                    if (reviewItem.type !== 'info') {
+                                        nonInformationalCount++;
+                                    }
+                                    reviewItem = extendReviewItemScope(reviewItem, nonInformationalCount);
+                                    items.set(item.id, reviewItem);
+                                    return reviewItem;
+                                })
+                                .value()
+                        });
+                        sections.set(section.id, reviewSection);
+                        return reviewSection;
+                    }).sort(compareByPosition)
+                })).sort(compareByPosition),
+                withScore,
+                items,
+                sections
+            };
 
-                        // Modify 'label' for itemButtonList items
-                        if (status === 'info') {
-                            reviewItem.label = __('Informational');
-                        } else {
-                            reviewItem.label = `${++nonInformationalCount}`;
-                        }
-
-                        // Add properties 'icon', 'ariaLabel', 'type', 'scoreType' for itemButtonList items
-                        reviewItem.icon = status === 'info' ? 'info' : null;
-
-                        reviewItem.ariaLabel = status === 'info' ? __('Informational') : __('Question %s', reviewItem.label);
-
-                        reviewItem.type = null;
-                        if (status !== 'info' && status !== 'skipped') {
-                            reviewItem.type = 'answered';
-                        } else {
-                            reviewItem.type = 'viewed';
-                        }
-
-                        reviewItem.scoreType = null;
-                        if (status === 'correct') {
-                            reviewItem.scoreType = 'correct';
-                        } else if (status === 'incorrect') {
-                            reviewItem.scoreType = 'incorrect';
-                        }
-                    });
-                    sections.push(section);
-                });
-            });
-
-            panelMap.sections = sections; // flatten 'parts-sections-items' to 'sections-items'
+            if (withScore) {
+                Object.assign(panelMap, { score, maxScore });
+            }
 
             return panelMap;
         }

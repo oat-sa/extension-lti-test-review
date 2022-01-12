@@ -136,10 +136,9 @@ define([
          * Refines the test runner data and build the expected review panel map
          * @param {testMap} testMap
          * @param {Boolean} [withScore=true]
-         * @param {Boolean} [showCorrect=false]
          * @returns {reviewPanelMap}
          */
-        getFizzyReviewPanelMap(testMap, withScore = true, showCorrect = false) {
+        getFizzyReviewPanelMap(testMap, withScore = true) {
             const panelMap = getAccordionReviewPanelMap(testMap, withScore);
             let nonInformationalCount = 0;
             let sections = [];
@@ -147,9 +146,9 @@ define([
             panelMap.parts.forEach((part) => {
                 part.sections.forEach((section) => {
                     section.items.forEach((reviewItem) => {
-                        // Modify 'label' for itemButtonList items
                         const status = reviewItem.type;
 
+                        // Modify 'label' for itemButtonList items
                         if (status === 'info') {
                             reviewItem.label = __('Informational');
                         } else {
@@ -169,12 +168,10 @@ define([
                         }
 
                         reviewItem.scoreType = null;
-                        if (showCorrect) {
-                            if (status === 'correct') {
-                                reviewItem.scoreType = 'correct';
-                            } else if (status === 'incorrect') {
-                                reviewItem.scoreType = 'incorrect';
-                            }
+                        if (status === 'correct') {
+                            reviewItem.scoreType = 'correct';
+                        } else if (status === 'incorrect') {
+                            reviewItem.scoreType = 'incorrect';
                         }
                     });
                     sections.push(section);

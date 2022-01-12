@@ -1384,13 +1384,6 @@ define([
                         setup();
                     }
                 });
-                manageButtons('#visual-test .header .correctness', 'yes', control => {
-                    const showCorrect = control === 'yes';
-                    if (showCorrect !== config.showCorrect) {
-                        config.showCorrect = showCorrect;
-                        setup();
-                    }
-                });
                 manageButtons('#visual-test .footer', 'enable', control => {
                     if (control === 'disable') {
                         instance.disable();

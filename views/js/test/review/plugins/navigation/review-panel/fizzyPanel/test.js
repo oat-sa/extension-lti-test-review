@@ -287,15 +287,15 @@ define([
             countSections: 3,
             countItems: 9,
             items: [
-                {type: 'viewed'},
-                {type: 'correct'},
-                {type: 'incorrect'},
-                {type: 'correct'},
-                {type: 'incorrect'},
-                {type: 'correct'},
-                {type: 'correct'},
-                {type: 'correct'},
-                {type: 'viewed'}
+                {status: 'viewed'},
+                {status: 'correct'},
+                {status: 'incorrect'},
+                {status: 'correct'},
+                {status: 'incorrect'},
+                {status: 'correct'},
+                {status: 'correct'},
+                {status: 'correct'},
+                {status: 'viewed'}
             ]
         }
     }, {
@@ -314,15 +314,15 @@ define([
             countSections: 3,
             countItems: 9,
             items: [
-                {type: 'viewed'},
-                {type: 'answered'},
-                {type: 'answered'},
-                {type: 'answered'},
-                {type: 'answered'},
-                {type: 'answered'},
-                {type: 'answered'},
-                {type: 'answered'},
-                {type: 'viewed'}
+                {status: 'viewed'},
+                {status: 'answered'},
+                {status: 'answered'},
+                {status: 'answered'},
+                {status: 'answered'},
+                {status: 'answered'},
+                {status: 'answered'},
+                {status: 'answered'},
+                {status: 'viewed'}
             ]
         }
     }]).test('render with data ', (data, assert) => {
@@ -354,14 +354,7 @@ define([
                 assert.equal($container.find('.review-panel-section').length, data.expected.countSections, 'The test sections are rendered');
                 assert.equal($container.find('.buttonlist-item').length, data.expected.countItems, 'The test items are rendered');
 
-                const testMapSectionsFlat = [];
-                Object.values(testMapIncorrect.parts).forEach(part => {
-                    Object.values(part.sections).forEach(section => {
-                        testMapSectionsFlat.push(section);
-                    });
-                });
-
-                testMapSectionsFlat.forEach((section, i) => {
+                instance.getData().sections.forEach((section, i) => {
                     assert.equal(
                         $container.find('.review-panel-section .review-panel-text').eq(i).text().trim(),
                         section.label,
@@ -370,7 +363,10 @@ define([
                 });
 
                 data.expected.items.forEach((item, index) => {
-                    assert.equal($container.find(`.buttonlist-item:nth(${index})`).hasClass(item.type), true, `The item #${index} got the expected class: ${item.type}`);
+                    assert.ok(
+                        $container.find(`.buttonlist-item:nth(${index})`).hasClass(item.status),
+                        `The item #${index} got the expected class: ${item.status}`
+                    );
                 });
 
                 instance.destroy();
@@ -421,899 +417,357 @@ define([
             });
     });
 
-    // QUnit.module('API');
-
-    // QUnit.test('data with correct responses', assert => {
-    //     const ready = assert.async();
-    //     const $container = $('#fixture-data-correct');
-    //     const initialData = {
-    //         scope: 'test',
-    //         parts: {
-    //             part: {
-    //                 id: 'part',
-    //                 label: 'part',
-    //                 position: 0,
-    //                 sections: {
-    //                     section: {
-    //                         id: 'section',
-    //                         label: 'section',
-    //                         position: 0,
-    //                         items: [{
-    //                             id: 'item',
-    //                             label: 'item',
-    //                             informational: false,
-    //                             skipped: true,
-    //                             position: 0,
-    //                             score: 0,
-    //                             maxScore: 1
-    //                         }],
-    //                         score: 0,
-    //                         maxScore: 1
-    //                     }
-    //                 },
-    //                 score: 0,
-    //                 maxScore: 1
-    //             }
-    //         },
-    //         jumps: [{
-    //             identifier: 'item',
-    //             section: 'section',
-    //             part: 'part',
-    //             position: 0
-    //         }],
-    //         score: 0,
-    //         maxScore: 1
-    //     };
-    //     const initialDataAll = {
-    //         parts: [{
-    //             id: 'part',
-    //             label: 'part',
-    //             position: 0,
-    //             sections: [{
-    //                 id: 'section',
-    //                 label: 'section',
-    //                 position: 0,
-    //                 items: [{
-    //                     id: 'item',
-    //                     label: 'item',
-    //                     informational: false,
-    //                     skipped: true,
-    //                     withScore: true,
-    //                     type: 'skipped',
-    //                     position: 0,
-    //                     score: 0,
-    //                     maxScore: 1
-    //                 }],
-    //                 withScore: true,
-    //                 score: 0,
-    //                 maxScore: 1
-    //             }],
-    //             withScore: true,
-    //             score: 0,
-    //             maxScore: 1
-    //         }],
-    //         withScore: true,
-    //         score: 0,
-    //         maxScore: 1
-    //     };
-
-    //     assert.expect(67);
-
-    //     assert.equal($container.children().length, 0, 'The container is empty');
-
-    //     const instance = reviewPanelFactory($container, {}, initialData)
-    //         .on('init', function () {
-    //             assert.equal(this, instance, 'The instance has been initialized');
-    //         })
-    //         .on('ready', () => {
-    //             assert.ok(instance.is('ready'), 'The component is ready');
-    //             assert.equal($container.children().length, 1, 'The container contains an element');
-
-    //             assert.deepEqual(instance.getData().parts, initialDataAll.parts, 'The initial data is set: parts');
-    //             assert.deepEqual(instance.getData().items instanceof Map, true, 'The initial data is set: items');
-    //             assert.deepEqual(instance.getData().score, initialDataAll.score, 'The initial data is set: score');
-    //             assert.deepEqual(instance.getData().maxScore, initialDataAll.maxScore, 'The initial data is set: maxScore');
-
-    //             assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
-    //             assert.equal($container.find('.review-panel-part').length, 1, 'A test part is rendered');
-    //             assert.equal($container.find('.review-panel-section').length, 1, 'A test section is rendered');
-    //             assert.equal($container.find('.review-panel-item').length, 1, 'A test item is rendered');
-
-    //             assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
-    //             assert.equal($container.find('.review-panel-filter:visible').length, 2, 'The filters are displayed');
-    //             assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
-    //             assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is active');
-    //             assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active');
-
-    //             assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '0%', 'The header score is  rendered');
-    //             assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '0/1', 'The header score is rendered');
-
-    //             Promise
-    //                 .resolve()
-    //                 .then(() => {
-    //                     instance.off('.test');
-    //                     const promises = [
-    //                         new Promise(resolve => {
-    //                             instance.on('datachange.test', data => {
-    //                                 assert.ok(true, 'The datachange event is emitted');
-    //                                 assert.deepEqual(data.parts, reviewDataCorrect.parts, 'The event data contains: parts');
-    //                                 assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
-    //                                 assert.deepEqual(data.score, reviewDataCorrect.score, 'The event data contains: score');
-    //                                 assert.deepEqual(data.maxScore, reviewDataCorrect.maxScore, 'The event data contains: maxScore');
-    //                                 resolve();
-    //                             });
-    //                         }),
-    //                         new Promise(resolve => {
-    //                             instance.on('update.test', data => {
-    //                                 assert.ok(true, 'The update event is emitted');
-    //                                 assert.deepEqual(data.parts, reviewDataCorrect.parts, 'The event data contains: parts');
-    //                                 assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
-    //                                 assert.deepEqual(data.score, reviewDataCorrect.score, 'The event data contains: score');
-    //                                 assert.deepEqual(data.maxScore, reviewDataCorrect.maxScore, 'The event data contains: maxScore');
-    //                                 resolve();
-    //                             });
-    //                         }),
-    //                     ];
-    //                     assert.equal(instance.setData(testMapCorrect), instance, 'setData is fluent');
-    //                     assert.deepEqual(instance.getData().parts, reviewDataCorrect.parts, 'The updated data is set');
-    //                     return Promise.all(promises);
-    //                 })
-    //                 .then(() => {
-    //                     assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
-    //                     assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
-    //                     assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
-
-    //                     _.forEach(testMapCorrect.parts, part => {
-    //                         assert.equal(
-    //                             $container.find(`[data-control="${part.id}"] > .review-panel-label`).text().trim(),
-    //                             part.label,
-    //                             `The test part "${part.id}" got the expected label`
-    //                         );
-
-    //                         _.forEach(part.sections, section => {
-    //                             assert.equal(
-    //                                 $container.find(`[data-control="${section.id}"] > .review-panel-label`).text().trim(),
-    //                                 section.label,
-    //                                 `The test section "${section.id}" got the expected label`
-    //                             );
-
-    //                             _.forEach(section.items, item => {
-    //                                 assert.equal(
-    //                                     $container.find(`[data-control="${item.id}"] > .review-panel-label`).text().trim(),
-    //                                     item.label,
-    //                                     `The test item "${item.id}" got the expected label`
-    //                                 );
-    //                             });
-    //                         });
-    //                     });
-
-    //                     assert.equal($container.find('.review-panel-item:nth(0)').is('.item-info'), true, 'The 1st item got the expected icon');
-    //                     assert.equal($container.find('.review-panel-item.item-correct').length, 8, 'The other items got the expected icon');
-
-    //                     assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '100%', 'The header score is rendered');
-    //                     assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '17/17', 'The header score is rendered');
-
-    //                     assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
-    //                     assert.equal($container.find('.review-panel-filter:visible').length, 0, 'The filters are not displayed');
-    //                     assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
-    //                     assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is active');
-    //                     assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active');
-    //                 })
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('filterchange.test', filterId => {
-    //                             assert.equal(filterId, 'incorrect', 'The filterchange event is triggered with the expected parameter');
-    //                             resolve();
-    //                         });
-
-    //                     instance.setActiveFilter('incorrect');
-
-    //                     assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), false, 'The first filter is not active anymore');
-    //                     assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), true, 'The second filter is now active');
-    //                 }))
-    //                 .then(() => {
-    //                     assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
-    //                     assert.equal($container.find('.review-panel-filter:visible').length, 0, 'The filters are not displayed');
-    //                     assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
-
-    //                     assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), false, 'The first filter is not active');
-    //                     assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), true, 'The second filter is active');
-    //                 })
-    //                 .catch(err => {
-    //                     assert.pushResult({
-    //                         result: false,
-    //                         message: err
-    //                     });
-    //                 })
-    //                 .then(() => instance.destroy());
-    //         })
-    //         .after('destroy', () => {
-    //             assert.equal($container.children().length, 0, 'The container is now empty');
-    //             assert.ok(!instance.is('ready'), 'The component is not ready anymore');
-    //             ready();
-    //         })
-    //         .on('error', err => {
-    //             assert.ok(false, 'The operation should not fail!');
-    //             assert.pushResult({
-    //                 result: false,
-    //                 message: err
-    //             });
-    //             ready();
-    //         });
-    // });
-
-    // QUnit.test('data with incorrect responses', assert => {
-    //     const ready = assert.async();
-    //     const $container = $('#fixture-data-incorrect');
-    //     const initialData = {
-    //         scope: 'test',
-    //         parts: {
-    //             part: {
-    //                 id: 'part',
-    //                 label: 'part',
-    //                 position: 0,
-    //                 sections: {
-    //                     section: {
-    //                         id: 'section',
-    //                         label: 'section',
-    //                         position: 0,
-    //                         items: [{
-    //                             id: 'item',
-    //                             label: 'item',
-    //                             informational: false,
-    //                             skipped: false,
-    //                             position: 0,
-    //                             score: 1,
-    //                             maxScore: 1
-    //                         }],
-    //                         score: 1,
-    //                         maxScore: 1
-    //                     }
-    //                 },
-    //                 score: 1,
-    //                 maxScore: 1
-    //             }
-    //         },
-    //         jumps: [{
-    //             identifier: 'item',
-    //             section: 'section',
-    //             part: 'part',
-    //             position: 0
-    //         }],
-    //         score: 1,
-    //         maxScore: 1
-    //     };
-    //     const initialDataAll = {
-    //         parts: [{
-    //             id: 'part',
-    //             label: 'part',
-    //             position: 0,
-    //             sections: [{
-    //                 id: 'section',
-    //                 label: 'section',
-    //                 position: 0,
-    //                 items: [{
-    //                     id: 'item',
-    //                     label: 'item',
-    //                     informational: false,
-    //                     skipped: false,
-    //                     withScore: true,
-    //                     type: 'correct',
-    //                     position: 0,
-    //                     score: 1,
-    //                     maxScore: 1
-    //                 }],
-    //                 withScore: true,
-    //                 score: 1,
-    //                 maxScore: 1
-    //             }],
-    //             withScore: true,
-    //             score: 1,
-    //             maxScore: 1
-    //         }],
-    //         withScore: true,
-    //         score: 1,
-    //         maxScore: 1
-    //     };
-
-    //     assert.expect(70);
-
-    //     assert.equal($container.children().length, 0, 'The container is empty');
-
-    //     const instance = reviewPanelFactory($container, {}, initialData)
-    //         .on('init', function () {
-    //             assert.equal(this, instance, 'The instance has been initialized');
-    //         })
-    //         .on('ready', () => {
-    //             assert.ok(instance.is('ready'), 'The component is ready');
-    //             assert.equal($container.children().length, 1, 'The container contains an element');
-
-    //             assert.deepEqual(instance.getData().parts, initialDataAll.parts, 'The initial data is set: parts');
-    //             assert.deepEqual(instance.getData().items instanceof Map, true, 'The initial data is set: items');
-    //             assert.deepEqual(instance.getData().score, initialDataAll.score, 'The initial data is set: score');
-    //             assert.deepEqual(instance.getData().maxScore, initialDataAll.maxScore, 'The initial data is set: maxScore');
-
-    //             assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
-    //             assert.equal($container.find('.review-panel-part').length, 1, 'A test part is rendered');
-    //             assert.equal($container.find('.review-panel-section').length, 1, 'A test section is rendered');
-    //             assert.equal($container.find('.review-panel-item').length, 1, 'A test item is rendered');
-
-    //             assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
-    //             assert.equal($container.find('.review-panel-filter:visible').length, 0, 'The filters are not displayed');
-    //             assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
-    //             assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is active');
-    //             assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active');
-
-    //             assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '100%', 'The header score is  rendered');
-    //             assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '1/1', 'The header score is rendered');
-
-    //             Promise
-    //                 .resolve()
-    //                 .then(() => {
-    //                     instance.off('.test');
-    //                     const promises = [
-    //                         new Promise(resolve => {
-    //                             instance.on('datachange.test', data => {
-    //                                 assert.ok(true, 'The datachange event is emitted');
-    //                                 assert.deepEqual(data.parts, reviewDataIncorrect.parts, 'The event data contains: parts');
-    //                                 assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
-    //                                 assert.deepEqual(data.score, reviewDataIncorrect.score, 'The event data contains: score');
-    //                                 assert.deepEqual(data.maxScore, reviewDataIncorrect.maxScore, 'The event data contains: maxScore');
-    //                                 resolve();
-    //                             });
-    //                         }),
-    //                         new Promise(resolve => {
-    //                             instance.on('update.test', data => {
-    //                                 assert.ok(true, 'The update event is emitted');
-    //                                 assert.deepEqual(data.parts, reviewDataIncorrect.parts, 'The event data contains: parts');
-    //                                 assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
-    //                                 assert.deepEqual(data.score, reviewDataIncorrect.score, 'The event data contains: score');
-    //                                 assert.deepEqual(data.maxScore, reviewDataIncorrect.maxScore, 'The event data contains: maxScore');
-    //                                 resolve();
-    //                             });
-    //                         }),
-    //                     ];
-    //                     assert.equal(instance.setData(testMapIncorrect), instance, 'setData is fluent');
-    //                     assert.deepEqual(instance.getData().parts, reviewDataIncorrect.parts, 'The updated data is set');
-    //                     return Promise.all(promises);
-    //                 })
-    //                 .then(() => {
-    //                     assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
-    //                     assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
-    //                     assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
-
-    //                     _.forEach(testMapIncorrect.parts, part => {
-    //                         assert.equal(
-    //                             $container.find(`[data-control="${part.id}"] > .review-panel-label`).text().trim(),
-    //                             part.label,
-    //                             `The test part "${part.id}" got the expected label`
-    //                         );
-
-    //                         _.forEach(part.sections, section => {
-    //                             assert.equal(
-    //                                 $container.find(`[data-control="${section.id}"] > .review-panel-label`).text().trim(),
-    //                                 section.label,
-    //                                 `The test section "${section.id}" got the expected label`
-    //                             );
-
-    //                             _.forEach(section.items, item => {
-    //                                 assert.equal(
-    //                                     $container.find(`[data-control="${item.id}"] > .review-panel-label`).text().trim(),
-    //                                     item.label,
-    //                                     `The test item "${item.id}" got the expected label`
-    //                                 );
-    //                             });
-    //                         });
-    //                     });
-
-    //                     assert.equal($container.find('.review-panel-item:nth(0)').is('.item-info'), true, 'The 1st item got the expected icon');
-    //                     assert.equal($container.find('.review-panel-item:nth(2)').is('.item-incorrect'), true, 'The 3rd item got the expected icon');
-    //                     assert.equal($container.find('.review-panel-item:nth(4)').is('.item-incorrect'), true, 'The 3rd item got the expected icon');
-    //                     assert.equal($container.find('.review-panel-item:nth(8)').is('.item-skipped'), true, 'The last item got the expected icon');
-    //                     assert.equal($container.find('.review-panel-item.item-correct').length, 5, 'The other items got the expected icon');
-
-    //                     assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '80%', 'The header score is rendered');
-    //                     assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '12/15', 'The header score is rendered');
-
-    //                     assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
-    //                     assert.equal($container.find('.review-panel-filter:visible').length, 2, 'The filters are displayed');
-    //                     assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
-    //                     assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), true, 'The first filter is active');
-    //                     assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), false, 'The second filter is not active');
-    //                 })
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('filterchange.test', filterId => {
-    //                             assert.equal(filterId, 'incorrect', 'The filterchange event is triggered with the expected parameter');
-    //                             resolve();
-    //                         });
-
-    //                     instance.setActiveFilter('incorrect');
-
-    //                     assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), false, 'The first filter is not active anymore');
-    //                     assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), true, 'The second filter is now active');
-    //                 }))
-    //                 .then(() => {
-    //                     assert.equal($container.find('.review-panel-filter').length, 2, 'The expected number of filters is renderer');
-    //                     assert.equal($container.find('.review-panel-filter:visible').length, 2, 'The filters are displayed');
-    //                     assert.equal($container.find('.review-panel-filter.active').length, 1, 'A filter is active');
-    //                     assert.equal($container.find('.review-panel-filter:nth(0)').is('.active'), false, 'The first filter is not active');
-    //                     assert.equal($container.find('.review-panel-filter:nth(1)').is('.active'), true, 'The second filter is active');
-    //                 })
-    //                 .catch(err => {
-    //                     assert.pushResult({
-    //                         result: false,
-    //                         message: err
-    //                     });
-    //                 })
-    //                 .then(() => instance.destroy());
-    //         })
-    //         .after('destroy', () => {
-    //             assert.equal($container.children().length, 0, 'The container is now empty');
-    //             assert.ok(!instance.is('ready'), 'The component is not ready anymore');
-    //             ready();
-    //         })
-    //         .on('error', err => {
-    //             assert.ok(false, 'The operation should not fail!');
-    //             assert.pushResult({
-    //                 result: false,
-    //                 message: err
-    //             });
-    //             ready();
-    //         });
-    // });
-
-    // QUnit.test('active item', assert => {
-    //     const ready = assert.async();
-    //     const $container = $('#fixture-item');
-
-    //     assert.expect(52);
-
-    //     assert.equal($container.children().length, 0, 'The container is empty');
-
-    //     const instance = reviewPanelFactory($container, {}, testMapIncorrect)
-    //         .on('init', function () {
-    //             assert.equal(this, instance, 'The instance has been initialized');
-    //             const shouldExpand = new Map([['QTIExamples', true], ['assessmentSection-3', true]]);
-    //             instance
-    //                 .off('.test')
-    //                 .on('expand.test', id => {
-    //                     assert.ok(shouldExpand.has(id), `The expand event is triggered for ${id}`);
-    //                 })
-    //                 .on('active.test', id => {
-    //                     assert.equal(id, 'item-8', `The active event is triggered for ${id}`);
-    //                 })
-    //                 .setActiveItem('item-8');
-    //         })
-    //         .on('ready', () => {
-    //             assert.ok(instance.is('ready'), 'The component is ready');
-    //             assert.equal($container.children().length, 1, 'The container contains an element');
-
-    //             assert.deepEqual(instance.getData().parts, reviewDataIncorrect.parts, 'The initial data is set: parts');
-    //             assert.deepEqual(instance.getData().items instanceof Map, true, 'The initial data is set: items');
-    //             assert.deepEqual(instance.getData().score, reviewDataIncorrect.score, 'The initial data is set: score');
-    //             assert.deepEqual(instance.getData().maxScore, reviewDataIncorrect.maxScore, 'The initial data is set: maxScore');
-
-    //             assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
-
-    //             Promise
-    //                 .resolve()
-    //                 .then(() => {
-    //                     assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
-    //                     assert.equal($container.find('.review-panel-part.active').length, 1, 'A test part is already active');
-    //                     assert.equal($container.find('.review-panel-part.active').is('[data-control="QTIExamples"]'), true, 'The expected test part is now active');
-    //                     assert.equal($container.find('.review-panel-part.active.expanded').length, 1, 'The test part is expanded');
-
-    //                     assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
-    //                     assert.equal($container.find('.review-panel-section.active').length, 1, 'A test section is already active');
-    //                     assert.equal($container.find('.review-panel-section.active').is('[data-control="assessmentSection-3"]'), true, 'The expected test section is now active');
-    //                     assert.equal($container.find('.review-panel-section.active.expanded').length, 1, 'The test section is expanded');
-
-    //                     assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
-    //                     assert.equal($container.find('.review-panel-item.active').length, 1, 'A test item is already active');
-    //                     assert.equal($container.find('.review-panel-item.active').is('[data-control="item-8"]'), true, 'The expected test item is now active');
-
-    //                     assert.equal($container.find('.review-panel-content .active').length, 3, '3 elements are now active');
-    //                 })
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('active.test', id => {
-    //                             assert.equal(id, 'item-3', `The active event is triggered for ${id}`);
-    //                             resolve();
-    //                         })
-    //                         .on('itemchange.test', () => {
-    //                             assert.ok(false, 'The itemchange event should not be triggered');
-    //                         })
-    //                         .setActiveItem('item-3');
-    //                 }))
-    //                 .then(() => {
-    //                     assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
-    //                     assert.equal($container.find('.review-panel-part.active').length, 1, 'A test part is now active');
-    //                     assert.equal($container.find('.review-panel-part.active').is('[data-control="QTIExamples"]'), true, 'The expected test part is now active');
-    //                     assert.equal($container.find('.review-panel-part.active.expanded').length, 1, 'The test part is expanded');
-
-    //                     assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
-    //                     assert.equal($container.find('.review-panel-section.active').length, 1, 'A test section is now active');
-    //                     assert.equal($container.find('.review-panel-section.active').is('[data-control="assessmentSection-2"]'), true, 'The expected test section is now active');
-    //                     assert.equal($container.find('.review-panel-section.active.expanded').length, 1, 'The test section is expanded');
-
-    //                     assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
-    //                     assert.equal($container.find('.review-panel-item.active').length, 1, 'A test item is now active');
-    //                     assert.equal($container.find('.review-panel-item.active').is('[data-control="item-3"]'), true, 'The expected test item is now active');
-
-    //                     assert.equal($container.find('.review-panel-content .active').length, 3, '3 elements are now active');
-    //                 })
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('active.test', () => {
-    //                             assert.ok(false, 'The active event should not be triggered');
-    //                         })
-    //                         .on('itemchange.test', () => {
-    //                             assert.ok(false, 'The itemchange event should not be triggered');
-    //                         })
-    //                         .setActiveItem('item-3');
-    //                     window.setTimeout(resolve, 300);
-    //                 }))
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('active.test', id => {
-    //                             assert.equal(id, 'item-1', `The active event is triggered for ${id}`);
-    //                             resolve();
-    //                         })
-    //                         .on('itemchange.test', () => {
-    //                             assert.ok(false, 'The itemchange event should not be triggered');
-    //                         })
-    //                         .setActiveItem('item-1');
-    //                 }))
-    //                 .then(() => {
-    //                     assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
-    //                     assert.equal($container.find('.review-panel-part.active').length, 1, 'A test part is now active');
-    //                     assert.equal($container.find('.review-panel-part.active').is('[data-control="Introduction"]'), true, 'The expected test part is now active');
-    //                     assert.equal($container.find('.review-panel-part.active.expanded').length, 1, 'The test part is expanded');
-
-    //                     assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
-    //                     assert.equal($container.find('.review-panel-section.active').length, 1, 'A test section is now active');
-    //                     assert.equal($container.find('.review-panel-section.active').is('[data-control="assessmentSection-1"]'), true, 'The expected test section is now active');
-    //                     assert.equal($container.find('.review-panel-section.active.expanded').length, 1, 'The test part is expanded');
-
-    //                     assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
-    //                     assert.equal($container.find('.review-panel-item.active').length, 1, 'A test item is now active');
-    //                     assert.equal($container.find('.review-panel-item.active').is('[data-control="item-1"]'), true, 'The expected test item is now active');
-
-    //                     assert.equal($container.find('.review-panel-content .active').length, 3, '3 elements are now active');
-    //                 })
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('active.test', () => {
-    //                             assert.ok(false, 'The active event should not be triggered');
-    //                         })
-    //                         .on('itemchange.test', () => {
-    //                             assert.ok(false, 'The itemchange event should not be triggered');
-    //                         })
-    //                         .setActiveItem('item-1');
-    //                     window.setTimeout(resolve, 300);
-    //                 }))
-    //                 .catch(err => {
-    //                     assert.pushResult({
-    //                         result: false,
-    //                         message: err
-    //                     });
-    //                 })
-    //                 .then(() => instance.destroy());
-    //         })
-    //         .after('destroy', () => {
-    //             assert.equal($container.children().length, 0, 'The container is now empty');
-    //             assert.ok(!instance.is('ready'), 'The component is not ready anymore');
-    //             ready();
-    //         })
-    //         .on('error', err => {
-    //             assert.ok(false, 'The operation should not fail!');
-    //             assert.pushResult({
-    //                 result: false,
-    //                 message: err
-    //             });
-    //             ready();
-    //         });
-    // });
-
-    // QUnit.test('active item click', assert => {
-    //     const ready = assert.async();
-    //     const $container = $('#fixture-item-click');
-
-    //     assert.expect(50);
-
-    //     assert.equal($container.children().length, 0, 'The container is empty');
-
-    //     const instance = reviewPanelFactory($container, {}, testMapIncorrect)
-    //         .on('init', function () {
-    //             assert.equal(this, instance, 'The instance has been initialized');
-    //         })
-    //         .on('ready', () => {
-    //             assert.ok(instance.is('ready'), 'The component is ready');
-    //             assert.equal($container.children().length, 1, 'The container contains an element');
-
-    //             assert.deepEqual(instance.getData().parts, reviewDataIncorrect.parts, 'The initial data is set: parts');
-    //             assert.deepEqual(instance.getData().items instanceof Map, true, 'The initial data is set: items');
-    //             assert.deepEqual(instance.getData().score, reviewDataIncorrect.score, 'The initial data is set: score');
-    //             assert.deepEqual(instance.getData().maxScore, reviewDataIncorrect.maxScore, 'The initial data is set: maxScore');
-
-    //             assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
-
-    //             Promise
-    //                 .resolve()
-    //                 .then(() => {
-    //                     assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
-    //                     assert.equal($container.find('.review-panel-part.active').length, 0, 'No test part is active yet');
-    //                     assert.equal($container.find('.review-panel-part.expanded').length, 0, 'No test part is expanded yet');
-
-    //                     assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
-    //                     assert.equal($container.find('.review-panel-section.active').length, 0, 'No test section is active yet');
-    //                     assert.equal($container.find('.review-panel-section.expanded').length, 0, 'No test section is expanded yet');
-
-    //                     assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
-    //                     assert.equal($container.find('.review-panel-item.active').length, 0, 'No test item is active yet');
-
-    //                     assert.equal($container.find('.review-panel-content .active').length, 0, 'No element is active yet');
-    //                 })
-    //                 .then(() => {
-    //                     instance.off('.test');
-    //                     const promises = [
-    //                         new Promise(resolve => {
-    //                             instance.on('active.test', id => {
-    //                                 assert.equal(id, 'item-3', `The active event is triggered for ${id}`);
-    //                                 resolve();
-    //                             });
-    //                         }),
-    //                         new Promise(resolve => {
-    //                             instance.on('itemchange.test', (id, position) => {
-    //                                 assert.equal(id, 'item-3', `The itemchange event is triggered for ${id}`);
-    //                                 assert.equal(position, 2, `The itemchange event is triggered for position ${position}`);
-    //                                 resolve();
-    //                             });
-    //                         })
-    //                     ];
-    //                     $container.find('[data-control="item-3"]').click();
-    //                     return Promise.all(promises);
-    //                 })
-    //                 .then(() => {
-    //                     assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
-    //                     assert.equal($container.find('.review-panel-part.active').length, 1, 'A test part is now active');
-    //                     assert.equal($container.find('.review-panel-part.active').is('[data-control="QTIExamples"]'), true, 'The expected test part is now active');
-    //                     assert.equal($container.find('.review-panel-part.active.expanded').length, 1, 'The test part is expanded');
-
-    //                     assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
-    //                     assert.equal($container.find('.review-panel-section.active').length, 1, 'A test section is now active');
-    //                     assert.equal($container.find('.review-panel-section.active').is('[data-control="assessmentSection-2"]'), true, 'The expected test section is now active');
-    //                     assert.equal($container.find('.review-panel-section.active.expanded').length, 1, 'The test section is expanded');
-
-    //                     assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
-    //                     assert.equal($container.find('.review-panel-item.active').length, 1, 'A test item is now active');
-    //                     assert.equal($container.find('.review-panel-item.active').is('[data-control="item-3"]'), true, 'The expected test item is now active');
-
-    //                     assert.equal($container.find('.review-panel-content .active').length, 3, '3 elements are now active');
-    //                 })
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('active.test', () => {
-    //                             assert.ok(false, 'The active event should not be triggered');
-    //                         })
-    //                         .on('itemchange.test', () => {
-    //                             assert.ok(false, 'The itemchange event should not be triggered');
-    //                         });
-    //                     $container.find('[data-control="item-3"]').click();
-    //                     window.setTimeout(resolve, 300);
-    //                 }))
-    //                 .then(() => {
-    //                     instance.off('.test');
-    //                     const promises = [
-    //                         new Promise(resolve => {
-    //                             instance.on('active.test', id => {
-    //                                 assert.equal(id, 'item-1', `The active event is triggered for ${id}`);
-    //                                 resolve();
-    //                             });
-    //                         }),
-    //                         new Promise(resolve => {
-    //                             instance.on('itemchange.test', (id, position) => {
-    //                                 assert.equal(id, 'item-1', `The itemchange event is triggered for ${id}`);
-    //                                 assert.equal(position, 0, `The itemchange event is triggered for position ${position}`);
-    //                                 resolve();
-    //                             });
-    //                         })
-    //                     ];
-    //                     $container.find('[data-control="item-1"]').click();
-    //                     return Promise.all(promises);
-    //                 })
-    //                 .then(() => {
-    //                     assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
-    //                     assert.equal($container.find('.review-panel-part.active').length, 1, 'A test part is now active');
-    //                     assert.equal($container.find('.review-panel-part.active').is('[data-control="Introduction"]'), true, 'The expected test part is now active');
-    //                     assert.equal($container.find('.review-panel-part.active.expanded').length, 1, 'The test part is expanded');
-
-    //                     assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
-    //                     assert.equal($container.find('.review-panel-section.active').length, 1, 'A test section is now active');
-    //                     assert.equal($container.find('.review-panel-section.active').is('[data-control="assessmentSection-1"]'), true, 'The expected test section is now active');
-    //                     assert.equal($container.find('.review-panel-section.active.expanded').length, 1, 'The test section is expanded');
-
-    //                     assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
-    //                     assert.equal($container.find('.review-panel-item.active').length, 1, 'A test item is now active');
-    //                     assert.equal($container.find('.review-panel-item.active').is('[data-control="item-1"]'), true, 'The expected test item is now active');
-
-    //                     assert.equal($container.find('.review-panel-content .active').length, 3, '3 elements are now active');
-    //                 })
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('active.test', () => {
-    //                             assert.ok(false, 'The active event should not be triggered');
-    //                         })
-    //                         .on('itemchange.test', () => {
-    //                             assert.ok(false, 'The itemchange event should not be triggered');
-    //                         });
-    //                     $container.find('[data-control="item-1"]').click();
-    //                     window.setTimeout(resolve, 300);
-    //                 }))
-    //                 .catch(err => {
-    //                     assert.pushResult({
-    //                         result: false,
-    //                         message: err
-    //                     });
-    //                 })
-    //                 .then(() => instance.destroy());
-    //         })
-    //         .after('destroy', () => {
-    //             assert.equal($container.children().length, 0, 'The container is now empty');
-    //             assert.ok(!instance.is('ready'), 'The component is not ready anymore');
-    //             ready();
-    //         })
-    //         .on('error', err => {
-    //             assert.ok(false, 'The operation should not fail!');
-    //             assert.pushResult({
-    //                 result: false,
-    //                 message: err
-    //             });
-    //             ready();
-    //         });
-    // });
-
-    // QUnit.test('disable', assert => {
-    //     const ready = assert.async();
-    //     const $container = $('#fixture-disable');
-
-    //     assert.expect(27);
-
-    //     assert.equal($container.children().length, 0, 'The container is empty');
-
-    //     const instance = reviewPanelFactory($container, {}, testMapIncorrect)
-    //         .on('init', function () {
-    //             assert.equal(this, instance, 'The instance has been initialized');
-    //         })
-    //         .on('ready', () => {
-    //             assert.ok(instance.is('ready'), 'The component is ready');
-    //             assert.equal($container.children().length, 1, 'The container contains an element');
-
-    //             assert.deepEqual(instance.getData().parts, reviewDataIncorrect.parts, 'The initial data is set: parts');
-    //             assert.deepEqual(instance.getData().items instanceof Map, true, 'The initial data is set: items');
-    //             assert.deepEqual(instance.getData().score, reviewDataIncorrect.score, 'The initial data is set: score');
-    //             assert.deepEqual(instance.getData().maxScore, reviewDataIncorrect.maxScore, 'The initial data is set: maxScore');
-
-    //             assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
-    //             assert.equal(instance.is('disabled'), false, 'The instance is not disabled');
-
-    //             Promise
-    //                 .resolve()
-    //                 .then(() => {
-    //                     assert.equal($container.find('.review-panel-part').length, 2, 'The test parts are rendered');
-    //                     assert.equal($container.find('.review-panel-part.active').length, 0, 'No test part is active yet');
-    //                     assert.equal($container.find('.review-panel-part.expanded').length, 0, 'No test part is expanded yet');
-
-    //                     assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
-    //                     assert.equal($container.find('.review-panel-section.active').length, 0, 'No test section is active yet');
-    //                     assert.equal($container.find('.review-panel-section.expanded').length, 0, 'No test section is expanded yet');
-
-    //                     assert.equal($container.find('.review-panel-item').length, 9, 'The test items are rendered');
-    //                     assert.equal($container.find('.review-panel-item.active').length, 0, 'No test item is active yet');
-
-    //                     assert.equal($container.find('.review-panel-content .active').length, 0, 'No element is active yet');
-    //                 })
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .after('disable.test', () => {
-    //                             assert.equal(instance.is('disabled'), true, 'The instance is disabled');
-    //                             resolve();
-    //                         })
-    //                         .disable();
-    //                 }))
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('collapse.test', () => {
-    //                             assert.ok(false, 'The collapse event should not be triggered');
-    //                         })
-    //                         .on('expand.test', () => {
-    //                             assert.ok(false, 'The expand event should not be triggered');
-    //                         })
-    //                         .on('active.test', () => {
-    //                             assert.ok(false, 'The active event should not be triggered');
-    //                         })
-    //                         .on('itemchange.test', () => {
-    //                             assert.ok(false, 'The itemchange event should not be triggered');
-    //                         });
-    //                     $container.find('[data-control="item-1"]').click();
-    //                     window.setTimeout(resolve, 300);
-    //                 }))
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('collapse.test', () => {
-    //                             assert.ok(false, 'The collapse event should not be triggered');
-    //                         })
-    //                         .on('expand.test', () => {
-    //                             assert.ok(false, 'The expand event should not be triggered');
-    //                         })
-    //                         .on('active.test', () => {
-    //                             assert.ok(false, 'The active event should not be triggered');
-    //                         })
-    //                         .on('itemchange.test', () => {
-    //                             assert.ok(false, 'The itemchange event should not be triggered');
-    //                         });
-    //                     $container.find('[data-control="assessmentSection-2"]').click();
-    //                     window.setTimeout(resolve, 300);
-    //                 }))
-    //                 .then(() => new Promise(resolve => {
-    //                     instance
-    //                         .off('.test')
-    //                         .on('collapse.test', () => {
-    //                             assert.ok(false, 'The collapse event should not be triggered');
-    //                         })
-    //                         .on('expand.test', () => {
-    //                             assert.ok(false, 'The expand event should not be triggered');
-    //                         })
-    //                         .on('active.test', () => {
-    //                             assert.ok(false, 'The active event should not be triggered');
-    //                         })
-    //                         .on('itemchange.test', () => {
-    //                             assert.ok(false, 'The itemchange event should not be triggered');
-    //                         });
-    //                     $container.find('[data-control="QTIExamples"]').click();
-    //                     window.setTimeout(resolve, 300);
-    //                 }))
-    //                 .then(() => {
-    //                     assert.equal($container.find('.review-panel-part.active').length, 0, 'Still no test part is active');
-    //                     assert.equal($container.find('.review-panel-part.expanded').length, 0, 'Still no test part is expanded');
-    //                     assert.equal($container.find('.review-panel-section.active').length, 0, 'Still no test section is active');
-    //                     assert.equal($container.find('.review-panel-section.expanded').length, 0, 'Still no test section is expanded');
-    //                     assert.equal($container.find('.review-panel-item.active').length, 0, 'Still no test item is active');
-    //                 })
-    //                 .catch(err => {
-    //                     assert.pushResult({
-    //                         result: false,
-    //                         message: err
-    //                     });
-    //                 })
-    //                 .then(() => instance.destroy());
-    //         })
-    //         .after('destroy', () => {
-    //             assert.equal($container.children().length, 0, 'The container is now empty');
-    //             assert.ok(!instance.is('ready'), 'The component is not ready anymore');
-    //             ready();
-    //         })
-    //         .on('error', err => {
-    //             assert.ok(false, 'The operation should not fail!');
-    //             assert.pushResult({
-    //                 result: false,
-    //                 message: err
-    //             });
-    //             ready();
-    //         });
-    // });
+    QUnit.module('API');
+
+    QUnit.test('data with correct responses', assert => {
+        const ready = assert.async();
+        const $container = $('#fixture-data-correct');
+        const initialData = {
+            scope: 'test',
+            parts: {
+                part: {
+                    id: 'part',
+                    label: 'part',
+                    position: 0,
+                    sections: {
+                        section: {
+                            id: 'section',
+                            label: 'section',
+                            position: 0,
+                            items: [{
+                                id: 'item',
+                                label: 'item',
+                                informational: false,
+                                skipped: true,
+                                position: 0,
+                                score: 0,
+                                maxScore: 1
+                            }],
+                            score: 0,
+                            maxScore: 1
+                        }
+                    },
+                    score: 0,
+                    maxScore: 1
+                }
+            },
+            jumps: [{
+                identifier: 'item',
+                section: 'section',
+                part: 'part',
+                position: 0
+            }],
+            score: 0,
+            maxScore: 1
+        };
+        const initialDataAll = {
+            sections: [{
+                id: 'section',
+                label: 'section',
+                position: 0,
+                items: [{
+                    id: 'item',
+                    label: 'item',
+                    informational: false,
+                    skipped: true,
+                    withScore: true,
+                    maxScore: 1,
+                    score: 0,
+                    status: 'skipped',
+                    position: 0,
+                    ariaLabel: "Question 1",
+                    icon: null,
+                    numericLabel: "1",
+                    scoreType: "incorrect",
+                    status: "answered",
+                    type: "incorrect"
+                }],
+                withScore: true,
+                maxScore: 1,
+                score: 0
+            }],
+            withScore: true,
+            maxScore: 1,
+            score: 0
+        };
+
+        assert.expect(43);
+
+        assert.equal($container.children().length, 0, 'The container is empty');
+
+        const instance = reviewPanelFactory($container, { showScore: true, showCorrect: true, displaySectionTitles: true }, initialData)
+            .on('init', function () {
+                assert.equal(this, instance, 'The instance has been initialized');
+            })
+            .on('ready', () => {
+                assert.ok(instance.is('ready'), 'The component is ready');
+                assert.equal($container.children().length, 1, 'The container contains an element');
+
+                assert.deepEqual(instance.getData().sections, initialDataAll.sections, 'The initial data is set: sections');
+                assert.deepEqual(instance.getData().items instanceof Map, true, 'The initial data is set: items');
+                assert.deepEqual(instance.getData().score, initialDataAll.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, initialDataAll.maxScore, 'The initial data is set: maxScore');
+
+                assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
+                assert.equal($container.find('.review-panel-section').length, 1, 'A test section is rendered');
+                assert.equal($container.find('.review-panel-section .buttonlist-item').length, 1, 'A test item is rendered');
+
+                assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '0%', 'The header score is rendered');
+                assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '0/1', 'The footerr score is rendered');
+
+                Promise
+                    .resolve()
+                    .then(() => {
+                        instance.off('.test');
+                        const promises = [
+                            new Promise(resolve => {
+                                instance.on('datachange.test', data => {
+                                    assert.ok(true, 'The datachange event is emitted');
+                                    assert.deepEqual(data.parts, reviewDataCorrect.parts, 'The event data contains: parts');
+                                    assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
+                                    assert.deepEqual(data.score, reviewDataCorrect.score, 'The event data contains: score');
+                                    assert.deepEqual(data.maxScore, reviewDataCorrect.maxScore, 'The event data contains: maxScore');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('update.test', data => {
+                                    assert.ok(true, 'The update event is emitted');
+                                    assert.deepEqual(data.parts, reviewDataCorrect.parts, 'The event data contains: parts');
+                                    assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
+                                    assert.deepEqual(data.score, reviewDataCorrect.score, 'The event data contains: score');
+                                    assert.deepEqual(data.maxScore, reviewDataCorrect.maxScore, 'The event data contains: maxScore');
+                                    resolve();
+                                });
+                            }),
+                        ];
+                        assert.equal(instance.setData(testMapCorrect), instance, 'setData is fluent');
+                        assert.deepEqual(instance.getData().parts, reviewDataCorrect.parts, 'The updated data is set');
+                        return Promise.all(promises);
+                    })
+                    .then(() => {
+                        assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
+                        assert.equal($container.find('.review-panel-section .buttonlist-item').length, 9, 'The test items are rendered');
+
+                        instance.getData().sections.forEach((section, i) => {
+                            assert.equal(
+                                $container.find('.review-panel-section .review-panel-text').eq(i).text().trim(),
+                                section.label,
+                                `The test section "${section.label}" exists`
+                            );
+                        });
+
+                        const itemsEntries = Array.from(instance.getData().items.values());
+                        itemsEntries.forEach((item, index) => {
+                            assert.ok(
+                                $container.find(`.buttonlist-item:nth(${index})`).hasClass(item.status),
+                                `The item #${index} got the expected class: ${item.status}`
+                            );
+                        });
+
+                        assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '100%', 'The header score is rendered');
+                        assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '17/17', 'The footer score is rendered');
+                    })
+                    .catch(err => {
+                        assert.pushResult({
+                            result: false,
+                            message: err
+                        });
+                    })
+                    .then(() => instance.destroy());
+            })
+            .after('destroy', () => {
+                assert.equal($container.children().length, 0, 'The container is now empty');
+                assert.ok(!instance.is('ready'), 'The component is not ready anymore');
+                ready();
+            })
+            .on('error', err => {
+                assert.ok(false, 'The operation should not fail!');
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+                ready();
+            });
+    });
+
+    QUnit.test('data with incorrect responses', assert => {
+        const ready = assert.async();
+        const $container = $('#fixture-data-incorrect');
+        const initialData = {
+            scope: 'test',
+            parts: {
+                part: {
+                    id: 'part',
+                    label: 'part',
+                    position: 0,
+                    sections: {
+                        section: {
+                            id: 'section',
+                            label: 'section',
+                            position: 0,
+                            items: [{
+                                id: 'item',
+                                label: 'item',
+                                informational: false,
+                                skipped: false,
+                                position: 0,
+                                score: 1,
+                                maxScore: 1
+                            }],
+                            score: 1,
+                            maxScore: 1
+                        }
+                    },
+                    score: 1,
+                    maxScore: 1
+                }
+            },
+            jumps: [{
+                identifier: 'item',
+                section: 'section',
+                part: 'part',
+                position: 0
+            }],
+            score: 1,
+            maxScore: 1
+        };
+        const initialDataAll = {
+            sections: [{
+                id: 'section',
+                label: 'section',
+                position: 0,
+                items: [{
+                    id: 'item',
+                    label: 'item',
+                    informational: false,
+                    skipped: false,
+                    withScore: true,
+                    maxScore: 1,
+                    score: 1,
+                    status: 'skipped',
+                    position: 0,
+                    ariaLabel: "Question 1",
+                    icon: null,
+                    numericLabel: "1",
+                    scoreType: "correct",
+                    status: "answered",
+                    type: "correct"
+                }],
+                withScore: true,
+                score: 1,
+                maxScore: 1
+            }],
+            withScore: true,
+            score: 1,
+            maxScore: 1
+        };
+
+        assert.expect(48);
+
+        assert.equal($container.children().length, 0, 'The container is empty');
+
+        const instance = reviewPanelFactory($container, { showScore: true, showCorrect: true, displaySectionTitles: true }, initialData)
+            .on('init', function () {
+                assert.equal(this, instance, 'The instance has been initialized');
+            })
+            .on('ready', () => {
+                assert.ok(instance.is('ready'), 'The component is ready');
+                assert.equal($container.children().length, 1, 'The container contains an element');
+
+                assert.deepEqual(instance.getData().sections, initialDataAll.sections, 'The initial data is set: sections');
+                assert.deepEqual(instance.getData().items instanceof Map, true, 'The initial data is set: items');
+                assert.deepEqual(instance.getData().score, initialDataAll.score, 'The initial data is set: score');
+                assert.deepEqual(instance.getData().maxScore, initialDataAll.maxScore, 'The initial data is set: maxScore');
+
+                assert.equal($container.find('.review-panel-content').length, 1, 'The content area is rendered');
+                assert.equal($container.find('.review-panel-section').length, 1, 'A test section is rendered');
+                assert.equal($container.find('.review-panel-section .buttonlist-item').length, 1, 'A test item is rendered');
+
+                assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '100%', 'The header score is  rendered');
+                assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '1/1', 'The footer score is rendered');
+
+                Promise
+                    .resolve()
+                    .then(() => {
+                        instance.off('.test');
+                        const promises = [
+                            new Promise(resolve => {
+                                instance.on('datachange.test', data => {
+                                    assert.ok(true, 'The datachange event is emitted');
+                                    assert.deepEqual(data.parts, reviewDataIncorrect.parts, 'The event data contains: parts');
+                                    assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
+                                    assert.deepEqual(data.score, reviewDataIncorrect.score, 'The event data contains: score');
+                                    assert.deepEqual(data.maxScore, reviewDataIncorrect.maxScore, 'The event data contains: maxScore');
+                                    resolve();
+                                });
+                            }),
+                            new Promise(resolve => {
+                                instance.on('update.test', data => {
+                                    assert.ok(true, 'The update event is emitted');
+                                    assert.deepEqual(data.parts, reviewDataIncorrect.parts, 'The event data contains: parts');
+                                    assert.deepEqual(data.items instanceof Map, true, 'The event data contains: items');
+                                    assert.deepEqual(data.score, reviewDataIncorrect.score, 'The event data contains: score');
+                                    assert.deepEqual(data.maxScore, reviewDataIncorrect.maxScore, 'The event data contains: maxScore');
+                                    resolve();
+                                });
+                            }),
+                        ];
+                        assert.equal(instance.setData(testMapIncorrect), instance, 'setData is fluent');
+                        assert.deepEqual(instance.getData().parts, reviewDataIncorrect.parts, 'The updated data is set');
+                        return Promise.all(promises);
+                    })
+                    .then(() => {
+                        assert.equal($container.find('.review-panel-section').length, 3, 'The test sections are rendered');
+                        assert.equal($container.find('.review-panel-section .buttonlist-item').length, 9, 'The test items are rendered');
+
+                        instance.getData().sections.forEach((section, i) => {
+                            assert.equal(
+                                $container.find('.review-panel-section .review-panel-text').eq(i).text().trim(),
+                                section.label,
+                                `The test section "${section.label}" exists`
+                            );
+                        });
+
+                        const itemsEntries = Array.from(instance.getData().items.values());
+                        itemsEntries.forEach((item, index) => {
+                            assert.ok(
+                                $container.find(`.buttonlist-item:nth(${index})`).hasClass(item.status),
+                                `The item #${index} got the expected class: ${item.status}`
+                            );
+                        });
+
+                        assert.equal($container.find('.buttonlist-score-icon:nth(0)').is('.icon-correct'), true, 'The 1st item got the expected icon');
+                        assert.equal($container.find('.buttonlist-score-icon:nth(1)').is('.icon-incorrect'), true, 'The 2nd item got the expected icon');
+                        assert.equal($container.find('.buttonlist-score-icon:nth(2)').is('.icon-correct'), true, 'The 3rd item got the expected icon');
+                        assert.equal($container.find('.buttonlist-score-icon:nth(3)').is('.icon-incorrect'), true, 'The 4th item got the expected icon');
+                        assert.equal($container.find('.buttonlist-score-icon.icon-correct').length, 5, 'The other items got the expected icon');
+
+                        assert.equal($container.find('.review-panel-header .review-panel-score').text().trim(), '80%', 'The header score is rendered');
+                        assert.equal($container.find('.review-panel-footer .review-panel-score').text().trim(), '12/15', 'The header score is rendered');
+                    })
+                    .catch(err => {
+                        assert.pushResult({
+                            result: false,
+                            message: err
+                        });
+                    })
+                    .then(() => instance.destroy());
+            })
+            .after('destroy', () => {
+                assert.equal($container.children().length, 0, 'The container is now empty');
+                assert.ok(!instance.is('ready'), 'The component is not ready anymore');
+                ready();
+            })
+            .on('error', err => {
+                assert.ok(false, 'The operation should not fail!');
+                assert.pushResult({
+                    result: false,
+                    message: err
+                });
+                ready();
+            });
+    });
 
     QUnit.module('Visual');
 

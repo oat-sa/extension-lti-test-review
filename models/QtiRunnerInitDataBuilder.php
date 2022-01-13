@@ -233,7 +233,7 @@ class QtiRunnerInitDataBuilder
      * @param AssessmentSectionRef $itemRef
      * @return Boolean
      */
-    private function isItemInformational($itemRef)
+    private function isItemInformational(AssessmentSectionRef $itemRef) : bool
     {
         $categories = $itemRef->getCategories()->getArrayCopy();
 

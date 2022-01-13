@@ -9,9 +9,6 @@ use oat\tao\scripts\tools\migrations\AbstractMigration;
 use common_ext_Extension as Extension;
 use common_ext_ExtensionsManager as ExtensionsManager;
 
-/**
- * Auto-generated Migration: Please modify to your needs!
- */
 final class Version202201121636313291_ltiTestReview extends AbstractMigration
 {
     private const CONFIG_FILE = 'ReviewPanel';

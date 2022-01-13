@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019-22 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2019-2022 (original work) Open Assessment Technologies SA;
  *
  *
  */
@@ -320,7 +320,7 @@ class Review extends tao_actions_SinglePageModule
         return $extension->getConfig('ReviewPanel');
     }
 
-    private function getDisplaySectionTitlesOption($launchData): bool
+    private function getDisplaySectionTitlesOption(LtiLaunchData $launchData): bool
     {
         $reviewPanelConfig = $this->getReviewPanelConfig();
         $extensionSectionTitles = $reviewPanelConfig[self::OPTION_DISPLAY_SECTION_TITLES];
@@ -340,7 +340,7 @@ class Review extends tao_actions_SinglePageModule
         return filter_var($sectionTitles, FILTER_VALIDATE_BOOLEAN);
     }
 
-    private function getReviewLayoutOption($launchData): string
+    private function getReviewLayoutOption(LtiLaunchData $launchData): string
     {
         $reviewPanelConfig = $this->getReviewPanelConfig();
         $extensionReviewLayout = $reviewPanelConfig[self::OPTION_REVIEW_LAYOUT];

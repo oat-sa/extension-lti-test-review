@@ -33,6 +33,7 @@ use oat\taoQtiTest\models\runner\QtiRunnerServiceContext;
 use oat\taoResultServer\models\classes\ResultServerService;
 use qtism\data\AssessmentSection;
 use qtism\data\AssessmentSectionRef;
+use qtism\data\ExtendedAssessmentItemRef;
 use qtism\data\TestPart;
 use taoQtiTest_helpers_Utils;
 use taoResultServer_models_classes_OutcomeVariable;
@@ -230,10 +231,10 @@ class QtiRunnerInitDataBuilder
     }
 
     /**
-     * @param AssessmentSectionRef $itemRef
+     * @param ExtendedAssessmentItemRef $itemRef
      * @return Boolean
      */
-    private function isItemInformational(AssessmentSectionRef $itemRef) : bool
+    private function isItemInformational(ExtendedAssessmentItemRef $itemRef) : bool
     {
         $categories = $itemRef->getCategories()->getArrayCopy();
 

@@ -82,7 +82,7 @@ define([
      * @returns {mapEntry}
      */
     const extractData = (entry, withScore) => {
-        const { id, label, position, informational, skipped, score, maxScore } = entry || {};
+        const { id, label, position, informational, skipped, unseen, score, maxScore } = entry || {};
         const data = { id, label, position, withScore };
         if (withScore) {
             Object.assign(data, { score, maxScore });
@@ -92,6 +92,9 @@ define([
         }
         if ('undefined' !== typeof skipped) {
             data.skipped = skipped;
+        }
+        if ('undefined' !== typeof unseen) {
+            data.unseen = unseen;
         }
         return data;
     };
@@ -107,8 +110,9 @@ define([
      * @property {Number} maxScore - the item's max possible score
      * @property {Boolean} informational
      * @property {Boolean} skipped
+     * @property {Boolean} unseen
      * @property {String} type - 'correct'/'incorrect'/'info'/'skipped'/'default'
-     * @property {String} status - 'answered'/'viewed'
+     * @property {String} status - 'answered'/'viewed'/'unseen'
      * @property {String} scoreType - 'correct'/'incorrect'/null
      * @property {String} icon - 'info' or null
      */
@@ -135,7 +139,10 @@ define([
             reviewItem.scoreType = 'incorrect';
         }
 
-        if (type !== 'info' && type !== 'skipped') {
+        if (reviewItem.unseen) {
+            reviewItem.status = 'unseen';
+        }
+        else if (type !== 'info' && type !== 'skipped') {
             reviewItem.status = 'answered';
         } else {
             reviewItem.status = 'viewed';

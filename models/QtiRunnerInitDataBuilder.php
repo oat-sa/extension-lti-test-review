@@ -182,6 +182,7 @@ class QtiRunnerInitDataBuilder
 
                     $responsesCount = $this->getResponseCountsFromState($state);
 
+                    $isUnseen = empty($state);
                     $isInformational = $this->isItemInformational($item);
                     $isSkipped = !$isInformational && ($responsesCount === 0);
 
@@ -192,8 +193,9 @@ class QtiRunnerInitDataBuilder
                         'categories' => [],
                         'informational' => $isInformational,
                         'skipped' => $isSkipped,
+                        'unseen' => $isUnseen,
                         'score' => $itemsStates[$itemId]['score'] ?? null,
-                        'maxScore' => $itemsStates[$itemId]['maxScore'] ?? null
+                        'maxScore' => $itemsStates[$itemId]['maxScore'] ?? null // FIXME: unsubmitted item should still have a maxScore
                     ];
 
                     $this->fillItemsData($itemId, $item->getHref(), $itemData['data']);

@@ -40,8 +40,6 @@ final class Version202201121636313291_ltiTestReview extends AbstractMigration
 
     /**
      * @throws ExtensionException
-     *
-     * @return Extension
      */
     private function getExtension(): Extension
     {

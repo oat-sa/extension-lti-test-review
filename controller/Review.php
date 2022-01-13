@@ -313,27 +313,26 @@ class Review extends tao_actions_SinglePageModule
         return $messageType === LtiMessageInterface::LTI_MESSAGE_TYPE_SUBMISSION_REVIEW_REQUEST;
     }
 
-    private function getTestRunnerPluginsConfig(): array
+    private function getReviewPanelConfig(): array
     {
         $extensionsManager = $this->getServiceLocator()->get(common_ext_ExtensionsManager::SERVICE_ID);
-        $extension = $extensionsManager->getExtensionById('taoQtiTest');
-        $config = $extension->getConfig('testRunner');
-        return $config['plugins'];
+        $extension = $extensionsManager->getExtensionById('ltiTestReview');
+        return $extension->getConfig('ReviewPanel');
     }
 
     private function getDisplaySectionTitlesOption($launchData): bool
     {
-        $testRunnerPluginsConfig = $this->getTestRunnerPluginsConfig();
-        $testRunnerSectionTitles = $testRunnerPluginsConfig['review'][self::OPTION_DISPLAY_SECTION_TITLES];
+        $reviewPanelConfig = $this->getReviewPanelConfig();
+        $extensionSectionTitles = $reviewPanelConfig[self::OPTION_DISPLAY_SECTION_TITLES];
 
         $ltiParamSectionTitles = $launchData->hasVariable(self::LTI_DISPLAY_SECTION_TITLES)
             ? $launchData->getVariable(self::LTI_DISPLAY_SECTION_TITLES)
             : null;
 
-        // $sectionTitles priority: LTI param > taoQtiTest config > true
+        // $sectionTitles priority: LTI param > extension config > true
         $sectionTitles = true;
-        if (isset($testRunnerSectionTitles)) {
-            $sectionTitles = $testRunnerSectionTitles;
+        if (isset($extensionSectionTitles)) {
+            $sectionTitles = $extensionSectionTitles;
         }
         if (isset($ltiParamSectionTitles)) {
             $sectionTitles = $ltiParamSectionTitles;
@@ -343,17 +342,17 @@ class Review extends tao_actions_SinglePageModule
 
     private function getReviewLayoutOption($launchData): string
     {
-        $testRunnerPluginsConfig = $this->getTestRunnerPluginsConfig();
-        $testRunnerReviewLayout = $testRunnerPluginsConfig['review'][self::OPTION_REVIEW_LAYOUT];
+        $reviewPanelConfig = $this->getReviewPanelConfig();
+        $extensionReviewLayout = $reviewPanelConfig[self::OPTION_REVIEW_LAYOUT];
 
         $ltiParamReviewLayout = $launchData->hasVariable(self::LTI_REVIEW_LAYOUT)
             ? $launchData->getVariable(self::LTI_REVIEW_LAYOUT)
             : null;
 
-        // $reviewLayout priority: LTI param > taoQtiTest config > 'default'
+        // $reviewLayout priority: LTI param > extension config > 'default'
         $reviewLayout = 'default';
-        if (!empty($testRunnerReviewLayout)) {
-            $reviewLayout = $testRunnerReviewLayout;
+        if (!empty($extensionReviewLayout)) {
+            $reviewLayout = $extensionReviewLayout;
         }
         if (!empty($ltiParamReviewLayout) && array_key_exists($ltiParamReviewLayout, self::REVIEW_LAYOUTS_MAP)) {
             $reviewLayout = self::REVIEW_LAYOUTS_MAP[$ltiParamReviewLayout];

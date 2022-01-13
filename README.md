@@ -75,19 +75,15 @@ return new oat\ltiTestReview\models\DeliveryExecutionFinderService([
 
 **Note:** This will set the default value of these options for the whole platform. If you enable them by default, you can still disable them using LTI custom parameters.
 
-The default values for `custom_review_layout` and `custom_section_titles` are read from `config/taoQtiTest/testRunner.conf.php`:
+The default values for `custom_review_layout` and `custom_section_titles` are read from `config/ltiTestReview/ReviewPanel.conf.php`:
 
 ```php
-[
+return new oat\oatbox\config\ConfigurationService(array(
     'config' => array(
-        'plugins' => array(
-            'review' => array(
-                'reviewLayout' => 'default',
-                'displaySectionTitles' => true
-            )
-        )
+        'reviewLayout' => 'default',
+        'displaySectionTitles' => true
     )
-]
+));
 ```
 
-You may override them permanently by changing the values in that file (affects both test-taker review panel and LTI review panel), or temporarily by passing the custom LTI parameters when launching the review. The LTI params take precedence over the configuration values.
+**Note:** This will set the default value of these options for the whole platform. If you enable them by default, you can still disable them using LTI custom parameters.

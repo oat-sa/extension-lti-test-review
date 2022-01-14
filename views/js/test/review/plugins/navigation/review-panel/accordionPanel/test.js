@@ -23,13 +23,13 @@ define([
     'jquery',
     'lodash',
     'i18n',
-    'ltiTestReview/review/plugins/navigation/review-panel/panel',
-    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel/map-correct.json',
-    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel/map-incorrect.json',
-    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel/map-incorrect-filtered.json',
-    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel/review-data-correct.json',
-    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel/review-data-incorrect.json',
-    'json!ltiTestReview/test/review/plugins/navigation/review-panel/panel/review-data-incorrect-filtered.json'
+    'ltiTestReview/review/plugins/navigation/review-panel/accordionPanel',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/fixtures/map-correct.json',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/fixtures/map-incorrect.json',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/fixtures/map-incorrect-filtered.json',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/fixtures/review-data-correct.json',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/fixtures/review-data-incorrect.json',
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/fixtures/review-data-incorrect-filtered.json'
 ], function (
     $,
     _,
@@ -625,7 +625,12 @@ define([
                         type: 'incorrect',
                         position: 0,
                         score: 0,
-                        maxScore: 1
+                        maxScore: 1,
+                        ariaLabel: "Question 1",
+                        icon: null,
+                        numericLabel: "1",
+                        scoreType: "incorrect",
+                        status: "answered"
                     }],
                     withScore: true,
                     score: 0,
@@ -845,7 +850,12 @@ define([
                         type: 'correct',
                         position: 0,
                         score: 1,
-                        maxScore: 1
+                        maxScore: 1,
+                        ariaLabel: "Question 1",
+                        icon: null,
+                        numericLabel: "1",
+                        scoreType: "correct",
+                        status: "answered"
                     }],
                     withScore: true,
                     score: 1,

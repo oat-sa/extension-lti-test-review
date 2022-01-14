@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2019-2022 (original work) Open Assessment Technologies SA;
  *
  *
  */
@@ -28,6 +28,7 @@ use common_exception_Error;
 use common_exception_InconsistentData;
 use common_exception_NotFound;
 use common_exception_Unauthorized;
+use common_ext_ExtensionsManager;
 use core_kernel_users_GenerisUser;
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
@@ -58,6 +59,17 @@ class Review extends tao_actions_SinglePageModule
 {
     use OntologyAwareTrait;
     use HttpJsonResponseTrait;
+
+    public const OPTION_REVIEW_LAYOUT = 'reviewLayout';
+    public const OPTION_DISPLAY_SECTION_TITLES = 'displaySectionTitles';
+    public const LTI_REVIEW_LAYOUT = 'custom_review_layout';
+    public const LTI_DISPLAY_SECTION_TITLES = 'custom_section_titles';
+
+    // keys: exposed LTI custom_review_layout params => values: internal names
+    public const REVIEW_LAYOUTS_MAP = [
+        'default' => 'default',
+        'simple' => 'fizzy'
+    ];
 
     /** @var TaoLtiSession */
     private $ltiSession;
@@ -109,7 +121,9 @@ class Review extends tao_actions_SinglePageModule
             'execution' => $execution->getIdentifier(),
             'delivery' => $delivery->getUri(),
             'show-score' => (int) $finder->getShowScoreOption($launchData),
-            'show-correct' => (int) $finder->getShowCorrectOption($launchData)
+            'show-correct' => (int) $finder->getShowCorrectOption($launchData),
+            'display-section-titles' => (int) $this->getDisplaySectionTitlesOption($launchData),
+            'review-layout' => $this->getReviewLayoutOption($launchData)
         ];
 
         $this->composeView('delegated-view', $data, 'pages/index.tpl', 'tao');
@@ -297,5 +311,52 @@ class Review extends tao_actions_SinglePageModule
         $messageType = $this->ltiSession->getLaunchData()->getVariable(LtiLaunchData::LTI_MESSAGE_TYPE);
 
         return $messageType === LtiMessageInterface::LTI_MESSAGE_TYPE_SUBMISSION_REVIEW_REQUEST;
+    }
+
+    private function getReviewPanelConfig(): array
+    {
+        $extensionsManager = $this->getServiceLocator()->get(common_ext_ExtensionsManager::SERVICE_ID);
+        $extension = $extensionsManager->getExtensionById('ltiTestReview');
+        return $extension->getConfig('ReviewPanel');
+    }
+
+    private function getDisplaySectionTitlesOption(LtiLaunchData $launchData): bool
+    {
+        $reviewPanelConfig = $this->getReviewPanelConfig();
+        $extensionSectionTitles = $reviewPanelConfig[self::OPTION_DISPLAY_SECTION_TITLES];
+
+        $ltiParamSectionTitles = $launchData->hasVariable(self::LTI_DISPLAY_SECTION_TITLES)
+            ? $launchData->getVariable(self::LTI_DISPLAY_SECTION_TITLES)
+            : null;
+
+        // $sectionTitles priority: LTI param > extension config > true
+        $sectionTitles = true;
+        if (isset($extensionSectionTitles)) {
+            $sectionTitles = $extensionSectionTitles;
+        }
+        if (isset($ltiParamSectionTitles)) {
+            $sectionTitles = $ltiParamSectionTitles;
+        }
+        return filter_var($sectionTitles, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    private function getReviewLayoutOption(LtiLaunchData $launchData): string
+    {
+        $reviewPanelConfig = $this->getReviewPanelConfig();
+        $extensionReviewLayout = $reviewPanelConfig[self::OPTION_REVIEW_LAYOUT];
+
+        $ltiParamReviewLayout = $launchData->hasVariable(self::LTI_REVIEW_LAYOUT)
+            ? $launchData->getVariable(self::LTI_REVIEW_LAYOUT)
+            : null;
+
+        // $reviewLayout priority: LTI param > extension config > 'default'
+        $reviewLayout = 'default';
+        if (!empty($extensionReviewLayout)) {
+            $reviewLayout = $extensionReviewLayout;
+        }
+        if (!empty($ltiParamReviewLayout) && array_key_exists($ltiParamReviewLayout, self::REVIEW_LAYOUTS_MAP)) {
+            $reviewLayout = self::REVIEW_LAYOUTS_MAP[$ltiParamReviewLayout];
+        }
+        return $reviewLayout;
     }
 }

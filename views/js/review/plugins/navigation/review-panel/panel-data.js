@@ -13,15 +13,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2022 Open Assessment Technologies SA ;
  */
 /**
  * Helper that will build the dataset for the review panel in the expected format
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 define([
-    'lodash'
-], function (_) {
+    'lodash',
+    'i18n'
+], function (_, __) {
     'use strict';
 
     /**
@@ -64,6 +65,7 @@ define([
             if (item.score === item.maxScore) {
                 return 'correct';
             } else {
+                // also applies when item.score === null (skipped items)
                 return 'incorrect';
             }
         }
@@ -80,10 +82,10 @@ define([
      * @returns {mapEntry}
      */
     const extractData = (entry, withScore) => {
-        const {id, label, position, informational, skipped, score, maxScore} = entry || {};
-        const data = {id, label, position, withScore};
+        const { id, label, position, informational, skipped, unseen, score, maxScore } = entry || {};
+        const data = { id, label, position, withScore };
         if (withScore) {
-            Object.assign(data, {score, maxScore});
+            Object.assign(data, { score, maxScore });
         }
         if ('undefined' !== typeof informational) {
             data.informational = informational;
@@ -91,38 +93,108 @@ define([
         if ('undefined' !== typeof skipped) {
             data.skipped = skipped;
         }
+        if ('undefined' !== typeof unseen) {
+            data.unseen = unseen;
+        }
         return data;
+    };
+
+    /**
+     * @typedef {Object} ReviewItem
+     * @property {String} id - item id
+     * @property {Number} position - 0-based list index
+     * @property {String} label - displayed text
+     * @property {String} numericLabel - displayed number (alternative to label)
+     * @property {String} ariaLabel
+     * @property {Number} score - the item's current score
+     * @property {Number} maxScore - the item's max possible score
+     * @property {Boolean} informational
+     * @property {Boolean} skipped
+     * @property {Boolean} unseen
+     * @property {String} type - 'correct'/'incorrect'/'info'/'skipped'/'default'
+     * @property {String} status - 'answered'/'viewed'/'unseen'
+     * @property {String} scoreType - 'correct'/'incorrect'/null
+     * @property {String} icon - 'info' or null
+     */
+    /**
+     * Adds missing properties to a reviewItem, to support fizzyPanel UI
+     * @param {mapEntry} - item, will be mutated
+     * @returns {ReviewItem}
+     */
+    const extendReviewItemScope = (entry, numericLabel) => {
+        const reviewItem = Object.assign({}, entry);
+        const type = reviewItem.type;
+
+        // Add properties 'numericLabel', 'icon', 'ariaLabel', 'scoreType', 'status'
+        reviewItem.numericLabel = type === 'info' ? '' : `${numericLabel}`;
+
+        reviewItem.icon = type === 'info' ? 'info' : null;
+
+        reviewItem.ariaLabel = type === 'info' ? __('Informational item') : __('Question %s', reviewItem.numericLabel);
+
+        reviewItem.scoreType = null;
+        if (type === 'correct') {
+            reviewItem.scoreType = 'correct';
+        } else if (type === 'incorrect') {
+            reviewItem.scoreType = 'incorrect';
+        }
+
+        if (reviewItem.unseen) {
+            reviewItem.status = 'unseen';
+        }
+        else if (type !== 'info' && type !== 'skipped') {
+            reviewItem.status = 'answered';
+        } else {
+            reviewItem.status = 'viewed';
+        }
+
+        return reviewItem;
     };
 
     return {
         /**
-         * Refines the test runner data and build the expected review panel map
-         * @param {testMap} testMap
-         * @param {Boolean} withScore
-         * @returns {reviewPanelMap}
-         */
+        * Refines the test runner data and builds the expected review panel map
+        * @param {testMap} testMap
+        * @param {Boolean} [withScore=true]
+        * @returns {reviewPanelMap}
+        */
         getReviewPanelMap(testMap, withScore = true) {
-            const {parts, score, maxScore} = testMap;
+            const { parts, score, maxScore } = testMap;
             const items = new Map();
+            const sections = new Map();
+            let nonInformationalCount = 0;
 
             // rebuild the map keeping only relevant data, and sorting elements by position
             const panelMap = {
                 parts: _.map(parts, part => Object.assign(extractData(part, withScore), {
-                    sections: _.map(part.sections, section => Object.assign(extractData(section, withScore), {
-                        items: _.map(section.items, item => {
-                            const reviewItem = extractData(item, withScore);
-                            reviewItem.type = getItemType(item, withScore);
-                            items.set(item.id, reviewItem);
-                            return reviewItem;
-                        }).sort(compareByPosition)
-                    })).sort(compareByPosition)
+                    sections: _.map(part.sections, section => {
+                        const reviewSection = Object.assign(extractData(section, withScore), {
+                            // must sort items by position before treating data, so we can assign accurate numericLabels
+                            items: _.chain(section.items)
+                                .sortBy('position')
+                                .map(item => {
+                                    let reviewItem = extractData(item, withScore);
+                                    reviewItem.type = getItemType(item, withScore);
+                                    if (reviewItem.type !== 'info') {
+                                        nonInformationalCount++;
+                                    }
+                                    reviewItem = extendReviewItemScope(reviewItem, nonInformationalCount);
+                                    items.set(item.id, reviewItem);
+                                    return reviewItem;
+                                })
+                                .value()
+                        });
+                        sections.set(section.id, reviewSection);
+                        return reviewSection;
+                    }).sort(compareByPosition)
                 })).sort(compareByPosition),
                 withScore,
-                items
+                items,
+                sections
             };
 
             if (withScore) {
-                Object.assign(panelMap, {score, maxScore});
+                Object.assign(panelMap, { score, maxScore });
             }
 
             return panelMap;

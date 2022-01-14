@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2022 Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
@@ -22,12 +22,14 @@ define([
     'core/promiseTimeout',
     'taoTests/runner/plugin',
     'ltiTestReview/review/services/navigation-data',
-    'ltiTestReview/review/plugins/navigation/review-panel/panel'
+    'ltiTestReview/review/plugins/navigation/review-panel/accordionPanel',
+    'ltiTestReview/review/plugins/navigation/review-panel/fizzyPanel'
 ], function (
     promiseTimeout,
     pluginFactory,
     navigationDataServiceFactory,
-    reviewPanelFactory
+    accordionReviewPanelFactory,
+    fizzyReviewPanelFactory,
 ) {
     'use strict';
 
@@ -68,15 +70,29 @@ define([
 
         /**
          * Called during the runner's render phase
+         * @returns {Promise}
          */
         render() {
             return promiseTimeout(new Promise(resolve => {
                 const testRunner = this.getTestRunner();
                 const navigationDataService = navigationDataServiceFactory(testRunner.getTestMap());
-                const {showScore} = testRunner.getOptions();
+
+                const { showScore, showCorrect, displaySectionTitles, reviewLayout } = testRunner.getOptions();
+
+                const reviewPanelFactory = reviewLayout === 'fizzy' ? fizzyReviewPanelFactory : accordionReviewPanelFactory;
+
+                const reviewPanelConfig = Object.assign(
+                    {
+                        showScore,
+                        showCorrect,
+                        displaySectionTitles
+                    },
+                    this.getConfig()
+                );
+
                 const reviewPanel = reviewPanelFactory(
                     this.getAreaBroker().getPanelArea(),
-                    Object.assign({showScore}, this.getConfig()),
+                    reviewPanelConfig,
                     navigationDataService.getMap()
                 );
 

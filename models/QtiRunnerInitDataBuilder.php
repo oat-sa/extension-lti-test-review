@@ -14,7 +14,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2019-2022 (original work) Open Assessment Technologies SA;
  *
  */
 
@@ -33,6 +33,7 @@ use oat\taoQtiTest\models\runner\QtiRunnerServiceContext;
 use oat\taoResultServer\models\classes\ResultServerService;
 use qtism\data\AssessmentSection;
 use qtism\data\AssessmentSectionRef;
+use qtism\data\ExtendedAssessmentItemRef;
 use qtism\data\TestPart;
 use taoQtiTest_helpers_Utils;
 use taoResultServer_models_classes_OutcomeVariable;
@@ -181,7 +182,8 @@ class QtiRunnerInitDataBuilder
 
                     $responsesCount = $this->getResponseCountsFromState($state);
 
-                    $isInformational = empty($state);
+                    $isUnseen = empty($state);
+                    $isInformational = $this->isItemInformational($item);
                     $isSkipped = !$isInformational && ($responsesCount === 0);
 
                     $items[$itemId] = [
@@ -191,8 +193,9 @@ class QtiRunnerInitDataBuilder
                         'categories' => [],
                         'informational' => $isInformational,
                         'skipped' => $isSkipped,
+                        'unseen' => $isUnseen,
                         'score' => $itemsStates[$itemId]['score'] ?? null,
-                        'maxScore' => $itemsStates[$itemId]['maxScore'] ?? null
+                        'maxScore' => $itemsStates[$itemId]['maxScore'] ?? null // FIXME: unsubmitted item should still have a maxScore
                     ];
 
                     $this->fillItemsData($itemId, $item->getHref(), $itemData['data']);
@@ -227,6 +230,21 @@ class QtiRunnerInitDataBuilder
             'itemRef' => $itemRef,
             'itemData' => $itemData,
         ];
+    }
+
+    /**
+     * @param ExtendedAssessmentItemRef $itemRef
+     * @return Boolean
+     */
+    private function isItemInformational(ExtendedAssessmentItemRef $itemRef) : bool
+    {
+        $categories = $itemRef->getCategories()->getArrayCopy();
+
+        $hasInformationalCategory = in_array('x-tao-itemusage-informational', $categories, true);
+
+        $hasNoResponseDeclarations = method_exists($itemRef, 'getResponseDeclarations') && 0 == count($itemRef->getResponseDeclarations());
+
+        return $hasInformationalCategory || $hasNoResponseDeclarations;
     }
 
     /**

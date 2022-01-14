@@ -19,7 +19,12 @@
               "type": "incorrect",
               "position": 2,
               "score": 2,
-              "maxScore": 3
+              "maxScore": 3,
+              "ariaLabel": "Question 1",
+              "icon": null,
+              "numericLabel": "1",
+              "scoreType": "incorrect",
+              "status": "answered"
             },
             {
               "id": "item-5",
@@ -30,7 +35,12 @@
               "type": "incorrect",
               "position": 4,
               "score": 0,
-              "maxScore": 2
+              "maxScore": 2,
+              "ariaLabel": "Question 2",
+              "icon": null,
+              "numericLabel": "2",
+              "scoreType": "incorrect",
+              "status": "answered"
             }
           ],
           "withScore": true,
@@ -51,7 +61,12 @@
               "type": "skipped",
               "position": 8,
               "score": 0,
-              "maxScore": 0
+              "maxScore": 0,
+              "ariaLabel": "Question 3",
+              "icon": null,
+              "numericLabel": "3",
+              "scoreType": null,
+              "status": "viewed"
             }
           ],
           "withScore": true,

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: TAO 2022.01\n"
-"PO-Revision-Date: 2022-01-24T14:32:07\n"
+"Project-Id-Version: TAO 3.4.0-sprint134\n"
+"PO-Revision-Date: 2020-12-02T17:15:35\n"
 "Last-Translator: TAO Translation Team <translation@tao.lu>\n"
 "MIME-Version: 1.0\n"
 "Language: ja-JP\n"
@@ -16,14 +16,8 @@ msgstr ""
 msgid "All"
 msgstr "すべて"
 
-msgid "Available delivery executions for review does not exists"
-msgstr ""
-
 msgid "Correct response"
 msgstr "正解"
-
-msgid "Delivery id not provided"
-msgstr ""
 
 msgid "Go to the next item"
 msgstr "次へ進む"
@@ -38,22 +32,19 @@ msgid "Informational item"
 msgstr "情報ページ"
 
 msgid "Jump to:"
-msgstr ""
+msgstr "移動:"
 
 msgid "Navigation"
-msgstr ""
+msgstr "ナビゲーション"
 
 msgid "Next"
-msgstr ""
+msgstr "次へ"
 
 msgid "No response"
 msgstr "無解答"
 
 msgid "Question"
-msgstr ""
-
-msgid "Question %s"
-msgstr ""
+msgstr "問題"
 
 msgid "Show all items"
 msgstr "すべての問題を表示する"
@@ -61,24 +52,21 @@ msgstr "すべての問題を表示する"
 msgid "Show incorrect items only"
 msgstr "間違いの問題だけ表示する"
 
-msgid "Test review"
-msgstr ""
-
 msgid "TEST SCORE:"
 msgstr "スコア"
 
-msgid "Total"
-msgstr "トータル"
-
 msgid "TOTAL"
 msgstr "トータル"
-
-msgid "Total score:"
-msgstr ""
 
 msgid "Your response"
 msgstr "解答内容"
 
 msgid "Your Score:"
 msgstr "このページのスコア"
+
+msgid "Test review"
+msgstr "テストレビュー"
+
+msgid "Question %s"
+msgstr "問題 %s"
 

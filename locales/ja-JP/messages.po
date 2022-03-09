@@ -17,13 +17,13 @@ msgid "All"
 msgstr "すべて"
 
 msgid "Available delivery executions for review does not exists"
-msgstr ""
+msgstr "テストレビューで表示できる結果がありません"
 
 msgid "Correct response"
 msgstr "正解"
 
 msgid "Delivery id not provided"
-msgstr ""
+msgstr "デリバリーIDが指定されていません"
 
 msgid "Go to the next item"
 msgstr "次へ進む"
@@ -68,13 +68,13 @@ msgid "TEST SCORE:"
 msgstr "スコア"
 
 msgid "Total"
-msgstr ""
+msgstr "合計"
 
 msgid "TOTAL"
 msgstr "トータル"
 
 msgid "Total score:"
-msgstr ""
+msgstr "合計スコア:"
 
 msgid "Your response"
 msgstr "解答内容"

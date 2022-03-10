@@ -22,10 +22,8 @@ define([
     'ltiTestReview/review/plugins/navigation/review-panel/fizzyPanel',
     'json!ltiTestReview/test/review/plugins/navigation/review-panel/fixtures/map-correct.json',
     'json!ltiTestReview/test/review/plugins/navigation/review-panel/fixtures/map-incorrect.json',
-    'json!ltiTestReview/test/review/plugins/navigation/review-panel/fixtures/map-incorrect-filtered.json',
     'json!ltiTestReview/test/review/plugins/navigation/review-panel/fixtures/review-data-correct.json',
-    'json!ltiTestReview/test/review/plugins/navigation/review-panel/fixtures/review-data-incorrect.json',
-    'json!ltiTestReview/test/review/plugins/navigation/review-panel/fixtures/review-data-incorrect-filtered.json'
+    'json!ltiTestReview/test/review/plugins/navigation/review-panel/fixtures/review-data-incorrect.json'
 ], function (
     $,
     _,
@@ -33,10 +31,8 @@ define([
     reviewPanelFactory,
     testMapCorrect,
     testMapIncorrect,
-    testMapIncorrectFiltered,
     reviewDataCorrect,
-    reviewDataIncorrect,
-    reviewDataIncorrectFiltered
+    reviewDataIncorrect
 ) {
     'use strict';
 
@@ -54,7 +50,6 @@ define([
     };
     const defaultShowScore = false;
     const defaultShowCorrect = false;
-    const defaultDisplaySectionTitles = true;
 
     function getInstance(fixture, config = {}) {
         return reviewPanelFactory(fixture, config)
@@ -150,9 +145,10 @@ define([
             showCorrect: defaultShowCorrect
         }
     }, {
-        title: 'enabled showCorrect',
+        title: 'enabled showCorrect + displayItemTooltip',
         config: {
             showCorrect: true,
+            displayItemTooltip: true,
             reviewLayout
         },
         expected: {
@@ -161,12 +157,14 @@ define([
             headerLabel: false,
             footerLabel: false,
             showScore: defaultShowScore,
-            showCorrect: true
+            showCorrect: true,
+            displayItemTooltip: true
         }
     }, {
-        title: 'disabled displaySectionTitles',
+        title: 'disabled displaySectionTitles + displayItemTooltip',
         config: {
             displaySectionTitles: false,
+            displayItemTooltip: false,
             reviewLayout
         },
         expected: {
@@ -176,7 +174,8 @@ define([
             footerLabel: false,
             showScore: defaultShowScore,
             showCorrect: defaultShowCorrect,
-            displaySectionTitles: false
+            displaySectionTitles: false,
+            displayItemTooltip: false
         }
     }, {
         title: 'disabled only header',
@@ -273,6 +272,7 @@ define([
             showScore: true,
             showCorrect: true,
             displaySectionTitles: true,
+            displayItemTooltip: true,
             headerLabel: 'HEADER',
             footerLabel: 'FOOTER'
         },
@@ -286,6 +286,7 @@ define([
             footerScore: '12/15',
             countSections: 3,
             countItems: 9,
+            firstItemTooltip: 'Example_0_Introduction',
             items: [
                 {status: 'viewed'},
                 {status: 'correct'},
@@ -301,7 +302,8 @@ define([
     }, {
         title: 'scores disabled',
         config: {
-            displaySectionTitles: true
+            displaySectionTitles: true,
+            displayItemTooltip: false,
         },
         testMap: testMapIncorrect,
         expected: {
@@ -313,6 +315,7 @@ define([
             footerScore: '',
             countSections: 3,
             countItems: 9,
+            firstItemTooltip: void 0,
             items: [
                 {status: 'viewed'},
                 {status: 'answered'},
@@ -329,7 +332,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-render-data');
 
-        assert.expect(27);
+        assert.expect(28);
         assert.equal($container.children().length, 0, 'The container is empty');
 
         const instance = reviewPanelFactory($container, data.config, data.testMap)
@@ -368,6 +371,11 @@ define([
                         `The item #${index} got the expected class: ${item.status}`
                     );
                 });
+
+                assert.equal(
+                    $container.find('.buttonlist-btn').first().attr('title'),
+                    data.expected.firstItemTooltip,
+                    `The item tooltip depends on displayItemTooltip=${data.config.displayItemTooltip}`);
 
                 instance.destroy();
             })
@@ -778,7 +786,8 @@ define([
         const config = {
             showScore: true,
             showCorrect: true,
-            displaySectionTitles: true
+            displaySectionTitles: true,
+            displayItemTooltip: true
         };
         const data = {
             correct: testMapCorrect,

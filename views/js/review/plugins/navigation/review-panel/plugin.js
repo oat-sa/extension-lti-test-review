@@ -77,15 +77,18 @@ define([
                 const testRunner = this.getTestRunner();
                 const navigationDataService = navigationDataServiceFactory(testRunner.getTestMap());
 
-                const { showScore, showCorrect, displaySectionTitles, reviewLayout } = testRunner.getOptions();
+                const { showScore, showCorrect, displaySectionTitles, reviewLayout, displayItemTooltip } =
+                    testRunner.getOptions();
 
-                const reviewPanelFactory = reviewLayout === 'fizzy' ? fizzyReviewPanelFactory : accordionReviewPanelFactory;
+                const reviewPanelFactory =
+                    reviewLayout === 'fizzy' ? fizzyReviewPanelFactory : accordionReviewPanelFactory;
 
                 const reviewPanelConfig = Object.assign(
                     {
                         showScore,
                         showCorrect,
-                        displaySectionTitles
+                        displaySectionTitles,
+                        displayItemTooltip
                     },
                     this.getConfig()
                 );

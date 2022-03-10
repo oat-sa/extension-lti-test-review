@@ -59,6 +59,7 @@ The following custom parameters control the mode:
 | `custom_show_correct=1` | Show the correct responses when the student has failed. **Note:** This option discloses all the correct responses, for the whole test. |
 | `custom_review_layout=simple` | Switch the review panel layout from `default` to `simple` variant. |
 | `custom_section_titles=0` | Hide section titles in the `simple` review panel layout. |
+| `custom_item_tooltip=1` | Show tooltip with item label in the `simple` review panel layout. |
 
 When you use the [IMS emulator](http://ltiapps.net/test/tc.php) you must remove the prefix `custom_`.
 
@@ -75,13 +76,14 @@ return new oat\ltiTestReview\models\DeliveryExecutionFinderService([
 
 **Note:** This will set the default value of these options for the whole platform. If you enable them by default, you can still disable them using LTI custom parameters.
 
-The default values for `custom_review_layout` and `custom_section_titles` are read from `config/ltiTestReview/ReviewPanel.conf.php`:
+The default values for `custom_review_layout` and `custom_section_titles` and `custom_item_tooltip` are read from `config/ltiTestReview/ReviewPanel.conf.php`:
 
 ```php
 return new oat\oatbox\config\ConfigurationService(array(
     'config' => array(
         'reviewLayout' => 'default',
-        'displaySectionTitles' => true
+        'displaySectionTitles' => true,
+        'displayItemTooltip' => false
     )
 ));
 ```

@@ -1,0 +1,84 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TAO 2021.11\n"
+"PO-Revision-Date: 2022-02-18T13:40:10\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: ja-JP\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: ja-JP\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+
+msgid "All"
+msgstr "すべて"
+
+msgid "Available delivery executions for review does not exists"
+msgstr "テストレビューで表示できる結果がありません"
+
+msgid "Correct response"
+msgstr "正解"
+
+msgid "Delivery id not provided"
+msgstr "デリバリーIDが指定されていません"
+
+msgid "Go to the next item"
+msgstr "次へ進む"
+
+msgid "Go to the previous item"
+msgstr "前へ戻る"
+
+msgid "Incorrect"
+msgstr "間違い"
+
+msgid "Informational item"
+msgstr "情報ページ"
+
+msgid "Jump to:"
+msgstr "移動:"
+
+msgid "Navigation"
+msgstr "ナビゲーション"
+
+msgid "Next"
+msgstr "次へ"
+
+msgid "No response"
+msgstr "無解答"
+
+msgid "Question"
+msgstr "問題"
+
+msgid "Question %s"
+msgstr "問題 %s"
+
+msgid "Show all items"
+msgstr "すべての問題を表示する"
+
+msgid "Show incorrect items only"
+msgstr "間違いの問題だけ表示する"
+
+msgid "Test review"
+msgstr "テストレビュー"
+
+msgid "TEST SCORE:"
+msgstr "スコア"
+
+msgid "Total"
+msgstr "合計"
+
+msgid "TOTAL"
+msgstr "トータル"
+
+msgid "Total score:"
+msgstr "合計スコア:"
+
+msgid "Your response"
+msgstr "解答内容"
+
+msgid "Your Score:"
+msgstr "このページのスコア"
+

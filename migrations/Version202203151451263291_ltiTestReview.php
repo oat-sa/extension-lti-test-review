@@ -18,7 +18,7 @@ final class Version202203151451263291_ltiTestReview extends AbstractMigration
 
     public function getDescription(): string
     {
-        return 'Enable item tooltip for ReviewPanel';
+        return 'Set default for item tooltip property for ReviewPanel';
     }
 
     public function up(Schema $schema): void

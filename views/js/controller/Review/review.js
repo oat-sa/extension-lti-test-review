@@ -45,7 +45,7 @@ define([
         start() {
 
             const $container = $('.container');
-            const { execution, delivery, showScore, showCorrect, displaySectionTitles, reviewLayout } = $container.data();
+            const { execution, delivery, showScore, showCorrect, displaySectionTitles, displayItemTooltip, reviewLayout } = $container.data();
 
             reviewFactory($(".content-wrap", document), {
                 testUri: {
@@ -55,6 +55,7 @@ define([
                 showScore: !!showScore,
                 showCorrect: !!showCorrect,
                 displaySectionTitles: !!displaySectionTitles,
+                displayItemTooltip: !!displayItemTooltip,
                 reviewLayout,
                 readOnly: true,
                 plugins: [{

@@ -118,10 +118,12 @@ define([
      */
     /**
      * Adds missing properties to a reviewItem, to support fizzyPanel UI
-     * @param {mapEntry} - item, will be mutated
+     * @param {mapEntry} entry - item, will be mutated
+     * @param {String} numericLabel
+     * @param {Boolean} displayItemTooltip
      * @returns {ReviewItem}
      */
-    const extendReviewItemScope = (entry, numericLabel) => {
+    const extendReviewItemScope = (entry, numericLabel, displayItemTooltip) => {
         const reviewItem = Object.assign({}, entry);
         const type = reviewItem.type;
 
@@ -148,6 +150,10 @@ define([
             reviewItem.status = 'viewed';
         }
 
+        if (displayItemTooltip) {
+            reviewItem.title = reviewItem.label;
+        }
+
         return reviewItem;
     };
 
@@ -155,10 +161,11 @@ define([
         /**
         * Refines the test runner data and builds the expected review panel map
         * @param {testMap} testMap
-        * @param {Boolean} [withScore=true]
+        * @param {Boolean} withScore
+        * @param {Boolean} displayItemTooltip
         * @returns {reviewPanelMap}
         */
-        getReviewPanelMap(testMap, withScore = true) {
+        getReviewPanelMap(testMap, withScore, displayItemTooltip) {
             const { parts, score, maxScore } = testMap;
             const items = new Map();
             const sections = new Map();
@@ -178,7 +185,7 @@ define([
                                     if (reviewItem.type !== 'info') {
                                         nonInformationalCount++;
                                     }
-                                    reviewItem = extendReviewItemScope(reviewItem, nonInformationalCount);
+                                    reviewItem = extendReviewItemScope(reviewItem, nonInformationalCount, displayItemTooltip);
                                     items.set(item.id, reviewItem);
                                     return reviewItem;
                                 })

@@ -62,8 +62,10 @@ class Review extends tao_actions_SinglePageModule
 
     public const OPTION_REVIEW_LAYOUT = 'reviewLayout';
     public const OPTION_DISPLAY_SECTION_TITLES = 'displaySectionTitles';
+    public const OPTION_DISPLAY_ITEM_TOOLTIP = 'displayItemTooltip';
     public const LTI_REVIEW_LAYOUT = 'custom_review_layout';
     public const LTI_DISPLAY_SECTION_TITLES = 'custom_section_titles';
+    public const LTI_DISPLAY_ITEM_TOOLTIP = 'custom_item_tooltip';
 
     // keys: exposed LTI custom_review_layout params => values: internal names
     public const REVIEW_LAYOUTS_MAP = [
@@ -123,6 +125,7 @@ class Review extends tao_actions_SinglePageModule
             'show-score' => (int) $finder->getShowScoreOption($launchData),
             'show-correct' => (int) $finder->getShowCorrectOption($launchData),
             'display-section-titles' => (int) $this->getDisplaySectionTitlesOption($launchData),
+            'display-item-tooltip' => (int) $this->getDisplayItemTooltipOption($launchData),
             'review-layout' => $this->getReviewLayoutOption($launchData)
         ];
 
@@ -322,22 +325,32 @@ class Review extends tao_actions_SinglePageModule
 
     private function getDisplaySectionTitlesOption(LtiLaunchData $launchData): bool
     {
-        $reviewPanelConfig = $this->getReviewPanelConfig();
-        $extensionSectionTitles = $reviewPanelConfig[self::OPTION_DISPLAY_SECTION_TITLES];
+        return $this->getBooleanOption($launchData, self::OPTION_DISPLAY_SECTION_TITLES, self::LTI_DISPLAY_SECTION_TITLES, true);
+    }
 
-        $ltiParamSectionTitles = $launchData->hasVariable(self::LTI_DISPLAY_SECTION_TITLES)
-            ? $launchData->getVariable(self::LTI_DISPLAY_SECTION_TITLES)
+    private function getDisplayItemTooltipOption(LtiLaunchData $launchData): bool
+    {
+        return $this->getBooleanOption($launchData, self::OPTION_DISPLAY_ITEM_TOOLTIP, self::LTI_DISPLAY_ITEM_TOOLTIP, false);
+    }
+
+    private function getBooleanOption(LtiLaunchData $launchData, string $configOptionName, string $ltiParamName, bool $defaultValue): bool
+    {
+        $reviewPanelConfig = $this->getReviewPanelConfig();
+        $extensionValue = $reviewPanelConfig[$configOptionName];
+
+        $ltiParamValue = $launchData->hasVariable($ltiParamName)
+            ? $launchData->getVariable($ltiParamName)
             : null;
 
-        // $sectionTitles priority: LTI param > extension config > true
-        $sectionTitles = true;
-        if (isset($extensionSectionTitles)) {
-            $sectionTitles = $extensionSectionTitles;
+        //priority: LTI param > extension config > default
+        $optionValue = $defaultValue;
+        if (isset($extensionValue)) {
+            $optionValue = $extensionValue;
         }
-        if (isset($ltiParamSectionTitles)) {
-            $sectionTitles = $ltiParamSectionTitles;
+        if (isset($ltiParamValue)) {
+            $optionValue = $ltiParamValue;
         }
-        return filter_var($sectionTitles, FILTER_VALIDATE_BOOLEAN);
+        return filter_var($optionValue, FILTER_VALIDATE_BOOLEAN);
     }
 
     private function getReviewLayoutOption(LtiLaunchData $launchData): string

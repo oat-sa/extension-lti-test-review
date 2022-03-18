@@ -39,10 +39,11 @@ define([
             showScore = false,
             showCorrect = false,
             displaySectionTitles = true,
+            displayItemTooltip = false,
             reviewLayout = 'default',
             pluginsOptions = {}
         } = config;
-        return {fullPage, readOnly, showScore, showCorrect, displaySectionTitles, reviewLayout, plugins: pluginsOptions};
+        return {fullPage, readOnly, showScore, showCorrect, displaySectionTitles, displayItemTooltip, reviewLayout, plugins: pluginsOptions};
     };
 
     /**
@@ -56,12 +57,12 @@ define([
      * @param {Boolean} [config.showScore] - Allow to show the score.
      * @param {Boolean} [config.showCorrect] - Allow to show the correct responses.
      * @param {Boolean} [config.displaySectionTitles] - Allow to hide the section titles
+     * @param {Boolean} [config.displayItemTooltip] - Allow to show item tooltip in the review panel
      * @param {String} [config.reviewLayout] - Name of the panel layout to render
      * @param {Function} [template] - An optional template for the component
      * @returns {review}
      */
     return function qtiTestReviewFactory(container, config = {}, template = null) {
-
         const testRunnerConfig = {
             testDefinition: config.testDefinition || 'test-container',
             serviceCallId: config.testUri && config.testUri.resultId || 'review',

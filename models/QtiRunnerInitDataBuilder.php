@@ -23,6 +23,7 @@ namespace oat\ltiTestReview\models;
 use common_Exception;
 use common_exception_Error;
 use oat\generis\model\OntologyAwareTrait;
+use oat\ltiTestReview\models\Exception\DataItemNotValidException;
 use oat\ltiTestReview\models\Exception\MissingOutcomeDeclarationMaxScore;
 use oat\taoDeliveryRdf\model\DeliveryContainerService;
 use oat\taoOutcomeUi\helper\ResponseVariableFormatter;
@@ -44,7 +45,7 @@ class QtiRunnerInitDataBuilder
 {
     protected const OUTCOME_VAR_SCORE = 'SCORE';
     protected const OUTCOME_VAR_MAXSCORE = 'MAXSCORE';
-    private const OUTCOME_DECLARSTION_IDENTIFIER = 'identifier';
+    private const OUTCOME_DECLARATION_IDENTIFIER = 'identifier';
     private const OUTCOME_DECLARATION_MAXSCORE = 'MAXSCORE';
     private const OUTCOME_DECLARATION_DEFAULT_VALUE = 'defaultValue';
 
@@ -160,7 +161,7 @@ class QtiRunnerInitDataBuilder
 
     /**
      * @throws MissingOutcomeDeclarationMaxScore
-     * @throws common_Exception
+     * @throws common_Exception|DataItemNotValidException
      */
     protected function getTestMap(QtiRunnerServiceContext $context, array $itemsStates): array
     {
@@ -194,6 +195,8 @@ class QtiRunnerInitDataBuilder
                     $isInformational = $this->isItemInformational($item);
                     $isSkipped = !$isInformational && ($responsesCount === 0);
 
+                    $this->validateItemData($itemData);
+
                     $items[$itemId] = [
                         'id' => $itemId,
                         'label' => $itemData['data']['attributes']['label'],
@@ -203,7 +206,7 @@ class QtiRunnerInitDataBuilder
                         'skipped' => $isSkipped,
                         'unseen' => $isUnseen,
                         'score' => $itemsStates[$itemId]['score'] ?? null,
-                        'maxScore' => $itemsStates[$itemId]['maxScore'] ?? (float) $this->getMaxScore($itemData['data']['outcomes'])
+                        'maxScore' => $itemsStates[$itemId]['maxScore'] ?? $this->getMaxScore($itemData['data']['outcomes'])
                     ];
 
                     $this->fillItemsData($itemId, $item->getHref(), $itemData['data']);
@@ -315,14 +318,24 @@ class QtiRunnerInitDataBuilder
     /**
      * @throws MissingOutcomeDeclarationMaxScore
      */
-    private function getMaxScore($outcomes): ?float
+    private function getMaxScore($outcomes): float
     {
         foreach ($outcomes as $outcome) {
-            if ($outcome[self::OUTCOME_DECLARSTION_IDENTIFIER] === self::OUTCOME_DECLARATION_MAXSCORE) {
+            if ($outcome[self::OUTCOME_DECLARATION_IDENTIFIER] === self::OUTCOME_DECLARATION_MAXSCORE) {
                 return (float) $outcome[self::OUTCOME_DECLARATION_DEFAULT_VALUE];
             }
         }
 
         throw new MissingOutcomeDeclarationMaxScore();
+    }
+
+    /**
+     * @throws DataItemNotValidException
+     */
+    private function validateItemData($itemData)
+    {
+        if (!isset($itemData['data'], $itemData['data']['attributes'], $itemData['data']['outcomes'])) {
+            throw new DataItemNotValidException();
+        }
     }
 }

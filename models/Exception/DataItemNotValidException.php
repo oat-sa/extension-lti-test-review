@@ -22,10 +22,8 @@ declare(strict_types=1);
 
 namespace oat\ltiTestReview\models\Exception;
 
-class DataItemNotValidException extends \Exception
+use DomainException;
+
+class DataItemNotValidException extends DomainException
 {
-    public function __construct()
-    {
-        parent::__construct('DataItem array is missing required elements');
-    }
 }

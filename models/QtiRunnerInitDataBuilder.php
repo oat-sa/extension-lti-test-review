@@ -332,7 +332,7 @@ class QtiRunnerInitDataBuilder
     /**
      * @throws DataItemNotValidException
      */
-    private function validateItemData($itemData)
+    private function validateItemData($itemData): void
     {
         if (!isset($itemData['data'], $itemData['data']['attributes'], $itemData['data']['outcomes'])) {
             throw new DataItemNotValidException();

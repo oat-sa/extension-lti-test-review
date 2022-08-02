@@ -317,11 +317,9 @@ class QtiRunnerInitDataBuilder
 
     private function getMaxScore(array $data): ?float
     {
-        if (isset($data['outcomes'])) {
-            foreach ($data['outcomes'] as $outcome) {
-                if ($outcome[self::OUTCOME_DECLARATION_IDENTIFIER] === self::OUTCOME_DECLARATION_MAXSCORE) {
-                    return (float) $outcome[self::OUTCOME_DECLARATION_DEFAULT_VALUE];
-                }
+        foreach ($data['outcomes'] ?? [] as $outcome) {
+            if ($outcome[self::OUTCOME_DECLARATION_IDENTIFIER] === self::OUTCOME_DECLARATION_MAXSCORE) {
+                return (float)$outcome[self::OUTCOME_DECLARATION_DEFAULT_VALUE];
             }
         }
 

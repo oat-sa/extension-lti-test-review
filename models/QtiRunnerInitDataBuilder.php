@@ -205,8 +205,15 @@ class QtiRunnerInitDataBuilder
                         'informational' => $isInformational,
                         'skipped' => $isSkipped,
                         'unseen' => $isUnseen,
-                        'score' => $itemsStates[$itemId]['score'] ?? null,
-                        'maxScore' => $itemsStates[$itemId]['maxScore'] ?? $this->getMaxScore($itemData['data'])
+                        'score' => $itemsStates[$itemId]['score'] ?? $this->getOutcomeDeclarationDefaultVariable(
+                                $itemData['data'],
+                                self::OUTCOME_VAR_SCORE
+                            ),
+                        'maxScore' => $itemsStates[$itemId]['maxScore'] ??
+                            $this->getOutcomeDeclarationDefaultVariable(
+                                $itemData['data'],
+                                self::OUTCOME_DECLARATION_MAXSCORE
+                            )
                     ];
 
                     $this->fillItemsData($itemId, $item->getHref(), $itemData['data']);
@@ -315,10 +322,10 @@ class QtiRunnerInitDataBuilder
         return $responsesCount;
     }
 
-    private function getMaxScore(array $data): ?float
+    private function getOutcomeDeclarationDefaultVariable(array $data, $outcomeDeclaration): ?float
     {
         foreach ($data['outcomes'] ?? [] as $outcome) {
-            if ($outcome[self::OUTCOME_DECLARATION_IDENTIFIER] === self::OUTCOME_DECLARATION_MAXSCORE) {
+            if ($outcome[self::OUTCOME_DECLARATION_IDENTIFIER] === $outcomeDeclaration) {
                 return (float)$outcome[self::OUTCOME_DECLARATION_DEFAULT_VALUE];
             }
         }

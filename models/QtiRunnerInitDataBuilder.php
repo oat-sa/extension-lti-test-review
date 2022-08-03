@@ -24,7 +24,6 @@ use common_Exception;
 use common_exception_Error;
 use oat\generis\model\OntologyAwareTrait;
 use oat\ltiTestReview\models\Exception\InvalidDataItemException;
-use oat\ltiTestReview\models\Exception\MissingOutcomeDeclarationMaxScore;
 use oat\taoDeliveryRdf\model\DeliveryContainerService;
 use oat\taoOutcomeUi\helper\ResponseVariableFormatter;
 use oat\taoOutcomeUi\model\ResultsService;

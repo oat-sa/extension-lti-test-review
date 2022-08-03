@@ -334,7 +334,7 @@ class QtiRunnerInitDataBuilder
     /**
      * @throws InvalidDataItemException
      */
-    private function validateItemData($itemData): void
+    private function validateItemData(array $itemData): void
     {
         if (!isset($itemData['data']['attributes'])) {
             throw new InvalidDataItemException('DataItem array is missing required elements');

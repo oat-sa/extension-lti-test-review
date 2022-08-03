@@ -320,7 +320,7 @@ class QtiRunnerInitDataBuilder
         return $responsesCount;
     }
 
-    private function getOutcomeDeclarationDefaultVariable(array $data, $outcomeDeclaration): ?float
+    private function getOutcomeDeclarationDefaultVariable(array $data, string $outcomeDeclaration): ?float
     {
         foreach ($data['outcomes'] ?? [] as $outcome) {
             if ($outcome[self::OUTCOME_DECLARATION_IDENTIFIER] === $outcomeDeclaration) {

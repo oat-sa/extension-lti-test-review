@@ -24,6 +24,6 @@ namespace oat\ltiTestReview\models\Exception;
 
 use DomainException;
 
-class DataItemNotValidException extends DomainException
+class InvalidDataItemException extends DomainException
 {
 }

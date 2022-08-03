@@ -23,7 +23,7 @@ namespace oat\ltiTestReview\models;
 use common_Exception;
 use common_exception_Error;
 use oat\generis\model\OntologyAwareTrait;
-use oat\ltiTestReview\models\Exception\DataItemNotValidException;
+use oat\ltiTestReview\models\Exception\InvalidDataItemException;
 use oat\ltiTestReview\models\Exception\MissingOutcomeDeclarationMaxScore;
 use oat\taoDeliveryRdf\model\DeliveryContainerService;
 use oat\taoOutcomeUi\helper\ResponseVariableFormatter;
@@ -46,7 +46,6 @@ class QtiRunnerInitDataBuilder
     protected const OUTCOME_VAR_SCORE = 'SCORE';
     protected const OUTCOME_VAR_MAXSCORE = 'MAXSCORE';
     private const OUTCOME_DECLARATION_IDENTIFIER = 'identifier';
-    private const OUTCOME_DECLARATION_MAXSCORE = 'MAXSCORE';
     private const OUTCOME_DECLARATION_DEFAULT_VALUE = 'defaultValue';
 
     use OntologyAwareTrait;
@@ -160,8 +159,7 @@ class QtiRunnerInitDataBuilder
     }
 
     /**
-     * @throws MissingOutcomeDeclarationMaxScore
-     * @throws common_Exception|DataItemNotValidException
+     * @throws common_Exception|InvalidDataItemException
      */
     protected function getTestMap(QtiRunnerServiceContext $context, array $itemsStates): array
     {
@@ -212,7 +210,7 @@ class QtiRunnerInitDataBuilder
                         'maxScore' => $itemsStates[$itemId]['maxScore'] ??
                             $this->getOutcomeDeclarationDefaultVariable(
                                 $itemData['data'],
-                                self::OUTCOME_DECLARATION_MAXSCORE
+                                self::OUTCOME_VAR_MAXSCORE
                             )
                     ];
 
@@ -334,12 +332,12 @@ class QtiRunnerInitDataBuilder
     }
 
     /**
-     * @throws DataItemNotValidException
+     * @throws InvalidDataItemException
      */
     private function validateItemData($itemData): void
     {
         if (!isset($itemData['data']['attributes'])) {
-            throw new DataItemNotValidException('DataItem array is missing required elements');
+            throw new InvalidDataItemException('DataItem array is missing required elements');
         }
     }
 }

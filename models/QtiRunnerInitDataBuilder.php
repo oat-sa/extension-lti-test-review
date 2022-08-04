@@ -23,6 +23,7 @@ namespace oat\ltiTestReview\models;
 use common_Exception;
 use common_exception_Error;
 use oat\generis\model\OntologyAwareTrait;
+use oat\ltiTestReview\models\Exception\InvalidDataItemException;
 use oat\taoDeliveryRdf\model\DeliveryContainerService;
 use oat\taoOutcomeUi\helper\ResponseVariableFormatter;
 use oat\taoOutcomeUi\model\ResultsService;
@@ -43,6 +44,8 @@ class QtiRunnerInitDataBuilder
 {
     protected const OUTCOME_VAR_SCORE = 'SCORE';
     protected const OUTCOME_VAR_MAXSCORE = 'MAXSCORE';
+    private const OUTCOME_DECLARATION_IDENTIFIER = 'identifier';
+    private const OUTCOME_DECLARATION_DEFAULT_VALUE = 'defaultValue';
 
     use OntologyAwareTrait;
 
@@ -154,7 +157,10 @@ class QtiRunnerInitDataBuilder
         return $returnValue;
     }
 
-    protected function getTestMap(QtiRunnerServiceContext $context, array $itemsStates)
+    /**
+     * @throws common_Exception|InvalidDataItemException
+     */
+    protected function getTestMap(QtiRunnerServiceContext $context, array $itemsStates): array
     {
         $testDefinition = taoQtiTest_helpers_Utils::getTestDefinition($context->getTestCompilationUri());
 
@@ -186,6 +192,8 @@ class QtiRunnerInitDataBuilder
                     $isInformational = $this->isItemInformational($item);
                     $isSkipped = !$isInformational && ($responsesCount === 0);
 
+                    $this->validateItemData($itemData);
+
                     $items[$itemId] = [
                         'id' => $itemId,
                         'label' => $itemData['data']['attributes']['label'],
@@ -194,8 +202,15 @@ class QtiRunnerInitDataBuilder
                         'informational' => $isInformational,
                         'skipped' => $isSkipped,
                         'unseen' => $isUnseen,
-                        'score' => $itemsStates[$itemId]['score'] ?? null,
-                        'maxScore' => $itemsStates[$itemId]['maxScore'] ?? null // FIXME: unsubmitted item should still have a maxScore
+                        'score' => $itemsStates[$itemId]['score'] ?? $this->getOutcomeDeclarationDefaultVariable(
+                                $itemData['data'],
+                                self::OUTCOME_VAR_SCORE
+                            ),
+                        'maxScore' => $itemsStates[$itemId]['maxScore'] ??
+                            $this->getOutcomeDeclarationDefaultVariable(
+                                $itemData['data'],
+                                self::OUTCOME_VAR_MAXSCORE
+                            )
                     ];
 
                     $this->fillItemsData($itemId, $item->getHref(), $itemData['data']);
@@ -302,5 +317,26 @@ class QtiRunnerInitDataBuilder
         }
 
         return $responsesCount;
+    }
+
+    private function getOutcomeDeclarationDefaultVariable(array $data, string $outcomeDeclaration): ?float
+    {
+        foreach ($data['outcomes'] ?? [] as $outcome) {
+            if ($outcome[self::OUTCOME_DECLARATION_IDENTIFIER] === $outcomeDeclaration) {
+                return (float)$outcome[self::OUTCOME_DECLARATION_DEFAULT_VALUE];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws InvalidDataItemException
+     */
+    private function validateItemData(array $itemData): void
+    {
+        if (!isset($itemData['data']['attributes'])) {
+            throw new InvalidDataItemException('DataItem array is missing required elements');
+        }
     }
 }

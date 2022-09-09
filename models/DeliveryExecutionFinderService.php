@@ -21,7 +21,7 @@ namespace oat\ltiTestReview\models;
 
 use common_exception_Error;
 use common_exception_NotFound;
-use core_kernel_classes_Resource;
+use core_kernel_classes_Resource as Resource;
 use oat\ltiDeliveryProvider\model\execution\LtiDeliveryExecutionService;
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
 use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
@@ -31,7 +31,6 @@ use oat\taoDelivery\model\execution\DeliveryExecutionService;
 use oat\taoDelivery\model\execution\ServiceProxy as ExecutionServiceProxy;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiLaunchData;
-use oat\taoLti\models\classes\LtiService;
 use oat\taoLti\models\classes\LtiVariableMissingException;
 use tao_helpers_Date;
 
@@ -61,7 +60,7 @@ class DeliveryExecutionFinderService extends ConfigurableService
         $launchDataService = $this->getLaunchDataService();
         $ltiResultIdStorage = $this->getLtiResultIdStorage();
 
-        /** @var core_kernel_classes_Resource $execution */
+        /** @var Resource $execution */
         $execution = $launchDataService->findDeliveryExecutionFromLaunchData($launchData);
 
         if ($execution && $execution->exists()) {
@@ -88,9 +87,9 @@ class DeliveryExecutionFinderService extends ConfigurableService
     public function findLastExecutionByUserAndDelivery(
         string $userId,
         string $deliveryId,
-        ?core_kernel_classes_Resource $resourceLinkId = null
+        ?Resource $resourceLinkId = null
     ): ?DeliveryExecution {
-        $deliveryResource = new core_kernel_classes_Resource($deliveryId);
+        $deliveryResource = new Resource($deliveryId);
         if ($resourceLinkId === null) {
             $userDeliveryExecutions = $this->getExecutionServiceProxy()->getUserExecutions($deliveryResource, $userId);
         } else {

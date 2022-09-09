@@ -157,11 +157,20 @@ class DeliveryExecutionFinderServiceTest extends TestCase
         $deliveryId = 'http://backoffice.docker.localhost/ontologies/tao.rdf#i617822471ea2d126631ac77e4b86e48';
         $resourceLinkId = $this->createMock(core_kernel_classes_Resource::class);
 
-        $implementation = $this->createMock(DeliveryExecutionInterface::class);
+
+        $implementationA = $this->createMock(DeliveryExecutionInterface::class);
+        $implementationA->expects(self::once())->method('getStartTime')->willReturn('0');
+        $deliveryExecutionA = new DeliveryExecution($implementationA);
+
+        $implementationB = $this->createMock(DeliveryExecutionInterface::class);
+        $implementationB->expects(self::once())->method('getStartTime')->willReturn('1');
+        $deliveryExecutionB = new DeliveryExecution($implementationB);
+
+
         $this->ltiDeliveryExecutionServiceMock
             ->expects(self::once())
             ->method('getLinkedDeliveryExecutions')
-            ->willReturn([new DeliveryExecution($implementation)]);
+            ->willReturn([$deliveryExecutionB, $deliveryExecutionA]);
 
         $this->executionServiceProxy
             ->expects(self::never())
@@ -171,6 +180,37 @@ class DeliveryExecutionFinderServiceTest extends TestCase
 
         self::assertNotNull($deliveryExecution);
         $this->assertInstanceOf(DeliveryExecution::class, $deliveryExecution);
+        $this->assertSame($deliveryExecutionB, $deliveryExecution);
+    }
+
+
+    public function testFindDeliveryExecutionByUserAndDeliveryWithoutResourceLinkId(): void
+    {
+        $userId = 'test_user_id';
+        $deliveryId = 'http://backoffice.docker.localhost/ontologies/tao.rdf#i617822471ea2d126631ac77e4b86e48';
+
+        $implementationA = $this->createMock(DeliveryExecutionInterface::class);
+        $implementationA->expects(self::once())->method('getStartTime')->willReturn('0');
+        $deliveryExecutionA = new DeliveryExecution($implementationA);
+
+        $implementationB = $this->createMock(DeliveryExecutionInterface::class);
+        $implementationB->expects(self::once())->method('getStartTime')->willReturn('1');
+        $deliveryExecutionB = new DeliveryExecution($implementationB);
+
+        $this->ltiDeliveryExecutionServiceMock
+            ->expects(self::never())
+            ->method('getLinkedDeliveryExecutions');
+
+        $this->executionServiceProxy
+            ->expects(self::once())
+            ->method('getUserExecutions')
+            ->willReturn([$deliveryExecutionB, $deliveryExecutionA]);
+
+        $deliveryExecution = $this->subject->findLastExecutionByUserAndDelivery($userId, $deliveryId);
+
+        self::assertNotNull($deliveryExecution);
+        $this->assertInstanceOf(DeliveryExecution::class, $deliveryExecution);
+        $this->assertSame($deliveryExecutionB, $deliveryExecution);
     }
 
     public function testNotFoundDeliveryExecution()

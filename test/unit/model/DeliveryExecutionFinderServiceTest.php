@@ -21,6 +21,7 @@ namespace oat\ltiTestReview\test\unit\model;
 
 use core_kernel_classes_Resource;
 use oat\generis\test\TestCase;
+use oat\ltiDeliveryProvider\model\execution\LtiDeliveryExecutionService;
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
 use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
 use oat\ltiTestReview\models\DeliveryExecutionFinderService;
@@ -42,6 +43,9 @@ class DeliveryExecutionFinderServiceTest extends TestCase
     /** @var ServiceProxy */
     private $executionServiceProxy;
 
+    /** @var LtiDeliveryExecutionService */
+    private $ltiDeliveryExecutionServiceMock;
+
     /** @var DeliveryExecutionFinderService */
     private $subject;
 
@@ -52,12 +56,14 @@ class DeliveryExecutionFinderServiceTest extends TestCase
         $this->ltiResultAliasStorage = $this->createMock(LtiResultAliasStorage::class);
         $this->ltiLaunchDataService = $this->createMock(LtiLaunchDataService::class);
         $this->executionServiceProxy = $this->createMock(ServiceProxy::class);
+        $this->ltiDeliveryExecutionServiceMock = $this->createMock(LtiDeliveryExecutionService::class);
 
         $this->subject = new DeliveryExecutionFinderService();
         $this->subject->setServiceLocator($this->getServiceLocatorMock([
             LtiResultAliasStorage::SERVICE_ID => $this->ltiResultAliasStorage,
             LtiLaunchDataService::SERVICE_ID => $this->ltiLaunchDataService,
-            ServiceProxy::SERVICE_ID => $this->executionServiceProxy
+            ServiceProxy::SERVICE_ID => $this->executionServiceProxy,
+            LtiDeliveryExecutionService::SERVICE_ID => $this->ltiDeliveryExecutionServiceMock
         ]));
     }
 
@@ -116,26 +122,52 @@ class DeliveryExecutionFinderServiceTest extends TestCase
         $this->assertEquals($executionId, $deliveryExecution->getIdentifier());
     }
 
-    public function testNotFoundDeliveryExecutionByUserAndDelivery(): void
+    public function testNotFoundDeliveryExecutionByUserAndDeliveryWithoutResourceLinkId(): void
     {
         $userId = 'test_user_id';
         $deliveryId = 'http://backoffice.docker.localhost/ontologies/tao.rdf#i617822471ea2d126631ac77e4b86e48';
+        $this->ltiDeliveryExecutionServiceMock->expects(self::never())->method('getLinkedDeliveryExecutions');
 
-        $this->executionServiceProxy->method('getUserExecutions')->willReturn([]);
+        $this->executionServiceProxy->expects(self::once())->method('getUserExecutions')->willReturn([]);
         $deliveryExecution = $this->subject->findLastExecutionByUserAndDelivery($userId, $deliveryId);
 
         self::assertNull($deliveryExecution);
     }
 
-    public function testFindDeliveryExecutionByUserAndDelivery(): void
+    public function testNotFoundDeliveryExecutionByUserAndDeliveryWithResourceLinkId(): void
     {
         $userId = 'test_user_id';
         $deliveryId = 'http://backoffice.docker.localhost/ontologies/tao.rdf#i617822471ea2d126631ac77e4b86e48';
+        $resourceLinkId = $this->createMock(core_kernel_classes_Resource::class);
+
+        $this->ltiDeliveryExecutionServiceMock
+            ->expects(self::once())
+            ->method('getLinkedDeliveryExecutions')
+            ->willReturn([]);
+
+        $this->executionServiceProxy->expects(self::never())->method('getUserExecutions')->willReturn([]);
+        $deliveryExecution = $this->subject->findLastExecutionByUserAndDelivery($userId, $deliveryId, $resourceLinkId);
+
+        self::assertNull($deliveryExecution);
+    }
+
+    public function testFindDeliveryExecutionByUserAndDeliveryWithResourceLinkId(): void
+    {
+        $userId = 'test_user_id';
+        $deliveryId = 'http://backoffice.docker.localhost/ontologies/tao.rdf#i617822471ea2d126631ac77e4b86e48';
+        $resourceLinkId = $this->createMock(core_kernel_classes_Resource::class);
 
         $implementation = $this->createMock(DeliveryExecutionInterface::class);
+        $this->ltiDeliveryExecutionServiceMock
+            ->expects(self::once())
+            ->method('getLinkedDeliveryExecutions')
+            ->willReturn([new DeliveryExecution($implementation)]);
 
-        $this->executionServiceProxy->method('getUserExecutions')->willReturn([new DeliveryExecution($implementation)]);
-        $deliveryExecution = $this->subject->findLastExecutionByUserAndDelivery($userId, $deliveryId);
+        $this->executionServiceProxy
+            ->expects(self::never())
+            ->method('getUserExecutions');
+
+        $deliveryExecution = $this->subject->findLastExecutionByUserAndDelivery($userId, $deliveryId, $resourceLinkId);
 
         self::assertNotNull($deliveryExecution);
         $this->assertInstanceOf(DeliveryExecution::class, $deliveryExecution);

@@ -33,6 +33,17 @@ The user id should be provided in the `for_user` claim:
 }
 ```
 
+Requested for review delivery execution can be specified by `resource_link_id` claim 
+(will be launched the latest delivery execution specified by `user_id`, `delivery_id` and `resource_link_id`)
+
+```json
+{
+  "https://purl.imsglobal.org/spec/lti/claim/resource_link": {
+    "id": "unique_Id"
+  }
+}
+```
+
 For backwards compatibility, the following endpoint allows to select an exact delivery execution, whose id must be provided in a custom claim:
 
 ```

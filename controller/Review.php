@@ -103,7 +103,11 @@ class Review extends tao_actions_SinglePageModule
         if ($this->isSubmissionReviewRequestMessageProvided()) {
             $deliveryId = $this->getDeliveryId();
             $userId = $this->getUserId();
-            $execution = $finder->findLastExecutionByUserAndDelivery($userId, $deliveryId);
+            $resourceLinkId = null;
+            if ($launchData->hasVariable(LtiLaunchData::RESOURCE_LINK_ID)) {
+                $resourceLinkId = $this->ltiSession->getLtiLinkResource();
+            }
+            $execution = $finder->findLastExecutionByUserAndDelivery($userId, $deliveryId, $resourceLinkId);
 
             if ($execution === null) {
                 throw new LtiClientException(

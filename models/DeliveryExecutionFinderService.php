@@ -21,7 +21,8 @@ namespace oat\ltiTestReview\models;
 
 use common_exception_Error;
 use common_exception_NotFound;
-use core_kernel_classes_Resource;
+use core_kernel_classes_Resource as Resource;
+use oat\ltiDeliveryProvider\model\execution\LtiDeliveryExecutionService;
 use oat\ltiDeliveryProvider\model\LtiLaunchDataService;
 use oat\ltiDeliveryProvider\model\LtiResultAliasStorage;
 use oat\oatbox\service\ConfigurableService;
@@ -59,7 +60,7 @@ class DeliveryExecutionFinderService extends ConfigurableService
         $launchDataService = $this->getLaunchDataService();
         $ltiResultIdStorage = $this->getLtiResultIdStorage();
 
-        /** @var core_kernel_classes_Resource $execution */
+        /** @var Resource $execution */
         $execution = $launchDataService->findDeliveryExecutionFromLaunchData($launchData);
 
         if ($execution && $execution->exists()) {
@@ -83,11 +84,21 @@ class DeliveryExecutionFinderService extends ConfigurableService
      * @throws common_exception_Error
      * @throws common_exception_NotFound
      */
-    public function findLastExecutionByUserAndDelivery(string $userId, string $deliveryId): ?DeliveryExecution
-    {
-        $deliveryExecutionService = $this->getExecutionServiceProxy();
-        $deliveryResource = new core_kernel_classes_Resource($deliveryId);
-        $userDeliveryExecutions = $deliveryExecutionService->getUserExecutions($deliveryResource, $userId);
+    public function findLastExecutionByUserAndDelivery(
+        string $userId,
+        string $deliveryId,
+        ?Resource $resourceLinkId = null
+    ): ?DeliveryExecution {
+        $deliveryResource = new Resource($deliveryId);
+        if ($resourceLinkId === null) {
+            $userDeliveryExecutions = $this->getExecutionServiceProxy()->getUserExecutions($deliveryResource, $userId);
+        } else {
+            $userDeliveryExecutions = $this->getLtiDeliveryExecutionService()->getLinkedDeliveryExecutions(
+                $deliveryResource,
+                $resourceLinkId,
+                $userId
+            );
+        }
 
         if (count($userDeliveryExecutions) > 0) {
             usort(
@@ -163,5 +174,10 @@ class DeliveryExecutionFinderService extends ConfigurableService
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getServiceLocator()->get(ExecutionServiceProxy::SERVICE_ID);
+    }
+
+    protected function getLtiDeliveryExecutionService(): LtiDeliveryExecutionService
+    {
+        return $this->getServiceLocator()->get(LtiDeliveryExecutionService::SERVICE_ID);
     }
 }

@@ -73,6 +73,10 @@ define([
                 response[identifier] = {
                     response: itemHelper.toResponse(_.keys(declaration.mapEntries), baseType, cardinality)
                 };
+            } else {
+                response[identifier] = {
+                    response: itemHelper.toResponse('', baseType, cardinality)
+                };
             }
 
         });

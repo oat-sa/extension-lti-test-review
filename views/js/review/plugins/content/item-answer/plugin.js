@@ -38,7 +38,7 @@ define([
     /**
      * Gets the response of the current item
      * @param {runner} testRunner
-     * @return {Object}
+     * @returns {Object}
      */
     const getItemResponse = testRunner => {
         const context = testRunner.getTestContext();
@@ -57,7 +57,7 @@ define([
     /**
      * Gets the correct response of the current item
      * @param {runner} testRunner
-     * @return {Object}
+     * @returns {Object}
      */
     const getItemCorrectResponse = testRunner => {
         const declarations = itemHelper.getDeclarations(testRunner);
@@ -65,9 +65,20 @@ define([
         _.forEach(declarations, declaration => {
             const { attributes } = declaration;
             const { identifier, baseType, cardinality } = attributes || {};
-            response[identifier] = {
-                response: itemHelper.toResponse(declaration.correctResponse, baseType, cardinality)
-            };
+            if (!_.isEmpty(declaration.correctResponse)) {
+                response[identifier] = {
+                    response: itemHelper.toResponse(declaration.correctResponse, baseType, cardinality)
+                };
+            } else if (declaration.mapEntries && _.size(declaration.mapEntries)){
+                response[identifier] = {
+                    response: itemHelper.toResponse(_.keys(declaration.mapEntries), baseType, cardinality)
+                };
+            } else {
+                response[identifier] = {
+                    response: itemHelper.toResponse('', baseType, cardinality)
+                };
+            }
+
         });
         return response;
     };
@@ -113,6 +124,7 @@ define([
 
         /**
          * Called during the runner's render phase
+         * @returns {Promise}
          */
         render() {
             return promiseTimeout(new Promise(resolve => {

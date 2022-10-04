@@ -1,40 +1,40 @@
 {
-  "name": "oat-sa/extension-lti-test-review",
-  "description": "Extension for reviewing passed tests, with the display of actual and correct answers.",
-  "type": "tao-extension",
-  "authors": [
-    {
-      "name": "Open Assessment Technologies SA"
+    "name": "oat-sa/extension-lti-test-review",
+    "description": "Extension for reviewing passed tests, with the display of actual and correct answers.",
+    "type": "tao-extension",
+    "authors": [
+        {
+            "name": "Open Assessment Technologies SA"
+        }
+    ],
+    "keywords": [
+        "tao",
+        "computer-based-assessment"
+    ],
+    "homepage": "http://www.taotesting.com",
+    "license": "GPL-2.0-only",
+    "extra": {
+        "tao-extension-name": "ltiTestReview"
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "oat-sa/oatbox-extension-installer": "~1.1||dev-master",
+        "oat-sa/extension-tao-ltideliveryprovider": ">=12.0.0",
+        "oat-sa/generis": ">=15.22",
+        "oat-sa/tao-core": ">=50.24.6",
+        "oat-sa/extension-tao-delivery": ">=15.0.0",
+        "oat-sa/extension-tao-lti": ">=15.4.1",
+        "oat-sa/extension-tao-delivery-rdf": ">=14.0.0",
+        "oat-sa/extension-tao-proctoring": ">=20.0.0",
+        "oat-sa/extension-tao-testqti": ">=41.0.0",
+        "oat-sa/extension-tao-outcome": ">=13.0.0",
+        "oat-sa/extension-tao-testqti-previewer": ">=3.0.0",
+        "oat-sa/extension-tao-outcomeui": ">=11.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "oat\\ltiTestReview\\": "",
+            "oat\\ltiTestReview\\models\\": "models/"
+        }
     }
-  ],
-  "keywords": [
-    "tao",
-    "computer-based-assessment"
-  ],
-  "homepage": "http://www.taotesting.com",
-  "license": "GPL-2.0-only",
-  "extra": {
-    "tao-extension-name": "ltiTestReview"
-  },
-  "minimum-stability": "dev",
-  "require": {
-    "oat-sa/oatbox-extension-installer": "~1.1||dev-master",
-    "oat-sa/extension-tao-ltideliveryprovider" : ">=12.0.0",
-    "oat-sa/generis" : ">=14.0.0",
-    "oat-sa/tao-core" : ">=50.6.1",
-    "oat-sa/extension-tao-delivery" : ">=15.0.0",
-    "oat-sa/extension-tao-lti" : ">=15.4.1",
-    "oat-sa/extension-tao-delivery-rdf" : ">=14.0.0",
-    "oat-sa/extension-tao-proctoring" : ">=20.0.0",
-    "oat-sa/extension-tao-testqti" : ">=41.0.0",
-    "oat-sa/extension-tao-outcome" : ">=13.0.0",
-    "oat-sa/extension-tao-testqti-previewer" : ">=3.0.0",
-    "oat-sa/extension-tao-outcomeui": ">=11.0.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "oat\\ltiTestReview\\": "",
-      "oat\\ltiTestReview\\models\\": "models/"
-    }
-  }
 }

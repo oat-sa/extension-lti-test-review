@@ -82,8 +82,8 @@ define([
      * @returns {mapEntry}
      */
     const extractData = (entry, withScore) => {
-        const { id, label, position, informational, skipped, unseen, score, maxScore } = entry || {};
-        const data = { id, label, position, withScore };
+        const { id, label, position, informational, skipped, title, unseen, score, maxScore } = entry || {};
+        const data = { id, label, title, position, withScore };
         if (withScore) {
             Object.assign(data, { score, maxScore });
         }

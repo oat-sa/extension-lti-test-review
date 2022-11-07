@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -41,12 +42,12 @@ use taoResultServer_models_classes_ResponseVariable;
 
 class QtiRunnerInitDataBuilder
 {
+    use OntologyAwareTrait;
+
     protected const OUTCOME_VAR_SCORE = 'SCORE';
     protected const OUTCOME_VAR_MAXSCORE = 'MAXSCORE';
     private const OUTCOME_DECLARATION_IDENTIFIER = 'identifier';
     private const OUTCOME_DECLARATION_DEFAULT_VALUE = 'defaultValue';
-
-    use OntologyAwareTrait;
 
     /**
      * @var DeliveryContainerService

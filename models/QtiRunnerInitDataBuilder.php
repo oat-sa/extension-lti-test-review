@@ -15,7 +15,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  * Copyright (c) 2019-2022 (original work) Open Assessment Technologies SA;
- *
  */
 
 namespace oat\ltiTestReview\models;
@@ -49,19 +48,29 @@ class QtiRunnerInitDataBuilder
 
     use OntologyAwareTrait;
 
-    /** @var DeliveryContainerService */
+    /**
+     * @var DeliveryContainerService 
+     */
     private $deliveryContainerService;
 
-    /** @var QtiRunnerService */
+    /**
+     * @var QtiRunnerService 
+     */
     private $qtiRunnerService;
 
-    /** @var DeliveryExecutionManagerService */
+    /**
+     * @var DeliveryExecutionManagerService 
+     */
     private $deliveryExecutionService;
 
-    /** @var ResultsService */
+    /**
+     * @var ResultsService 
+     */
     private $resultService;
 
-    /** @var ResultServerService */
+    /**
+     * @var ResultServerService 
+     */
     private $resultServerService;
 
     private $itemsData = [];
@@ -98,10 +107,12 @@ class QtiRunnerInitDataBuilder
 
         $init = [
             'testMap' => $testMap,
-            'testContext' => array_merge($this->qtiRunnerService->getTestContext($serviceContext), [
+            'testContext' => array_merge(
+                $this->qtiRunnerService->getTestContext($serviceContext), [
                 'itemIdentifier' => $firstItem['itemId'],
                 'itemPosition' => 0
-            ]),
+                ]
+            ),
             'testData' => $this->qtiRunnerService->getTestData($serviceContext),
             'testResponses' => array_column($itemsData, 'state', 'identifier'),
             'success' => true,
@@ -136,13 +147,17 @@ class QtiRunnerInitDataBuilder
             ];
 
             if ($fetchScores) {
-                $outcome = array_filter($variable[taoResultServer_models_classes_OutcomeVariable::class],
+                $outcome = array_filter(
+                    $variable[taoResultServer_models_classes_OutcomeVariable::class],
                     static function ($key) {
                         return in_array($key, [static::OUTCOME_VAR_SCORE, static::OUTCOME_VAR_MAXSCORE], true);
-                    }, ARRAY_FILTER_USE_KEY);
+                    }, ARRAY_FILTER_USE_KEY
+                );
 
                 if (isset($outcome[static::OUTCOME_VAR_SCORE])) {
-                    /** @var taoResultServer_models_classes_OutcomeVariable $var */
+                    /**
+ * @var taoResultServer_models_classes_OutcomeVariable $var 
+*/
                     $var = $outcome[static::OUTCOME_VAR_SCORE]['var'];
                     $returnValue[$variable['internalIdentifier']]['score'] = (float)$var->getValue();
                 }
@@ -173,14 +188,20 @@ class QtiRunnerInitDataBuilder
 
         $position = 0;
         foreach ($testDefinition->getTestParts() as $testPart) {
-            /** @var TestPart $testPart */
+            /**
+ * @var TestPart $testPart 
+*/
             $sections = [];
             foreach ($testPart->getAssessmentSections() as $section) {
-                /** @var AssessmentSection $section */
+                /**
+ * @var AssessmentSection $section 
+*/
 
                 $items = [];
                 foreach ($section->getSectionParts() as $item) {
-                    /** @var AssessmentSectionRef $item */
+                    /**
+ * @var AssessmentSectionRef $item 
+*/
                     $itemData = $this->qtiRunnerService->getItemData($context, $item->getHref());
 
                     $itemId = $item->getIdentifier();
@@ -197,15 +218,16 @@ class QtiRunnerInitDataBuilder
                     $items[$itemId] = [
                         'id' => $itemId,
                         'label' => $itemData['data']['attributes']['label'],
+                        'title' => $itemData['data']['attributes']['title'],
                         'position' => $position,
                         'categories' => [],
                         'informational' => $isInformational,
                         'skipped' => $isSkipped,
                         'unseen' => $isUnseen,
                         'score' => $itemsStates[$itemId]['score'] ?? $this->getOutcomeDeclarationDefaultVariable(
-                                $itemData['data'],
-                                self::OUTCOME_VAR_SCORE
-                            ),
+                            $itemData['data'],
+                            self::OUTCOME_VAR_SCORE
+                        ),
                         'maxScore' => $itemsStates[$itemId]['maxScore'] ??
                             $this->getOutcomeDeclarationDefaultVariable(
                                 $itemData['data'],
@@ -248,7 +270,7 @@ class QtiRunnerInitDataBuilder
     }
 
     /**
-     * @param ExtendedAssessmentItemRef $itemRef
+     * @param  ExtendedAssessmentItemRef $itemRef
      * @return Boolean
      */
     private function isItemInformational(ExtendedAssessmentItemRef $itemRef) : bool
@@ -288,7 +310,7 @@ class QtiRunnerInitDataBuilder
     }
 
     /**
-     * @param string $deliveryExecutionId
+     * @param  string $deliveryExecutionId
      * @return QtiRunnerServiceContext
      * @throws common_Exception
      */
@@ -305,7 +327,7 @@ class QtiRunnerInitDataBuilder
     private function getResponseCountsFromState(array $itemState): int
     {
         $responsesCount = 0;
-        if (!empty($itemState))  {
+        if (!empty($itemState)) {
             foreach ($itemState as $response) {
                 if (!empty($response['response']['base'])) {
                     $responsesCount += 1;

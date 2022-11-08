@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,7 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  * Copyright (c) 2019-2022 (original work) Open Assessment Technologies SA;
- *
  */
 
 namespace oat\ltiTestReview\models;
@@ -42,26 +42,36 @@ use taoResultServer_models_classes_ResponseVariable;
 
 class QtiRunnerInitDataBuilder
 {
+    use OntologyAwareTrait;
+
     protected const OUTCOME_VAR_SCORE = 'SCORE';
     protected const OUTCOME_VAR_MAXSCORE = 'MAXSCORE';
     private const OUTCOME_DECLARATION_IDENTIFIER = 'identifier';
     private const OUTCOME_DECLARATION_DEFAULT_VALUE = 'defaultValue';
 
-    use OntologyAwareTrait;
-
-    /** @var DeliveryContainerService */
+    /**
+     * @var DeliveryContainerService
+     */
     private $deliveryContainerService;
 
-    /** @var QtiRunnerService */
+    /**
+     * @var QtiRunnerService
+     */
     private $qtiRunnerService;
 
-    /** @var DeliveryExecutionManagerService */
+    /**
+     * @var DeliveryExecutionManagerService
+     */
     private $deliveryExecutionService;
 
-    /** @var ResultsService */
+    /**
+     * @var ResultsService
+     */
     private $resultService;
 
-    /** @var ResultServerService */
+    /**
+     * @var ResultServerService
+     */
     private $resultServerService;
 
     private $itemsData = [];
@@ -98,10 +108,13 @@ class QtiRunnerInitDataBuilder
 
         $init = [
             'testMap' => $testMap,
-            'testContext' => array_merge($this->qtiRunnerService->getTestContext($serviceContext), [
-                'itemIdentifier' => $firstItem['itemId'],
-                'itemPosition' => 0
-            ]),
+            'testContext' => array_merge(
+                $this->qtiRunnerService->getTestContext($serviceContext),
+                [
+                    'itemIdentifier' => $firstItem['itemId'],
+                    'itemPosition' => 0,
+                ]
+            ),
             'testData' => $this->qtiRunnerService->getTestData($serviceContext),
             'testResponses' => array_column($itemsData, 'state', 'identifier'),
             'success' => true,
@@ -118,7 +131,7 @@ class QtiRunnerInitDataBuilder
         $filterSubmission = ResultsService::VARIABLES_FILTER_LAST_SUBMITTED;
         $filterTypes = [
             taoResultServer_models_classes_ResponseVariable::class,
-            taoResultServer_models_classes_OutcomeVariable::class
+            taoResultServer_models_classes_OutcomeVariable::class,
         ];
 
         $implementation = $this->resultServerService->getResultStorage($delivery->getUri());
@@ -129,20 +142,24 @@ class QtiRunnerInitDataBuilder
         $returnValue = [];
 
         foreach ($variables as $variable) {
-
             $returnValue[$variable['internalIdentifier']] = [
                 'identifier' => $variable['internalIdentifier'],
                 'state' => json_decode($variable['state'], true),
             ];
 
             if ($fetchScores) {
-                $outcome = array_filter($variable[taoResultServer_models_classes_OutcomeVariable::class],
+                $outcome = array_filter(
+                    $variable[taoResultServer_models_classes_OutcomeVariable::class],
                     static function ($key) {
                         return in_array($key, [static::OUTCOME_VAR_SCORE, static::OUTCOME_VAR_MAXSCORE], true);
-                    }, ARRAY_FILTER_USE_KEY);
+                    },
+                    ARRAY_FILTER_USE_KEY
+                );
 
                 if (isset($outcome[static::OUTCOME_VAR_SCORE])) {
-                    /** @var taoResultServer_models_classes_OutcomeVariable $var */
+                    /**
+                     * @var taoResultServer_models_classes_OutcomeVariable $var
+                     */
                     $var = $outcome[static::OUTCOME_VAR_SCORE]['var'];
                     $returnValue[$variable['internalIdentifier']]['score'] = (float)$var->getValue();
                 }
@@ -173,14 +190,20 @@ class QtiRunnerInitDataBuilder
 
         $position = 0;
         foreach ($testDefinition->getTestParts() as $testPart) {
-            /** @var TestPart $testPart */
+            /**
+             * @var TestPart $testPart
+             */
             $sections = [];
             foreach ($testPart->getAssessmentSections() as $section) {
-                /** @var AssessmentSection $section */
+                /**
+                 * @var AssessmentSection $section
+                 */
 
                 $items = [];
                 foreach ($section->getSectionParts() as $item) {
-                    /** @var AssessmentSectionRef $item */
+                    /**
+                     * @var AssessmentSectionRef $item
+                     */
                     $itemData = $this->qtiRunnerService->getItemData($context, $item->getHref());
 
                     $itemId = $item->getIdentifier();
@@ -197,20 +220,21 @@ class QtiRunnerInitDataBuilder
                     $items[$itemId] = [
                         'id' => $itemId,
                         'label' => $itemData['data']['attributes']['label'],
+                        'title' => $itemData['data']['attributes']['title'],
                         'position' => $position,
                         'categories' => [],
                         'informational' => $isInformational,
                         'skipped' => $isSkipped,
                         'unseen' => $isUnseen,
                         'score' => $itemsStates[$itemId]['score'] ?? $this->getOutcomeDeclarationDefaultVariable(
-                                $itemData['data'],
-                                self::OUTCOME_VAR_SCORE
-                            ),
+                            $itemData['data'],
+                            self::OUTCOME_VAR_SCORE
+                        ),
                         'maxScore' => $itemsStates[$itemId]['maxScore'] ??
-                            $this->getOutcomeDeclarationDefaultVariable(
-                                $itemData['data'],
-                                self::OUTCOME_VAR_MAXSCORE
-                            )
+                                $this->getOutcomeDeclarationDefaultVariable(
+                                    $itemData['data'],
+                                    self::OUTCOME_VAR_MAXSCORE
+                                ),
                     ];
 
                     $this->fillItemsData($itemId, $item->getHref(), $itemData['data']);
@@ -222,7 +246,7 @@ class QtiRunnerInitDataBuilder
                     'id' => $sectionId,
                     'label' => $section->getTitle(),
                     'items' => $items,
-                    'stats' => []
+                    'stats' => [],
                 ];
             }
 
@@ -231,7 +255,7 @@ class QtiRunnerInitDataBuilder
                 'id' => $testPartId,
                 'label' => $testPart->getIdentifier(),
                 'sections' => $sections,
-                'stats' => []
+                'stats' => [],
             ];
         }
 
@@ -248,16 +272,18 @@ class QtiRunnerInitDataBuilder
     }
 
     /**
-     * @param ExtendedAssessmentItemRef $itemRef
+     * @param  ExtendedAssessmentItemRef $itemRef
      * @return Boolean
      */
-    private function isItemInformational(ExtendedAssessmentItemRef $itemRef) : bool
+    private function isItemInformational(ExtendedAssessmentItemRef $itemRef): bool
     {
         $categories = $itemRef->getCategories()->getArrayCopy();
 
         $hasInformationalCategory = in_array('x-tao-itemusage-informational', $categories, true);
 
-        $hasNoResponseDeclarations = method_exists($itemRef, 'getResponseDeclarations') && 0 == count($itemRef->getResponseDeclarations());
+        $hasNoResponseDeclarations = method_exists($itemRef, 'getResponseDeclarations') && 0 == count(
+            $itemRef->getResponseDeclarations()
+        );
 
         return $hasInformationalCategory || $hasNoResponseDeclarations;
     }
@@ -288,7 +314,7 @@ class QtiRunnerInitDataBuilder
     }
 
     /**
-     * @param string $deliveryExecutionId
+     * @param  string $deliveryExecutionId
      * @return QtiRunnerServiceContext
      * @throws common_Exception
      */
@@ -305,12 +331,11 @@ class QtiRunnerInitDataBuilder
     private function getResponseCountsFromState(array $itemState): int
     {
         $responsesCount = 0;
-        if (!empty($itemState))  {
+        if (!empty($itemState)) {
             foreach ($itemState as $response) {
                 if (!empty($response['response']['base'])) {
                     $responsesCount += 1;
-                }
-                elseif (!empty($response['response']['list'])) {
+                } elseif (!empty($response['response']['list'])) {
                     $responsesCount += count(array_merge(...array_values($response['response']['list'])));
                 }
             }

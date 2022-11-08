@@ -11,7 +11,7 @@
     <ul class="review-panel-filters plain">
     {{#each filters}}
         <li class="review-panel-filter navigable" data-control="{{id}}">
-            <span class="review-panel-label" title="{{title}}">{{label}}</span>
+            <span class="review-panel-label" title="{{title}}">{{title}}</span>
         </li>
     {{/each}}
     </ul>

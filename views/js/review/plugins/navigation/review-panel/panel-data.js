@@ -150,10 +150,6 @@ define([
             reviewItem.status = 'viewed';
         }
 
-        if (displayItemTooltip) {
-            reviewItem.title = reviewItem.label;
-        }
-
         return reviewItem;
     };
 

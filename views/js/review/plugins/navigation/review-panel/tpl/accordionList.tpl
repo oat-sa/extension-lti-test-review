@@ -10,6 +10,9 @@
                 <ul class="review-panel-block plain">
                 {{#each items}}
                     <li class="review-panel-item navigable{{#if active}} active{{/if}}{{#if type}} item-{{type}}{{/if}}" data-control="{{id}}" data-position="{{position}}" title="{{title}}">
+                    {{#if scoreType}}
+                        <span class="icon-{{scoreType}}"></span>
+                    {{/if}}
                         <span class="review-panel-label">{{title}}</span>
                     {{#if withScore}}
                         <span class="review-panel-score">{{#if informational}}-{{else}}{{#if maxScore}}{{score}}/{{maxScore}}{{else}}{{score}}{{/if}}{{/if}}</span>

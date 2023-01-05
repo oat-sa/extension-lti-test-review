@@ -62,6 +62,12 @@ define([
             return 'info';
         }
         if (withScore && item.maxScore) {
+            if (item.externalScored && item.isScored === false) {
+                return 'score-pending';
+            }
+            if (item.score > 0 && item.score < item.maxScore) {
+                return 'score-partial';
+            }
             if (item.score === item.maxScore) {
                 return 'correct';
             } else {
@@ -111,9 +117,9 @@ define([
      * @property {Boolean} informational
      * @property {Boolean} skipped
      * @property {Boolean} unseen
-     * @property {String} type - 'correct'/'incorrect'/'info'/'skipped'/'default'
+     * @property {String} type - 'correct'/'incorrect'/'info'/'skipped'/'score-pending'/'score-partial'/'default'
      * @property {String} status - 'answered'/'viewed'/'unseen'
-     * @property {String} scoreType - 'correct'/'incorrect'/null
+     * @property {String} scoreType - 'correct'/'incorrect'/'score-pending'/'score-partial'/null
      * @property {String} icon - 'info' or null
      */
     /**
@@ -139,6 +145,10 @@ define([
             reviewItem.scoreType = 'correct';
         } else if (type === 'incorrect') {
             reviewItem.scoreType = 'incorrect';
+        } else if (type === 'score-pending') {
+            reviewItem.scoreType = 'score-pending';
+        } else if (type === 'score-partial') {
+            reviewItem.scoreType = 'score-partial';
         }
 
         if (reviewItem.unseen) {

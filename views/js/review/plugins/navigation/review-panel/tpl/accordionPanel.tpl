@@ -26,3 +26,13 @@
     </footer>
 {{/if}}
 </div>
+{{#if replaceIcons}}
+<style>
+    {{#each replaceIcons}}
+    .review-panel.accordion .review-panel-content .review-panel-item.item-{{@key}} .review-panel-label:before {
+        content: "{{code}}";
+        color: {{color}};
+    }
+    {{/each}}
+</style>
+{{/if}}

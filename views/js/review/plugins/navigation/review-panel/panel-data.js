@@ -121,9 +121,10 @@ define([
      * @param {mapEntry} entry - item, will be mutated
      * @param {String} numericLabel
      * @param {Boolean} displayItemTooltip
+     * @param {Object} replaceIcons
      * @returns {ReviewItem}
      */
-    const extendReviewItemScope = (entry, numericLabel, displayItemTooltip) => {
+    const extendReviewItemScope = (entry, numericLabel, displayItemTooltip, replaceIcons) => {
         const reviewItem = Object.assign({}, entry);
         const type = reviewItem.type;
 
@@ -137,8 +138,14 @@ define([
         reviewItem.scoreType = null;
         if (type === 'correct') {
             reviewItem.scoreType = 'correct';
+            if (replaceIcons.correct && replaceIcons.correct.icon) {
+                reviewItem.scoreType = replaceIcons.correct.icon;
+            }
         } else if (type === 'incorrect') {
             reviewItem.scoreType = 'incorrect';
+            if (replaceIcons.incorrect && replaceIcons.incorrect.icon) {
+                reviewItem.scoreType = replaceIcons.incorrect.icon;
+            }
         }
 
         if (reviewItem.unseen) {
@@ -159,9 +166,10 @@ define([
         * @param {testMap} testMap
         * @param {Boolean} withScore
         * @param {Boolean} displayItemTooltip
+        * @param {Object} replaceIcons
         * @returns {reviewPanelMap}
         */
-        getReviewPanelMap(testMap, withScore, displayItemTooltip) {
+        getReviewPanelMap(testMap, withScore, displayItemTooltip, replaceIcons) {
             const { parts, score, maxScore } = testMap;
             const items = new Map();
             const sections = new Map();
@@ -181,7 +189,7 @@ define([
                                     if (reviewItem.type !== 'info') {
                                         nonInformationalCount++;
                                     }
-                                    reviewItem = extendReviewItemScope(reviewItem, nonInformationalCount, displayItemTooltip);
+                                    reviewItem = extendReviewItemScope(reviewItem, nonInformationalCount, displayItemTooltip, replaceIcons);
                                     items.set(item.id, reviewItem);
                                     return reviewItem;
                                 })

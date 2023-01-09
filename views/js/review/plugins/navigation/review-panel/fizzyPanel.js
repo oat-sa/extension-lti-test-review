@@ -185,10 +185,10 @@ define([
              * @fires datachange
              */
             setData(newMap) {
-                const { showScore, displaySectionTitles, displayItemTooltip } = this.getConfig();
+                const { showScore, displaySectionTitles, displayItemTooltip, replaceIcons } = this.getConfig();
 
                 // Modify the testMap items, adding properties for the fizzy display
-                data = reviewDataHelper.getReviewPanelMap(newMap, showScore, displayItemTooltip);
+                data = reviewDataHelper.getReviewPanelMap(newMap, showScore, displayItemTooltip, replaceIcons);
                 data.displaySectionTitles = displaySectionTitles;
                 // unpack Map
                 data.sections = Array.from(data.sections.values());

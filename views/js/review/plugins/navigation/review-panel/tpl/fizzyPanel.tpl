@@ -20,3 +20,12 @@
     </footer>
 {{/if}}
 </div>
+{{#if replaceIcons}}
+<style>
+    {{#each replaceIcons}}
+    .buttonlist-item.{{icon}} .buttonlist-score-badge {
+        background-color: {{color}};
+    }
+    {{/each}}
+</style>
+{{/if}}

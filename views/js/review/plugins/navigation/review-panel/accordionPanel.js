@@ -257,7 +257,7 @@ define([
              * @fires datachange
              */
             setData(newMap) {
-                data = reviewDataHelper.getReviewPanelMap(newMap, this.getConfig().showScore, false);
+                data = reviewDataHelper.getReviewPanelMap(newMap, this.getConfig().showScore, false, this.getConfig().replaceIcons);
 
                 /**
                  * @event datachange

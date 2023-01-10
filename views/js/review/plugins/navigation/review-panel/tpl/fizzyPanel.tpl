@@ -23,8 +23,11 @@
 {{#if replaceIcons}}
 <style>
     {{#each replaceIcons}}
-    .buttonlist-item.{{icon}} .buttonlist-score-badge {
+    .buttonlist-items .buttonlist-item.{{@key}} .buttonlist-btn .buttonlist-score-badge {
         background-color: {{color}};
+    }
+    .buttonlist-item.{{@key}} .buttonlist-score-badge .icon-{{@key}}:before {
+        content: "{{code}}";
     }
     .item-answer.show-correct.{{@key}} .icon {
         color: {{color}};

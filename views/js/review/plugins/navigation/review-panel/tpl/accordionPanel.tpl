@@ -33,7 +33,7 @@
         content: "{{code}}";
         color: {{color}};
     }
-    .item-answer.show-{{@key}}.{{@key}} .icon {
+    .item-answer.show-correct.{{@key}} .icon {
         color: {{color}};
     }
     .item-answer .icon-{{@key}}:before {

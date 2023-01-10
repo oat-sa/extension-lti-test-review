@@ -26,6 +26,12 @@
     .buttonlist-item.{{icon}} .buttonlist-score-badge {
         background-color: {{color}};
     }
+    .item-answer.show-correct.{{@key}} .icon {
+        color: {{color}};
+    }
+    .item-answer .icon-{{@key}}:before {
+        content: "{{code}}";
+    }
     {{/each}}
 </style>
 {{/if}}

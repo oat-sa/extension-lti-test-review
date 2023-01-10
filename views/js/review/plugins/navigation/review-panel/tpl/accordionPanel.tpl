@@ -33,6 +33,12 @@
         content: "{{code}}";
         color: {{color}};
     }
+    .item-answer.show-{{@key}}.{{@key}} .icon {
+        color: {{color}};
+    }
+    .item-answer .icon-{{@key}}:before {
+        content: "{{code}}";
+    }
     {{/each}}
 </style>
 {{/if}}

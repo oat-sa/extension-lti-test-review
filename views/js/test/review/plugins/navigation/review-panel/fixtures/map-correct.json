@@ -16,6 +16,7 @@
             "item-1": {
               "id": "item-1",
               "label": "Example_0_Introduction",
+              "title": "Example_0_Introduction",
               "position": 0,
               "occurrence": 0,
               "remainingAttempts": 0,
@@ -71,6 +72,7 @@
             "item-2": {
               "id": "item-2",
               "label": "example_1_TAO",
+              "title": "example_1_TAO",
               "position": 1,
               "occurrence": 0,
               "remainingAttempts": 1,
@@ -91,6 +93,7 @@
             "item-3": {
               "id": "item-3",
               "label": "example_2_Math",
+              "title": "example_2_Math",
               "position": 2,
               "occurrence": 0,
               "remainingAttempts": 1,
@@ -111,6 +114,7 @@
             "item-4": {
               "id": "item-4",
               "label": "Example_3_Baudelaire",
+              "title": "Example_3_Baudelaire",
               "position": 3,
               "occurrence": 0,
               "remainingAttempts": 1,
@@ -131,6 +135,7 @@
             "item-5": {
               "id": "item-5",
               "label": "Example_4_Appearance",
+              "title": "Example_4_Appearance",
               "position": 4,
               "occurrence": 0,
               "remainingAttempts": 1,
@@ -170,6 +175,7 @@
             "item-6": {
               "id": "item-6",
               "label": "Example_5_picasso",
+              "title": "Example_5_picasso",
               "position": 5,
               "occurrence": 0,
               "remainingAttempts": 1,
@@ -190,6 +196,7 @@
             "item-7": {
               "id": "item-7",
               "label": "Example_6_Geography",
+              "title": "Example_6_Geography",
               "position": 6,
               "occurrence": 0,
               "remainingAttempts": 1,
@@ -210,6 +217,7 @@
             "item-8": {
               "id": "item-8",
               "label": "Example_7_Geo 2",
+              "title": "Example_7_Geo 2",
               "position": 7,
               "occurrence": 0,
               "remainingAttempts": 1,
@@ -230,6 +238,7 @@
             "item-9": {
               "id": "item-9",
               "label": "Example_8_Geo 3",
+              "title": "Example_8_Geo 3",
               "position": 8,
               "occurrence": 0,
               "remainingAttempts": 1,

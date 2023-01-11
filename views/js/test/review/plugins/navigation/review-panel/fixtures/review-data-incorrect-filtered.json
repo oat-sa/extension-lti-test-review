@@ -13,6 +13,7 @@
             {
               "id": "item-3",
               "label": "example_2_Math",
+              "title": "example_2_Math",
               "informational": false,
               "skipped": false,
               "withScore": true,
@@ -29,6 +30,7 @@
             {
               "id": "item-5",
               "label": "Example_4_Appearance",
+              "title": "Example_4_Appearance",
               "informational": false,
               "skipped": false,
               "withScore": true,
@@ -55,6 +57,7 @@
             {
               "id": "item-9",
               "label": "Example_8_Geo 3",
+              "title": "Example_8_Geo 3",
               "informational": false,
               "skipped": true,
               "withScore": true,

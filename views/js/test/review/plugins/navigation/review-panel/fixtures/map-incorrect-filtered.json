@@ -17,6 +17,7 @@
             "item-3": {
               "id": "item-3",
               "label": "example_2_Math",
+              "title": "example_2_Math",
               "position": 2,
               "occurrence": 0,
               "remainingAttempts": 1,
@@ -37,6 +38,7 @@
             "item-5": {
               "id": "item-5",
               "label": "Example_4_Appearance",
+              "title": "Example_4_Appearance",
               "position": 4,
               "occurrence": 0,
               "remainingAttempts": 1,
@@ -76,6 +78,7 @@
             "item-9": {
               "id": "item-9",
               "label": "Example_8_Geo 3",
+              "title": "Example_8_Geo 3",
               "position": 8,
               "occurrence": 0,
               "remainingAttempts": 1,

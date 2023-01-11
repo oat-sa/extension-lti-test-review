@@ -123,10 +123,9 @@ define([
      * Adds missing properties to a reviewItem, to support fizzyPanel UI
      * @param {mapEntry} entry - item, will be mutated
      * @param {String} numericLabel
-     * @param {Boolean} displayItemTooltip
      * @returns {ReviewItem}
      */
-    const extendReviewItemScope = (entry, numericLabel, displayItemTooltip) => {
+    const extendReviewItemScope = (entry, numericLabel) => {
         const reviewItem = Object.assign({}, entry);
         const type = reviewItem.type;
 
@@ -146,8 +145,7 @@ define([
 
         if (reviewItem.unseen) {
             reviewItem.status = 'unseen';
-        }
-        else if (type !== 'info' && type !== 'skipped') {
+        } else if (type !== 'info' && type !== 'skipped') {
             reviewItem.status = 'answered';
         } else {
             reviewItem.status = 'viewed';
@@ -158,13 +156,12 @@ define([
 
     return {
         /**
-        * Refines the test runner data and builds the expected review panel map
-        * @param {testMap} testMap
-        * @param {Boolean} withScore
-        * @param {Boolean} displayItemTooltip
-        * @returns {reviewPanelMap}
-        */
-        getReviewPanelMap(testMap, withScore, displayItemTooltip) {
+         * Refines the test runner data and builds the expected review panel map
+         * @param {testMap} testMap
+         * @param {Boolean} withScore
+         * @returns {reviewPanelMap}
+         */
+        getReviewPanelMap(testMap, withScore) {
             const { parts, score, maxScore } = testMap;
             const items = new Map();
             const sections = new Map();
@@ -184,7 +181,7 @@ define([
                                     if (reviewItem.type !== 'info') {
                                         nonInformationalCount++;
                                     }
-                                    reviewItem = extendReviewItemScope(reviewItem, nonInformationalCount, displayItemTooltip);
+                                    reviewItem = extendReviewItemScope(reviewItem, nonInformationalCount);
                                     items.set(item.id, reviewItem);
                                     return reviewItem;
                                 })

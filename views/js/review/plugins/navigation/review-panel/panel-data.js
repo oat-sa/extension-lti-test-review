@@ -83,7 +83,7 @@ define([
      */
     const extractData = (entry, withScore) => {
         const { id, label, position, informational, skipped, title, unseen, score, maxScore } = entry || {};
-        const data = { id, label, title, position, withScore };
+        const data = { id, label, position, withScore };
         if (withScore) {
             Object.assign(data, { score, maxScore });
         }
@@ -95,6 +95,9 @@ define([
         }
         if ('undefined' !== typeof unseen) {
             data.unseen = unseen;
+        }
+        if ('undefined' !== typeof title) {
+            data.title = title;
         }
         return data;
     };

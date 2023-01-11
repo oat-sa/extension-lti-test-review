@@ -19,6 +19,7 @@
                 </ul>
             </li>
             {{/each}}
+        </ul>
     </li>
     {{/each}}
 </ul>

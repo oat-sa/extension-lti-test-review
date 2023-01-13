@@ -29,16 +29,20 @@
 {{#if replaceIcons}}
 <style>
     {{#each replaceIcons}}
-    .review-panel.accordion .review-panel-content .review-panel-item.item-{{@key}} .review-panel-label:before {
-        content: "{{code}}";
-        color: {{color}};
-    }
-    .item-answer.show-correct.{{@key}} .icon {
-        color: {{color}};
-    }
-    .item-answer .icon-{{@key}}:before {
-        content: "{{code}}";
-    }
+        .review-panel.accordion .review-panel-content .review-panel-item.item-{{@key}} .review-panel-label:before {
+            color: {{color}};
+        }
+        .item-answer.show-correct.{{@key}} .icon {
+            color: {{color}};
+        }
+        {{#if code}}
+            .review-panel.accordion .review-panel-content .review-panel-item.item-{{@key}} .review-panel-label:before {
+                content: "{{code}}";
+            }
+            .item-answer .icon-{{@key}}:before {
+                content: "{{code}}";
+            }
+        {{/if}}
     {{/each}}
 </style>
 {{/if}}

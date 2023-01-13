@@ -155,6 +155,10 @@ define([
                             itemAnswer.setCorrect();
                         } else if (item.skipped) {
                             itemAnswer.setSkipped();
+                        } else if (item.isExternallyScored) {
+                            itemAnswer.setPending();
+                        } else if (item.score > 0 && item.score < item.maxScore) {
+                            itemAnswer.setPartial();
                         } else {
                             itemAnswer.setIncorrect();
                         }

@@ -205,7 +205,6 @@ define([
             headerTitle: defaultHeaderTitle,
             footerLabel: false,
             headerLabel: defaultHeader.label,
-            footerLabel: false,
             header: defaultHeader,
             showScore: true,
             showCorrect: defaultShowCorrect
@@ -487,7 +486,6 @@ define([
                     icon: null,
                     numericLabel: "1",
                     scoreType: "incorrect",
-                    status: "answered",
                     type: "incorrect"
                 }],
                 withScore: true,
@@ -659,7 +657,6 @@ define([
                     icon: null,
                     numericLabel: "1",
                     scoreType: "correct",
-                    status: "answered",
                     type: "correct"
                 }],
                 withScore: true,

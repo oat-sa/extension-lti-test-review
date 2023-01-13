@@ -584,6 +584,7 @@ define([
                             items: [{
                                 id: 'item',
                                 label: 'item',
+                                title: 'item',
                                 informational: false,
                                 skipped: true,
                                 position: 0,
@@ -619,6 +620,7 @@ define([
                     items: [{
                         id: 'item',
                         label: 'item',
+                        title: 'item',
                         informational: false,
                         skipped: true,
                         withScore: true,
@@ -809,6 +811,7 @@ define([
                             items: [{
                                 id: 'item',
                                 label: 'item',
+                                title: 'item',
                                 informational: false,
                                 skipped: false,
                                 position: 0,
@@ -844,6 +847,7 @@ define([
                     items: [{
                         id: 'item',
                         label: 'item',
+                        title: 'item',
                         informational: false,
                         skipped: false,
                         withScore: true,

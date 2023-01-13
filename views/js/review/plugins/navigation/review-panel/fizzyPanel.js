@@ -157,7 +157,15 @@ define([
 
             if (component.is('rendered')) {
                 controls.$content.find(cssSelectors.itemButtonListContainer).each((index, itemButtonListContainerElem) => {
-                    const itemButtonListComponent = itemButtonListFactory({ items: data.sections[index].items })
+                    let items = data.sections[index].items;
+                    if (!config.displayItemTooltip) {
+                        items = items.map(item => {
+                            const itemData = _.clone(item);
+                            delete itemData.title;
+                            return itemData;
+                        });
+                    }
+                    const itemButtonListComponent = itemButtonListFactory({ items })
                         .render(itemButtonListContainerElem)
                         .on('click', onItemClick);
                     itemButtonListComponents.push(itemButtonListComponent);
@@ -185,10 +193,10 @@ define([
              * @fires datachange
              */
             setData(newMap) {
-                const { showScore, displaySectionTitles, displayItemTooltip } = this.getConfig();
+                const { showScore, displaySectionTitles } = this.getConfig();
 
                 // Modify the testMap items, adding properties for the fizzy display
-                data = reviewDataHelper.getReviewPanelMap(newMap, showScore, displayItemTooltip);
+                data = reviewDataHelper.getReviewPanelMap(newMap, showScore);
                 data.displaySectionTitles = displaySectionTitles;
                 // unpack Map
                 data.sections = Array.from(data.sections.values());

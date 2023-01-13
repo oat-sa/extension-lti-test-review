@@ -11,7 +11,7 @@
     <ul class="review-panel-filters plain">
     {{#each filters}}
         <li class="review-panel-filter navigable" data-control="{{id}}">
-            <span class="review-panel-label" title="{{title}}">{{title}}</span>
+            <span class="review-panel-label" title="{{title}}">{{label}}</span>
         </li>
     {{/each}}
     </ul>
@@ -26,3 +26,19 @@
     </footer>
 {{/if}}
 </div>
+{{#if replaceIcons}}
+<style>
+    {{#each replaceIcons}}
+    .review-panel.accordion .review-panel-content .review-panel-item.item-{{@key}} .review-panel-label:before {
+        content: "{{code}}";
+        color: {{color}};
+    }
+    .item-answer.show-correct.{{@key}} .icon {
+        color: {{color}};
+    }
+    .item-answer .icon-{{@key}}:before {
+        content: "{{code}}";
+    }
+    {{/each}}
+</style>
+{{/if}}

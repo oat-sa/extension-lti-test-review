@@ -71,14 +71,14 @@
               "informational": false,
               "skipped": false,
               "withScore": true,
-              "type": "incorrect",
+              "type": "score-partial",
               "position": 2,
               "score": 2,
               "maxScore": 3,
               "ariaLabel": "Question 2",
               "icon": null,
               "numericLabel": "2",
-              "scoreType": "incorrect",
+              "scoreType": "score-partial",
               "status": "answered"
             },
             {

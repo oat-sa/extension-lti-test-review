@@ -301,7 +301,7 @@ define([
             items: [
                 {type: 'info', score: '-'},
                 {type: 'correct', score: '2/2'},
-                {type: 'incorrect', score: '2/3'},
+                {type: 'score-partial', score: '2/3'},
                 {type: 'correct', score: '2/2'},
                 {type: 'incorrect', score: '0/2'},
                 {type: 'correct', score: '2/2'},
@@ -965,8 +965,8 @@ define([
                         });
 
                         assert.equal($container.find('.review-panel-item:nth(0)').is('.item-info'), true, 'The 1st item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(2)').is('.item-incorrect'), true, 'The 3rd item got the expected icon');
-                        assert.equal($container.find('.review-panel-item:nth(4)').is('.item-incorrect'), true, 'The 3rd item got the expected icon');
+                        assert.equal($container.find('.review-panel-item:nth(2)').is('.item-score-partial'), true, 'The 3rd item got the expected icon');
+                        assert.equal($container.find('.review-panel-item:nth(4)').is('.item-incorrect'), true, 'The 5th item got the expected icon');
                         assert.equal($container.find('.review-panel-item:nth(8)').is('.item-skipped'), true, 'The last item got the expected icon');
                         assert.equal($container.find('.review-panel-item.item-correct').length, 5, 'The other items got the expected icon');
 

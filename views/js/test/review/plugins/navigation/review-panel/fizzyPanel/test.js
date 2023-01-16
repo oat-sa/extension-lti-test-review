@@ -289,7 +289,7 @@ define([
             items: [
                 {status: 'viewed'},
                 {status: 'correct'},
-                {status: 'incorrect'},
+                {status: 'score-partial'},
                 {status: 'correct'},
                 {status: 'incorrect'},
                 {status: 'correct'},

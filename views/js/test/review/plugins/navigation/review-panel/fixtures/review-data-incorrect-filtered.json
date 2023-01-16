@@ -17,14 +17,14 @@
               "informational": false,
               "skipped": false,
               "withScore": true,
-              "type": "incorrect",
+              "type": "score-partial",
               "position": 2,
               "score": 2,
               "maxScore": 3,
               "ariaLabel": "Question 1",
               "icon": null,
               "numericLabel": "1",
-              "scoreType": "incorrect",
+              "scoreType": "score-partial",
               "status": "answered"
             },
             {

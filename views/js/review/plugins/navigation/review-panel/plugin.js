@@ -19,14 +19,12 @@
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
 define([
-    'module',
     'core/promiseTimeout',
     'taoTests/runner/plugin',
     'ltiTestReview/review/services/navigation-data',
     'ltiTestReview/review/plugins/navigation/review-panel/accordionPanel',
     'ltiTestReview/review/plugins/navigation/review-panel/fizzyPanel'
 ], function (
-    module,
     promiseTimeout,
     pluginFactory,
     navigationDataServiceFactory,
@@ -76,7 +74,6 @@ define([
          */
         render() {
             return promiseTimeout(new Promise(resolve => {
-                const replaceIcons = module.config() || {};
                 const testRunner = this.getTestRunner();
                 const navigationDataService = navigationDataServiceFactory(testRunner.getTestMap());
 
@@ -91,8 +88,7 @@ define([
                         showScore,
                         showCorrect,
                         displaySectionTitles,
-                        displayItemTooltip,
-                        replaceIcons
+                        displayItemTooltip
                     },
                     this.getConfig()
                 );

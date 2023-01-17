@@ -20,24 +20,3 @@
     </footer>
 {{/if}}
 </div>
-{{#if replaceIcons}}
-<style>
-    {{#each replaceIcons}}
-        .buttonlist-items .buttonlist-item.{{@key}} .buttonlist-btn .buttonlist-score-badge {
-            background-color: {{background}};
-            color: {{color}};
-        }
-        .item-answer.show-correct.{{@key}} .icon {
-            color: {{color}};
-        }
-        {{#if code}}
-            .buttonlist-item.{{@key}} .buttonlist-score-badge .icon-{{@key}}:before {
-                content: "{{code}}";
-            }
-            .item-answer .icon-{{@key}}:before {
-                content: "{{code}}";
-            }
-        {{/if}}
-    {{/each}}
-</style>
-{{/if}}

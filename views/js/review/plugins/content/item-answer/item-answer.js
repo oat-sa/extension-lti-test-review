@@ -148,6 +148,17 @@ define([
     };
 
     /**
+     * Defines the tab containing student response and no response proccessing maxScore = 0
+     * @type {tabConfig}
+     */
+    const defaultTab = {
+        name: 'answer',
+        label: __('Your response'),
+        icon: 'radio-checked',
+        cls: 'default'
+    };
+
+    /**
      * Defines possible sets of tabs
      * @type {Object}
      */
@@ -158,7 +169,8 @@ define([
         incorrect: [answerIncorrectTab, correctTab],
         informational: [informationalTab],
         partial: [answerPartialTab, correctTab],
-        pending: [answerPendingTab]
+        pending: [answerPendingTab],
+        default: [defaultTab]
     };
 
     /**
@@ -171,7 +183,8 @@ define([
         skipped: tabsSets.incorrect,
         informational: tabsSets.informational,
         partial: tabsSets.partial,
-        pending: tabsSets.pending
+        pending: tabsSets.pending,
+        default: tabsSets.default
     };
 
     /**
@@ -184,14 +197,15 @@ define([
         skipped: tabsSets.skipped,
         informational: tabsSets.informational,
         partial: tabsSets.answered,
-        pending: tabsSets.pending
+        pending: tabsSets.pending,
+        default: tabsSets.default
     };
 
     /**
      * List of possible states
      * @type {String[]}
      */
-    const states = ['correct', 'incorrect', 'skipped', 'informational', 'partial', 'pending'];
+    const states = ['correct', 'incorrect', 'skipped', 'informational', 'partial', 'pending', 'default'];
 
     /**
      * Builds a component that shows up the item status regarding the responses.
@@ -334,6 +348,14 @@ define([
             },
 
             /**
+             * Tells if the item is default
+             * @returns {Boolean}
+             */
+            isDefaultState() {
+                return this.is('default');
+            },
+
+            /**
              * Defines the item as correct
              * @returns {itemAnswerComponent}
              */
@@ -379,6 +401,14 @@ define([
              */
             setPending() {
                 return this.setStatus('pending');
+            },
+
+            /**
+             * Defines the item as pending
+             * @returns {itemAnswerComponent}
+             */
+            setDefault() {
+                return this.setStatus('default');
             }
         };
 

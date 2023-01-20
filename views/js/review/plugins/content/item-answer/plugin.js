@@ -159,8 +159,10 @@ define([
                             itemAnswer.setPending();
                         } else if (item.score > 0 && item.score < item.maxScore) {
                             itemAnswer.setPartial();
-                        } else {
+                        } else if (item.maxScore) {
                             itemAnswer.setIncorrect();
+                        } else {
+                            itemAnswer.setDefault();
                         }
 
                         // remove all tabindex's inside item for right navigation

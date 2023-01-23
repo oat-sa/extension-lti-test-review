@@ -154,7 +154,7 @@ define([
     const defaultTab = {
         name: 'answer',
         label: __('Your response'),
-        icon: 'radio-checked',
+        icon: null,
         cls: 'default'
     };
 

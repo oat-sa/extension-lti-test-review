@@ -153,6 +153,19 @@ $partialColor: #AD5700;
             display: none;
         }
     }
+    &:not(.show-score) {
+        .item-answer-bar {
+            .item-answer-tabs {
+                .answer-tabs {
+                    .tab {
+                        .icon {
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
     &.show-correct {
         &.correct {
             .icon {

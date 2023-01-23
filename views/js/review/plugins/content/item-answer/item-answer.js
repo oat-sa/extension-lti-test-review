@@ -169,7 +169,7 @@ define([
         incorrect: [answerIncorrectTab, correctTab],
         informational: [informationalTab],
         partial: [answerPartialTab, correctTab],
-        pending: [answerPendingTab],
+        pending: [answerPendingTab, correctTab],
         default: [defaultTab]
     };
 

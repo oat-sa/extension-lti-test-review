@@ -197,7 +197,7 @@ define([
         skipped: tabsSets.skipped,
         informational: tabsSets.informational,
         partial: tabsSets.answered,
-        pending: tabsSets.pending,
+        pending: tabsSets.answered,
         default: tabsSets.default
     };
 

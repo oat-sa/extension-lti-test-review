@@ -158,7 +158,7 @@ $partialColor: #AD5700;
             .item-answer-tabs {
                 .answer-tabs {
                     .tab {
-                        .icon {
+                        .icon:not(.icon-informational) {
                             display: none;
                         }
                     }

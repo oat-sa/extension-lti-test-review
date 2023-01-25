@@ -29,7 +29,7 @@ define([
     pluginFactory,
     navigationDataServiceFactory,
     accordionReviewPanelFactory,
-    fizzyReviewPanelFactory,
+    fizzyReviewPanelFactory
 ) {
     'use strict';
 

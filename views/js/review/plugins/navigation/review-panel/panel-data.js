@@ -61,12 +61,22 @@ define([
         if (item.informational) {
             return 'info';
         }
-        if (withScore && item.maxScore) {
-            if (item.score === item.maxScore) {
-                return 'correct';
-            } else {
-                // also applies when item.score === null (skipped items)
-                return 'incorrect';
+        if (withScore) {
+            if (item.isExternallyScored) {
+                return 'score-pending';
+            }
+            if (item.maxScore) {
+                if (item.score > 0 && item.score < item.maxScore) {
+                    return 'score-partial';
+                }
+                if (item.score === item.maxScore) {
+                    return 'correct';
+                } else {
+                    // also applies when item.score === null (skipped items)
+                    return 'incorrect';
+                }
+            } else if (!item.skipped) {
+                return 'no-score';
             }
         }
         if (item.skipped) {
@@ -83,7 +93,7 @@ define([
      */
     const extractData = (entry, withScore) => {
         const { id, label, position, informational, skipped, title, unseen, score, maxScore } = entry || {};
-        const data = { id, label, title, position, withScore };
+        const data = { id, label, position, withScore };
         if (withScore) {
             Object.assign(data, { score, maxScore });
         }
@@ -95,6 +105,9 @@ define([
         }
         if ('undefined' !== typeof unseen) {
             data.unseen = unseen;
+        }
+        if ('undefined' !== typeof title) {
+            data.title = title;
         }
         return data;
     };
@@ -111,19 +124,18 @@ define([
      * @property {Boolean} informational
      * @property {Boolean} skipped
      * @property {Boolean} unseen
-     * @property {String} type - 'correct'/'incorrect'/'info'/'skipped'/'default'
+     * @property {String} type - 'correct'/'incorrect'/'info'/'skipped'/'score-pending'/'score-partial'/'default'
      * @property {String} status - 'answered'/'viewed'/'unseen'
-     * @property {String} scoreType - 'correct'/'incorrect'/null
+     * @property {String} scoreType - 'correct'/'incorrect'/'score-pending'/'score-partial'/null
      * @property {String} icon - 'info' or null
      */
     /**
      * Adds missing properties to a reviewItem, to support fizzyPanel UI
      * @param {mapEntry} entry - item, will be mutated
      * @param {String} numericLabel
-     * @param {Boolean} displayItemTooltip
      * @returns {ReviewItem}
      */
-    const extendReviewItemScope = (entry, numericLabel, displayItemTooltip) => {
+    const extendReviewItemScope = (entry, numericLabel) => {
         const reviewItem = Object.assign({}, entry);
         const type = reviewItem.type;
 
@@ -139,12 +151,15 @@ define([
             reviewItem.scoreType = 'correct';
         } else if (type === 'incorrect') {
             reviewItem.scoreType = 'incorrect';
+        } else if (type === 'score-pending') {
+            reviewItem.scoreType = 'score-pending';
+        } else if (type === 'score-partial') {
+            reviewItem.scoreType = 'score-partial';
         }
 
         if (reviewItem.unseen) {
             reviewItem.status = 'unseen';
-        }
-        else if (type !== 'info' && type !== 'skipped') {
+        } else if (type !== 'info' && type !== 'skipped') {
             reviewItem.status = 'answered';
         } else {
             reviewItem.status = 'viewed';
@@ -155,13 +170,12 @@ define([
 
     return {
         /**
-        * Refines the test runner data and builds the expected review panel map
-        * @param {testMap} testMap
-        * @param {Boolean} withScore
-        * @param {Boolean} displayItemTooltip
-        * @returns {reviewPanelMap}
-        */
-        getReviewPanelMap(testMap, withScore, displayItemTooltip) {
+         * Refines the test runner data and builds the expected review panel map
+         * @param {testMap} testMap
+         * @param {Boolean} withScore
+         * @returns {reviewPanelMap}
+         */
+        getReviewPanelMap(testMap, withScore) {
             const { parts, score, maxScore } = testMap;
             const items = new Map();
             const sections = new Map();
@@ -181,7 +195,7 @@ define([
                                     if (reviewItem.type !== 'info') {
                                         nonInformationalCount++;
                                     }
-                                    reviewItem = extendReviewItemScope(reviewItem, nonInformationalCount, displayItemTooltip);
+                                    reviewItem = extendReviewItemScope(reviewItem, nonInformationalCount);
                                     items.set(item.id, reviewItem);
                                     return reviewItem;
                                 })

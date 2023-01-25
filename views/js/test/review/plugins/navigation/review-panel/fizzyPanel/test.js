@@ -205,7 +205,6 @@ define([
             headerTitle: defaultHeaderTitle,
             footerLabel: false,
             headerLabel: defaultHeader.label,
-            footerLabel: false,
             header: defaultHeader,
             showScore: true,
             showCorrect: defaultShowCorrect
@@ -290,7 +289,7 @@ define([
             items: [
                 {status: 'viewed'},
                 {status: 'correct'},
-                {status: 'incorrect'},
+                {status: 'score-partial'},
                 {status: 'correct'},
                 {status: 'incorrect'},
                 {status: 'correct'},
@@ -481,13 +480,12 @@ define([
                     withScore: true,
                     maxScore: 1,
                     score: 0,
-                    status: 'skipped',
+                    status: "answered",
                     position: 0,
                     ariaLabel: "Question 1",
                     icon: null,
                     numericLabel: "1",
                     scoreType: "incorrect",
-                    status: "answered",
                     type: "incorrect"
                 }],
                 withScore: true,
@@ -653,13 +651,12 @@ define([
                     withScore: true,
                     maxScore: 1,
                     score: 1,
-                    status: 'skipped',
+                    status: "answered",
                     position: 0,
                     ariaLabel: "Question 1",
                     icon: null,
                     numericLabel: "1",
                     scoreType: "correct",
-                    status: "answered",
                     type: "correct"
                 }],
                 withScore: true,
@@ -746,7 +743,7 @@ define([
                         });
 
                         assert.equal($container.find('.buttonlist-score-icon:nth(0)').is('.icon-correct'), true, 'The 1st item got the expected icon');
-                        assert.equal($container.find('.buttonlist-score-icon:nth(1)').is('.icon-incorrect'), true, 'The 2nd item got the expected icon');
+                        assert.equal($container.find('.buttonlist-score-icon:nth(1)').is('.icon-score-partial'), true, 'The 2nd item got the expected icon');
                         assert.equal($container.find('.buttonlist-score-icon:nth(2)').is('.icon-correct'), true, 'The 3rd item got the expected icon');
                         assert.equal($container.find('.buttonlist-score-icon:nth(3)').is('.icon-incorrect'), true, 'The 4th item got the expected icon');
                         assert.equal($container.find('.buttonlist-score-icon.icon-correct').length, 5, 'The other items got the expected icon');

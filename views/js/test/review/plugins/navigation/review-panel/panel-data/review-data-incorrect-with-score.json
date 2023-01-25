@@ -53,13 +53,13 @@
               "skipped": false,
               "withScore": true,
               "position": 1,
-              "type": "incorrect",
+              "type": "score-partial",
               "score": 1,
               "maxScore": 2,
               "ariaLabel": "Question 1",
               "icon": null,
               "numericLabel": "1",
-              "scoreType": "incorrect",
+              "scoreType": "score-partial",
               "status": "answered"
             },
             {
@@ -85,13 +85,13 @@
               "skipped": false,
               "withScore": true,
               "position": 3,
-              "type": "incorrect",
+              "type": "score-partial",
               "score": 2,
               "maxScore": 3,
               "ariaLabel": "Question 3",
               "icon": null,
               "numericLabel": "3",
-              "scoreType": "incorrect",
+              "scoreType": "score-partial",
               "status": "answered"
             },
             {
@@ -117,13 +117,13 @@
               "skipped": false,
               "withScore": true,
               "position": 5,
-              "type": "incorrect",
+              "type": "score-partial",
               "score": 1,
               "maxScore": 2,
               "ariaLabel": "Question 5",
               "icon": null,
               "numericLabel": "5",
-              "scoreType": "incorrect",
+              "scoreType": "score-partial",
               "status": "answered"
             },
             {

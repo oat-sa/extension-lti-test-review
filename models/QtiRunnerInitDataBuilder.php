@@ -235,6 +235,7 @@ class QtiRunnerInitDataBuilder
                                     $itemData['data'],
                                     self::OUTCOME_VAR_MAXSCORE
                                 ),
+                        'isExternallyScored' => $this->isExternallyScored($itemData['data'] ?? []),
                     ];
 
                     $this->fillItemsData($itemId, $item->getHref(), $itemData['data']);
@@ -353,6 +354,18 @@ class QtiRunnerInitDataBuilder
         }
 
         return null;
+    }
+
+
+    private function isExternallyScored(array $data): bool
+    {
+        foreach ($data['outcomes'] ?? [] as $outcome) {
+            if (isset($outcome['attributes']['externalScored'])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

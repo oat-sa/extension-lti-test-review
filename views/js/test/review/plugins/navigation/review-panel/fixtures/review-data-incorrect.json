@@ -13,6 +13,7 @@
             {
               "id": "item-1",
               "label": "Example_0_Introduction",
+              "title": "Example_0_Introduction",
               "informational": true,
               "skipped": false,
               "withScore": true,
@@ -49,6 +50,7 @@
             {
               "id": "item-2",
               "label": "example_1_TAO",
+              "title": "example_1_TAO",
               "informational": false,
               "skipped": false,
               "withScore": true,
@@ -65,22 +67,24 @@
             {
               "id": "item-3",
               "label": "example_2_Math",
+              "title": "example_2_Math",
               "informational": false,
               "skipped": false,
               "withScore": true,
-              "type": "incorrect",
+              "type": "score-partial",
               "position": 2,
               "score": 2,
               "maxScore": 3,
               "ariaLabel": "Question 2",
               "icon": null,
               "numericLabel": "2",
-              "scoreType": "incorrect",
+              "scoreType": "score-partial",
               "status": "answered"
             },
             {
               "id": "item-4",
               "label": "Example_3_Baudelaire",
+              "title": "Example_3_Baudelaire",
               "informational": false,
               "skipped": false,
               "withScore": true,
@@ -97,6 +101,7 @@
             {
               "id": "item-5",
               "label": "Example_4_Appearance",
+              "title": "Example_4_Appearance",
               "informational": false,
               "skipped": false,
               "withScore": true,
@@ -123,6 +128,7 @@
             {
               "id": "item-6",
               "label": "Example_5_picasso",
+              "title": "Example_5_picasso",
               "informational": false,
               "skipped": false,
               "withScore": true,
@@ -139,6 +145,7 @@
             {
               "id": "item-7",
               "label": "Example_6_Geography",
+              "title": "Example_6_Geography",
               "informational": false,
               "skipped": false,
               "withScore": true,
@@ -155,6 +162,7 @@
             {
               "id": "item-8",
               "label": "Example_7_Geo 2",
+              "title": "Example_7_Geo 2",
               "informational": false,
               "skipped": false,
               "withScore": true,
@@ -171,6 +179,7 @@
             {
               "id": "item-9",
               "label": "Example_8_Geo 3",
+              "title": "Example_8_Geo 3",
               "informational": false,
               "skipped": true,
               "withScore": true,

@@ -51,6 +51,8 @@ $itemBackgroundActive: lighten($lightBlueGrey, 5);
 $defaultIconColor: $grey;
 $correctColor: $success;
 $incorrectColor: $error;
+$pendingColor: #6E6E6E;
+$partialColor: #AD5700;
 
 @mixin review-panel-line-layout($justify) {
     display: flex;
@@ -324,6 +326,18 @@ $incorrectColor: $error;
             .review-panel-label:before {
                 @include icon-result-nok;
                 color: $incorrectColor;
+            }
+        }
+        &.item-score-pending {
+            .review-panel-label:before {
+                @include icon-time;
+                color: $pendingColor;
+            }
+        }
+        &.item-score-partial {
+            .review-panel-label:before {
+                @include icon-score-partial;
+                color: $partialColor;
             }
         }
     }

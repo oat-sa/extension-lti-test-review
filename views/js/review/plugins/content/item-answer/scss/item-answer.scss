@@ -30,6 +30,8 @@ $activeTabTextColor: $textColor;
 $activeTabBackgroundColor: $uiGeneralContentBg;
 $correctColor: blacken($success, .2);
 $incorrectColor: blacken($error, .2);
+$pendingColor: #6E6E6E;
+$partialColor: #AD5700;
 
 .item-answer {
     position: relative;
@@ -151,6 +153,19 @@ $incorrectColor: blacken($error, .2);
             display: none;
         }
     }
+    &:not(.show-score) {
+        .item-answer-bar {
+            .item-answer-tabs {
+                .answer-tabs {
+                    .tab {
+                        .icon:not(.icon-informational) {
+                            display: none;
+                        }
+                    }
+                }
+            }
+        }
+    }
     &.show-correct {
         &.correct {
             .icon {
@@ -161,6 +176,16 @@ $incorrectColor: blacken($error, .2);
         &.skipped {
             .icon {
                 color: $incorrectColor;
+            }
+        }
+        &.pending {
+            .icon {
+                color: $pendingColor;
+            }
+        }
+        &.partial {
+            .icon {
+                color: $partialColor;
             }
         }
     }

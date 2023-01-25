@@ -145,9 +145,7 @@ define([
                 testRunner
                     .on('renderitem', itemRef => {
                         const item = mapHelper.getItem(testRunner.getTestMap(), itemRef);
-                        const score = item.informational ? '' : `${item.score}/${item.maxScore}`;
-
-                        itemAnswer.setScore(score);
+                        let score = item.informational ? '' : `${item.score}/${item.maxScore}`;
 
                         if (item.informational) {
                             itemAnswer.setInformational();
@@ -155,9 +153,18 @@ define([
                             itemAnswer.setCorrect();
                         } else if (item.skipped) {
                             itemAnswer.setSkipped();
-                        } else {
+                        } else if (item.isExternallyScored) {
+                            itemAnswer.setPending();
+                        } else if (item.score > 0 && item.score < item.maxScore) {
+                            itemAnswer.setPartial();
+                        } else if (item.maxScore) {
                             itemAnswer.setIncorrect();
+                        } else {
+                            score = '';
+                            itemAnswer.setDefault();
                         }
+
+                        itemAnswer.setScore(score);
 
                         // remove all tabindex's inside item for right navigation
                         areaBroker.getContentArea().find('[tabindex]').attr('tabindex', -1);

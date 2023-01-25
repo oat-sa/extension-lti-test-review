@@ -126,6 +126,39 @@ define([
     };
 
     /**
+     * Defines the tab containing student response when partial
+     * @type {tabConfig}
+     */
+    const answerPartialTab = {
+        name: 'answer',
+        label: __('Your response'),
+        icon: 'score-partial',
+        cls: 'partial'
+    };
+
+    /**
+     * Defines the tab containing student response when incorrect
+     * @type {tabConfig}
+     */
+    const answerPendingTab = {
+        name: 'answer',
+        label: __('Your response'),
+        icon: 'time',
+        cls: 'pending'
+    };
+
+    /**
+     * Defines the tab containing student response and no response proccessing maxScore = 0
+     * @type {tabConfig}
+     */
+    const defaultTab = {
+        name: 'answer',
+        label: __('Your response'),
+        icon: null,
+        cls: 'default'
+    };
+
+    /**
      * Defines possible sets of tabs
      * @type {Object}
      */
@@ -134,7 +167,10 @@ define([
         skipped: [skippedTab],
         correct: [answerCorrectTab],
         incorrect: [answerIncorrectTab, correctTab],
-        informational: [informationalTab]
+        informational: [informationalTab],
+        partial: [answerPartialTab, correctTab],
+        pending: [answerPendingTab, correctTab],
+        default: [defaultTab]
     };
 
     /**
@@ -145,7 +181,10 @@ define([
         correct: tabsSets.correct,
         incorrect: tabsSets.incorrect,
         skipped: tabsSets.incorrect,
-        informational: tabsSets.informational
+        informational: tabsSets.informational,
+        partial: tabsSets.partial,
+        pending: tabsSets.pending,
+        default: tabsSets.default
     };
 
     /**
@@ -156,14 +195,17 @@ define([
         correct: tabsSets.answered,
         incorrect: tabsSets.answered,
         skipped: tabsSets.skipped,
-        informational: tabsSets.informational
+        informational: tabsSets.informational,
+        partial: tabsSets.answered,
+        pending: tabsSets.answered,
+        default: tabsSets.default
     };
 
     /**
      * List of possible states
      * @type {String[]}
      */
-    const states = ['correct', 'incorrect', 'skipped', 'informational'];
+    const states = ['correct', 'incorrect', 'skipped', 'informational', 'partial', 'pending', 'default'];
 
     /**
      * Builds a component that shows up the item status regarding the responses.
@@ -290,6 +332,30 @@ define([
             },
 
             /**
+             * Tells if the item is informational
+             * @returns {Boolean}
+             */
+            isPartial() {
+                return this.is('partial');
+            },
+
+            /**
+             * Tells if the item is informational
+             * @returns {Boolean}
+             */
+            isPending() {
+                return this.is('pending');
+            },
+
+            /**
+             * Tells if the item is default
+             * @returns {Boolean}
+             */
+            isDefaultState() {
+                return this.is('default');
+            },
+
+            /**
              * Defines the item as correct
              * @returns {itemAnswerComponent}
              */
@@ -319,6 +385,30 @@ define([
              */
             setInformational() {
                 return this.setStatus('informational');
+            },
+
+            /**
+             * Defines the item as partial
+             * @returns {itemAnswerComponent}
+             */
+            setPartial() {
+                return this.setStatus('partial');
+            },
+
+            /**
+             * Defines the item as pending
+             * @returns {itemAnswerComponent}
+             */
+            setPending() {
+                return this.setStatus('pending');
+            },
+
+            /**
+             * Defines the item as pending
+             * @returns {itemAnswerComponent}
+             */
+            setDefault() {
+                return this.setStatus('default');
             }
         };
 

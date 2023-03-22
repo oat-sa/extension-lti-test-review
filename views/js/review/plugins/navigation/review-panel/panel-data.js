@@ -62,19 +62,22 @@ define([
             return 'info';
         }
         if (withScore) {
-            if (item.isExternallyScored) {
-                return 'score-pending';
-            }
             if (item.maxScore) {
                 if (item.score > 0 && item.score < item.maxScore) {
                     return 'score-partial';
                 }
                 if (item.score === item.maxScore) {
                     return 'correct';
-                } else {
-                    // also applies when item.score === null (skipped items)
-                    return 'incorrect';
                 }
+                if (item.score === 0 && !item.isExternallyScored) {
+                    return 'incorrect'
+                }
+                if (item.isExternallyScored) {
+                    return 'score-pending';
+                }
+
+                // also applies when item.score === null (skipped items)
+                return 'incorrect';
             } else if (!item.skipped) {
                 return 'no-score';
             }

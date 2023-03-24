@@ -62,7 +62,7 @@ define([
             return 'info';
         }
         if (withScore) {
-            if (item.isExternallyScored) {
+            if (item.isExternallyScored && item.pendingExternalScore) {
                 return 'score-pending';
             }
             if (item.maxScore) {

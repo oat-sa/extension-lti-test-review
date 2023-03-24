@@ -237,7 +237,7 @@ class QtiRunnerInitDataBuilder
                                     self::OUTCOME_VAR_MAXSCORE
                                 ),
                         'isExternallyScored' => $this->isExternallyScored($itemData['data'] ?? []),
-                        'isExternallyGraded' => $itemsStates[$itemId]['isExternallyGraded'] ?? false,
+                        'pendingExternalScore' => !($itemsStates[$itemId]['isExternallyGraded'] ?? false), //invert the condition to have a better attribute exposed on the FE
                     ];
 
                     $this->fillItemsData($itemId, $item->getHref(), $itemData['data']);

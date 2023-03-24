@@ -162,6 +162,7 @@ class QtiRunnerInitDataBuilder
                      */
                     $var = $outcome[static::OUTCOME_VAR_SCORE]['var'];
                     $returnValue[$variable['internalIdentifier']]['score'] = (float)$var->getValue();
+                    $returnValue[$variable['internalIdentifier']]['isExternallyGraded'] = $outcome[static::OUTCOME_VAR_SCORE]['isExternallyGraded'] ?? false;
                 }
 
                 if (isset($outcome[static::OUTCOME_VAR_MAXSCORE])) {
@@ -236,6 +237,7 @@ class QtiRunnerInitDataBuilder
                                     self::OUTCOME_VAR_MAXSCORE
                                 ),
                         'isExternallyScored' => $this->isExternallyScored($itemData['data'] ?? []),
+                        'isExternallyGraded' => $itemsStates[$itemId]['isExternallyGraded'] ?? false,
                     ];
 
                     $this->fillItemsData($itemId, $item->getHref(), $itemData['data']);

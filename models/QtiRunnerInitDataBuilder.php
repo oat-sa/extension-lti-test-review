@@ -163,7 +163,7 @@ class QtiRunnerInitDataBuilder
                     $var = $outcome[static::OUTCOME_VAR_SCORE]['var'];
                     $returnValue[$variable['internalIdentifier']]['score'] = (float)$var->getValue();
                     $returnValue[$variable['internalIdentifier']]['isExternallyGraded'] =
-                        $outcome[static::OUTCOME_VAR_SCORE]['isExternallyGraded'] ?? false;
+                        $var->getExternallyGraded();
                 }
 
                 if (isset($outcome[static::OUTCOME_VAR_MAXSCORE])) {

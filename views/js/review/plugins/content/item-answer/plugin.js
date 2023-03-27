@@ -153,7 +153,7 @@ define([
                             itemAnswer.setCorrect();
                         } else if (item.skipped) {
                             itemAnswer.setSkipped();
-                        } else if (item.isExternallyScored) {
+                        } else if (item.isExternallyScored && item.pendingExternalScore) {
                             itemAnswer.setPending();
                         } else if (item.score > 0 && item.score < item.maxScore) {
                             itemAnswer.setPartial();

@@ -1,0 +1,84 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: TAO 2021.11\n"
+"PO-Revision-Date: 2022-02-18T13:40:09\n"
+"Last-Translator: TAO Translation Team <translation@tao.lu>\n"
+"MIME-Version: 1.0\n"
+"Language: pt-BR\n"
+"sourceLanguage: en-US\n"
+"targetLanguage: pt-BR\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Basepath: ../../\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+
+msgid "All"
+msgstr "todos"
+
+msgid "Available delivery executions for review does not exists"
+msgstr ""
+
+msgid "Correct response"
+msgstr ""
+
+msgid "Delivery id not provided"
+msgstr ""
+
+msgid "Go to the next item"
+msgstr ""
+
+msgid "Go to the previous item"
+msgstr ""
+
+msgid "Incorrect"
+msgstr "Incorreta"
+
+msgid "Informational item"
+msgstr ""
+
+msgid "Jump to:"
+msgstr ""
+
+msgid "Navigation"
+msgstr "Navegação"
+
+msgid "Next"
+msgstr "Próximo"
+
+msgid "No response"
+msgstr ""
+
+msgid "Question"
+msgstr "Pergunta"
+
+msgid "Question %s"
+msgstr "Pergunta %s"
+
+msgid "Show all items"
+msgstr ""
+
+msgid "Show incorrect items only"
+msgstr ""
+
+msgid "Test review"
+msgstr ""
+
+msgid "TEST SCORE:"
+msgstr ""
+
+msgid "Total"
+msgstr "Total"
+
+msgid "TOTAL"
+msgstr "TOTAL"
+
+msgid "Total score:"
+msgstr "Pontuação total:"
+
+msgid "Your response"
+msgstr ""
+
+msgid "Your Score:"
+msgstr ""
+

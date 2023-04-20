@@ -123,6 +123,34 @@ class QtiRunnerInitDataBuilder
         return $init;
     }
 
+    public function getQtiTestItems(string $deliveryExecutionId): array
+    {
+        $context = $this->getServiceContext($deliveryExecutionId);
+        $testDefinition = taoQtiTest_helpers_Utils::getTestDefinition($context->getTestCompilationUri());
+        $testParts = [];
+        foreach ($testDefinition->getTestParts() as $testPart) {
+            $sections = [];
+            foreach ($testPart->getAssessmentSections() as $section) {
+                $items = [];
+                foreach ($section->getSectionParts() as $item) {
+                    $itemData = $this->qtiRunnerService->getItemData($context, $item->getHref());
+                    $itemId = $item->getIdentifier();
+                    $this->validateItemData($itemData);
+
+                    $itemData['data']['isExternallyScored'] = $this->isExternallyScored($itemData['data'] ?? []);
+
+                    $items[$itemId] = $itemData['data'];
+                }
+                $sectionId = $section->getIdentifier();
+                $sections[$sectionId] = $items;
+            }
+            $testPartId = $testPart->getIdentifier();
+            $testParts[$testPartId] = $sections;
+        }
+
+        return $testParts;
+    }
+
     protected function getItemsData(string $deliveryExecutionId, $fetchScores = false)
     {
         $deliveryExecution = $this->deliveryExecutionService->getDeliveryExecutionById($deliveryExecutionId);

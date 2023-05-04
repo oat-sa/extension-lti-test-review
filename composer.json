@@ -21,15 +21,15 @@
         "oat-sa/oatbox-extension-installer": "~1.1||dev-master",
         "oat-sa/extension-tao-ltideliveryprovider": "dev-feature/AUT-2995",
         "oat-sa/generis": ">=15.22",
-        "oat-sa/tao-core": "dev-feature/AUT-2995",
+        "oat-sa/tao-core": ">=51.2.0",
         "oat-sa/extension-tao-delivery": "dev-feature/AUT-2995",
         "oat-sa/extension-tao-lti": "dev-feature/AUT-2995",
         "oat-sa/extension-tao-delivery-rdf": "dev-feature/AUT-2995",
         "oat-sa/extension-tao-proctoring": "dev-feature/AUT-2995",
-        "oat-sa/extension-tao-testqti": "dev-feature/AUT-2995",
-        "oat-sa/extension-tao-outcome": "dev-feature/AUT-2995",
+        "oat-sa/extension-tao-testqti": ">=41.0.0",
+        "oat-sa/extension-tao-outcome": ">=13.0.0",
         "oat-sa/extension-tao-testqti-previewer": "dev-feature/AUT-2995",
-        "oat-sa/extension-tao-outcomeui": "dev-feature/AUT-2995"
+        "oat-sa/extension-tao-outcomeui": ">=11.0.0"
     },
     "autoload": {
         "psr-4": {

@@ -1,14 +1,1 @@
-{
-	"version": 3,
-	"file": "buttons.css",
-	"sources": [
-		"../scss/buttons.scss",
-		"../../../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_bootstrap.scss",
-		"../../../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_variables.scss",
-		"../../../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_functions.scss",
-		"../../../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_colors.scss",
-		"../../../../../../../../tao/views/scss/inc/fonts/_tao-icon-vars.scss"
-	],
-	"names": [],
-	"mappings": "AAuBA,AAAA,UAAU,AAAC,CACP,MAAM,CAAE,IAAI,CACZ,OAAO,CAAE,IAAI,CACb,cAAc,CAAE,WAAW,CAC3B,aAAa,CAAE,OAAO,CAwDzB,AA5DD,AAMI,UANM,CAMN,OAAO,AAAC,CACJ,aAAa,CAAE,CAAC,CAChB,cAAc,CAAE,SAAS,CACzB,IAAI,CAAE,QAAQ,CACd,YAAY,CAAE,GAAG,CACjB,MAAM,CAfC,IAAI,CAgBX,WAAW,CAhBJ,IAAI,CA0Cd,AAtCL,AAcQ,UAdE,CAMN,OAAO,AAQF,MAAM,AAAC,CACJ,YAAY,CAAE,CAAC,CAClB,AAhBT,AAkBQ,UAlBE,CAMN,OAAO,AAYF,SAAS,AAAC,CACP,IAAI,CAAE,QAAQ,CAIjB,AAvBT,AAoBY,UApBF,CAMN,OAAO,AAYF,SAAS,CAEN,KAAK,AAAC,CACF,OAAO,CAAE,CAAC,CACb,AAtBb,AA0BY,UA1BF,CAMN,OAAO,AAmBF,MAAM,CACH,KAAK,AAAC,CACF,KAAK,CAAE,KAAK,CACZ,OAAO,CAAE,KAAK,CACd,WAAW,CAAE,IAAI,CACjB,KAAK,CAAE,IAAI,CACd,AA/Bb,AAiCQ,UAjCE,CAMN,OAAO,CA2BH,KAAK,AAAC,CACF,MAAM,CAtCH,IAAI,CAuCP,WAAW,CAvCR,IAAI,CAwCP,SAAS,CAAE,IAAI,CAClB,AArCT,AAwCI,UAxCM,CAwCN,MAAM,AAAC,CACH,OAAO,CAAE,MAAM,CAClB,AA1CL,AA4CQ,UA5CE,AA2CL,IAAK,CAAA,SAAS,EACX,OAAO,AAAC,CACJ,QAAQ,CAAE,QAAQ,CAarB,AA1DT,AAgDgB,UAhDN,AA2CL,IAAK,CAAA,SAAS,EACX,OAAO,AAGF,MAAM,AACF,OAAO,AAAC,CACL,OAAO,CAAE,GAAG,CACZ,QAAQ,CAAE,QAAQ,CAClB,GAAG,CAtDV,IAAG,CAuDI,IAAI,CAvDX,IAAG,CAwDI,MAAM,CAxDb,IAAG,CAyDI,KAAK,CAzDZ,IAAG,CA0DI,MAAM,CAzDZ,GAAG,CAyDwB,KAAK,CI5EvC,OAAgB,CJ6EN"
-}
+{"version":3,"sourceRoot":"","sources":["../scss/buttons.scss"],"names":[],"mappings":"AAuBA,WACI,YACA,aACA,2BACA,sBAEA,mBACI,gBACA,yBACA,cACA,iBACA,OAfO,KAgBP,YAhBO,KAkBP,yBACI,eAGJ,4BACI,cACA,kCACI,UAKJ,+BACI,YACA,cACA,iBACA,WAGR,yBACI,OAtCG,KAuCH,YAvCG,KAwCH,eAIR,kBACI,eAGA,kCACI,kBAGI,+CACI,YACA,kBACA,SACA,UACA,YACA,WACA","file":"buttons.css"}

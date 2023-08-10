@@ -1,14 +1,1 @@
-{
-	"version": 3,
-	"file": "fizzy-panel.css",
-	"sources": [
-		"../scss/fizzy-panel.scss",
-		"../../../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_bootstrap.scss",
-		"../../../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_variables.scss",
-		"../../../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_functions.scss",
-		"../../../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_colors.scss",
-		"../../../../../../../../tao/views/scss/inc/fonts/_tao-icon-vars.scss"
-	],
-	"names": [],
-	"mappings": "AAmCA,AAAA,aAAa,AAAA,MAAM,AAAC,CAChB,KAAK,CIfG,IAAI,CJgBZ,QAAQ,CAAE,QAAQ,CAClB,OAAO,CAAE,IAAI,CACb,cAAc,CAAE,MAAM,CACtB,eAAe,CAAE,UAAU,CAC3B,MAAM,CAAE,OAAO,CACf,KAAK,CAAE,IAAI,CACX,MAAM,CAAE,IAAI,CACZ,OAAO,CAAE,CAAC,CAtBA,IAAI,CA2EjB,AA9DD,AAYI,aAZS,AAAA,MAAM,CAYf,mBAAmB,AAAC,CAChB,OAAO,CAAE,KAAK,CACd,WAAW,CAAE,MAAM,CACtB,AAfL,AAgBI,aAhBS,AAAA,MAAM,CAgBf,mBAAmB,AAAC,CAChB,OAAO,CAAE,KAAK,CACd,WAAW,CAAE,MAAM,CACtB,AAnBL,AAsBQ,aAtBK,AAAA,MAAM,CAqBf,oBAAoB,CAChB,mBAAmB,AAAC,CAChB,SAAS,CAAE,IAAI,CACf,WAAW,CAAE,IAAI,CACjB,aAAa,CAAE,GAAG,CAAC,KAAK,CG+HxB,OAAsC,CH9HtC,MAAM,CAAE,IAAI,CAxCV,IAAI,CAwCoB,CAAC,CAxCzB,IAAI,CAyCN,OAAO,CAAE,iBAAiB,CAC7B,AA5BT,AA6BQ,aA7BK,AAAA,MAAM,CAqBf,oBAAoB,CAQhB,0BAA0B,AAAC,CAlC/B,OAAO,CAAE,IAAI,CACb,cAAc,CAAE,GAAG,CACnB,eAAe,CAiC2B,aAAa,CAC/C,OAAO,CAAE,MAAM,CA7Cb,IAAI,CA8CN,KAAK,CI9CL,IAAI,CJ+CJ,SAAS,CAAE,MAAM,CACjB,WAAW,CAAE,IAAI,CACpB,AAnCT,AAsCI,aAtCS,AAAA,MAAM,CAsCf,qBAAqB,AAAC,CAClB,IAAI,CAAE,QAAQ,CACd,UAAU,CAAE,IAAI,CAUnB,AAlDL,AAyCQ,aAzCK,AAAA,MAAM,CAsCf,qBAAqB,CAGjB,sBAAsB,AAAC,CACnB,OAAO,CAAE,UAAU,CACnB,UAAU,CAAE,IAAI,CAMnB,AAjDT,AA4CY,aA5CC,AAAA,MAAM,CAsCf,qBAAqB,CAGjB,sBAAsB,CAGlB,mBAAmB,AAAC,CAChB,SAAS,CAAE,MAAM,CACjB,MAAM,CAAE,MAAM,CA5DhB,IAAI,CA4D0B,IAAI,CA5DlC,IAAI,CA6DF,OAAO,CAAE,KAAK,CACjB,AAhDb,AAoDI,aApDS,AAAA,MAAM,CAoDf,oBAAoB,AAAC,CAzDrB,OAAO,CAAE,IAAI,CACb,cAAc,CAAE,GAAG,CACnB,eAAe,CAwDuB,aAAa,CAC/C,OAAO,CAAE,MAAM,CApET,IAAI,CAoEmB,CAAC,CApExB,IAAI,CAqEV,KAAK,CIrED,IAAI,CJsER,SAAS,CAAE,MAAM,CACjB,WAAW,CAAE,IAAI,CAIpB,AA7DL,AA0DQ,aA1DK,AAAA,MAAM,CAoDf,oBAAoB,CAMhB,mBAAmB,AAAC,CAChB,OAAO,CAAE,CACb,CAAC"
-}
+{"version":3,"sourceRoot":"","sources":["../scss/fizzy-panel.scss","../../../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_colors.scss"],"names":[],"mappings":"AAmCA,oBACI,MCfQ,KDgBR,kBACA,aACA,sBACA,2BACA,eACA,WACA,YACA,eAGA,wCACI,cACA,mBAEJ,wCACI,cACA,mBAIA,6DACI,eACA,iBACA,gCACA,wBACA,wBAEJ,oEAlCJ,aACA,mBACA,gBAiC0C,cAClC,mBACA,MC9CA,KD+CA,iBACA,iBAIR,0CACI,cACA,gBACA,iEACI,mBACA,gBACA,qFACI,iBACA,6BACA,cAKZ,yCAzDA,aACA,mBACA,gBAwDsC,cAClC,0BACA,MCrEI,KDsEJ,iBACA,iBACA,6DACI","file":"fizzy-panel.css"}

@@ -1,14 +1,1 @@
-{
-	"version": 3,
-	"file": "qtiTestReviewComponent.css",
-	"sources": [
-		"../scss/qtiTestReviewComponent.scss",
-		"../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_bootstrap.scss",
-		"../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_variables.scss",
-		"../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_functions.scss",
-		"../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_colors.scss",
-		"../../../../../../tao/views/scss/inc/fonts/_tao-icon-vars.scss"
-	],
-	"names": [],
-	"mappings": "AAmBA,AAAA,oBAAoB,AAAC,CACjB,UAAU,CAAE,OAAO,CA6BtB,AA9BD,AAYI,oBAZgB,AAYf,SAAS,AAAC,CARP,QAAQ,CAAE,QAAQ,CAClB,GAAG,CAAE,CAAC,CACN,IAAI,CAAE,CAAC,CACP,KAAK,CAAE,CAAC,CACR,MAAM,CAAE,CAAC,CACT,OAAO,CAKoB,MAAM,CACjC,UAAU,CG6KN,IAA6B,CHxKpC,AApBL,AAiBQ,oBAjBY,AAYf,SAAS,CAKN,kBAAkB,AAAC,CACf,MAAM,CAAE,KAAK,CAChB,AAnBT,AAyBQ,oBAzBY,AAsBf,SAAS,CAGN,SAAS,AAAA,QAAQ,AAAC,CACd,OAAO,CAAE,IAAI,CACb,OAAO,CAAE,IAAI,CAChB"
-}
+{"version":3,"sourceRoot":"","sources":["../scss/qtiTestReviewComponent.scss","../../../../../../tao/views/node_modules/@oat-sa/tao-core-ui/scss/inc/_colors.scss"],"names":[],"mappings":"AAmBA,qBACI,mBAWA,8BARI,kBACA,MACA,OACA,QACA,SACA,QAK2B,OAC3B,WCLa,KDOb,iDACI,aAOJ,gDACI,aACA","file":"qtiTestReviewComponent.css"}

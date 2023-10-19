@@ -1,4 +1,7 @@
 $sidePanelBorderWidth: 1px;
+$sideBarSWidth: 200px;
+$sideBarMWidth: 250px;
+$sideBarLWidth: 300px;
 $focusBorderWidth: 3px;
 @mixin sidePanelWidth($width) {
     max-width: $width;
@@ -31,12 +34,12 @@ $focusBorderWidth: 3px;
         flex-direction: column;
         justify-content: flex-start;
 
-        @include sidePanelWidth(300px);
+        @include sidePanelWidth($sideBarLWidth);
         @media only screen and (max-device-width: 800px) {
-            @include sidePanelWidth(200px);
+            @include sidePanelWidth($sideBarSWidth);
         }
         @media only screen and (min-device-width: 800px) and (max-device-width: 1280px) {
-            @include sidePanelWidth(250px);
+            @include sidePanelWidth($sideBarMWidth);
         }
 
         .panel-box {
@@ -61,10 +64,10 @@ $focusBorderWidth: 3px;
         padding: 30px 30px 0 30px;
 
         @media only screen and (max-device-width: 800px) {
-            max-width: 76%;
+            max-width: calc(100% - $sideBarSWidth);
         }
         @media only screen and (min-device-width: 800px) and (max-device-width: 1280px) {
-            max-width: 76%;
+            max-width: calc(100% - $sideBarMWidth);
         }
         
         .item-tool {

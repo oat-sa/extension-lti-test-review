@@ -180,7 +180,7 @@ define([
     const tabsByStatusWithCorrect = {
         correct: tabsSets.correct,
         incorrect: tabsSets.incorrect,
-        skipped: tabsSets.incorrect,
+        skipped: tabsSets.skipped,
         informational: tabsSets.informational,
         partial: tabsSets.partial,
         pending: tabsSets.pending,

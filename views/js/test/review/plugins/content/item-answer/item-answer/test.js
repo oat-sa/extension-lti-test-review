@@ -522,7 +522,7 @@ define([
             hidden: false,
             iconCorrect: '.icon-correct',
             iconIncorrect: '.icon-incorrect',
-            iconSkipped: '.icon-skipped',
+            iconSkipped: '.icon-no-score',
             iconInformational: '.icon-informational',
         }
     }, {

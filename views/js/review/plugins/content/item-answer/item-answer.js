@@ -110,7 +110,7 @@ define([
     const skippedTab = {
         name: 'answer',
         label: __('Your response'),
-        icon: 'skipped',
+        icon: 'no-score',
         cls: 'skipped'
     };
 

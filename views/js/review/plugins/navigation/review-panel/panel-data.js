@@ -71,16 +71,17 @@ define([
                 }
                 if (item.score === item.maxScore) {
                     return 'correct';
-                } else {
-                    // also applies when item.score === null (skipped items)
-                    return 'incorrect';
                 }
+                if (item.skipped) {
+                    return 'no-score';
+                }
+                return 'incorrect';
             } else if (!item.skipped) {
                 return 'no-score';
             }
         }
         if (item.skipped) {
-            return 'skipped';
+            return 'no-score';
         }
         return 'default';
     };

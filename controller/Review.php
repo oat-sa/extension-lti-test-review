@@ -139,7 +139,9 @@ class Review extends tao_actions_SinglePageModule
             $execution = $finder->findDeliveryExecution($launchData);
         }
 
-        $this->pauseConcurrentSessions($execution);
+        if ($this->isPausingConcurrentSessionsEnabled()) {
+            $this->pauseConcurrentSessions($execution);
+        }
 
         $delivery = $execution->getDelivery();
 

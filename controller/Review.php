@@ -33,10 +33,18 @@ use core_kernel_users_GenerisUser;
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use oat\ltiDeliveryProvider\model\delivery\ActiveDeliveryExecutionsService;
 use oat\ltiTestReview\models\DeliveryExecutionFinderService;
 use oat\ltiTestReview\models\QtiRunnerInitDataBuilderFactory;
+use oat\oatbox\user\AnonymousUser;
+use oat\tao\model\featureFlag\FeatureFlagChecker;
 use oat\tao\model\http\HttpJsonResponseTrait;
 use oat\tao\model\mvc\DefaultUrlService;
+use oat\taoDelivery\model\execution\DeliveryExecution;
+use oat\taoDelivery\model\execution\DeliveryExecutionInterface;
+use oat\taoDelivery\model\execution\DeliveryExecutionService;
+use oat\taoDelivery\model\execution\StateServiceInterface;
+use oat\taoDelivery\model\RuntimeService;
 use oat\taoLti\models\classes\LtiClientException;
 use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
@@ -45,11 +53,16 @@ use oat\taoLti\models\classes\LtiMessages\LtiErrorMessage;
 use oat\taoLti\models\classes\LtiService;
 use oat\taoLti\models\classes\LtiVariableMissingException;
 use oat\taoLti\models\classes\TaoLtiSession;
+use oat\taoLti\models\classes\user\LtiUser;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
+use oat\taoQtiTest\model\Service\PauseService;
+use oat\taoQtiTest\models\runner\QtiRunnerService;
+use oat\taoQtiTest\models\runner\QtiRunnerServiceContext;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
 use tao_actions_SinglePageModule;
 use taoResultServer_models_classes_ReadableResultStorage;
+use Throwable;
 
 /**
  * Review controller class thar provides data for js-application
@@ -59,6 +72,13 @@ class Review extends tao_actions_SinglePageModule
 {
     use OntologyAwareTrait;
     use HttpJsonResponseTrait;
+
+    /**
+     * Controls whether launching a new delivery suspends other sessions by the same user.
+     *
+     * @var string
+     */
+    public const FEATURE_FLAG_PAUSE_CONCURRENT_SESSIONS = 'FEATURE_FLAG_PAUSE_CONCURRENT_SESSIONS';
 
     public const OPTION_REVIEW_LAYOUT = 'reviewLayout';
     public const OPTION_DISPLAY_SECTION_TITLES = 'displaySectionTitles';
@@ -118,6 +138,9 @@ class Review extends tao_actions_SinglePageModule
         } else {
             $execution = $finder->findDeliveryExecution($launchData);
         }
+
+        $this->pauseConcurrentSessions($execution);
+
         $delivery = $execution->getDelivery();
 
         $urlRouteService = $this->getDefaultUrlService();
@@ -134,6 +157,110 @@ class Review extends tao_actions_SinglePageModule
         ];
 
         $this->composeView('delegated-view', $data, 'pages/index.tpl', 'tao');
+    }
+
+    private function pauseConcurrentSessions(
+        DeliveryExecution $activeExecution
+    ): void {
+        $userIdentifier = $activeExecution->getUserIdentifier();
+
+        if (empty($userIdentifier) || $userIdentifier === LtiUser::ANONYMOUS_USER_URI) {
+            return;
+        }
+
+        $logger = $this->getLogger();
+        $logger->info(
+            sprintf(
+                "%s: Attempting to stop all sessions for user %s",
+                self::class,
+                $userIdentifier
+            )
+        );
+
+        $deliveryExecutionService = $this->getDeliveryExecutionService();
+        $activeExecutionService = $this->getActiveDeliveryExecutionsService();
+
+        $otherExecutionIds = $activeExecutionService->getExecutionIdsForOtherDeliveries(
+            $userIdentifier,
+            $activeExecution->getIdentifier()
+        );
+
+        $count = 0;
+
+        $logger->warning(sprintf("otherExecutionIds: %s", var_export($otherExecutionIds,true)));
+
+        foreach ($otherExecutionIds as $executionId) {
+            try {
+                $execution = $deliveryExecutionService->getDeliveryExecution(
+                    $executionId
+                );
+
+                if (!$execution instanceof DeliveryExecution) {
+                    continue;
+                }
+
+                $logger->debug(
+                    sprintf(
+                        '%s: Current execution %s, pausing non-current execution %s',
+                        self::class,
+                        $activeExecution->getIdentifier(),
+                        $executionId
+                    )
+                );
+
+                $this->pauseSingleExecution($execution);
+                $count++;
+            } catch (Throwable $e) {
+                $logger->warning(
+                    sprintf(
+                        '%s: Unable to pause delivery execution %s: %s',
+                        self::class,
+                        $executionId,
+                        $e->getMessage()
+                    )
+                );
+            }
+        }
+
+        $logger->debug(
+            sprintf(
+                '%s: %d executions paused for other deliveries',
+                self::class,
+                $count
+            )
+        );
+    }
+
+    protected function pauseSingleExecution(DeliveryExecution $execution): void
+    {
+        if ($execution->getState()->getUri() == DeliveryExecutionInterface::STATE_PAUSED) {
+            $this->getLogger()->debug(
+                sprintf('%s already paused', $execution->getIdentifier())
+            );
+
+            return; // Already paused
+        }
+
+        $this->setSessionAttribute(
+            "pauseReason-{$execution->getIdentifier()}",
+            PauseService::PAUSE_REASON_CONCURRENT_TEST
+        );
+
+        $context = $this->getRunnerServiceContextByDeliveryExecution($execution);
+
+        $this->getRunnerService()->endTimer($context);
+        $this->getRunnerService()->pause($context);
+        $this->getStateService()->pause($execution);
+    }
+
+    private function getActiveDeliveryExecutionsService(): ActiveDeliveryExecutionsService
+    {
+        return $this->getServiceManager()->getContainer()->get(ActiveDeliveryExecutionsService::class);
+    }
+
+    private function getDeliveryExecutionService(): DeliveryExecutionService
+    {
+        return $this->getServiceLocator()->get(DeliveryExecutionService::SERVICE_ID);
     }
 
     /**
@@ -264,6 +391,41 @@ class Review extends tao_actions_SinglePageModule
         }
     }
 
+    private function getRunnerServiceContextByDeliveryExecution(
+        DeliveryExecutionInterface $execution
+    ): QtiRunnerServiceContext {
+        $delivery = $execution->getDelivery();
+        $container = $this->getRuntimeService()->getDeliveryContainer($delivery->getUri());
+
+        $testDefinition = $container->getSourceTest($execution);
+        $testCompilation = sprintf(
+            '%s|%s',
+            $container->getPrivateDirId($execution),
+            $container->getPublicDirId($execution)
+        );
+
+        return $this->getRunnerService()->getServiceContext(
+            $testDefinition,
+            $testCompilation,
+            $execution->getIdentifier()
+        );
+    }
+
+    private function getRuntimeService(): RuntimeService
+    {
+        return $this->getServiceLocator()->get(RuntimeService::SERVICE_ID);
+    }
+
+    protected function getRunnerService(): QtiRunnerService
+    {
+        return $this->getServiceLocator()->get(QtiRunnerService::SERVICE_ID);
+    }
+
+    private function getStateService(): StateServiceInterface
+    {
+        return $this->getPsrContainer()->get(StateServiceInterface::SERVICE_ID);
+    }
+
     private function getDeliveryExecutionFinderService(): DeliveryExecutionFinderService
     {
         return $this->getPsrContainer()->get(DeliveryExecutionFinderService::SERVICE_ID);
@@ -318,6 +480,13 @@ class Review extends tao_actions_SinglePageModule
         $messageType = $this->ltiSession->getLaunchData()->getVariable(LtiLaunchData::LTI_MESSAGE_TYPE);
 
         return $messageType === LtiMessageInterface::LTI_MESSAGE_TYPE_SUBMISSION_REVIEW_REQUEST;
+    }
+
+    private function isPausingConcurrentSessionsEnabled(): bool
+    {
+        return !$this->getFeatureFlagChecker()->isEnabled(
+            static::FEATURE_FLAG_PAUSE_CONCURRENT_SESSIONS
+        );
     }
 
     private function getReviewPanelConfig(): array
@@ -375,5 +544,10 @@ class Review extends tao_actions_SinglePageModule
             $reviewLayout = self::REVIEW_LAYOUTS_MAP[$ltiParamReviewLayout];
         }
         return $reviewLayout;
+    }
+
+    private function getFeatureFlagChecker(): FeatureFlagChecker
+    {
+        return $this->getPsrContainer()->get(FeatureFlagChecker::class);
     }
 }

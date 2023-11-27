@@ -140,7 +140,14 @@ class Review extends tao_actions_SinglePageModule
         }
 
         if ($this->isPausingConcurrentSessionsEnabled()) {
-            $this->pauseConcurrentSessions($execution);
+            $pausedExecutionIds = $this->pauseConcurrentSessions($execution);
+
+            foreach ($pausedExecutionIds as $pausedExecutionId) {
+                $this->setSessionAttribute(
+                    "pauseReason-{$pausedExecutionId}",
+                    PauseService::PAUSE_REASON_CONCURRENT_TEST
+                );
+            }
         }
 
         $delivery = $execution->getDelivery();
@@ -163,21 +170,12 @@ class Review extends tao_actions_SinglePageModule
 
     private function pauseConcurrentSessions(
         DeliveryExecution $activeExecution
-    ): void {
+    ): array {
         $userIdentifier = $activeExecution->getUserIdentifier();
 
         if (empty($userIdentifier) || $userIdentifier === LtiUser::ANONYMOUS_USER_URI) {
-            return;
+            return [];
         }
-
-        $logger = $this->getLogger();
-        $logger->info(
-            sprintf(
-                "%s: Attempting to stop all sessions for user %s",
-                self::class,
-                $userIdentifier
-            )
-        );
 
         $deliveryExecutionService = $this->getDeliveryExecutionService();
         $activeExecutionService = $this->getActiveDeliveryExecutionsService();
@@ -187,9 +185,7 @@ class Review extends tao_actions_SinglePageModule
             $activeExecution->getIdentifier()
         );
 
-        $count = 0;
-
-        $logger->warning(sprintf("otherExecutionIds: %s", var_export($otherExecutionIds,true)));
+        $pausedExecutionIds = [];
 
         foreach ($otherExecutionIds as $executionId) {
             try {
@@ -201,19 +197,11 @@ class Review extends tao_actions_SinglePageModule
                     continue;
                 }
 
-                $logger->debug(
-                    sprintf(
-                        '%s: Current execution %s, pausing non-current execution %s',
-                        self::class,
-                        $activeExecution->getIdentifier(),
-                        $executionId
-                    )
-                );
-
-                $this->pauseSingleExecution($execution);
-                $count++;
+                if ($this->pauseSingleExecution($execution)) {
+                    $pausedExecutionIds[] = $executionId;
+                }
             } catch (Throwable $e) {
-                $logger->warning(
+                $this->getLogger()->warning(
                     sprintf(
                         '%s: Unable to pause delivery execution %s: %s',
                         self::class,
@@ -224,35 +212,26 @@ class Review extends tao_actions_SinglePageModule
             }
         }
 
-        $logger->debug(
-            sprintf(
-                '%s: %d executions paused for other deliveries',
-                self::class,
-                $count
-            )
-        );
+        return $pausedExecutionIds;
     }
 
-    protected function pauseSingleExecution(DeliveryExecution $execution): void
+    protected function pauseSingleExecution(DeliveryExecution $execution): bool
     {
         if ($execution->getState()->getUri() == DeliveryExecutionInterface::STATE_PAUSED) {
             $this->getLogger()->debug(
                 sprintf('%s already paused', $execution->getIdentifier())
             );
 
-            return; // Already paused
+            return false; // Already paused
         }
-
-        $this->setSessionAttribute(
-            "pauseReason-{$execution->getIdentifier()}",
-            PauseService::PAUSE_REASON_CONCURRENT_TEST
-        );
 
         $context = $this->getRunnerServiceContextByDeliveryExecution($execution);
 
         $this->getRunnerService()->endTimer($context);
         $this->getRunnerService()->pause($context);
         $this->getStateService()->pause($execution);
+
+        return true;
     }
 
     private function getActiveDeliveryExecutionsService(): ActiveDeliveryExecutionsService

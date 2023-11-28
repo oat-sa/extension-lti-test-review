@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019-2022 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2019-2023 (original work) Open Assessment Technologies SA;
  *
  *
  */
@@ -46,6 +46,7 @@ use oat\taoLti\models\classes\LtiService;
 use oat\taoLti\models\classes\LtiVariableMissingException;
 use oat\taoLti\models\classes\TaoLtiSession;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
+use oat\taoQtiTest\model\Service\ConcurringSessionService;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
 use tao_actions_SinglePageModule;
@@ -118,6 +119,9 @@ class Review extends tao_actions_SinglePageModule
         } else {
             $execution = $finder->findDeliveryExecution($launchData);
         }
+
+        $this->getConcurringSessionService()->pauseConcurrentSessions($execution);
+
         $delivery = $execution->getDelivery();
 
         $urlRouteService = $this->getDefaultUrlService();
@@ -375,5 +379,10 @@ class Review extends tao_actions_SinglePageModule
             $reviewLayout = self::REVIEW_LAYOUTS_MAP[$ltiParamReviewLayout];
         }
         return $reviewLayout;
+    }
+
+    private function getConcurringSessionService(): ConcurringSessionService
+    {
+        return $this->getPsrContainer()->get(ConcurringSessionService::class);
     }
 }

@@ -49,7 +49,6 @@ use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
 use oat\taoQtiTest\model\Service\ConcurringSessionService;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
-use PHPSession;
 use tao_actions_SinglePageModule;
 use taoResultServer_models_classes_ReadableResultStorage;
 
@@ -121,7 +120,7 @@ class Review extends tao_actions_SinglePageModule
             $execution = $finder->findDeliveryExecution($launchData);
         }
 
-        $this->getConcurringSessionService()->pauseConcurrentSessions($execution, PHPSession::singleton());
+        $this->getConcurringSessionService()->pauseConcurrentSessions($execution);
 
         $delivery = $execution->getDelivery();
 

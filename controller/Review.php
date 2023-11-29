@@ -299,7 +299,6 @@ class Review extends tao_actions_SinglePageModule
         }
 
         throw new LtiClientException(__('Delivery id not provided'), LtiErrorMessage::ERROR_MISSING_PARAMETER);
-
     }
 
     /**
@@ -333,16 +332,30 @@ class Review extends tao_actions_SinglePageModule
 
     private function getDisplaySectionTitlesOption(LtiLaunchData $launchData): bool
     {
-        return $this->getBooleanOption($launchData, self::OPTION_DISPLAY_SECTION_TITLES, self::LTI_DISPLAY_SECTION_TITLES, true);
+        return $this->getBooleanOption(
+            $launchData,
+            self::OPTION_DISPLAY_SECTION_TITLES,
+            self::LTI_DISPLAY_SECTION_TITLES,
+            true
+        );
     }
 
     private function getDisplayItemTooltipOption(LtiLaunchData $launchData): bool
     {
-        return $this->getBooleanOption($launchData, self::OPTION_DISPLAY_ITEM_TOOLTIP, self::LTI_DISPLAY_ITEM_TOOLTIP, false);
+        return $this->getBooleanOption(
+            $launchData,
+            self::OPTION_DISPLAY_ITEM_TOOLTIP,
+            self::LTI_DISPLAY_ITEM_TOOLTIP,
+            false
+        );
     }
 
-    private function getBooleanOption(LtiLaunchData $launchData, string $configOptionName, string $ltiParamName, bool $defaultValue): bool
-    {
+    private function getBooleanOption(
+        LtiLaunchData $launchData,
+        string $configOptionName,
+        string $ltiParamName,
+        bool $defaultValue
+    ): bool {
         $reviewPanelConfig = $this->getReviewPanelConfig();
         $extensionValue = $reviewPanelConfig[$configOptionName];
 

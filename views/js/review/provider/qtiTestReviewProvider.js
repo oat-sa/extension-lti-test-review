@@ -31,6 +31,7 @@ define([
     'taoQtiTest/runner/ui/toolbox/toolbox',
     'taoQtiItem/runner/qtiItemRunner',
     'taoQtiTest/runner/config/assetManager',
+    'taoQtiTest/runner/services/sequenceStore',
     'ltiTestReview/review/services/navigator',
     'tpl!ltiTestReview/review/provider/tpl/qtiTestReviewProvider'
 ], function (
@@ -43,16 +44,18 @@ define([
     toolboxFactory,
     qtiItemRunner,
     assetManagerFactory,
+    sequenceStoreService,
     testNavigatorFactory,
     layoutTpl
 ) {
     'use strict';
 
+    const { getSequenceNumber, getSequenceStore } = sequenceStoreService;
+
     /**
      * A Test runner provider to be registered against the runner
      */
     return {
-
         //provider name
         name: 'qtiTestReviewProvider',
 
@@ -155,8 +158,8 @@ define([
             this.assetManager = assetManagerFactory();
 
             // first and second tab will show block and navigate to panel or content
-            const createJumplinks = (container) => {
-                container.on('click', (e) => {
+            const createJumplinks = container => {
+                container.on('click', e => {
                     if (e.target.classList.contains('jumplink')) {
                         e.preventDefault();
                         e.target.blur();
@@ -164,13 +167,13 @@ define([
                         areaBroker.getArea(where).find(':not(.hidden)[tabindex]').first().focus();
                     }
                 });
-                container.on('focusin', (e) => {
+                container.on('focusin', e => {
                     if (e.target.classList.contains('jumplink')) {
                         const where = e.target.dataset.area;
                         areaBroker.getArea(where).addClass('focused');
                     }
                 });
-                container.on('focusout', (e) => {
+                container.on('focusout', e => {
                     if (e.target.classList.contains('jumplink')) {
                         const where = e.target.dataset.area;
                         areaBroker.getArea(where).removeClass('focused');
@@ -182,10 +185,9 @@ define([
             /*
              * Install behavior on events
              */
-            this
-                .on('ready', () => {
-                    load();
-                })
+            this.on('ready', () => {
+                load();
+            })
                 .on('loaditem', (itemRef, itemData) => {
                     dataHolder.set('itemIdentifier', itemRef);
                     dataHolder.set('itemData', itemData);
@@ -234,7 +236,10 @@ define([
                     dataHolder.set('testContext', data.testContext);
                     dataHolder.set('testData', data.testData);
                     dataHolder.set('testResponses', data.testResponses);
-                    return data;
+
+                    return Promise.all([getSequenceNumber(this), getSequenceStore()])
+                        .then(([sequenceNumber, sequenceStore]) => sequenceStore.setSequenceNumber(sequenceNumber))
+                        .then(() => data);
                 });
         },
 
@@ -325,9 +330,7 @@ define([
 
             if (this.itemRunner) {
                 return new Promise(resolve => {
-                    this.itemRunner
-                        .on('clear', resolve)
-                        .clear();
+                    this.itemRunner.on('clear', resolve).clear();
                 });
             }
             return Promise.resolve();

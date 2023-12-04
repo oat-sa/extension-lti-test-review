@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019-2022 (original work) Open Assessment Technologies SA;
+ * Copyright (c) 2019-2023 (original work) Open Assessment Technologies SA;
  *
  *
  */
@@ -46,6 +46,7 @@ use oat\taoLti\models\classes\LtiService;
 use oat\taoLti\models\classes\LtiVariableMissingException;
 use oat\taoLti\models\classes\TaoLtiSession;
 use oat\taoProctoring\model\execution\DeliveryExecutionManagerService;
+use oat\taoQtiTest\model\Service\ConcurringSessionService;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
 use tao_actions_SinglePageModule;
@@ -118,6 +119,9 @@ class Review extends tao_actions_SinglePageModule
         } else {
             $execution = $finder->findDeliveryExecution($launchData);
         }
+
+        $this->getConcurringSessionService()->pauseConcurrentSessions($execution);
+
         $delivery = $execution->getDelivery();
 
         $urlRouteService = $this->getDefaultUrlService();
@@ -295,7 +299,6 @@ class Review extends tao_actions_SinglePageModule
         }
 
         throw new LtiClientException(__('Delivery id not provided'), LtiErrorMessage::ERROR_MISSING_PARAMETER);
-
     }
 
     /**
@@ -329,16 +332,30 @@ class Review extends tao_actions_SinglePageModule
 
     private function getDisplaySectionTitlesOption(LtiLaunchData $launchData): bool
     {
-        return $this->getBooleanOption($launchData, self::OPTION_DISPLAY_SECTION_TITLES, self::LTI_DISPLAY_SECTION_TITLES, true);
+        return $this->getBooleanOption(
+            $launchData,
+            self::OPTION_DISPLAY_SECTION_TITLES,
+            self::LTI_DISPLAY_SECTION_TITLES,
+            true
+        );
     }
 
     private function getDisplayItemTooltipOption(LtiLaunchData $launchData): bool
     {
-        return $this->getBooleanOption($launchData, self::OPTION_DISPLAY_ITEM_TOOLTIP, self::LTI_DISPLAY_ITEM_TOOLTIP, false);
+        return $this->getBooleanOption(
+            $launchData,
+            self::OPTION_DISPLAY_ITEM_TOOLTIP,
+            self::LTI_DISPLAY_ITEM_TOOLTIP,
+            false
+        );
     }
 
-    private function getBooleanOption(LtiLaunchData $launchData, string $configOptionName, string $ltiParamName, bool $defaultValue): bool
-    {
+    private function getBooleanOption(
+        LtiLaunchData $launchData,
+        string $configOptionName,
+        string $ltiParamName,
+        bool $defaultValue
+    ): bool {
         $reviewPanelConfig = $this->getReviewPanelConfig();
         $extensionValue = $reviewPanelConfig[$configOptionName];
 
@@ -375,5 +392,10 @@ class Review extends tao_actions_SinglePageModule
             $reviewLayout = self::REVIEW_LAYOUTS_MAP[$ltiParamReviewLayout];
         }
         return $reviewLayout;
+    }
+
+    private function getConcurringSessionService(): ConcurringSessionService
+    {
+        return $this->getPsrContainer()->get(ConcurringSessionService::class);
     }
 }

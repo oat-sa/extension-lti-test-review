@@ -149,16 +149,14 @@ define([
 
                         if (item.informational) {
                             itemAnswer.setInformational();
-                        } else if (item.score && item.score === item.maxScore) {
-                            itemAnswer.setCorrect();
-                        } else if (item.skipped) {
-                            itemAnswer.setSkipped();
                         } else if (item.isExternallyScored && item.pendingExternalScore) {
                             itemAnswer.setPending();
-                        } else if (item.score > 0 && item.score < item.maxScore) {
-                            itemAnswer.setPartial();
-                        } else if (item.maxScore) {
+                        } else if (item.maxScore > 0 && item.score > 0 && item.score === item.maxScore) {
+                            itemAnswer.setCorrect();
+                        } else if (item.maxScore > 0 && item.score === 0) {
                             itemAnswer.setIncorrect();
+                        } else if (item.maxScore > 0 && item.score > 0 && item.score < item.maxScore) {
+                            itemAnswer.setPartial();
                         } else {
                             score = '';
                             itemAnswer.setDefault();

@@ -61,29 +61,20 @@ define([
         if (item.informational) {
             return 'info';
         }
-        if (withScore) {
-            if (item.isExternallyScored && item.pendingExternalScore) {
-                return 'score-pending';
-            }
-            if (item.maxScore) {
-                if (item.score > 0 && item.score < item.maxScore) {
-                    return 'score-partial';
-                }
-                if (item.score === item.maxScore) {
-                    return 'correct';
-                }
-                if (item.skipped) {
-                    return 'no-score';
-                }
-                return 'incorrect';
-            } else if (!item.skipped) {
-                return 'no-score';
-            }
+        if (item.isExternallyScored && item.pendingExternalScore) {
+            return 'score-pending';
         }
-        if (item.skipped) {
-            return 'no-score';
+        if (item.maxScore > 0 && item.score > 0 && item.score === item.maxScore) {
+            return 'correct';
         }
-        return 'default';
+        if (item.maxScore > 0 && item.score === 0) {
+            return 'incorrect';
+        }
+        if (item.maxScore > 0 && item.score > 0 && item.score < item.maxScore) {
+            return 'score-partial';
+        }
+
+        return 'no-score';
     };
 
     /**

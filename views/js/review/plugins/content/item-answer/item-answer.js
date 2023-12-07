@@ -27,15 +27,7 @@ define([
     'tpl!ltiTestReview/review/plugins/content/item-answer/tpl/item-answer',
     'tpl!ltiTestReview/review/plugins/content/item-answer/tpl/answer-tabs',
     'css!ltiTestReview/review/plugins/content/item-answer/css/item-answer'
-], function (
-    _,
-    __,
-    componentFactory,
-    tabsFactory,
-    capitalize,
-    itemAnswerTpl,
-    answerTabsTpl
-) {
+], function (_, __, componentFactory, tabsFactory, capitalize, itemAnswerTpl, answerTabsTpl) {
     'use strict';
 
     /**
@@ -62,6 +54,54 @@ define([
     };
 
     /**
+     * @param {String} status
+     * @returns {tabConfig}
+     */
+    function getAnswerTab(status) {
+        let label;
+        if (status === 'informational') {
+            label = __('Informational item');
+        } else {
+            label = __('Your response');
+        }
+
+        let icon;
+        let cls;
+        if (status === 'informational') {
+            icon = 'informational';
+            cls = 'informational';
+        } else if (status === 'pending') {
+            icon = 'time';
+            cls = 'pending';
+        } else if (status === 'correct') {
+            icon = 'correct';
+            cls = 'correct';
+        } else if (status === 'incorrect') {
+            icon = 'incorrect';
+            cls = 'incorrect';
+        } else if (status === 'partial') {
+            icon = 'score-partial';
+            cls = 'partial';
+        } else if (status === 'default') {
+            icon = 'answered';
+            cls = 'answered';
+        } else if (status === 'skipped') {
+            icon = 'skipped';
+            cls = 'skipped';
+        } else {
+            icon = null;
+            cls = null;
+        }
+
+        return {
+            name: 'answer',
+            label,
+            icon,
+            cls
+        };
+    }
+
+    /**
      * Defines the tab containing correct response
      * @type {tabConfig}
      */
@@ -70,121 +110,28 @@ define([
         label: __('Correct response')
     };
 
-    /**
-     * Defines the tab containing student response when correct
-     * @type {tabConfig}
-     */
-    const answerCorrectTab = {
-        name: 'answer',
-        label: __('Your response'),
-        icon: 'correct',
-        cls: 'correct'
-    };
-
-    /**
-     * Defines the tab containing student response when incorrect
-     * @type {tabConfig}
-     */
-    const answerIncorrectTab = {
-        name: 'answer',
-        label: __('Your response'),
-        icon: 'incorrect',
-        cls: 'incorrect'
-    };
-
-    /**
-     * Defines the tab containing answered student response
-     * @type {tabConfig}
-     */
-    const answeredTab = {
-        name: 'answer',
-        label: __('Your response'),
-        icon: 'answered',
-        cls: 'answered'
-    };
-
-    /**
-     * Defines the tab containing skipped student response
-     * @type {tabConfig}
-     */
-    const skippedTab = {
-        name: 'answer',
-        label: __('Your response'),
-        icon: 'no-score',
-        cls: 'skipped'
-    };
-
-    /**
-     * Defines the tab containing student response when incorrect
-     * @type {tabConfig}
-     */
-    const informationalTab = {
-        name: 'answer',
-        label: __('Informational item'),
-        icon: 'informational',
-        cls: 'informational'
-    };
-
-    /**
-     * Defines the tab containing student response when partial
-     * @type {tabConfig}
-     */
-    const answerPartialTab = {
-        name: 'answer',
-        label: __('Your response'),
-        icon: 'score-partial',
-        cls: 'partial'
-    };
-
-    /**
-     * Defines the tab containing student response when incorrect
-     * @type {tabConfig}
-     */
-    const answerPendingTab = {
-        name: 'answer',
-        label: __('Your response'),
-        icon: 'time',
-        cls: 'pending'
-    };
-
-    /**
-     * Defines the tab containing student response and no response proccessing maxScore = 0
-     * @type {tabConfig}
-     */
-    const defaultTab = {
-        name: 'answer',
-        label: __('Your response'),
-        icon: null,
-        cls: 'default'
-    };
-
-    /**
-     * Defines possible sets of tabs
-     * @type {Object}
-     */
-    const tabsSets = {
-        answered: [answeredTab],
-        skipped: [skippedTab],
-        correct: [answerCorrectTab],
-        incorrect: [answerIncorrectTab, correctTab],
-        informational: [informationalTab],
-        partial: [answerPartialTab, correctTab],
-        pending: [answerPendingTab, correctTab],
-        default: [defaultTab]
-    };
+    const informationalTab = getAnswerTab('informational');
+    const correctAnswerTab = getAnswerTab('correct');
+    const incorrectTab = getAnswerTab('incorrect');
+    const partialTab = getAnswerTab('partial');
+    const pendingTab = getAnswerTab('pending');
+    const noScoreTab = getAnswerTab('no-score');
+    const skippedTab = getAnswerTab('skipped');
+    const defaultTab = getAnswerTab('default');
 
     /**
      * Defines tabs by status with correct responses enabled
      * @type {Object}
      */
     const tabsByStatusWithCorrect = {
-        correct: tabsSets.correct,
-        incorrect: tabsSets.incorrect,
-        skipped: tabsSets.skipped,
-        informational: tabsSets.informational,
-        partial: tabsSets.partial,
-        pending: tabsSets.pending,
-        default: tabsSets.default
+        informational: [informationalTab],
+        correct: [correctAnswerTab, correctTab],
+        incorrect: [incorrectTab, correctTab],
+        partial: [partialTab, correctTab],
+        pending: [pendingTab, correctTab],
+        'no-score': [noScoreTab],
+        skipped: [skippedTab],
+        default: [defaultTab]
     };
 
     /**
@@ -192,13 +139,14 @@ define([
      * @type {Object}
      */
     const tabsByStatusWithoutCorrect = {
-        correct: tabsSets.answered,
-        incorrect: tabsSets.incorrect,
-        skipped: tabsSets.skipped,
-        informational: tabsSets.informational,
-        partial: tabsSets.answered,
-        pending: tabsSets.pending,
-        default: tabsSets.default
+        informational: [informationalTab],
+        correct: [correctAnswerTab],
+        incorrect: [incorrectTab],
+        partial: [partialTab],
+        pending: [pendingTab],
+        'no-score': [noScoreTab],
+        skipped: [skippedTab],
+        default: [defaultTab]
     };
 
     /**
@@ -256,14 +204,43 @@ define([
              * @returns {itemAnswerComponent}
              */
             setScore(score) {
-                if (!score && 'number' !== typeof score || !this.getConfig().showScore) {
+                if ((!score && 'number' !== typeof score) || !this.getConfig().showScore) {
                     score = '';
                 }
                 this.getConfig().score = `${score}`;
 
                 if (this.is('rendered')) {
-                    const scoreLine = this.getConfig().score && `${this.getConfig().scoreText} ${this.getConfig().score}`;
+                    const scoreLine =
+                        this.getConfig().score && `${this.getConfig().scoreText} ${this.getConfig().score}`;
                     controls.$score.text(scoreLine);
+                }
+
+                return this;
+            },
+
+            /**
+             * If `showScore=false`, is equal to `status=skipped`.
+             * If `showScore=true`, can apply to any `status`
+             * @returns {Boolean}
+             */
+            getHasNoAnswer() {
+                return this.getConfig().hasNoAnswer;
+            },
+
+            /**
+             * @param {Boolean} hasNoAnswer
+             * @returns {itemAnswerComponent}
+             */
+            setHasNoAnswer(hasNoAnswer) {
+                this.getConfig().hasNoAnswer = hasNoAnswer;
+
+                if (this.is('rendered')) {
+                    const activeTab = this.getActiveTab();
+                    if (activeTab === 'answer' && hasNoAnswer) {
+                        controls.$status.text(this.getConfig().skippedText);
+                    } else {
+                        controls.$status.text('');
+                    }
                 }
 
                 return this;
@@ -404,7 +381,15 @@ define([
             },
 
             /**
-             * Defines the item as pending
+             * Defines the item as no-score
+             * @returns {itemAnswerComponent}
+             */
+            setNoScore() {
+                return this.setStatus('no-score');
+            },
+
+            /**
+             * Defines the item as default
              * @returns {itemAnswerComponent}
              */
             setDefault() {
@@ -433,15 +418,18 @@ define([
                     $status: this.getElement().find('.item-answer-status')
                 };
 
-                const tabsByStatus = this.getConfig().showCorrect ? tabsByStatusWithCorrect : tabsByStatusWithoutCorrect;
+                const tabsByStatus = this.getConfig().showCorrect
+                    ? tabsByStatusWithCorrect
+                    : tabsByStatusWithoutCorrect;
                 let tabs = tabsByStatus[this.getStatus()];
-                const tabsComponent = tabsFactory(controls.$tabs, {activeTab, tabs})
+
+                const tabsComponent = tabsFactory(controls.$tabs, { activeTab, tabs })
                     .setTemplate(answerTabsTpl)
                     .on('tabchange', name => {
                         activeTab = name;
 
                         // status based on status and tab
-                        if (name === 'answer' && this.getStatus() === 'skipped') {
+                        if (name === 'answer' && this.getHasNoAnswer()) {
                             controls.$status.text(this.getConfig().skippedText);
                         } else {
                             controls.$status.text('');
@@ -457,12 +445,10 @@ define([
                         /**
                          * @event ready
                          */
-                        this.setState('ready', true)
-                            .trigger('ready');
+                        this.setState('ready', true).trigger('ready');
                     });
 
-                this
-                    .setState('show-score', this.getConfig().showScore)
+                this.setState('show-score', this.getConfig().showScore)
                     .setState('show-correct', this.getConfig().showCorrect)
                     .on('statuschange', (status, change) => {
                         if (change && tabs !== tabsByStatus[status]) {

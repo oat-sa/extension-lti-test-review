@@ -130,6 +130,8 @@ $partialColor: #AD5700;
         line-height: 20px;
         font-weight: bold;
         padding-top: 10px;
+        text-transform: uppercase;
+        color: $skippedColor;
     }
 
     .icon-correct:before {
@@ -187,12 +189,6 @@ $partialColor: #AD5700;
             .icon {
                 color: $partialColor;
             }
-        }
-    }
-    &.skipped {
-        .item-answer-status {
-            text-transform: uppercase;
-            color: $skippedColor;
         }
     }
 

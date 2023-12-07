@@ -123,11 +123,12 @@ define([
      */
     /**
      * Adds missing properties to a reviewItem, to support fizzyPanel UI
+     * @param {mapEntry} item - the original test item entry
      * @param {mapEntry} entry - item, will be mutated
      * @param {String} numericLabel
      * @returns {ReviewItem}
      */
-    const extendReviewItemScope = (entry, numericLabel) => {
+    const extendReviewItemScope = (item, entry, numericLabel) => {
         const reviewItem = Object.assign({}, entry);
         const type = reviewItem.type;
 
@@ -155,6 +156,10 @@ define([
             reviewItem.status = 'answered';
         } else {
             reviewItem.status = 'viewed';
+        }
+
+        if (item.maxScore === null && item.score === null && !item.isExternallyScored) {
+            reviewItem.skipped = false;
         }
 
         return reviewItem;
@@ -187,7 +192,7 @@ define([
                                     if (reviewItem.type !== 'info') {
                                         nonInformationalCount++;
                                     }
-                                    reviewItem = extendReviewItemScope(reviewItem, nonInformationalCount);
+                                    reviewItem = extendReviewItemScope(item, reviewItem, nonInformationalCount);
                                     items.set(item.id, reviewItem);
                                     return reviewItem;
                                 })

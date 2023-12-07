@@ -193,11 +193,11 @@ define([
      */
     const tabsByStatusWithoutCorrect = {
         correct: tabsSets.answered,
-        incorrect: tabsSets.answered,
+        incorrect: tabsSets.incorrect,
         skipped: tabsSets.skipped,
         informational: tabsSets.informational,
         partial: tabsSets.answered,
-        pending: tabsSets.answered,
+        pending: tabsSets.pending,
         default: tabsSets.default
     };
 

@@ -158,7 +158,7 @@ define([
             reviewItem.status = 'viewed';
         }
 
-        if (item.maxScore === null && item.score === null && !item.isExternallyScored) {
+        if (!item.maxScore && !item.score && !item.isExternallyScored) {
             reviewItem.skipped = false;
         }
 

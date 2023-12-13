@@ -350,13 +350,13 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-render-data');
 
-        // assert.expect(18 +
-        //     data.expected.countParts +
-        //     data.expected.countSections +
-        //     data.expected.countItems +
-        //     data.expected.items.length * 2 +
-        //     data.expected.filters.length * 2
-        // );
+        assert.expect(18 +
+            data.expected.countParts +
+            data.expected.countSections +
+            data.expected.countItems +
+            data.expected.items.length * 2 +
+            data.expected.filters.length * 2
+        );
         assert.equal($container.children().length, 0, 'The container is empty');
 
         const instance = reviewPanelFactory($container, data.config, data.testMap)
@@ -407,7 +407,11 @@ define([
                 });
 
                 data.expected.items.forEach((item, index) => {
-                    // assert.equal($container.find(`.review-panel-item:nth(${index})`).is(`.item-${item.type}`), true, `The item #${index} got the expected icon: ${item.type}`);
+                    if (item.type === 'skipped' && item.score === '-') {
+                        assert.equal($container.find(`.review-panel-item:nth(${index})`).is(`.item-${item.type}`), false, `The item #${index} dont have icon`);
+                    } else {
+                        assert.equal($container.find(`.review-panel-item:nth(${index})`).is(`.item-${item.type}`), true, `The item #${index} got the expected icon: ${item.type}`);
+                    }
                     assert.equal($container.find(`.review-panel-item:nth(${index}) .review-panel-score`).text().trim(), item.score, `The item #${index} got the expected score: ${item.score}`);
                 });
 

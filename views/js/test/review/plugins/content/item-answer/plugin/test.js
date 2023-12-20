@@ -284,7 +284,11 @@ define([
                     }))
                     .then(() => {
                         assert.strictEqual($container.find('.item-answer').is('.correct'), true, 'The component is set to "correct"');
-                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
+                        if (config.showScore) {
+                            assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 2, 'Only two tab should be present');
+                        } else {
+                            assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
+                        }
                         assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
                         assert.strictEqual($container.find('.item-answer-score').text().trim(), `${__('Your Score:')} 1/1`, 'The score is set');
                         assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status is empty');
@@ -303,7 +307,11 @@ define([
                             .next();
                     }))
                     .then(() => {
-                        assert.strictEqual($container.find('.item-answer').is('.skipped'), true, 'The component is set to "skipped"');
+                        if (config.showScore) {
+                            assert.strictEqual($container.find('.item-answer').is('.skipped'), false, 'The component is set to "skipped"');
+                        } else {
+                            assert.strictEqual($container.find('.item-answer').is('.skipped'), true, 'The component is set to "skipped"');
+                        }
                         assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 2, 'Two tabs should be present');
                         assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
                         assert.strictEqual($container.find('.item-answer-score').text().trim(), `${__('Your Score:')} 0/1`, 'The score is set');
@@ -446,8 +454,12 @@ define([
                             });
                     }))
                     .then(() => {
-                        assert.strictEqual($container.find('.item-answer').is('.correct'), true, 'The component is set to "correct"');
-                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
+                        assert.strictEqual($container.find('.item-answer').is('.correct'), data.expected.showScore, 'The component is set to "correct"');
+                        if (data.expected.showScore && data.expected.showCorrect) {
+                            assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 2, 'Only two tab should be present');
+                        } else {
+                            assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
+                        }
                         assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
                         if (data.expected.showScore) {
                             assert.strictEqual($container.find('.item-answer-score').text().trim(), `${__('Your Score:')} 1/1`, 'The score is set');
@@ -475,8 +487,8 @@ define([
                             .next();
                     }))
                     .then(() => {
-                        assert.strictEqual($container.find('.item-answer').is('.skipped'), true, 'The component is set to "skipped"');
-                        if (data.expected.showCorrect) {
+                        assert.strictEqual($container.find('.item-answer').is('.skipped'), !data.expected.showScore, 'The component is set to "skipped"');
+                        if (data.expected.showCorrect && data.expected.showScore) {
                             assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 2, 'Two tabs should be present');
                         } else {
                             assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
@@ -494,7 +506,7 @@ define([
                         assert.strictEqual($item.find('.result-area [data-identifier="choice_2"]').length, 1, 'Choice #2 is selected');
                         assert.strictEqual($item.find('.result-area [data-identifier="choice_4"]').length, 1, 'Choice #4 is selected');
 
-                        if (data.expected.showCorrect) {
+                        if (data.expected.showScore && data.expected.showCorrect) {
                             assert.strictEqual($container.find('.item-answer .tab[data-tab-name="correct"]').length, 1, 'The tab correct is presented');
                             $container.find('.item-answer .tab[data-tab-name="correct"] .action').click();
                         } else {
@@ -502,7 +514,7 @@ define([
                         }
                     })
                     .then(() => {
-                        if (data.expected.showCorrect) {
+                        if (data.expected.showScore && data.expected.showCorrect) {
                             assert.strictEqual($item.find('.result-area [data-identifier="choice_1"]').length, 1, 'Choice #1 is selected');
                             assert.strictEqual($item.find('.choice-area [data-identifier="choice_2"]').length, 1, 'Choice #2 is not selected');
                             assert.strictEqual($item.find('.choice-area [data-identifier="choice_3"]').length, 1, 'Choice #3 is not selected');
@@ -524,8 +536,8 @@ define([
                             .next();
                     }))
                     .then(() => {
-                        assert.strictEqual($container.find('.item-answer').is('.incorrect'), true, 'The component is set to "incorrect"');
-                        if (data.expected.showCorrect) {
+                        assert.strictEqual($container.find('.item-answer').is('.incorrect'), data.expected.showScore, 'The component is set to "incorrect"');
+                        if (data.expected.showScore && data.expected.showCorrect) {
                             assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 2, 'Two tabs should be present');
                         } else {
                             assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');

@@ -18,6 +18,7 @@
               "withScore": false,
               "position": 0,
               "type": "info",
+              "accordionScoreLabel": "-",
               "ariaLabel": "Informational item",
               "icon": "info",
               "numericLabel": "",
@@ -48,6 +49,7 @@
               "withScore": false,
               "position": 1,
               "type": "default",
+              "accordionScoreLabel": "-",
               "ariaLabel": "Question 1",
               "icon": null,
               "numericLabel": "1",
@@ -62,6 +64,7 @@
               "withScore": false,
               "position": 2,
               "type": "default",
+              "accordionScoreLabel": "-",
               "ariaLabel": "Question 2",
               "icon": null,
               "numericLabel": "2",
@@ -78,6 +81,7 @@
               "type": "default",
               "ariaLabel": "Question 3",
               "icon": null,
+              "accordionScoreLabel": "-",
               "numericLabel": "3",
               "scoreType": null,
               "status": "answered"
@@ -92,6 +96,7 @@
               "type": "default",
               "ariaLabel": "Question 4",
               "icon": null,
+              "accordionScoreLabel": "-",
               "numericLabel": "4",
               "scoreType": null,
               "status": "answered"
@@ -106,6 +111,7 @@
               "type": "default",
               "ariaLabel": "Question 5",
               "icon": null,
+              "accordionScoreLabel": "-",
               "numericLabel": "5",
               "scoreType": null,
               "status": "answered"
@@ -120,6 +126,7 @@
               "type": "default",
               "ariaLabel": "Question 6",
               "icon": null,
+              "accordionScoreLabel": "-",
               "numericLabel": "6",
               "scoreType": null,
               "status": "answered"
@@ -134,6 +141,7 @@
               "type": "default",
               "ariaLabel": "Question 7",
               "icon": null,
+              "accordionScoreLabel": "-",
               "numericLabel": "7",
               "scoreType": null,
               "status": "answered"
@@ -146,6 +154,7 @@
               "withScore": false,
               "position": 8,
               "type": "skipped",
+              "accordionScoreLabel": "-",
               "ariaLabel": "Question 8",
               "icon": null,
               "numericLabel": "8",

@@ -25,14 +25,7 @@ define([
     'taoQtiTest/runner/helpers/currentItem',
     'taoQtiTest/runner/helpers/map',
     'ltiTestReview/review/plugins/content/item-answer/item-answer'
-], function (
-    _,
-    promiseTimeout,
-    pluginFactory,
-    itemHelper,
-    mapHelper,
-    itemAnswerFactory
-) {
+], function (_, promiseTimeout, pluginFactory, itemHelper, mapHelper, itemAnswerFactory) {
     'use strict';
 
     /**
@@ -69,7 +62,7 @@ define([
                 response[identifier] = {
                     response: itemHelper.toResponse(declaration.correctResponse, baseType, cardinality)
                 };
-            } else if (declaration.mapEntries && _.size(declaration.mapEntries)){
+            } else if (declaration.mapEntries && _.size(declaration.mapEntries)) {
                 response[identifier] = {
                     response: itemHelper.toResponse(_.keys(declaration.mapEntries), baseType, cardinality)
                 };
@@ -78,7 +71,6 @@ define([
                     response: itemHelper.toResponse('', baseType, cardinality)
                 };
             }
-
         });
         return response;
     };
@@ -107,6 +99,41 @@ define([
     };
 
     /**
+     * Should match to `review-panel` plugin's item types
+     * @param {Object} item
+     * @param {Boolean} withScore
+     * @returns {String}
+     */
+    const getItemStatusType = (item, withScore) => {
+        if (withScore) {
+            if (item.informational) {
+                return 'info';
+            }
+            if (item.isExternallyScored && item.pendingExternalScore) {
+                return 'score-pending';
+            }
+            if (item.maxScore && item.score > 0 && item.score === item.maxScore) {
+                return 'correct';
+            }
+            if (item.maxScore && item.score === 0) {
+                return 'incorrect';
+            }
+            if (item.maxScore && item.score > 0 && item.score < item.maxScore) {
+                return 'score-partial';
+            }
+            return 'no-score';
+        } else {
+            if (item.informational) {
+                return 'info';
+            }
+            if (item.skipped) {
+                return 'skipped';
+            }
+            return 'default';
+        }
+    };
+
+    /**
      * Test Review Plugin : Item Answer Tabs
      * Displays a tabs bar that allows to switch between responses and correct responses
      */
@@ -127,54 +154,64 @@ define([
          * @returns {Promise}
          */
         render() {
-            return promiseTimeout(new Promise(resolve => {
-                const testRunner = this.getTestRunner();
-                const areaBroker = this.getAreaBroker();
-                const { showScore, showCorrect } = testRunner.getOptions();
-                const itemAnswer = itemAnswerFactory(
-                    areaBroker.getArea('itemTool'),
-                    Object.assign({ showScore, showCorrect }, this.getConfig())
-                );
+            return promiseTimeout(
+                new Promise(resolve => {
+                    const testRunner = this.getTestRunner();
+                    const areaBroker = this.getAreaBroker();
+                    const { showScore, showCorrect } = testRunner.getOptions();
+                    const itemAnswer = itemAnswerFactory(
+                        areaBroker.getArea('itemTool'),
+                        Object.assign({ showScore, showCorrect }, this.getConfig())
+                    );
 
-                // control the test runner from the review panel
-                itemAnswer
-                    .on('tabchange', name => setItemState(name, testRunner))
-                    .on('ready', resolve);
+                    // control the test runner from the review panel
+                    itemAnswer.on('tabchange', name => setItemState(name, testRunner)).on('ready', resolve);
 
-                // reflect the test runner state to the review panel
-                testRunner
-                    .on('renderitem', itemRef => {
-                        const item = mapHelper.getItem(testRunner.getTestMap(), itemRef);
-                        let score = item.informational ? '' : `${item.score}/${item.maxScore}`;
+                    // reflect the test runner state to the review panel
+                    testRunner
+                        .on('renderitem', itemRef => {
+                            const item = mapHelper.getItem(testRunner.getTestMap(), itemRef);
 
-                        if (item.informational) {
-                            itemAnswer.setInformational();
-                        } else if (item.score && item.score === item.maxScore) {
-                            itemAnswer.setCorrect();
-                        } else if (item.skipped) {
-                            itemAnswer.setSkipped();
-                        } else if (item.isExternallyScored && item.pendingExternalScore) {
-                            itemAnswer.setPending();
-                        } else if (item.score > 0 && item.score < item.maxScore) {
-                            itemAnswer.setPartial();
-                        } else if (item.maxScore) {
-                            itemAnswer.setIncorrect();
-                        } else {
-                            score = '';
-                            itemAnswer.setDefault();
-                        }
+                            const statusType = getItemStatusType(item, showScore);
+                            if (statusType === 'info') {
+                                itemAnswer.setInformational();
+                            } else if (statusType === 'score-pending') {
+                                itemAnswer.setPending();
+                            } else if (statusType === 'correct') {
+                                itemAnswer.setCorrect();
+                            } else if (statusType === 'incorrect') {
+                                itemAnswer.setIncorrect();
+                            } else if (statusType === 'score-partial') {
+                                itemAnswer.setPartial();
+                            } else if (statusType === 'default') {
+                                itemAnswer.setDefault();
+                            } else if (statusType === 'skipped') {
+                                itemAnswer.setSkipped();
+                            } else {
+                                itemAnswer.setNoScore();
+                            }
 
-                        itemAnswer.setScore(score);
+                            itemAnswer.setHasNoAnswer(item.skipped);
 
-                        // remove all tabindex's inside item for right navigation
-                        areaBroker.getContentArea().find('[tabindex]').attr('tabindex', -1);
-                    })
-                    .on(`plugin-show.${this.getName()}`, () => itemAnswer.show())
-                    .on(`plugin-hide.${this.getName()}`, () => itemAnswer.hide())
-                    .on(`plugin-enable.${this.getName()}`, () => itemAnswer.enable())
-                    .on(`plugin-disable.${this.getName()}`, () => itemAnswer.disable())
-                    .on(`plugin-destroy.${this.getName()}`, () => itemAnswer.destroy());
-            }));
+                            let score = '';
+                            if (
+                                ['correct', 'incorrect', 'score-partial', 'score-pending'].includes(statusType) &&
+                                item.maxScore
+                            ) {
+                                score = `${item.score || 0}/${item.maxScore}`;
+                            }
+                            itemAnswer.setScore(score);
+
+                            // remove all tabindex's inside item for right navigation
+                            areaBroker.getContentArea().find('[tabindex]').attr('tabindex', -1);
+                        })
+                        .on(`plugin-show.${this.getName()}`, () => itemAnswer.show())
+                        .on(`plugin-hide.${this.getName()}`, () => itemAnswer.hide())
+                        .on(`plugin-enable.${this.getName()}`, () => itemAnswer.enable())
+                        .on(`plugin-disable.${this.getName()}`, () => itemAnswer.disable())
+                        .on(`plugin-destroy.${this.getName()}`, () => itemAnswer.destroy());
+                })
+            );
         }
     });
 });

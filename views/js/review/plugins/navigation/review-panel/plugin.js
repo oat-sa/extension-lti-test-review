@@ -33,6 +33,29 @@ define([
 ) {
     'use strict';
 
+    /**
+     * @param {mapEntry} item
+     * @returns {String}
+     */
+    const getItemTypeForFilter = item => {
+        if (item.informational) {
+            return 'info';
+        }
+        if (item.isExternallyScored && item.pendingExternalScore) {
+            return 'score-pending';
+        }
+        if (item.maxScore && item.score > 0 && item.score === item.maxScore) {
+            return 'correct';
+        }
+        if (item.maxScore && item.score === 0) {
+            return 'incorrect';
+        }
+        if (item.maxScore && item.score > 0 && item.score < item.maxScore) {
+            return 'score-partial';
+        }
+        return 'no-score';
+    };
+
     const filters = {
         /**
          * No filter, keep all items
@@ -48,7 +71,8 @@ define([
          * @returns {Boolean}
          */
         incorrect(item) {
-            return !item.informational && (!item.maxScore || item.score !== item.maxScore);
+            const itemType = getItemTypeForFilter(item);
+            return ['incorrect', 'score-partial'].includes(itemType);
         }
     };
 
@@ -73,52 +97,53 @@ define([
          * @returns {Promise}
          */
         render() {
-            return promiseTimeout(new Promise(resolve => {
-                const testRunner = this.getTestRunner();
-                const navigationDataService = navigationDataServiceFactory(testRunner.getTestMap());
+            return promiseTimeout(
+                new Promise(resolve => {
+                    const testRunner = this.getTestRunner();
+                    const navigationDataService = navigationDataServiceFactory(testRunner.getTestMap());
 
-                const { showScore, showCorrect, displaySectionTitles, reviewLayout, displayItemTooltip } =
-                    testRunner.getOptions();
+                    const { showScore, showCorrect, displaySectionTitles, reviewLayout, displayItemTooltip } =
+                        testRunner.getOptions();
 
-                const reviewPanelFactory =
-                    reviewLayout === 'fizzy' ? fizzyReviewPanelFactory : accordionReviewPanelFactory;
+                    const reviewPanelFactory =
+                        reviewLayout === 'fizzy' ? fizzyReviewPanelFactory : accordionReviewPanelFactory;
 
-                const reviewPanelConfig = Object.assign(
-                    {
-                        showScore,
-                        showCorrect,
-                        displaySectionTitles,
-                        displayItemTooltip
-                    },
-                    this.getConfig()
-                );
+                    const reviewPanelConfig = Object.assign(
+                        {
+                            showScore,
+                            showCorrect,
+                            displaySectionTitles,
+                            displayItemTooltip
+                        },
+                        this.getConfig()
+                    );
 
-                const reviewPanel = reviewPanelFactory(
-                    this.getAreaBroker().getPanelArea(),
-                    reviewPanelConfig,
-                    navigationDataService.getMap()
-                );
+                    const reviewPanel = reviewPanelFactory(
+                        this.getAreaBroker().getPanelArea(),
+                        reviewPanelConfig,
+                        navigationDataService.getMap()
+                    );
 
-                // control the test runner from the review panel
-                reviewPanel
-                    .on('filterchange', filterId => navigationDataService.filterMap(filters[filterId]))
-                    .on('itemchange', (itemRef, position) => testRunner.jump(position, 'item'))
-                    .on('ready', resolve);
+                    // control the test runner from the review panel
+                    reviewPanel
+                        .on('filterchange', filterId => navigationDataService.filterMap(filters[filterId]))
+                        .on('itemchange', (itemRef, position) => testRunner.jump(position, 'item'))
+                        .on('ready', resolve);
 
-                // reflect the filter to the map
-                navigationDataService
-                    .on('mapfilter', filteredMap => testRunner.setTestMap(filteredMap));
+                    // reflect the filter to the map
+                    navigationDataService.on('mapfilter', filteredMap => testRunner.setTestMap(filteredMap));
 
-                // reflect the test runner state to the review panel
-                testRunner
-                    .on('testmapchange', testMap => reviewPanel.setData(testMap))
-                    .on('loaditem', itemRef => reviewPanel.setActiveItem(itemRef))
-                    .on(`plugin-show.${this.getName()}`, () => reviewPanel.show())
-                    .on(`plugin-hide.${this.getName()}`, () => reviewPanel.hide())
-                    .on(`plugin-enable.${this.getName()}`, () => reviewPanel.enable())
-                    .on(`plugin-disable.${this.getName()}`, () => reviewPanel.disable())
-                    .on('destroy', () => reviewPanel.destroy());
-            }));
+                    // reflect the test runner state to the review panel
+                    testRunner
+                        .on('testmapchange', testMap => reviewPanel.setData(testMap))
+                        .on('loaditem', itemRef => reviewPanel.setActiveItem(itemRef))
+                        .on(`plugin-show.${this.getName()}`, () => reviewPanel.show())
+                        .on(`plugin-hide.${this.getName()}`, () => reviewPanel.hide())
+                        .on(`plugin-enable.${this.getName()}`, () => reviewPanel.enable())
+                        .on(`plugin-disable.${this.getName()}`, () => reviewPanel.disable())
+                        .on('destroy', () => reviewPanel.destroy());
+                })
+            );
         }
     });
 });

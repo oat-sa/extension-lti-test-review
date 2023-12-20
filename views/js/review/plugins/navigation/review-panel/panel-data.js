@@ -13,16 +13,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019-2022 Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2023 Open Assessment Technologies SA ;
  */
 /**
  * Helper that will build the dataset for the review panel in the expected format
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
  */
-define([
-    'lodash',
-    'i18n'
-], function (_, __) {
+define(['lodash', 'i18n'], function (_, __) {
     'use strict';
 
     /**
@@ -53,36 +50,38 @@ define([
 
     /**
      * Gets the type for a particular item
+     * (used for example to show icon: if 'xxx' type, then `class="item-xxx"`)
      * @param {mapEntry} item
      * @param {Boolean} withScore
      * @returns {String}
      */
     const getItemType = (item, withScore) => {
-        if (item.informational) {
-            return 'info';
-        }
         if (withScore) {
+            if (item.informational) {
+                return 'info';
+            }
             if (item.isExternallyScored && item.pendingExternalScore) {
                 return 'score-pending';
             }
-            if (item.maxScore) {
-                if (item.score > 0 && item.score < item.maxScore) {
-                    return 'score-partial';
-                }
-                if (item.score === item.maxScore) {
-                    return 'correct';
-                } else {
-                    // also applies when item.score === null (skipped items)
-                    return 'incorrect';
-                }
-            } else if (!item.skipped) {
-                return 'no-score';
+            if (item.maxScore && item.score > 0 && item.score === item.maxScore) {
+                return 'correct';
             }
+            if (item.maxScore && item.score === 0) {
+                return 'incorrect';
+            }
+            if (item.maxScore && item.score > 0 && item.score < item.maxScore) {
+                return 'score-partial';
+            }
+            return 'no-score';
+        } else {
+            if (item.informational) {
+                return 'info';
+            }
+            if (item.skipped) {
+                return 'skipped';
+            }
+            return 'default';
         }
-        if (item.skipped) {
-            return 'skipped';
-        }
-        return 'default';
     };
 
     /**
@@ -131,11 +130,12 @@ define([
      */
     /**
      * Adds missing properties to a reviewItem, to support fizzyPanel UI
+     * @param {mapEntry} item - the original test item entry
      * @param {mapEntry} entry - item, will be mutated
      * @param {String} numericLabel
      * @returns {ReviewItem}
      */
-    const extendReviewItemScope = (entry, numericLabel) => {
+    const extendReviewItemScope = (item, entry, numericLabel) => {
         const reviewItem = Object.assign({}, entry);
         const type = reviewItem.type;
 
@@ -146,6 +146,7 @@ define([
 
         reviewItem.ariaLabel = type === 'info' ? __('Informational item') : __('Question %s', reviewItem.numericLabel);
 
+        //used in oat-sa/tao-core-ui-fe itemButtonList
         reviewItem.scoreType = null;
         if (type === 'correct') {
             reviewItem.scoreType = 'correct';
@@ -163,6 +164,12 @@ define([
             reviewItem.status = 'answered';
         } else {
             reviewItem.status = 'viewed';
+        }
+
+        //for accordionList.tpl
+        reviewItem.accordionScoreLabel = '-';
+        if (['correct', 'incorrect', 'score-partial', 'score-pending'].includes(reviewItem.type) && item.maxScore) {
+            reviewItem.accordionScoreLabel = `${item.score || 0}/${item.maxScore}`;
         }
 
         return reviewItem;
@@ -183,28 +190,30 @@ define([
 
             // rebuild the map keeping only relevant data, and sorting elements by position
             const panelMap = {
-                parts: _.map(parts, part => Object.assign(extractData(part, withScore), {
-                    sections: _.map(part.sections, section => {
-                        const reviewSection = Object.assign(extractData(section, withScore), {
-                            // must sort items by position before treating data, so we can assign accurate numericLabels
-                            items: _.chain(section.items)
-                                .sortBy('position')
-                                .map(item => {
-                                    let reviewItem = extractData(item, withScore);
-                                    reviewItem.type = getItemType(item, withScore);
-                                    if (reviewItem.type !== 'info') {
-                                        nonInformationalCount++;
-                                    }
-                                    reviewItem = extendReviewItemScope(reviewItem, nonInformationalCount);
-                                    items.set(item.id, reviewItem);
-                                    return reviewItem;
-                                })
-                                .value()
-                        });
-                        sections.set(section.id, reviewSection);
-                        return reviewSection;
-                    }).sort(compareByPosition)
-                })).sort(compareByPosition),
+                parts: _.map(parts, part =>
+                    Object.assign(extractData(part, withScore), {
+                        sections: _.map(part.sections, section => {
+                            const reviewSection = Object.assign(extractData(section, withScore), {
+                                // must sort items by position before treating data, so we can assign accurate numericLabels
+                                items: _.chain(section.items)
+                                    .sortBy('position')
+                                    .map(item => {
+                                        let reviewItem = extractData(item, withScore);
+                                        reviewItem.type = getItemType(item, withScore);
+                                        if (reviewItem.type !== 'info') {
+                                            nonInformationalCount++;
+                                        }
+                                        reviewItem = extendReviewItemScope(item, reviewItem, nonInformationalCount);
+                                        items.set(item.id, reviewItem);
+                                        return reviewItem;
+                                    })
+                                    .value()
+                            });
+                            sections.set(section.id, reviewSection);
+                            return reviewSection;
+                        }).sort(compareByPosition)
+                    })
+                ).sort(compareByPosition),
                 withScore,
                 items,
                 sections

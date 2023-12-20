@@ -295,7 +295,7 @@ define([
                 {status: 'correct'},
                 {status: 'correct'},
                 {status: 'correct'},
-                {status: 'viewed'}
+                {status: 'answered'}
             ]
         }
     }, {
@@ -482,6 +482,7 @@ define([
                     score: 0,
                     status: "answered",
                     position: 0,
+                    "accordionScoreLabel": "0/1",
                     ariaLabel: "Question 1",
                     icon: null,
                     numericLabel: "1",
@@ -653,6 +654,7 @@ define([
                     score: 1,
                     status: "answered",
                     position: 0,
+                    "accordionScoreLabel": "1/1",
                     ariaLabel: "Question 1",
                     icon: null,
                     numericLabel: "1",

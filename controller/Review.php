@@ -121,6 +121,7 @@ class Review extends tao_actions_SinglePageModule
         }
 
         $this->getConcurringSessionService()->pauseConcurrentSessions($execution);
+        $this->getConcurringSessionService()->clearConcurringSession($execution);
 
         $delivery = $execution->getDelivery();
 

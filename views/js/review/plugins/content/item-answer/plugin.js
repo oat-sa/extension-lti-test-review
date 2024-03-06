@@ -133,7 +133,13 @@ define([
         }
     };
 
-    const getHasCorrectResponseDefined = item => {
+    /**
+     * Checks if item should have correct response tab
+     *  (`showCorrect` config option should be checked outside)
+     * @param {Object} item
+     * @returns {Boolean}
+     */
+    const getHasCorrectResponseTab = item => {
         const statusWithScore = getItemStatusType(item, true);
         return ['score-pending', 'incorrect', 'score-partial'].includes(statusWithScore);
     };
@@ -178,8 +184,8 @@ define([
                             const item = mapHelper.getItem(testRunner.getTestMap(), itemRef);
 
                             const statusType = getItemStatusType(item, showScore);
-                            const hasCorrectResponseDefined = getHasCorrectResponseDefined(item);
-                            itemAnswer.setStatus(statusType, hasCorrectResponseDefined);
+                            const hasCorrectResponseTab = getHasCorrectResponseTab(item);
+                            itemAnswer.setStatus(statusType, hasCorrectResponseTab);
 
                             itemAnswer.setHasNoAnswer(item.skipped);
 

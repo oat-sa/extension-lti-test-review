@@ -219,11 +219,11 @@ define([
             /**
              * Defines the item status
              * @param {String} statusType
-             * @param {Boolean} hasCorrectResponseDefined
+             * @param {Boolean} hasCorrectResponseTab
              * @returns {itemAnswerComponent}
              * @fires statuschange
              */
-            setStatus(statusType, hasCorrectResponseDefined) {
+            setStatus(statusType, hasCorrectResponseTab) {
                 let status;
                 if (statusType === 'info') {
                     status = 'informational';
@@ -244,10 +244,9 @@ define([
                 }
 
                 const statusChanged = this.getConfig().status !== status;
-                const hasCorrectResponseChanged =
-                    this.getConfig().hasCorrectResponseDefined !== hasCorrectResponseDefined;
+                const hasCorrectResponseChanged = this.getConfig().hasCorrectResponseTab !== hasCorrectResponseTab;
                 this.getConfig().status = status;
-                this.getConfig().hasCorrectResponseDefined = hasCorrectResponseDefined;
+                this.getConfig().hasCorrectResponseTab = hasCorrectResponseTab;
 
                 // reflect the state onto the component
                 states.forEach(state => this.setState(state, status === state));
@@ -255,16 +254,20 @@ define([
                 /**
                  * @event statuschange
                  * @param {Boolean} statusChanged - If status actually changed or not
-                 * @param {Boolean} hasCorrectResponseChanged - If hasCorrectResponseDefined actually changed or not
+                 * @param {Boolean} hasCorrectResponseChanged - If hasCorrectResponseTab actually changed or not
                  */
                 this.trigger('statuschange', statusChanged, hasCorrectResponseChanged);
                 return this;
             },
 
+            /**
+             * Calculates which tabs should be shown based on component state and config
+             * @returns {Array<Object>}
+             */
             calculateTabs() {
-                const { showCorrect, hasCorrectResponseDefined, status } = this.getConfig();
+                const { showCorrect, hasCorrectResponseTab, status } = this.getConfig();
                 const tabs = [getAnswerTab(status)];
-                if (showCorrect && hasCorrectResponseDefined) {
+                if (showCorrect && hasCorrectResponseTab) {
                     tabs.push(correctTab);
                 }
                 return tabs;

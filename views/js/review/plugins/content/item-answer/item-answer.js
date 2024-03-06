@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2024 Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
@@ -110,45 +110,6 @@ define([
         label: __('Correct response')
     };
 
-    const informationalTab = getAnswerTab('informational');
-    const correctAnswerTab = getAnswerTab('correct');
-    const incorrectTab = getAnswerTab('incorrect');
-    const partialTab = getAnswerTab('partial');
-    const pendingTab = getAnswerTab('pending');
-    const noScoreTab = getAnswerTab('no-score');
-    const skippedTab = getAnswerTab('skipped');
-    const defaultTab = getAnswerTab('default');
-
-    /**
-     * Defines tabs by status with correct responses enabled
-     * @type {Object}
-     */
-    const tabsByStatusWithCorrect = {
-        informational: [informationalTab],
-        correct: [correctAnswerTab, correctTab],
-        incorrect: [incorrectTab, correctTab],
-        partial: [partialTab, correctTab],
-        pending: [pendingTab, correctTab],
-        'no-score': [noScoreTab],
-        skipped: [skippedTab],
-        default: [defaultTab]
-    };
-
-    /**
-     * Defines tabs by status with correct responses disabled
-     * @type {Object}
-     */
-    const tabsByStatusWithoutCorrect = {
-        informational: [informationalTab],
-        correct: [correctAnswerTab],
-        incorrect: [incorrectTab],
-        partial: [partialTab],
-        pending: [pendingTab],
-        'no-score': [noScoreTab],
-        skipped: [skippedTab],
-        default: [defaultTab]
-    };
-
     /**
      * List of possible states
      * @type {String[]}
@@ -187,7 +148,8 @@ define([
      */
     function itemAnswerFactory(container, config) {
         let controls = null;
-        let activeTab = 'answer';
+        let activeTab = null;
+        let tabs = [];
 
         const api = {
             /**
@@ -256,24 +218,56 @@ define([
 
             /**
              * Defines the item status
-             * @param {String} status
+             * @param {String} statusType
+             * @param {Boolean} hasCorrectResponseDefined
              * @returns {itemAnswerComponent}
              * @fires statuschange
              */
-            setStatus(status) {
-                const change = this.getConfig().status !== status;
+            setStatus(statusType, hasCorrectResponseDefined) {
+                let status;
+                if (statusType === 'info') {
+                    status = 'informational';
+                } else if (statusType === 'score-pending') {
+                    status = 'pending';
+                } else if (statusType === 'correct') {
+                    status = 'correct';
+                } else if (statusType === 'incorrect') {
+                    status = 'incorrect';
+                } else if (statusType === 'score-partial') {
+                    status = 'partial';
+                } else if (statusType === 'default') {
+                    status = 'default';
+                } else if (statusType === 'skipped') {
+                    status = 'skipped';
+                } else {
+                    status = 'no-score';
+                }
+
+                const statusChanged = this.getConfig().status !== status;
+                const hasCorrectResponseChanged =
+                    this.getConfig().hasCorrectResponseDefined !== hasCorrectResponseDefined;
                 this.getConfig().status = status;
+                this.getConfig().hasCorrectResponseDefined = hasCorrectResponseDefined;
 
                 // reflect the state onto the component
                 states.forEach(state => this.setState(state, status === state));
 
                 /**
                  * @event statuschange
-                 * @param {String} status - The new status
-                 * @param {Boolean} change - If the status actually changed or not
+                 * @param {Boolean} statusChanged - If status actually changed or not
+                 * @param {Boolean} hasCorrectResponseChanged - If hasCorrectResponseDefined actually changed or not
                  */
-                this.trigger('statuschange', status, change);
+                this.trigger('statuschange', statusChanged, hasCorrectResponseChanged);
                 return this;
+            },
+
+            calculateTabs() {
+                const { showCorrect, hasCorrectResponseDefined, status } = this.getConfig();
+                const tabs = [getAnswerTab(status)];
+                if (showCorrect && hasCorrectResponseDefined) {
+                    tabs.push(correctTab);
+                }
+                return tabs;
             },
 
             /**
@@ -282,118 +276,6 @@ define([
              */
             getActiveTab() {
                 return activeTab;
-            },
-
-            /**
-             * Tells if the item got correct responses
-             * @returns {Boolean}
-             */
-            isCorrect() {
-                return this.is('correct');
-            },
-
-            /**
-             * Tells if the item got skipped
-             * @returns {Boolean}
-             */
-            isSkipped() {
-                return this.is('skipped') && !this.isCorrect();
-            },
-
-            /**
-             * Tells if the item is informational
-             * @returns {Boolean}
-             */
-            isInformational() {
-                return this.is('informational');
-            },
-
-            /**
-             * Tells if the item is informational
-             * @returns {Boolean}
-             */
-            isPartial() {
-                return this.is('partial');
-            },
-
-            /**
-             * Tells if the item is informational
-             * @returns {Boolean}
-             */
-            isPending() {
-                return this.is('pending');
-            },
-
-            /**
-             * Tells if the item is default
-             * @returns {Boolean}
-             */
-            isDefaultState() {
-                return this.is('default');
-            },
-
-            /**
-             * Defines the item as correct
-             * @returns {itemAnswerComponent}
-             */
-            setCorrect() {
-                return this.setStatus('correct');
-            },
-
-            /**
-             * Defines the item as incorrect
-             * @returns {itemAnswerComponent}
-             */
-            setIncorrect() {
-                return this.setStatus('incorrect');
-            },
-
-            /**
-             * Defines the item as incorrect and skipped
-             * @returns {itemAnswerComponent}
-             */
-            setSkipped() {
-                return this.setStatus('skipped');
-            },
-
-            /**
-             * Defines the item as informational
-             * @returns {itemAnswerComponent}
-             */
-            setInformational() {
-                return this.setStatus('informational');
-            },
-
-            /**
-             * Defines the item as partial
-             * @returns {itemAnswerComponent}
-             */
-            setPartial() {
-                return this.setStatus('partial');
-            },
-
-            /**
-             * Defines the item as pending
-             * @returns {itemAnswerComponent}
-             */
-            setPending() {
-                return this.setStatus('pending');
-            },
-
-            /**
-             * Defines the item as no-score
-             * @returns {itemAnswerComponent}
-             */
-            setNoScore() {
-                return this.setStatus('no-score');
-            },
-
-            /**
-             * Defines the item as default
-             * @returns {itemAnswerComponent}
-             */
-            setDefault() {
-                return this.setStatus('default');
             }
         };
 
@@ -418,10 +300,8 @@ define([
                     $status: this.getElement().find('.item-answer-status')
                 };
 
-                const tabsByStatus = this.getConfig().showCorrect
-                    ? tabsByStatusWithCorrect
-                    : tabsByStatusWithoutCorrect;
-                let tabs = tabsByStatus[this.getStatus()];
+                tabs = this.calculateTabs();
+                activeTab = tabs[0];
 
                 const tabsComponent = tabsFactory(controls.$tabs, { activeTab, tabs })
                     .setTemplate(answerTabsTpl)
@@ -450,9 +330,10 @@ define([
 
                 this.setState('show-score', this.getConfig().showScore)
                     .setState('show-correct', this.getConfig().showCorrect)
-                    .on('statuschange', (status, change) => {
-                        if (change && tabs !== tabsByStatus[status]) {
-                            tabs = tabsByStatus[status];
+                    .on('statuschange', (statusChanged, hasCorrectResponseChanged) => {
+                        if (statusChanged || hasCorrectResponseChanged) {
+                            tabs = this.calculateTabs();
+
                             tabsComponent.setTabs(tabs);
                             if (this.is('disabled')) {
                                 tabsComponent.disable();

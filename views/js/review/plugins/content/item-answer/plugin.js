@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2024 Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
@@ -133,6 +133,11 @@ define([
         }
     };
 
+    const getHasCorrectResponseDefined = item => {
+        const statusWithScore = getItemStatusType(item, true);
+        return ['score-pending', 'incorrect', 'score-partial'].includes(statusWithScore);
+    };
+
     /**
      * Test Review Plugin : Item Answer Tabs
      * Displays a tabs bar that allows to switch between responses and correct responses
@@ -173,23 +178,8 @@ define([
                             const item = mapHelper.getItem(testRunner.getTestMap(), itemRef);
 
                             const statusType = getItemStatusType(item, showScore);
-                            if (statusType === 'info') {
-                                itemAnswer.setInformational();
-                            } else if (statusType === 'score-pending') {
-                                itemAnswer.setPending();
-                            } else if (statusType === 'correct') {
-                                itemAnswer.setCorrect();
-                            } else if (statusType === 'incorrect') {
-                                itemAnswer.setIncorrect();
-                            } else if (statusType === 'score-partial') {
-                                itemAnswer.setPartial();
-                            } else if (statusType === 'default') {
-                                itemAnswer.setDefault();
-                            } else if (statusType === 'skipped') {
-                                itemAnswer.setSkipped();
-                            } else {
-                                itemAnswer.setNoScore();
-                            }
+                            const hasCorrectResponseDefined = getHasCorrectResponseDefined(item);
+                            itemAnswer.setStatus(statusType, hasCorrectResponseDefined);
 
                             itemAnswer.setHasNoAnswer(item.skipped);
 

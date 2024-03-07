@@ -141,7 +141,7 @@ define([
      */
     const getHasCorrectResponseTab = item => {
         const statusWithScore = getItemStatusType(item, true);
-        return ['score-pending', 'incorrect', 'score-partial'].includes(statusWithScore);
+        return ['score-pending', 'correct', 'incorrect', 'score-partial'].includes(statusWithScore);
     };
 
     /**

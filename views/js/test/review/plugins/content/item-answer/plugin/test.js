@@ -284,7 +284,7 @@ define([
                     }))
                     .then(() => {
                         assert.strictEqual($container.find('.item-answer').is('.correct'), true, 'The component is set to "correct"');
-                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 2, 'Two tabs should be present');
                         assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
                         assert.strictEqual($container.find('.item-answer-score').text().trim(), `${__('Your Score:')} 1/1`, 'The score is set');
                         assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status is empty');
@@ -451,7 +451,11 @@ define([
                         } else {
                             assert.strictEqual($container.find('.item-answer').is('.default'), true, 'The component is set to "default"');
                         }
-                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
+                        if (data.expected.showCorrect) {
+                            assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 2, 'Two tabs should be present');
+                        } else {
+                            assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one should be present');
+                        }
                         assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
                         if (data.expected.showScore) {
                             assert.strictEqual($container.find('.item-answer-score').text().trim(), `${__('Your Score:')} 1/1`, 'The score is set');

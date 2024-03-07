@@ -740,7 +740,7 @@ define([
                             })
                         ]);
 
-                        assert.strictEqual(instance.setStatus('info', false), instance, 'setStatus(info) is fluent');
+                        assert.strictEqual(instance.setStatus('informational', false), instance, 'setStatus(info) is fluent');
 
                         return promise;
                     })
@@ -1258,7 +1258,7 @@ define([
                             })
                         ]);
 
-                        assert.strictEqual(instance.setStatus('info', false), instance, 'setStatus(info) is fluent');
+                        assert.strictEqual(instance.setStatus('informational', false), instance, 'setStatus(info) is fluent');
 
                         return promise;
                     })
@@ -1331,9 +1331,9 @@ define([
                     instance.setStatus('skipped', currentHasCorrectResponse);
                     break;
 
-                case 'info':
+                case 'informational':
                     instance.setScore('');
-                    instance.setStatus('info', currentHasCorrectResponse);
+                    instance.setStatus('informational', currentHasCorrectResponse);
                     break;
             }
         };

@@ -99,7 +99,7 @@ define([
     };
 
     /**
-     * Should match to `review-panel` plugin's item types
+     * Should match `review-panel` plugin's item types
      * @param {Object} item
      * @param {Boolean} withScore
      * @returns {String}
@@ -107,10 +107,10 @@ define([
     const getItemStatusType = (item, withScore) => {
         if (withScore) {
             if (item.informational) {
-                return 'info';
+                return 'informational';
             }
             if (item.isExternallyScored && item.pendingExternalScore) {
-                return 'score-pending';
+                return 'pending';
             }
             if (item.maxScore && item.score > 0 && item.score === item.maxScore) {
                 return 'correct';
@@ -119,12 +119,12 @@ define([
                 return 'incorrect';
             }
             if (item.maxScore && item.score > 0 && item.score < item.maxScore) {
-                return 'score-partial';
+                return 'partial';
             }
             return 'no-score';
         } else {
             if (item.informational) {
-                return 'info';
+                return 'informational';
             }
             if (item.skipped) {
                 return 'skipped';
@@ -141,7 +141,7 @@ define([
      */
     const getHasCorrectResponseTab = item => {
         const statusWithScore = getItemStatusType(item, true);
-        return ['score-pending', 'correct', 'incorrect', 'score-partial'].includes(statusWithScore);
+        return ['pending', 'correct', 'incorrect', 'partial'].includes(statusWithScore);
     };
 
     /**
@@ -191,7 +191,7 @@ define([
 
                             let score = '';
                             if (
-                                ['correct', 'incorrect', 'score-partial', 'score-pending'].includes(statusType) &&
+                                ['correct', 'incorrect', 'partial', 'pending'].includes(statusType) &&
                                 item.maxScore
                             ) {
                                 score = `${item.score || 0}/${item.maxScore}`;

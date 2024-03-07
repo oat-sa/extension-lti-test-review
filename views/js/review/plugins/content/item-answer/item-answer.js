@@ -111,17 +111,13 @@ define([
     };
 
     /**
-     * List of possible states
+     * List of possible statuses/states
      * @type {String[]}
      */
-    const states = ['correct', 'incorrect', 'skipped', 'informational', 'partial', 'pending', 'default'];
+    const statuses = ['correct', 'incorrect', 'skipped', 'informational', 'partial', 'pending', 'default', 'no-score'];
 
     /**
      * Builds a component that shows up the item status regarding the responses.
-     * States:
-     * - correct - Whether or not the item got correct responses
-     * - skipped - Whether or not the item has been skipped. This option only matters if `correct` is set.
-     * - informational - Whether or not the item is informational. If so, the component won't display anything.
      *
      * @example
      *  const container = $();
@@ -218,29 +214,14 @@ define([
 
             /**
              * Defines the item status
-             * @param {String} statusType
+             * @param {String} status
              * @param {Boolean} hasCorrectResponseTab
              * @returns {itemAnswerComponent}
              * @fires statuschange
              */
-            setStatus(statusType, hasCorrectResponseTab) {
-                let status;
-                if (statusType === 'info') {
-                    status = 'informational';
-                } else if (statusType === 'score-pending') {
-                    status = 'pending';
-                } else if (statusType === 'correct') {
-                    status = 'correct';
-                } else if (statusType === 'incorrect') {
-                    status = 'incorrect';
-                } else if (statusType === 'score-partial') {
-                    status = 'partial';
-                } else if (statusType === 'default') {
-                    status = 'default';
-                } else if (statusType === 'skipped') {
-                    status = 'skipped';
-                } else {
-                    status = 'no-score';
+            setStatus(status, hasCorrectResponseTab) {
+                if (!statuses.includes(status)) {
+                    throw new TypeError('Unknown status for review item-answer');
                 }
 
                 const statusChanged = this.getConfig().status !== status;
@@ -249,7 +230,7 @@ define([
                 this.getConfig().hasCorrectResponseTab = hasCorrectResponseTab;
 
                 // reflect the state onto the component
-                states.forEach(state => this.setState(state, status === state));
+                statuses.forEach(availableStatus => this.setState(availableStatus, status === availableStatus));
 
                 /**
                  * @event statuschange

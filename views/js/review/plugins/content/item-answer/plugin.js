@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
- * Copyright (c) 2019 Open Assessment Technologies SA ;
+ * Copyright (c) 2019-2024 Open Assessment Technologies SA ;
  */
 /**
  * @author Jean-Sébastien Conan <jean-sebastien@taotesting.com>
@@ -99,7 +99,7 @@ define([
     };
 
     /**
-     * Should match to `review-panel` plugin's item types
+     * Should match `review-panel` plugin's item types
      * @param {Object} item
      * @param {Boolean} withScore
      * @returns {String}
@@ -107,10 +107,10 @@ define([
     const getItemStatusType = (item, withScore) => {
         if (withScore) {
             if (item.informational) {
-                return 'info';
+                return 'informational';
             }
             if (item.isExternallyScored && item.pendingExternalScore) {
-                return 'score-pending';
+                return 'pending';
             }
             if (item.maxScore && item.score > 0 && item.score === item.maxScore) {
                 return 'correct';
@@ -119,18 +119,29 @@ define([
                 return 'incorrect';
             }
             if (item.maxScore && item.score > 0 && item.score < item.maxScore) {
-                return 'score-partial';
+                return 'partial';
             }
             return 'no-score';
         } else {
             if (item.informational) {
-                return 'info';
+                return 'informational';
             }
             if (item.skipped) {
                 return 'skipped';
             }
             return 'default';
         }
+    };
+
+    /**
+     * Checks if item should have correct response tab
+     *  (`showCorrect` config option should be checked outside)
+     * @param {Object} item
+     * @returns {Boolean}
+     */
+    const getHasCorrectResponseTab = item => {
+        const statusWithScore = getItemStatusType(item, true);
+        return ['pending', 'correct', 'incorrect', 'partial'].includes(statusWithScore);
     };
 
     /**
@@ -173,29 +184,14 @@ define([
                             const item = mapHelper.getItem(testRunner.getTestMap(), itemRef);
 
                             const statusType = getItemStatusType(item, showScore);
-                            if (statusType === 'info') {
-                                itemAnswer.setInformational();
-                            } else if (statusType === 'score-pending') {
-                                itemAnswer.setPending();
-                            } else if (statusType === 'correct') {
-                                itemAnswer.setCorrect();
-                            } else if (statusType === 'incorrect') {
-                                itemAnswer.setIncorrect();
-                            } else if (statusType === 'score-partial') {
-                                itemAnswer.setPartial();
-                            } else if (statusType === 'default') {
-                                itemAnswer.setDefault();
-                            } else if (statusType === 'skipped') {
-                                itemAnswer.setSkipped();
-                            } else {
-                                itemAnswer.setNoScore();
-                            }
+                            const hasCorrectResponseTab = getHasCorrectResponseTab(item);
+                            itemAnswer.setStatus(statusType, hasCorrectResponseTab);
 
                             itemAnswer.setHasNoAnswer(item.skipped);
 
                             let score = '';
                             if (
-                                ['correct', 'incorrect', 'score-partial', 'score-pending'].includes(statusType) &&
+                                ['correct', 'incorrect', 'partial', 'pending'].includes(statusType) &&
                                 item.maxScore
                             ) {
                                 score = `${item.score || 0}/${item.maxScore}`;

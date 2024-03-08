@@ -87,13 +87,6 @@ define([
         {title: 'getStatus'},
         {title: 'setStatus'},
         {title: 'getActiveTab'},
-        {title: 'isCorrect'},
-        {title: 'isSkipped'},
-        {title: 'isInformational'},
-        {title: 'setCorrect'},
-        {title: 'setIncorrect'},
-        {title: 'setSkipped'},
-        {title: 'setInformational'}
     ]).test('component API ', (data, assert) => {
         const instance = getInstance('#fixture-api');
         assert.expect(1);
@@ -175,7 +168,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-init');
 
-        assert.expect(7);
+        assert.expect(4);
 
         const instance = itemAnswerFactory($container, data.config)
             .on('init', function () {
@@ -186,9 +179,6 @@ define([
 
                 assert.strictEqual(instance.getScore(), data.expected.score, 'The expected score is set');
                 assert.strictEqual(instance.getStatus(), data.expected.status, 'The expected status is set');
-                assert.strictEqual(instance.isCorrect(), data.expected.correct, 'The correct status is set as expected');
-                assert.strictEqual(instance.isSkipped(), data.expected.skipped, 'The skipped status is set as expected');
-                assert.strictEqual(instance.isInformational(), data.expected.informational, 'The informational status is set as expected');
 
                 instance.destroy();
             })
@@ -357,8 +347,8 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', status => {
-                                    assert.strictEqual(status, 'incorrect', 'The status changed to incorrect');
+                                instance.on('statuschange.test', () => {
+                                    assert.strictEqual(instance.getConfig().status, 'incorrect', 'The status changed to incorrect');
                                     resolve();
                                 });
                             }),
@@ -370,7 +360,7 @@ define([
                             })
                         ]);
 
-                        instance.setIncorrect();
+                        instance.setStatus('incorrect', true);
 
                         return promise;
                     })
@@ -558,7 +548,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-status');
 
-        assert.expect(77);
+        assert.expect(69);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
@@ -598,8 +588,8 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', (status, change) => {
-                                    assert.strictEqual(status, 'skipped', 'The status changed to skipped');
+                                instance.on('statuschange.test', (change) => {
+                                    assert.strictEqual(instance.getConfig().status, 'skipped', 'The status changed to skipped');
                                     assert.strictEqual(change, true, 'The status has actually changed');
                                     resolve();
                                 });
@@ -612,15 +602,12 @@ define([
                             })
                         ]);
 
-                        assert.strictEqual(instance.setStatus('skipped'), instance, 'setStatus() is fluent');
+                        assert.strictEqual(instance.setStatus('skipped', false), instance, 'setStatus() is fluent');
 
                         return promise;
                     })
                     .then(() => {
-                        assert.strictEqual(instance.isCorrect(), false, 'The item is not correct');
-                        assert.strictEqual(instance.isSkipped(), true, 'The item is skipped');
-                        assert.strictEqual(instance.isInformational(), false, 'The item is not informational');
-
+                        assert.strictEqual(instance.getStatus(), 'skipped', 'The item is skipped');
                         assert.strictEqual($container.children().is('.correct'), false, 'The component did not get the state correct');
                         assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
                         assert.strictEqual($container.children().is('.skipped'), true, 'The component got the state skipped');
@@ -642,8 +629,8 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', (status, change) => {
-                                    assert.strictEqual(status, 'correct', 'The status changed to correct');
+                                instance.on('statuschange.test', (change) => {
+                                    assert.strictEqual(instance.getConfig().status, 'correct', 'The status changed to correct');
                                     assert.strictEqual(change, true, 'The status has actually changed');
                                     resolve();
                                 });
@@ -656,15 +643,12 @@ define([
                             })
                         ]);
 
-                        assert.strictEqual(instance.setStatus('correct'), instance, 'setStatus() is fluent');
+                        assert.strictEqual(instance.setStatus('correct', false), instance, 'setStatus() is fluent');
 
                         return promise;
                     })
                     .then(() => {
-                        assert.strictEqual(instance.isCorrect(), true, 'The item is correct');
-                        assert.strictEqual(instance.isSkipped(), false, 'The item is not skipped');
-                        assert.strictEqual(instance.isInformational(), false, 'The item is not informational');
-
+                        assert.strictEqual(instance.getStatus(), 'correct', 'The item is correct');
                         assert.strictEqual($container.children().is('.correct'), true, 'The component got the state correct');
                         assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
                         assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
@@ -682,8 +666,8 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', (status, change) => {
-                                    assert.strictEqual(status, 'incorrect', 'The status changed to incorrect');
+                                instance.on('statuschange.test', (change) => {
+                                    assert.strictEqual(instance.getConfig().status, 'incorrect', 'The status changed to incorrect');
                                     assert.strictEqual(change, true, 'The status has actually changed');
                                     resolve();
                                 });
@@ -696,7 +680,7 @@ define([
                             })
                         ]);
 
-                        assert.strictEqual(instance.setStatus('incorrect'), instance, 'setStatus() is fluent');
+                        assert.strictEqual(instance.setStatus('incorrect', true), instance, 'setStatus() is fluent');
 
                         return promise;
                     })
@@ -705,8 +689,8 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', (status, change) => {
-                                    assert.strictEqual(status, 'incorrect', 'The status changed to incorrect');
+                                instance.on('statuschange.test', (change) => {
+                                    assert.strictEqual(instance.getConfig().status, 'incorrect', 'The status changed to incorrect');
                                     assert.strictEqual(change, false, 'The status has not actually changed');
                                     resolve();
                                 });
@@ -719,15 +703,12 @@ define([
                             })
                         ]);
 
-                        assert.strictEqual(instance.setStatus('incorrect'), instance, 'setStatus() is fluent');
+                        assert.strictEqual(instance.setStatus('incorrect', true), instance, 'setStatus() is fluent');
 
                         return promise;
                     })
                     .then(() => {
-                        assert.strictEqual(instance.isCorrect(), false, 'The item is not correct');
-                        assert.strictEqual(instance.isSkipped(), false, 'The item is not skipped');
-                        assert.strictEqual(instance.isInformational(), false, 'The item is not informational');
-
+                        assert.strictEqual(instance.getStatus(), 'incorrect', 'The item is incorrect');
                         assert.strictEqual($container.children().is('.correct'), false, 'The component did not get the state correct');
                         assert.strictEqual($container.children().is('.incorrect'), true, 'The component got the state incorrect');
                         assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
@@ -745,8 +726,8 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', (status, change) => {
-                                    assert.strictEqual(status, 'informational', 'The status changed to informational');
+                                instance.on('statuschange.test', (change) => {
+                                    assert.strictEqual(instance.getConfig().status, 'informational', 'The status changed to informational');
                                     assert.strictEqual(change, true, 'The status has actually changed');
                                     resolve();
                                 });
@@ -759,15 +740,12 @@ define([
                             })
                         ]);
 
-                        assert.strictEqual(instance.setStatus('informational'), instance, 'setStatus() is fluent');
+                        assert.strictEqual(instance.setStatus('informational', false), instance, 'setStatus(info) is fluent');
 
                         return promise;
                     })
                     .then(() => {
-                        assert.strictEqual(instance.isCorrect(), false, 'The item is not correct');
-                        assert.strictEqual(instance.isSkipped(), false, 'The item is not skipped');
-                        assert.strictEqual(instance.isInformational(), true, 'The item is informational');
-
+                        assert.strictEqual(instance.getStatus(), 'informational', 'The item is informational');
                         assert.strictEqual($container.children().is('.correct'), false, 'The component did not get the state correct');
                         assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
                         assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
@@ -791,6 +769,7 @@ define([
                 ready();
             });
     });
+
 
     QUnit.cases.init([{
         title: 'default',
@@ -828,7 +807,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-correct');
 
-        assert.expect(34);
+        assert.expect(32);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
@@ -866,8 +845,8 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', (status, change) => {
-                                    assert.strictEqual(status, 'correct', 'The status changed to correct');
+                                instance.on('statuschange.test', (change) => {
+                                    assert.strictEqual(instance.getConfig().status, 'correct', 'The status changed to correct');
                                     assert.strictEqual(change, true, 'The status has actually changed');
                                     resolve();
                                 });
@@ -880,15 +859,12 @@ define([
                             })
                         ]);
 
-                        assert.strictEqual(instance.setCorrect(), instance, 'setCorrect() is fluent');
+                        assert.strictEqual(instance.setStatus('correct', false), instance, 'setStatus(correct) is fluent');
 
                         return promise;
                     })
                     .then(() => {
-                        assert.strictEqual(instance.isCorrect(), true, 'The item is correct');
-                        assert.strictEqual(instance.isSkipped(), false, 'The item is not skipped');
-                        assert.strictEqual(instance.isInformational(), false, 'The item is not informational');
-
+                        assert.strictEqual(instance.getStatus(), 'correct', 'The item is correct');
                         assert.strictEqual($container.children().is('.correct'), true, 'The component got the state correct');
                         assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
                         assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
@@ -896,11 +872,7 @@ define([
                         assert.strictEqual($container.find('.item-answer-status').text().trim(), '', 'The status area is empty');
 
                         assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab[data-tab-name="answer"]').length, 1, 'The tab "answer" is set');
-                        if (data.expected.showCorrect) {
-                            assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 2, 'Two tabs should be present');
-                        } else {
-                            assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
-                        }
+                        assert.strictEqual($container.find('.item-answer-tabs .answer-tabs .tab').length, 1, 'Only one tab should be present');
                         if (data.expected.showCorrect) {
                             assert.strictEqual($container.find('[data-tab-name="answer"] .icon').is(data.expected.icon), true, 'The expected icon is set');
                         } else {
@@ -970,7 +942,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-incorrect');
 
-        assert.expect(35);
+        assert.expect(33);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
@@ -1008,8 +980,8 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', (status, change) => {
-                                    assert.strictEqual(status, 'incorrect', 'The status changed to incorrect');
+                                instance.on('statuschange.test', (change) => {
+                                    assert.strictEqual(instance.getConfig().status, 'incorrect', 'The status changed to incorrect');
                                     assert.strictEqual(change, true, 'The status has actually changed');
                                     resolve();
                                 });
@@ -1022,15 +994,12 @@ define([
                             })
                         ]);
 
-                        assert.strictEqual(instance.setIncorrect(), instance, 'setIncorrect() is fluent');
+                        assert.strictEqual(instance.setStatus('incorrect', true), instance, 'setStatus(incorrect) is fluent');
 
                         return promise;
                     })
                     .then(() => {
-                        assert.strictEqual(instance.isCorrect(), false, 'The item is not correct');
-                        assert.strictEqual(instance.isSkipped(), false, 'The item is not skipped');
-                        assert.strictEqual(instance.isInformational(), false, 'The item is not informational');
-
+                        assert.strictEqual(instance.getStatus(), 'incorrect', 'The item is incorrect');
                         assert.strictEqual($container.children().is('.correct'), false, 'The component did not get the state correct');
                         assert.strictEqual($container.children().is('.incorrect'), true, 'The component got the state incorrect');
                         assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
@@ -1110,7 +1079,7 @@ define([
         const $container = $('#fixture-skipped');
         const skippedText = '';
 
-        assert.expect(35);
+        assert.expect(33);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
@@ -1148,8 +1117,8 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', (status, change) => {
-                                    assert.strictEqual(status, 'skipped', 'The status changed to skipped');
+                                instance.on('statuschange.test', (change) => {
+                                    assert.strictEqual(instance.getConfig().status, 'skipped', 'The status changed to skipped');
                                     assert.strictEqual(change, true, 'The status has actually changed');
                                     resolve();
                                 });
@@ -1162,15 +1131,12 @@ define([
                             })
                         ]);
 
-                        assert.strictEqual(instance.setSkipped(), instance, 'setSkipped() is fluent');
+                        assert.strictEqual(instance.setStatus('skipped', false), instance, 'setStatus(skipped) is fluent');
 
                         return promise;
                     })
                     .then(() => {
-                        assert.strictEqual(instance.isCorrect(), false, 'The item is not correct');
-                        assert.strictEqual(instance.isSkipped(), true, 'The item is skipped');
-                        assert.strictEqual(instance.isInformational(), false, 'The item is not informational');
-
+                        assert.strictEqual(instance.getStatus(), 'skipped', 'The item is skipped');
                         assert.strictEqual($container.children().is('.correct'), false, 'The component did not get the state correct');
                         assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
                         assert.strictEqual($container.children().is('.skipped'), true, 'The component got the state skipped');
@@ -1240,7 +1206,7 @@ define([
         const ready = assert.async();
         const $container = $('#fixture-informational');
 
-        assert.expect(34);
+        assert.expect(32);
 
         assert.strictEqual($container.children().length, 0, 'The container is empty');
 
@@ -1278,8 +1244,8 @@ define([
 
                         const promise = Promise.all([
                             new Promise(resolve => {
-                                instance.on('statuschange.test', (status, change) => {
-                                    assert.strictEqual(status, 'informational', 'The status changed to informational');
+                                instance.on('statuschange.test', (change) => {
+                                    assert.strictEqual(instance.getConfig().status, 'informational', 'The status changed to informational');
                                     assert.strictEqual(change, false, 'The status has not actually changed');
                                     resolve();
                                 });
@@ -1292,15 +1258,12 @@ define([
                             })
                         ]);
 
-                        assert.strictEqual(instance.setInformational(), instance, 'setInformational() is fluent');
+                        assert.strictEqual(instance.setStatus('informational', false), instance, 'setStatus(info) is fluent');
 
                         return promise;
                     })
                     .then(() => {
-                        assert.strictEqual(instance.isCorrect(), false, 'The item is not correct');
-                        assert.strictEqual(instance.isSkipped(), false, 'The item is not skipped');
-                        assert.strictEqual(instance.isInformational(), true, 'The item is informational');
-
+                        assert.strictEqual(instance.getStatus(), 'informational', 'The item is informational');
                         assert.strictEqual($container.children().is('.correct'), false, 'The component did not get the state correct');
                         assert.strictEqual($container.children().is('.incorrect'), false, 'The component did not get the state incorrect');
                         assert.strictEqual($container.children().is('.skipped'), false, 'The component did not get the state skipped');
@@ -1347,28 +1310,30 @@ define([
         let instance = null;
         let componentDisabled = false;
         let currentStatus = 'correct';
+        let currentHasCorrectResponse = false;
 
-        const setStatus = status => {
+        const setStatus = (status, hasCorrectResponse) => {
             currentStatus = status;
+            currentHasCorrectResponse = hasCorrectResponse;
             switch (status) {
                 case 'correct':
                     instance.setScore('5/5');
-                    instance.setCorrect();
+                    instance.setStatus('correct', currentHasCorrectResponse);
                     break;
 
                 case 'incorrect':
                     instance.setScore('3/5');
-                    instance.setIncorrect();
+                    instance.setStatus('incorrect', currentHasCorrectResponse);
                     break;
 
                 case 'skipped':
                     instance.setScore('0/5');
-                    instance.setSkipped();
+                    instance.setStatus('skipped', currentHasCorrectResponse);
                     break;
 
                 case 'informational':
                     instance.setScore('');
-                    instance.setInformational();
+                    instance.setStatus('informational', currentHasCorrectResponse);
                     break;
             }
         };
@@ -1394,7 +1359,7 @@ define([
                             if (componentDisabled) {
                                 instance.disable();
                             }
-                            setStatus(currentStatus);
+                            setStatus(currentStatus, currentHasCorrectResponse);
                             resolve();
                         })
                         .on('statuschange tabchange', () => {

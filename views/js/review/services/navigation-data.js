@@ -160,7 +160,7 @@ define([
                         part = Object.assign({}, part, {
                             sections: _.reduce(part.sections, (sections, section, sectionId) => {
                                 section = Object.assign({}, section, {
-                                    items: _.pick(section.items, filter)
+                                    items: _.pickBy(section.items, filter)
                                 });
 
                                 if (_.size(section.items)) {

@@ -33,6 +33,8 @@ use core_kernel_users_GenerisUser;
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use oat\ltiDeliveryProvider\model\execution\LtiContextRepositoryInterface;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\ltiTestReview\models\DeliveryExecutionFinderService;
 use oat\ltiTestReview\models\QtiRunnerInitDataBuilderFactory;
 use oat\tao\model\http\HttpJsonResponseTrait;
@@ -51,6 +53,8 @@ use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
 use tao_actions_SinglePageModule;
 use taoResultServer_models_classes_ReadableResultStorage;
+use oat\tao\model\featureFlag\FeatureFlagChecker;
+use oat\tao\model\featureFlag\FeatureFlagCheckerInterface;
 
 /**
  * Review controller class thar provides data for js-application
@@ -67,6 +71,8 @@ class Review extends tao_actions_SinglePageModule
     public const LTI_REVIEW_LAYOUT = 'custom_review_layout';
     public const LTI_DISPLAY_SECTION_TITLES = 'custom_section_titles';
     public const LTI_DISPLAY_ITEM_TOOLTIP = 'custom_item_tooltip';
+
+    public const FEATURE_FLAG_TEST_REVIEW_FULL_NAME = 'FEATURE_FLAG_TEST_REVIEW_FULL_NAME';
 
     // keys: exposed LTI custom_review_layout params => values: internal names
     public const REVIEW_LAYOUTS_MAP = [
@@ -100,25 +106,8 @@ class Review extends tao_actions_SinglePageModule
     {
         $launchData = $this->ltiSession->getLaunchData();
         $finder = $this->getDeliveryExecutionFinderService();
-
-        if ($this->isSubmissionReviewRequestMessageProvided()) {
-            $deliveryId = $this->getDeliveryId();
-            $userId = $this->getUserId();
-            $resourceLinkId = null;
-            if ($launchData->hasVariable(LtiLaunchData::RESOURCE_LINK_ID)) {
-                $resourceLinkId = $this->ltiSession->getLtiLinkResource();
-            }
-            $execution = $finder->findLastExecutionByUserAndDelivery($userId, $deliveryId, $resourceLinkId);
-
-            if ($execution === null) {
-                throw new LtiClientException(
-                    __('Available delivery executions for review does not exists'),
-                    LtiErrorMessage::ERROR_INVALID_PARAMETER
-                );
-            }
-        } else {
-            $execution = $finder->findDeliveryExecution($launchData);
-        }
+        $reviewerName = $this->getUserFullName();
+        $execution = $this->getExecution($this->getDeliveryId());
 
         $this->getConcurringSessionService()->pauseConcurrentSessions($execution);
         $this->getConcurringSessionService()->clearConcurringSession($execution);
@@ -127,6 +116,7 @@ class Review extends tao_actions_SinglePageModule
 
         $urlRouteService = $this->getDefaultUrlService();
         $this->setData('logout', $urlRouteService->getLogoutUrl());
+        $this->setData('userLabel', $reviewerName);
 
         $data = [
             'execution' => $execution->getIdentifier(),
@@ -151,14 +141,28 @@ class Review extends tao_actions_SinglePageModule
 
         try {
             $data = [];
+
             if (!empty($params['serviceCallId'])) {
                 $finder = $this->getDeliveryExecutionFinderService();
                 $this->checkPermissions($params['serviceCallId']);
+
                 $data = $dataBuilder->create()->build(
                     $params['serviceCallId'],
                     $finder->getShowScoreOption($this->ltiSession->getLaunchData())
                 );
+
+                if ($this->getFeatureFlagChecker()->isEnabled(self::FEATURE_FLAG_TEST_REVIEW_FULL_NAME)) {
+                    $execution = $this->getExecution($this->getDeliveryId());
+                    $ltiContextRepository = $this->getLtiContextRepository();
+                    $ltiLaunchData = $ltiContextRepository->findByDeliveryExecution($execution);
+                    $fullname = '';
+                    if ($ltiLaunchData) {
+                        $fullname = $ltiLaunchData->getVariable(LtiLaunchData::LIS_PERSON_NAME_FULL);
+                    }
+                    $data['testTakerFullName'] = $fullname;
+                }
             }
+
             $this->returnJson($data);
         } catch (common_exception_ClientException $e) {
             $this->logError($e->getMessage());
@@ -314,6 +318,15 @@ class Review extends tao_actions_SinglePageModule
         return $this->ltiSession->getUserUri();
     }
 
+    private function getUserFullName(): string
+    {
+        if ($this->isSubmissionReviewRequestMessageProvided()) {
+            return $this->ltiSession->getLaunchData()->getUserFullName();
+        }
+
+        return '';
+    }
+
     /**
      * @throws LtiVariableMissingException
      */
@@ -398,5 +411,41 @@ class Review extends tao_actions_SinglePageModule
     private function getConcurringSessionService(): ConcurringSessionService
     {
         return $this->getPsrContainer()->get(ConcurringSessionService::class);
+    }
+
+    private function getLtiContextRepository(): LtiContextRepositoryInterface
+    {
+        return $this->getPsrContainer()->get(LtiContextRepositoryInterface::class);
+    }
+
+    private function getExecution(string $deliveryId): DeliveryExecution
+    {
+        $launchData = $this->ltiSession->getLaunchData();
+        $finder = $this->getDeliveryExecutionFinderService();
+        if ($this->isSubmissionReviewRequestMessageProvided()) {
+            // $deliveryId = $this->getDeliveryId();
+            $userId = $this->getUserId();
+            $resourceLinkId = null;
+            if ($launchData->hasVariable(LtiLaunchData::RESOURCE_LINK_ID)) {
+                $resourceLinkId = $this->ltiSession->getLtiLinkResource();
+            }
+            $execution = $finder->findLastExecutionByUserAndDelivery($userId, $deliveryId, $resourceLinkId);
+
+            if ($execution === null) {
+                throw new LtiClientException(
+                    __('Available delivery executions for review does not exists'),
+                    LtiErrorMessage::ERROR_INVALID_PARAMETER
+                );
+            }
+        } else {
+            $execution = $finder->findDeliveryExecution($launchData);
+        }
+
+        return $execution;
+    }
+
+    private function getFeatureFlagChecker(): FeatureFlagCheckerInterface
+    {
+        return $this->getServiceLocator()->get(FeatureFlagChecker::class);
     }
 }

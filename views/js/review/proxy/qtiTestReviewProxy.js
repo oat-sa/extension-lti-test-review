@@ -58,8 +58,12 @@ define([
              * @returns {Promise}
              */
             this.request = (url, reqParams, contentType, noToken) => {
+                let _url = url;
+                if(true) {
+                    _url += window.location.search.replace('?', '&');
+                }
                 return coreRequest({
-                    url: url,
+                    url: _url,
                     data: reqParams,
                     method: reqParams ? 'POST' : 'GET',
                     contentType: contentType,

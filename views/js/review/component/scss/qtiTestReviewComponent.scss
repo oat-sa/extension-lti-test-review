@@ -47,4 +47,19 @@
             display: none;
         }
     }
+
+    .test-runner-sections {
+        position: relative;
+    }
+
+    .test-taker-full-name {
+        position: absolute;
+        top: 0;
+        right: 0;
+        padding: .5rem 1rem;
+
+        &:before {
+            padding: 0.5rem;
+        }
+    }
 }

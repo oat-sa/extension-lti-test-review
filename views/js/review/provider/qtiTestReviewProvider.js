@@ -243,7 +243,7 @@ define([
                     dataHolder.set('testData', data.testData);
                     dataHolder.set('testResponses', data.testResponses);
 
-                    if(!!data.testTakerFullName){
+                    if(data.testTakerFullName){
                         dataHolder.set('testTakerFullName', data.testTakerFullName);
                     }
 

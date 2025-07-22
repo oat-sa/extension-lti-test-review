@@ -26,8 +26,9 @@ define([
     'core/promiseQueue',
     'core/request',
     'core/communicator',
-    'ltiTestReview/review/config/qtiTestReviewConfig'
-], function (_, promiseQueue, coreRequest, communicatorFactory, configFactory) {
+    'ltiTestReview/review/config/qtiTestReviewConfig',
+    'context'
+], function (_, promiseQueue, coreRequest, communicatorFactory, configFactory, context) {
     'use strict';
 
     /**
@@ -59,7 +60,7 @@ define([
              */
             this.request = (url, reqParams, contentType, noToken) => {
                 let _url = url;
-                if(true) {
+                if (context.featureFlags.FEATURE_FLAG_TEST_REVIEW_FULL_NAME) {
                     _url += window.location.search.replace('?', '&');
                 }
                 return coreRequest({

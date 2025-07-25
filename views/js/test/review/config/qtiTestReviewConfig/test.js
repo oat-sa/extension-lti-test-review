@@ -73,7 +73,8 @@ define([
             serviceCallId: 'http://tao.rdf/1234#56789'
         },
         expected: {
-            serviceCallId: 'http://tao.rdf/1234#56789'
+            serviceCallId: 'http://tao.rdf/1234#56789',
+            delivery: null
         }
     }, {
         title: 'Standard item identifier',
@@ -82,6 +83,7 @@ define([
         },
         itemId: 'http://tao.rdf/item#123',
         expected: {
+            delivery: null,
             serviceCallId: 'http://tao.rdf/1234#56789',
             itemUri: 'http://tao.rdf/item#123'
         }
@@ -96,6 +98,7 @@ define([
             deliveryUri: 'http://tao.rdf/delivery#123'
         },
         expected: {
+            delivery: null,
             serviceCallId: 'http://tao.rdf/1234#56789',
             resultId: 'http://tao.rdf/result#123',
             itemDefinition: 'http://tao.rdf/item#123',
@@ -180,16 +183,19 @@ define([
     QUnit.test('reviewConfig.getTestActionUrl', assert => {
         const config = {
             serviceCallId: 'foo',
+            delivery: null,
             bootstrap: {
                 serviceController: 'MockRunner',
                 serviceExtension: 'MockExtension'
             }
         };
         const expectedUrl = urlUtil.route('action1', config.bootstrap.serviceController, config.bootstrap.serviceExtension, {
-            serviceCallId: config.serviceCallId
+            serviceCallId: config.serviceCallId,
+            delivery: config.delivery
         });
         const expectedUrl2 = urlUtil.route('action2', config.bootstrap.serviceController, config.bootstrap.serviceExtension, {
-            serviceCallId: config.serviceCallId
+            serviceCallId: config.serviceCallId,
+            delivery: config.delivery
         });
         const instance = reviewConfig(config);
 
@@ -202,6 +208,7 @@ define([
     QUnit.test('reviewConfig.getItemActionUrl', assert => {
         const config = {
             serviceCallId: 'foo',
+            delivery: null,
             bootstrap: {
                 serviceController: 'MockRunner',
                 serviceExtension: 'MockExtension'
@@ -210,10 +217,12 @@ define([
         const actionName = 'MockAction';
         const expectedUrl = urlUtil.route(actionName, config.bootstrap.serviceController, config.bootstrap.serviceExtension, {
             serviceCallId: config.serviceCallId,
+            delivery: config.delivery,
             itemUri: 'item1'
         });
         const expectedUrl2 = urlUtil.route(actionName, config.bootstrap.serviceController, config.bootstrap.serviceExtension, {
             serviceCallId: config.serviceCallId,
+            delivery: config.delivery,
             itemUri: 'item2'
         });
         const instance = reviewConfig(config);

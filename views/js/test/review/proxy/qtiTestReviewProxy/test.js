@@ -92,6 +92,7 @@ define([
         const ready = assert.async();
         const initConfig = {
             serviceCallId: 'foo',
+            delivery: null,
             bootstrap: {
                 serviceController: 'MockRunner',
                 serviceExtension: 'MockExtension'
@@ -99,7 +100,8 @@ define([
         };
 
         const expectedUrl = urlUtil.route('init', initConfig.bootstrap.serviceController, initConfig.bootstrap.serviceExtension, {
-            serviceCallId: initConfig.serviceCallId
+            serviceCallId: initConfig.serviceCallId,
+            delivery: initConfig.delivery
         });
 
         assert.expect(7);
@@ -258,6 +260,7 @@ define([
         const ready = assert.async();
         const initConfig = {
             serviceCallId: 'foo',
+            delivery: null,
             bootstrap: {
                 serviceController: 'MockRunner',
                 serviceExtension: 'MockExtension'
@@ -265,7 +268,8 @@ define([
         };
 
         const expectedUrl = urlUtil.route(caseData.action, initConfig.bootstrap.serviceController, initConfig.bootstrap.serviceExtension, {
-            serviceCallId: initConfig.serviceCallId
+            serviceCallId: initConfig.serviceCallId,
+            delivery: initConfig.delivery
         });
 
         assert.expect(9);
@@ -372,6 +376,7 @@ define([
         const ready = assert.async();
         const initConfig = {
             serviceCallId: 'foo',
+            delivery: null,
             bootstrap: {
                 serviceController: 'MockRunner',
                 serviceExtension: 'MockExtension'
@@ -380,6 +385,7 @@ define([
 
         const expectedUrl = urlUtil.route('getItem', initConfig.bootstrap.serviceController, initConfig.bootstrap.serviceExtension, {
             serviceCallId: initConfig.serviceCallId,
+            delivery: initConfig.delivery,
             itemUri: caseData.uri
         });
 
@@ -496,6 +502,7 @@ define([
         const ready = assert.async();
         const initConfig = {
             serviceCallId: 'foo',
+            delivery: null,
             bootstrap: {
                 serviceController: 'MockRunner',
                 serviceExtension: 'MockExtension'
@@ -504,6 +511,7 @@ define([
 
         const expectedUrl = urlUtil.route(caseData.action, initConfig.bootstrap.serviceController, initConfig.bootstrap.serviceExtension, {
             serviceCallId: initConfig.serviceCallId,
+            delivery: initConfig.delivery,
             itemUri: caseData.uri
         });
 

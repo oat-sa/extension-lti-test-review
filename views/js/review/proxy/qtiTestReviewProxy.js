@@ -59,12 +59,8 @@ define([
              * @returns {Promise}
              */
             this.request = (url, reqParams, contentType, noToken) => {
-                let _url = url;
-                if (context.featureFlags.FEATURE_FLAG_TEST_REVIEW_FULL_NAME) {
-                    _url += window.location.search.replace('?', '&');
-                }
                 return coreRequest({
-                    url: _url,
+                    url: url,
                     data: reqParams,
                     method: reqParams ? 'POST' : 'GET',
                     contentType: contentType,

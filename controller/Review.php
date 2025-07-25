@@ -53,8 +53,6 @@ use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
 use tao_actions_SinglePageModule;
 use taoResultServer_models_classes_ReadableResultStorage;
-use oat\tao\model\featureFlag\FeatureFlagChecker;
-use oat\tao\model\featureFlag\FeatureFlagCheckerInterface;
 
 /**
  * Review controller class thar provides data for js-application
@@ -71,8 +69,6 @@ class Review extends tao_actions_SinglePageModule
     public const LTI_REVIEW_LAYOUT = 'custom_review_layout';
     public const LTI_DISPLAY_SECTION_TITLES = 'custom_section_titles';
     public const LTI_DISPLAY_ITEM_TOOLTIP = 'custom_item_tooltip';
-
-    public const FEATURE_FLAG_TEST_REVIEW_FULL_NAME = 'FEATURE_FLAG_TEST_REVIEW_FULL_NAME';
 
     // keys: exposed LTI custom_review_layout params => values: internal names
     public const REVIEW_LAYOUTS_MAP = [
@@ -106,8 +102,8 @@ class Review extends tao_actions_SinglePageModule
     {
         $launchData = $this->ltiSession->getLaunchData();
         $finder = $this->getDeliveryExecutionFinderService();
-        $reviewerName = $this->getUserFullName();
-        $execution = $this->getExecution($this->getDeliveryId());
+        $reviewedTestTakerName = $this->getUserFullName();
+        $execution = $this->getExecution();
 
         $this->getConcurringSessionService()->pauseConcurrentSessions($execution);
         $this->getConcurringSessionService()->clearConcurringSession($execution);
@@ -116,7 +112,7 @@ class Review extends tao_actions_SinglePageModule
 
         $urlRouteService = $this->getDefaultUrlService();
         $this->setData('logout', $urlRouteService->getLogoutUrl());
-        $this->setData('userLabel', $reviewerName);
+        $this->setData('userLabel', $reviewedTestTakerName);
 
         $data = [
             'execution' => $execution->getIdentifier(),
@@ -138,6 +134,7 @@ class Review extends tao_actions_SinglePageModule
     {
         $dataBuilder = $this->getQtiRunnerInitDataBuilderFactory();
         $params = $this->getPsrRequest()->getQueryParams();
+        $ltiData = $this->ltiSession->getLaunchData();
 
         try {
             $data = [];
@@ -148,18 +145,16 @@ class Review extends tao_actions_SinglePageModule
 
                 $data = $dataBuilder->create()->build(
                     $params['serviceCallId'],
-                    $finder->getShowScoreOption($this->ltiSession->getLaunchData())
+                    $finder->getShowScoreOption($ltiData)
                 );
 
-                if ($this->getFeatureFlagChecker()->isEnabled(self::FEATURE_FLAG_TEST_REVIEW_FULL_NAME)) {
-                    $execution = $this->getExecution($this->getDeliveryId());
+                if ($ltiData->getCustomParameter('deliverySettings.review.testTakerFullName')) {
+                    $execution = $this->getExecution();
                     $ltiContextRepository = $this->getLtiContextRepository();
                     $ltiLaunchData = $ltiContextRepository->findByDeliveryExecution($execution);
-                    $fullname = '';
-                    if ($ltiLaunchData) {
-                        $fullname = $ltiLaunchData->getVariable(LtiLaunchData::LIS_PERSON_NAME_FULL);
+                    if ($ltiLaunchData && $ltiLaunchData->hasVariable(LtiLaunchData::LIS_PERSON_NAME_FULL)) {
+                        $data['testTakerFullName'] = $ltiLaunchData->getVariable(LtiLaunchData::LIS_PERSON_NAME_FULL);
                     }
-                    $data['testTakerFullName'] = $fullname;
                 }
             }
 
@@ -418,12 +413,12 @@ class Review extends tao_actions_SinglePageModule
         return $this->getPsrContainer()->get(LtiContextRepositoryInterface::class);
     }
 
-    private function getExecution(string $deliveryId): DeliveryExecution
+    private function getExecution(): DeliveryExecution
     {
         $launchData = $this->ltiSession->getLaunchData();
         $finder = $this->getDeliveryExecutionFinderService();
         if ($this->isSubmissionReviewRequestMessageProvided()) {
-            // $deliveryId = $this->getDeliveryId();
+            $deliveryId = $this->getDeliveryId();
             $userId = $this->getUserId();
             $resourceLinkId = null;
             if ($launchData->hasVariable(LtiLaunchData::RESOURCE_LINK_ID)) {

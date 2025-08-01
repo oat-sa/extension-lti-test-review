@@ -187,6 +187,12 @@ define([
              */
             this.on('ready', () => {
                 load();
+
+                if(dataHolder.get('testTakerFullName')) {
+                    const $fullNameContainer = areaBroker.getContainer().find('.test-taker-full-name');
+                    $fullNameContainer.show();
+                    $fullNameContainer.html(dataHolder.get('testTakerFullName'));
+                }
             })
                 .on('loaditem', (itemRef, itemData) => {
                     dataHolder.set('itemIdentifier', itemRef);
@@ -236,6 +242,10 @@ define([
                     dataHolder.set('testContext', data.testContext);
                     dataHolder.set('testData', data.testData);
                     dataHolder.set('testResponses', data.testResponses);
+
+                    if(data.testTakerFullName){
+                        dataHolder.set('testTakerFullName', data.testTakerFullName);
+                    }
 
                     return Promise.all([getSequenceNumber(this), getSequenceStore()])
                         .then(([sequenceNumber, sequenceStore]) => sequenceStore.setSequenceNumber(sequenceNumber))

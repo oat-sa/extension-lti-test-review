@@ -13,6 +13,8 @@
     </div>
 
     <div class="test-runner-sections">
+        <section class="test-taker-full-name icon-test-taker" style="display: none">
+        </section>
 
         <aside class="test-sidebar test-sidebar-left">
             <div class="panel-box"></div>

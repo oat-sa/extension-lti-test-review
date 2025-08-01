@@ -33,6 +33,8 @@ use core_kernel_users_GenerisUser;
 use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use oat\ltiDeliveryProvider\model\execution\LtiContextRepositoryInterface;
+use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\ltiTestReview\models\DeliveryExecutionFinderService;
 use oat\ltiTestReview\models\QtiRunnerInitDataBuilderFactory;
 use oat\tao\model\http\HttpJsonResponseTrait;
@@ -100,26 +102,13 @@ class Review extends tao_actions_SinglePageModule
     {
         $launchData = $this->ltiSession->getLaunchData();
         $finder = $this->getDeliveryExecutionFinderService();
-
-        if ($this->isSubmissionReviewRequestMessageProvided()) {
-            $deliveryId = $this->getDeliveryId();
-            $userId = $this->getUserId();
-            $resourceLinkId = null;
-            if ($launchData->hasVariable(LtiLaunchData::RESOURCE_LINK_ID)) {
-                $resourceLinkId = $this->ltiSession->getLtiLinkResource();
-            }
-            $execution = $finder->findLastExecutionByUserAndDelivery($userId, $deliveryId, $resourceLinkId);
-
-            if ($execution === null) {
-                throw new LtiClientException(
-                    __('Available delivery executions for review does not exists'),
-                    LtiErrorMessage::ERROR_INVALID_PARAMETER
-                );
-            }
-        } else {
-            $execution = $finder->findDeliveryExecution($launchData);
-        }
-
+        $reviewedTestTakerName = $this->getUserFullName();
+        $execution = $finder->getExecution(
+            $this->ltiSession,
+            $this->isSubmissionReviewRequestMessageProvided(),
+            $this->getDeliveryId(),
+            $this->getUserId()
+        );
         $this->getConcurringSessionService()->pauseConcurrentSessions($execution);
         $this->getConcurringSessionService()->clearConcurringSession($execution);
 
@@ -127,6 +116,7 @@ class Review extends tao_actions_SinglePageModule
 
         $urlRouteService = $this->getDefaultUrlService();
         $this->setData('logout', $urlRouteService->getLogoutUrl());
+        $this->setData('userLabel', $reviewedTestTakerName);
 
         $data = [
             'execution' => $execution->getIdentifier(),
@@ -148,17 +138,35 @@ class Review extends tao_actions_SinglePageModule
     {
         $dataBuilder = $this->getQtiRunnerInitDataBuilderFactory();
         $params = $this->getPsrRequest()->getQueryParams();
+        $ltiData = $this->ltiSession->getLaunchData();
 
         try {
             $data = [];
+
             if (!empty($params['serviceCallId'])) {
                 $finder = $this->getDeliveryExecutionFinderService();
                 $this->checkPermissions($params['serviceCallId']);
+
                 $data = $dataBuilder->create()->build(
                     $params['serviceCallId'],
-                    $finder->getShowScoreOption($this->ltiSession->getLaunchData())
+                    $finder->getShowScoreOption($ltiData)
                 );
+
+                if ($ltiData->getCustomParameter('deliverySettings.review.testTakerFullName')) {
+                    $execution = $finder->getExecution(
+                        $this->ltiSession,
+                        $this->isSubmissionReviewRequestMessageProvided(),
+                        $this->getDeliveryId(),
+                        $this->getUserId()
+                    );
+                    $ltiContextRepository = $this->getLtiContextRepository();
+                    $ltiLaunchData = $ltiContextRepository->findByDeliveryExecution($execution);
+                    if ($ltiLaunchData && $ltiLaunchData->hasVariable(LtiLaunchData::LIS_PERSON_NAME_FULL)) {
+                        $data['testTakerFullName'] = $ltiLaunchData->getVariable(LtiLaunchData::LIS_PERSON_NAME_FULL);
+                    }
+                }
             }
+
             $this->returnJson($data);
         } catch (common_exception_ClientException $e) {
             $this->logError($e->getMessage());
@@ -314,6 +322,15 @@ class Review extends tao_actions_SinglePageModule
         return $this->ltiSession->getUserUri();
     }
 
+    private function getUserFullName(): string
+    {
+        if ($this->isSubmissionReviewRequestMessageProvided()) {
+            return $this->ltiSession->getLaunchData()->getUserFullName();
+        }
+
+        return '';
+    }
+
     /**
      * @throws LtiVariableMissingException
      */
@@ -398,5 +415,10 @@ class Review extends tao_actions_SinglePageModule
     private function getConcurringSessionService(): ConcurringSessionService
     {
         return $this->getPsrContainer()->get(ConcurringSessionService::class);
+    }
+
+    private function getLtiContextRepository(): LtiContextRepositoryInterface
+    {
+        return $this->getPsrContainer()->get(LtiContextRepositoryInterface::class);
     }
 }

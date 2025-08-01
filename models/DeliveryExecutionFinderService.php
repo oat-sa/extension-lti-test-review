@@ -32,6 +32,9 @@ use oat\taoDelivery\model\execution\ServiceProxy as ExecutionServiceProxy;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiLaunchData;
 use oat\taoLti\models\classes\LtiVariableMissingException;
+use oat\taoLti\models\classes\TaoLtiSession;
+use oat\taoLti\models\classes\LtiClientException;
+use oat\taoLti\models\classes\LtiMessages\LtiErrorMessage;
 use tao_helpers_Date;
 
 /**
@@ -138,6 +141,41 @@ class DeliveryExecutionFinderService extends ConfigurableService
     public function getShowCorrectOption(LtiLaunchData $launchData): bool
     {
         return $this->getBooleanOption($launchData, self::LTI_SHOW_CORRECT, self::OPTION_SHOW_CORRECT);
+    }
+
+    /**
+     * @param TaoLtiSession $ltiSession
+     * @param bool $isSubmissionReviewRequestMessageProvided
+     * @param string $deliveryId
+     * @param string $userId
+     * @return DeliveryExecution
+     * @throws LtiClientException
+     */
+    public function getExecution(
+        TaoLtiSession $ltiSession,
+        bool $isSubmissionReviewRequestMessageProvided,
+        string $deliveryId,
+        string $userId
+    ): DeliveryExecution {
+        $launchData = $ltiSession->getLaunchData();
+        if ($isSubmissionReviewRequestMessageProvided) {
+            $resourceLinkId = null;
+            if ($launchData->hasVariable(LtiLaunchData::RESOURCE_LINK_ID)) {
+                $resourceLinkId = $ltiSession->getLtiLinkResource();
+            }
+            $execution = $this->findLastExecutionByUserAndDelivery($userId, $deliveryId, $resourceLinkId);
+
+            if ($execution === null) {
+                throw new LtiClientException(
+                    __('Available delivery executions for review does not exists'),
+                    LtiErrorMessage::ERROR_INVALID_PARAMETER
+                );
+            }
+        } else {
+            $execution = $this->findDeliveryExecution($launchData);
+        }
+
+        return $execution;
     }
 
     /**

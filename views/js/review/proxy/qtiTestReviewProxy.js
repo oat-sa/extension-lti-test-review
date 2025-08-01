@@ -26,8 +26,9 @@ define([
     'core/promiseQueue',
     'core/request',
     'core/communicator',
-    'ltiTestReview/review/config/qtiTestReviewConfig'
-], function (_, promiseQueue, coreRequest, communicatorFactory, configFactory) {
+    'ltiTestReview/review/config/qtiTestReviewConfig',
+    'context'
+], function (_, promiseQueue, coreRequest, communicatorFactory, configFactory, context) {
     'use strict';
 
     /**

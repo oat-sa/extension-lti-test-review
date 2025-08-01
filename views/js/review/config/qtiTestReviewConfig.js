@@ -80,8 +80,10 @@ define([
              */
             getParameters(itemIdentifier) {
                 const type = typeof itemIdentifier;
+                const locationParams = new URLSearchParams(window.location.search);
                 const parameters = {
-                    serviceCallId: this.getServiceCallId()
+                    serviceCallId: this.getServiceCallId(),
+                    delivery: locationParams.get('delivery')
                 };
 
                 if (type === 'string') {

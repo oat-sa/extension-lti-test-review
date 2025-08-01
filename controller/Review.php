@@ -103,8 +103,12 @@ class Review extends tao_actions_SinglePageModule
         $launchData = $this->ltiSession->getLaunchData();
         $finder = $this->getDeliveryExecutionFinderService();
         $reviewedTestTakerName = $this->getUserFullName();
-        $execution = $this->getExecution();
-
+        $execution = $finder->getExecution(
+                        $this->ltiSession,
+                        $this->isSubmissionReviewRequestMessageProvided(),
+                        $this->getDeliveryId(),
+                        $this->getUserId()
+                    );
         $this->getConcurringSessionService()->pauseConcurrentSessions($execution);
         $this->getConcurringSessionService()->clearConcurringSession($execution);
 
@@ -149,7 +153,12 @@ class Review extends tao_actions_SinglePageModule
                 );
 
                 if ($ltiData->getCustomParameter('deliverySettings.review.testTakerFullName')) {
-                    $execution = $this->getExecution();
+                    $execution = $finder->getExecution(
+                        $this->ltiSession,
+                        $this->isSubmissionReviewRequestMessageProvided(),
+                        $this->getDeliveryId(),
+                        $this->getUserId()
+                    );
                     $ltiContextRepository = $this->getLtiContextRepository();
                     $ltiLaunchData = $ltiContextRepository->findByDeliveryExecution($execution);
                     if ($ltiLaunchData && $ltiLaunchData->hasVariable(LtiLaunchData::LIS_PERSON_NAME_FULL)) {
@@ -411,36 +420,5 @@ class Review extends tao_actions_SinglePageModule
     private function getLtiContextRepository(): LtiContextRepositoryInterface
     {
         return $this->getPsrContainer()->get(LtiContextRepositoryInterface::class);
-    }
-
-    private function getExecution(): DeliveryExecution
-    {
-        $launchData = $this->ltiSession->getLaunchData();
-        $finder = $this->getDeliveryExecutionFinderService();
-        if ($this->isSubmissionReviewRequestMessageProvided()) {
-            $deliveryId = $this->getDeliveryId();
-            $userId = $this->getUserId();
-            $resourceLinkId = null;
-            if ($launchData->hasVariable(LtiLaunchData::RESOURCE_LINK_ID)) {
-                $resourceLinkId = $this->ltiSession->getLtiLinkResource();
-            }
-            $execution = $finder->findLastExecutionByUserAndDelivery($userId, $deliveryId, $resourceLinkId);
-
-            if ($execution === null) {
-                throw new LtiClientException(
-                    __('Available delivery executions for review does not exists'),
-                    LtiErrorMessage::ERROR_INVALID_PARAMETER
-                );
-            }
-        } else {
-            $execution = $finder->findDeliveryExecution($launchData);
-        }
-
-        return $execution;
-    }
-
-    private function getFeatureFlagChecker(): FeatureFlagCheckerInterface
-    {
-        return $this->getServiceLocator()->get(FeatureFlagChecker::class);
     }
 }

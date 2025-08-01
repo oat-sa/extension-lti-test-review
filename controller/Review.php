@@ -104,11 +104,11 @@ class Review extends tao_actions_SinglePageModule
         $finder = $this->getDeliveryExecutionFinderService();
         $reviewedTestTakerName = $this->getUserFullName();
         $execution = $finder->getExecution(
-                        $this->ltiSession,
-                        $this->isSubmissionReviewRequestMessageProvided(),
-                        $this->getDeliveryId(),
-                        $this->getUserId()
-                    );
+            $this->ltiSession,
+            $this->isSubmissionReviewRequestMessageProvided(),
+            $this->getDeliveryId(),
+            $this->getUserId()
+        );
         $this->getConcurringSessionService()->pauseConcurrentSessions($execution);
         $this->getConcurringSessionService()->clearConcurringSession($execution);
 

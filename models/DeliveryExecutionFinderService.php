@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -111,7 +112,6 @@ class DeliveryExecutionFinderService extends ConfigurableService
                     $startStampB = tao_helpers_Date::getTimeStamp($executionB->getStartTime(), true);
 
                     return (float) $startStampA <=> (float) $startStampB;
-
                 }
             );
 

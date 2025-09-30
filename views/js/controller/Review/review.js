@@ -15,12 +15,7 @@
  *
  * Copyright (c) 2015-2022 (original work) Open Assessment Technologies SA ;
  */
-define([
-    'jquery',
-    'ui/feedback',
-    'core/logger',
-    'ltiTestReview/review/component/qtiTestReviewComponent'
-], function (
+define(['jquery', 'ui/feedback', 'core/logger', 'ltiTestReview/review/component/qtiTestReviewComponent'], function (
     $,
     feedback,
     loggerFactory,
@@ -43,11 +38,18 @@ define([
          * Entry point of the page
          */
         start() {
-
             const $container = $('.container');
-            const { execution, delivery, showScore, showCorrect, displaySectionTitles, displayItemTooltip, reviewLayout } = $container.data();
+            const {
+                execution,
+                delivery,
+                showScore,
+                showCorrect,
+                displaySectionTitles,
+                displayItemTooltip,
+                reviewLayout
+            } = $container.data();
 
-            reviewFactory($(".content-wrap", document), {
+            reviewFactory($('.content-wrap', document), {
                 testUri: {
                     resultId: execution,
                     deliveryUri: delivery
@@ -58,26 +60,34 @@ define([
                 displayItemTooltip: !!displayItemTooltip,
                 reviewLayout,
                 readOnly: true,
-                plugins: [{
-                    module: 'ltiTestReview/review/plugins/navigation/review-panel/plugin',
-                    bundle: 'ltiTestReview/loader/ltiTestReview.min',
-                    category: 'navigation'
-                }, {
-                    module: 'ltiTestReview/review/plugins/navigation/next-prev/plugin',
-                    bundle: 'ltiTestReview/loader/ltiTestReview.min',
-                    category: 'navigation'
-                }, {
-                    module: 'ltiTestReview/review/plugins/content/item-answer/plugin',
-                    bundle: 'ltiTestReview/loader/ltiTestReview.min',
-                    category: 'content'
-                }]
-            })
-            .on('error', err => {
+                plugins: [
+                    {
+                        module: 'ltiTestReview/review/plugins/navigation/review-panel/plugin',
+                        bundle: 'ltiTestReview/loader/ltiTestReview.min',
+                        category: 'navigation'
+                    },
+                    {
+                        module: 'ltiTestReview/review/plugins/navigation/next-prev/plugin',
+                        bundle: 'ltiTestReview/loader/ltiTestReview.min',
+                        category: 'navigation'
+                    },
+                    {
+                        module: 'ltiTestReview/review/plugins/content/item-answer/plugin',
+                        bundle: 'ltiTestReview/loader/ltiTestReview.min',
+                        category: 'content'
+                    },
+                    {
+                        module: 'taoQtiTest/runner/plugins/content/itemScrolling/itemScrolling',
+                        bundle: 'taoQtiTest/loader/testPlugins.min',
+                        category: 'content'
+                    }
+                ]
+            }).on('error', err => {
                 logger.error(err);
                 if (err && err.message) {
                     feedback().error(err.message);
                 }
-            } );
+            });
         }
     };
 });

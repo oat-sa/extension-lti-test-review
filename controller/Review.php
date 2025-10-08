@@ -34,16 +34,13 @@ use oat\generis\model\GenerisRdf;
 use oat\generis\model\OntologyAwareTrait;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use oat\ltiDeliveryProvider\model\execution\LtiContextRepositoryInterface;
-use oat\taoDelivery\model\execution\DeliveryExecution;
 use oat\ltiTestReview\models\DeliveryExecutionFinderService;
 use oat\ltiTestReview\models\QtiRunnerInitDataBuilderFactory;
 use oat\tao\model\http\HttpJsonResponseTrait;
 use oat\tao\model\mvc\DefaultUrlService;
-use oat\taoLti\models\classes\LtiClientException;
 use oat\taoLti\models\classes\LtiException;
 use oat\taoLti\models\classes\LtiInvalidLaunchDataException;
 use oat\taoLti\models\classes\LtiLaunchData;
-use oat\taoLti\models\classes\LtiMessages\LtiErrorMessage;
 use oat\taoLti\models\classes\LtiService;
 use oat\taoLti\models\classes\LtiVariableMissingException;
 use oat\taoLti\models\classes\TaoLtiSession;
@@ -297,17 +294,9 @@ class Review extends tao_actions_SinglePageModule
         return $this->getPsrContainer()->get(QtiRunnerInitDataBuilderFactory::SERVICE_ID);
     }
 
-    /**
-     * @throws LtiClientException
-     */
-    private function getDeliveryId(): string
+    private function getDeliveryId(): ?string
     {
-        $deliveryId = $this->getPsrRequest()->getQueryParams()['delivery'] ?? null;
-        if ($deliveryId !== null) {
-            return $deliveryId;
-        }
-
-        throw new LtiClientException(__('Delivery id not provided'), LtiErrorMessage::ERROR_MISSING_PARAMETER);
+        return $this->getPsrRequest()->getQueryParams()['delivery'] ?? null;
     }
 
     /**

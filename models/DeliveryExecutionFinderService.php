@@ -146,7 +146,7 @@ class DeliveryExecutionFinderService extends ConfigurableService
     /**
      * @param TaoLtiSession $ltiSession
      * @param bool $isSubmissionReviewRequestMessageProvided
-     * @param string $deliveryId
+     * @param ?string $deliveryId
      * @param string $userId
      * @return DeliveryExecution
      * @throws LtiClientException
@@ -154,11 +154,17 @@ class DeliveryExecutionFinderService extends ConfigurableService
     public function getExecution(
         TaoLtiSession $ltiSession,
         bool $isSubmissionReviewRequestMessageProvided,
-        string $deliveryId,
+        ?string $deliveryId,
         string $userId
     ): DeliveryExecution {
         $launchData = $ltiSession->getLaunchData();
         if ($isSubmissionReviewRequestMessageProvided) {
+            if ($deliveryId === null) {
+                throw new LtiClientException(
+                    __('Delivery id not provided'),
+                    LtiErrorMessage::ERROR_MISSING_PARAMETER
+                );
+            }
             $resourceLinkId = null;
             if ($launchData->hasVariable(LtiLaunchData::RESOURCE_LINK_ID)) {
                 $resourceLinkId = $ltiSession->getLtiLinkResource();

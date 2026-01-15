@@ -314,7 +314,7 @@ class Review extends tao_actions_SinglePageModule
     private function getUserFullName(): string
     {
         if ($this->isSubmissionReviewRequestMessageProvided()) {
-            return $this->ltiSession->getLaunchData()->getUserFullName();
+            return $this->ltiSession->getLaunchData()->getUserFullName() ?? '';
         }
 
         return '';

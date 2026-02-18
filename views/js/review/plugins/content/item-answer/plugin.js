@@ -42,6 +42,21 @@ define([
             const { itemIdentifier } = context;
             const responses = dataHolder.get('testResponses');
             response = responses[itemIdentifier];
+            const toBeEscaped = [];
+            const itemData = dataHolder.get('itemData');
+            Object.values(itemData.content.data.body.elements).forEach(el => {
+                if (['plain', 'preformatted'].includes(el.attributes.format) && el.attributes.responseIdentifier)
+                    toBeEscaped.push(el.attributes.responseIdentifier);
+            });
+            if (toBeEscaped.length) {
+                const clonedResponse = _.cloneDeep(response);
+                for (const key of Object.keys(response)) {
+                    if (toBeEscaped.includes(key)) {
+                        clonedResponse[key].response.base.string = _.escape(clonedResponse[key].response.base.string);
+                    }
+                }
+                response = clonedResponse;
+            }
         }
 
         return response;

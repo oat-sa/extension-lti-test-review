@@ -44,14 +44,17 @@ define([
             response = responses[itemIdentifier];
             const toBeEscaped = [];
             const itemData = dataHolder.get('itemData');
-            Object.values(itemData.content.data.body.elements).forEach(el => {
-                if (['plain', 'preformatted'].includes(el.attributes.format) && el.attributes.responseIdentifier)
-                    toBeEscaped.push(el.attributes.responseIdentifier);
-            });
+            const elements = itemData?.content?.data?.body?.elements;
+            if (elements) {
+                Object.values(elements).forEach(el => {
+                    if (['plain', 'preformatted'].includes(el.attributes?.format) && el.attributes?.responseIdentifier)
+                        toBeEscaped.push(el.attributes.responseIdentifier);
+                });
+            }
             if (toBeEscaped.length) {
                 const clonedResponse = _.cloneDeep(response);
                 for (const key of Object.keys(response)) {
-                    if (toBeEscaped.includes(key)) {
+                    if (toBeEscaped.includes(key) && typeof clonedResponse[key]?.response?.base?.string === 'string') {
                         clonedResponse[key].response.base.string = _.escape(clonedResponse[key].response.base.string);
                     }
                 }

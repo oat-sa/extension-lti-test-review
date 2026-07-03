@@ -49,6 +49,7 @@ use oat\taoQtiTest\model\Service\ConcurringSessionService;
 use oat\taoQtiTestPreviewer\models\ItemPreviewer;
 use oat\taoResultServer\models\classes\ResultServerService;
 use tao_actions_SinglePageModule;
+use tao_helpers_Display;
 use taoResultServer_models_classes_ReadableResultStorage;
 
 /**
@@ -159,7 +160,9 @@ class Review extends tao_actions_SinglePageModule
                     $ltiContextRepository = $this->getLtiContextRepository();
                     $ltiLaunchData = $ltiContextRepository->findByDeliveryExecution($execution);
                     if ($ltiLaunchData && $ltiLaunchData->hasVariable(LtiLaunchData::LIS_PERSON_NAME_FULL)) {
-                        $data['testTakerFullName'] = $ltiLaunchData->getVariable(LtiLaunchData::LIS_PERSON_NAME_FULL);
+                        $data['testTakerFullName'] = tao_helpers_Display::htmlizeAllowingRubyTags(
+                            $ltiLaunchData->getVariable(LtiLaunchData::LIS_PERSON_NAME_FULL)
+                        );
                     }
                 }
             }

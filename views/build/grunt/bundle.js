@@ -30,6 +30,7 @@ module.exports = function(grunt) {
                     extension : 'ltiTestReview',
                     outputDir : 'loader',
                     dependencies : ['taoItems', 'taoQtiItem', 'taoTests', 'taoQtiTest', 'taoQtiTestPreviewer'],
+                    babelPreTransform: { enabled: true, exclude: ['mathjax'] },
                     bundles : [{
                         name : 'ltiTestReview',
                         babel : true,

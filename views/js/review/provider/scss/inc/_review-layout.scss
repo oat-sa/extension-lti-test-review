@@ -3,6 +3,7 @@ $sideBarSWidth: 200px;
 $sideBarMWidth: 250px;
 $sideBarLWidth: 300px;
 $focusBorderWidth: 3px;
+$itemPadding: 30px;
 @mixin sidePanelWidth($width) {
     max-width: $width;
     min-width: $width;
@@ -61,7 +62,8 @@ $focusBorderWidth: 3px;
         display: flex;
         flex-direction: column;
         height: 100%;
-        padding: 30px 30px 0 30px;
+        padding: $itemPadding 0 0 $itemPadding;
+        min-width: 0;
 
         @media only screen and (max-device-width: 800px) {
             max-width: calc(100% - $sideBarSWidth);
@@ -103,6 +105,10 @@ $focusBorderWidth: 3px;
         width: 100%;
     }
 
+    .item-tool {
+        padding-inline-end: $itemPadding;
+    }
+
     #qti-item {
         width: 100%;
         min-width: 100%;
@@ -111,11 +117,14 @@ $focusBorderWidth: 3px;
     }
 
     .qti-item {
-        padding: 0 0 30px 0;
+        /* when item has scrollable blocks inside it (with the same writing-mode), ensure there's enough space between scrollbars for item and blocks */
+        padding-inline: 0 $itemPadding;
+        padding-block: 0 $itemPadding;
     }
 
     .qti-itemBody.writing-mode-vertical-rl {
-        padding: 0;
+        padding-block: 0;
+        padding-inline: 0 $itemPadding;
     }
 
     .size-wrapper {
@@ -170,8 +179,8 @@ $focusBorderWidth: 3px;
 .item-writing-mode-vertical-rl {
     .test-review-scope {
         .qti-item {
-            padding-inline: 0;
-            padding-block: 10px;
+            padding-inline: 0 $itemPadding;
+            padding-block: 10px 0;
         }
     }
 }
